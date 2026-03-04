@@ -1,0 +1,22 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero",
+      "description": "Financial success and growth",
+      "imageUrl": "https://picsum.photos/seed/xp1/1200/600",
+      "imageHint": "financial growth"
+    },
+    {
+      "id": "market",
+      "description": "Abstract stock market graphics",
+      "imageUrl": "https://picsum.photos/seed/xp2/800/600",
+      "imageHint": "stock market"
+    },
+    {
+      "id": "savings",
+      "description": "Piggy bank and coins illustration",
+      "imageUrl": "https://picsum.photos/seed/xp3/600/400",
+      "imageHint": "savings goal"
+    }
+  ]
+}
