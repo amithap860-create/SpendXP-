@@ -41,6 +41,7 @@ interface UserContextType {
   portfolio: PortfolioItem[];
   savingsGoal: number; // Stored in USD
   savingsCurrent: number; // Stored in USD
+  liabilities: number; // Stored in USD (new)
   isLoggedIn: boolean;
   login: (email: string, age: number) => void;
   logout: () => void;
@@ -49,6 +50,7 @@ interface UserContextType {
   sellStock: (symbol: string, shares: number, priceUsd: number) => void;
   updateSavings: (amountUsd: number) => void;
   setSavingsGoal: (amountUsd: number) => void;
+  updateLiabilities: (amountUsd: number) => void;
   // Helpers
   formatValue: (usdAmount: number) => string;
   convertToCurrent: (usdAmount: number) => number;
@@ -68,6 +70,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
   const [savingsGoal, setSavingsGoalValue] = useState(500); // Internal USD
   const [savingsCurrent, setSavingsCurrent] = useState(0); // Internal USD
+  const [liabilities, setLiabilities] = useState(0); // Internal USD
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const isInitialized = useRef(false);
 
@@ -86,6 +89,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setPortfolio(data.portfolio ?? []);
         setSavingsGoalValue(data.savingsGoal ?? 500);
         setSavingsCurrent(data.savingsCurrent ?? 0);
+        setLiabilities(data.liabilities ?? 0);
         setIsLoggedIn(!!data.email);
       } catch (e) {
         console.error("Failed to parse saved user state", e);
@@ -97,11 +101,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (isInitialized.current && isLoggedIn) {
       const state = {
-        name, email, age, ageGroup, country, currency, balance, portfolio, savingsGoal, savingsCurrent
+        name, email, age, ageGroup, country, currency, balance, portfolio, savingsGoal, savingsCurrent, liabilities
       };
       localStorage.setItem('spendxp_user', JSON.stringify(state));
     }
-  }, [name, email, age, ageGroup, country, currency, balance, portfolio, savingsGoal, savingsCurrent, isLoggedIn]);
+  }, [name, email, age, ageGroup, country, currency, balance, portfolio, savingsGoal, savingsCurrent, liabilities, isLoggedIn]);
 
   const login = (newEmail: string, newAge: number) => {
     let group: AgeGroup = '11-15';
@@ -125,6 +129,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setPortfolio([]);
     setSavingsGoalValue(500);
     setSavingsCurrent(0);
+    setLiabilities(0);
     setIsLoggedIn(false);
     localStorage.removeItem('spendxp_user');
   };
@@ -204,10 +209,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSavingsGoalValue(amountUsd);
   };
 
+  const updateLiabilities = (amountUsd: number) => {
+    setLiabilities(prev => Math.max(0, prev + amountUsd));
+  };
+
   return (
     <UserContext.Provider value={{ 
-      name, email, age, ageGroup, country, currency, balance, portfolio, savingsGoal, savingsCurrent, isLoggedIn,
-      login, logout, updateProfile, buyStock, sellStock, updateSavings, setSavingsGoal,
+      name, email, age, ageGroup, country, currency, balance, portfolio, savingsGoal, savingsCurrent, liabilities, isLoggedIn,
+      login, logout, updateProfile, buyStock, sellStock, updateSavings, setSavingsGoal, updateLiabilities,
       formatValue, convertToCurrent, convertFromCurrent
     }}>
       {children}
