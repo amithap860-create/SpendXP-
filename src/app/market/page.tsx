@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -52,7 +53,7 @@ export default function MarketSimulation() {
       setStocks(prev => prev.map(stock => {
         if (stock.name === result.impactedCompany) {
           const impact = result.impactDirection === 'positive' ? 5 : (result.impactDirection === 'negative' ? -5 : 0);
-          return { ...stock, price: stock.price + impact, change: impact };
+          return { ...stock, price: Math.max(1, stock.price + impact), change: impact };
         }
         return stock;
       }));
@@ -70,6 +71,10 @@ export default function MarketSimulation() {
   const handleBuy = () => {
     if (!selectedStock) return;
     const amount = parseInt(tradeAmount);
+    if (isNaN(amount) || amount <= 0) {
+      toast({ title: "Invalid Amount", description: "Please enter a valid number of shares.", variant: "destructive" });
+      return;
+    }
     if (balance < selectedStock.price * amount) {
       toast({ title: "Insufficient Balance", variant: "destructive" });
       return;
@@ -81,6 +86,10 @@ export default function MarketSimulation() {
   const handleSell = () => {
     if (!selectedStock) return;
     const amount = parseInt(tradeAmount);
+    if (isNaN(amount) || amount <= 0) {
+      toast({ title: "Invalid Amount", description: "Please enter a valid number of shares.", variant: "destructive" });
+      return;
+    }
     const item = portfolio.find(p => p.symbol === selectedStock.symbol);
     if (!item || item.shares < amount) {
       toast({ title: "Insufficient Shares", variant: "destructive" });
@@ -204,7 +213,7 @@ export default function MarketSimulation() {
                       {portfolio.find(p => p.symbol === selectedStock.symbol) ? (
                         <div className="flex justify-between items-center bg-white/5 p-3 rounded-lg">
                           <span className="text-sm">Held: {portfolio.find(p => p.symbol === selectedStock.symbol)?.shares} shares</span>
-                          <span className="text-xs bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full">Profit: +4%</span>
+                          <span className="text-xs bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full">Active</span>
                         </div>
                       ) : (
                         <div className="text-xs italic text-primary-foreground/40">You don't own any shares of this company yet.</div>

@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -9,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { WalletCards, Sparkles } from 'lucide-react';
 import Image from 'next/image';
+import { getPlaceholderById } from '@/lib/placeholder-images';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -26,12 +28,20 @@ export default function LandingPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !age) return;
+    const ageNum = parseInt(age);
+    if (!email || isNaN(ageNum)) return;
     
     localStorage.setItem('spendxp_email_memory', email);
-    login(email, parseInt(age));
+    login(email, ageNum);
     router.push('/dashboard');
   };
+
+  const avatars = [
+    getPlaceholderById('avatar-1'),
+    getPlaceholderById('avatar-2'),
+    getPlaceholderById('avatar-3'),
+    getPlaceholderById('avatar-4')
+  ];
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-100 via-blue-50 to-white">
@@ -49,9 +59,17 @@ export default function LandingPage() {
           </p>
           <div className="flex items-center gap-4 justify-center md:justify-start pt-4">
             <div className="flex -space-x-3">
-              {[1, 2, 3, 4].map(i => (
-                <div key={i} className="h-10 w-10 rounded-full border-2 border-white bg-blue-200 overflow-hidden">
-                   <img src={`https://picsum.photos/seed/user${i}/40/40`} alt="user" />
+              {avatars.map((avatar, i) => (
+                <div key={i} className="h-10 w-10 rounded-full border-2 border-white bg-blue-200 overflow-hidden relative">
+                   {avatar && (
+                     <Image 
+                      src={avatar.imageUrl} 
+                      alt={avatar.description} 
+                      fill 
+                      className="object-cover"
+                      data-ai-hint={avatar.imageHint}
+                    />
+                   )}
                 </div>
               ))}
             </div>

@@ -1,3 +1,4 @@
+
 {
   "placeholderImages": [
     {
@@ -17,6 +18,30 @@
       "description": "Piggy bank and coins illustration",
       "imageUrl": "https://picsum.photos/seed/xp3/600/400",
       "imageHint": "savings goal"
+    },
+    {
+      "id": "avatar-1",
+      "description": "Student avatar 1",
+      "imageUrl": "https://picsum.photos/seed/user1/100/100",
+      "imageHint": "student portrait"
+    },
+    {
+      "id": "avatar-2",
+      "description": "Student avatar 2",
+      "imageUrl": "https://picsum.photos/seed/user2/100/100",
+      "imageHint": "student portrait"
+    },
+    {
+      "id": "avatar-3",
+      "description": "Student avatar 3",
+      "imageUrl": "https://picsum.photos/seed/user3/100/100",
+      "imageHint": "student portrait"
+    },
+    {
+      "id": "avatar-4",
+      "description": "Student avatar 4",
+      "imageUrl": "https://picsum.photos/seed/user4/100/100",
+      "imageHint": "student portrait"
     }
   ]
 }

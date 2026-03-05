@@ -1,6 +1,7 @@
+
 "use client"
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 
 export type AgeGroup = '8-11' | '11-15' | '16-20';
 
@@ -46,29 +47,38 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [savingsGoal, setSavingsGoalValue] = useState(500);
   const [savingsCurrent, setSavingsCurrent] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const isInitialized = useRef(false);
 
+  // Load from local storage on mount
   useEffect(() => {
     const saved = localStorage.getItem('spendxp_user');
     if (saved) {
-      const data = JSON.parse(saved);
-      setEmail(data.email);
-      setAge(data.age);
-      setAgeGroup(data.ageGroup);
-      setBalance(data.balance ?? 1000);
-      setPortfolio(data.portfolio ?? []);
-      setSavingsGoalValue(data.savingsGoal ?? 500);
-      setSavingsCurrent(data.savingsCurrent ?? 0);
-      setIsLoggedIn(true);
+      try {
+        const data = JSON.parse(saved);
+        setEmail(data.email || '');
+        setAge(data.age || 0);
+        setAgeGroup(data.ageGroup || '11-15');
+        setBalance(data.balance ?? 1000);
+        setPortfolio(data.portfolio ?? []);
+        setSavingsGoalValue(data.savingsGoal ?? 500);
+        setSavingsCurrent(data.savingsCurrent ?? 0);
+        setIsLoggedIn(!!data.email);
+      } catch (e) {
+        console.error("Failed to parse saved user state", e);
+      }
     }
+    isInitialized.current = true;
   }, []);
 
-  const saveState = (updates: any) => {
-    const currentState = {
-      email, age, ageGroup, balance, portfolio, savingsGoal, savingsCurrent,
-      ...updates
-    };
-    localStorage.setItem('spendxp_user', JSON.stringify(currentState));
-  };
+  // Save to local storage whenever relevant state changes
+  useEffect(() => {
+    if (isInitialized.current && isLoggedIn) {
+      const state = {
+        email, age, ageGroup, balance, portfolio, savingsGoal, savingsCurrent
+      };
+      localStorage.setItem('spendxp_user', JSON.stringify(state));
+    }
+  }, [email, age, ageGroup, balance, portfolio, savingsGoal, savingsCurrent, isLoggedIn]);
 
   const login = (newEmail: string, newAge: number) => {
     let group: AgeGroup = '11-15';
@@ -79,12 +89,16 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAge(newAge);
     setAgeGroup(group);
     setIsLoggedIn(true);
-    saveState({ email: newEmail, age: newAge, ageGroup: group });
   };
 
   const logout = () => {
     setEmail('');
     setAge(0);
+    setAgeGroup('11-15');
+    setBalance(1000);
+    setPortfolio([]);
+    setSavingsGoalValue(500);
+    setSavingsCurrent(0);
     setIsLoggedIn(false);
     localStorage.removeItem('spendxp_user');
   };
@@ -99,14 +113,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (existing) {
         const newShares = existing.shares + shares;
         const newAvg = (existing.shares * existing.avgPrice + totalCost) / newShares;
-        const updated = prev.map(i => i.symbol === symbol ? { ...i, shares: newShares, avgPrice: newAvg } : i);
-        saveState({ portfolio: updated, balance: balance - totalCost });
-        return updated;
+        return prev.map(i => i.symbol === symbol ? { ...i, shares: newShares, avgPrice: newAvg } : i);
       }
-      const newItem = { symbol, shares, avgPrice: price };
-      const updated = [...prev, newItem];
-      saveState({ portfolio: updated, balance: balance - totalCost });
-      return updated;
+      return [...prev, { symbol, shares, avgPrice: price }];
     });
   };
 
@@ -117,20 +126,25 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const totalGain = shares * price;
     setBalance(prev => prev + totalGain);
     setPortfolio(prev => {
-      const updated = prev.map(i => i.symbol === symbol ? { ...i, shares: i.shares - shares } : i).filter(i => i.shares > 0);
-      saveState({ portfolio: updated, balance: balance + totalGain });
-      return updated;
+      return prev.map(i => i.symbol === symbol ? { ...i, shares: i.shares - shares } : i).filter(i => i.shares > 0);
     });
   };
 
   const updateSavings = (amount: number) => {
-    setSavingsCurrent(prev => Math.max(0, prev + amount));
-    saveState({ savingsCurrent: savingsCurrent + amount });
+    const potentialNewSavings = savingsCurrent + amount;
+    if (amount > 0 && balance < amount) return;
+
+    if (amount > 0) {
+      setBalance(prev => prev - amount);
+    } else {
+      setBalance(prev => prev + Math.abs(amount));
+    }
+    
+    setSavingsCurrent(Math.max(0, potentialNewSavings));
   };
 
   const setSavingsGoal = (amount: number) => {
     setSavingsGoalValue(amount);
-    saveState({ savingsGoal: amount });
   };
 
   return (
