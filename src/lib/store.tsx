@@ -4,10 +4,22 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 
 export type AgeGroup = '8-11' | '11-15' | '16-20';
 
+export const EXCHANGE_RATES: Record<string, number> = {
+  USD: 1.0,
+  EUR: 0.92,
+  GBP: 0.79,
+  CAD: 1.35,
+  AUD: 1.52,
+  JPY: 150.12,
+  INR: 82.95,
+  BRL: 4.97,
+  ZAR: 19.10
+};
+
 export interface Stock {
   symbol: string;
   name: string;
-  price: number;
+  price: number; // Stored in USD
   change: number;
   history: number[];
 }
@@ -15,7 +27,7 @@ export interface Stock {
 export interface PortfolioItem {
   symbol: string;
   shares: number;
-  avgPrice: number;
+  avgPrice: number; // Stored in USD
 }
 
 interface UserContextType {
@@ -25,18 +37,22 @@ interface UserContextType {
   ageGroup: AgeGroup;
   country: string;
   currency: string;
-  balance: number;
+  balance: number; // Stored in USD
   portfolio: PortfolioItem[];
-  savingsGoal: number;
-  savingsCurrent: number;
+  savingsGoal: number; // Stored in USD
+  savingsCurrent: number; // Stored in USD
   isLoggedIn: boolean;
   login: (email: string, age: number) => void;
   logout: () => void;
   updateProfile: (data: { name: string; email: string; age: number; country: string; currency: string }) => void;
-  buyStock: (symbol: string, shares: number, price: number) => void;
-  sellStock: (symbol: string, shares: number, price: number) => void;
-  updateSavings: (amount: number) => void;
-  setSavingsGoal: (amount: number) => void;
+  buyStock: (symbol: string, shares: number, priceUsd: number) => void;
+  sellStock: (symbol: string, shares: number, priceUsd: number) => void;
+  updateSavings: (amountUsd: number) => void;
+  setSavingsGoal: (amountUsd: number) => void;
+  // Helpers
+  formatValue: (usdAmount: number) => string;
+  convertToCurrent: (usdAmount: number) => number;
+  convertFromCurrent: (currentAmount: number) => number;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -48,14 +64,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [ageGroup, setAgeGroup] = useState<AgeGroup>('11-15');
   const [country, setCountry] = useState('United States');
   const [currency, setCurrency] = useState('USD');
-  const [balance, setBalance] = useState(1000);
+  const [balance, setBalance] = useState(1000); // Internal USD
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
-  const [savingsGoal, setSavingsGoalValue] = useState(500);
-  const [savingsCurrent, setSavingsCurrent] = useState(0);
+  const [savingsGoal, setSavingsGoalValue] = useState(500); // Internal USD
+  const [savingsCurrent, setSavingsCurrent] = useState(0); // Internal USD
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const isInitialized = useRef(false);
 
-  // Load from local storage on mount
   useEffect(() => {
     const saved = localStorage.getItem('spendxp_user');
     if (saved) {
@@ -79,7 +94,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isInitialized.current = true;
   }, []);
 
-  // Save to local storage whenever relevant state changes
   useEffect(() => {
     if (isInitialized.current && isLoggedIn) {
       const state = {
@@ -128,8 +142,26 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAgeGroup(group);
   };
 
-  const buyStock = (symbol: string, shares: number, price: number) => {
-    const totalCost = shares * price;
+  const convertToCurrent = (usdAmount: number) => {
+    const rate = EXCHANGE_RATES[currency] || 1;
+    return usdAmount * rate;
+  };
+
+  const convertFromCurrent = (currentAmount: number) => {
+    const rate = EXCHANGE_RATES[currency] || 1;
+    return currentAmount / rate;
+  };
+
+  const formatValue = (usdAmount: number) => {
+    const converted = convertToCurrent(usdAmount);
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency,
+    }).format(converted);
+  };
+
+  const buyStock = (symbol: string, shares: number, priceUsd: number) => {
+    const totalCost = shares * priceUsd;
     if (balance < totalCost) return;
 
     setBalance(prev => prev - totalCost);
@@ -140,42 +172,43 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const newAvg = (existing.shares * existing.avgPrice + totalCost) / newShares;
         return prev.map(i => i.symbol === symbol ? { ...i, shares: newShares, avgPrice: newAvg } : i);
       }
-      return [...prev, { symbol, shares, avgPrice: price }];
+      return [...prev, { symbol, shares, avgPrice: priceUsd }];
     });
   };
 
-  const sellStock = (symbol: string, shares: number, price: number) => {
+  const sellStock = (symbol: string, shares: number, priceUsd: number) => {
     const existing = portfolio.find(i => i.symbol === symbol);
     if (!existing || existing.shares < shares) return;
 
-    const totalGain = shares * price;
+    const totalGain = shares * priceUsd;
     setBalance(prev => prev + totalGain);
     setPortfolio(prev => {
       return prev.map(i => i.symbol === symbol ? { ...i, shares: i.shares - shares } : i).filter(i => i.shares > 0);
     });
   };
 
-  const updateSavings = (amount: number) => {
-    const potentialNewSavings = savingsCurrent + amount;
-    if (amount > 0 && balance < amount) return;
+  const updateSavings = (amountUsd: number) => {
+    const potentialNewSavings = savingsCurrent + amountUsd;
+    if (amountUsd > 0 && balance < amountUsd) return;
 
-    if (amount > 0) {
-      setBalance(prev => prev - amount);
+    if (amountUsd > 0) {
+      setBalance(prev => prev - amountUsd);
     } else {
-      setBalance(prev => prev + Math.abs(amount));
+      setBalance(prev => prev + Math.abs(amountUsd));
     }
     
     setSavingsCurrent(Math.max(0, potentialNewSavings));
   };
 
-  const setSavingsGoal = (amount: number) => {
-    setSavingsGoalValue(amount);
+  const setSavingsGoal = (amountUsd: number) => {
+    setSavingsGoalValue(amountUsd);
   };
 
   return (
     <UserContext.Provider value={{ 
       name, email, age, ageGroup, country, currency, balance, portfolio, savingsGoal, savingsCurrent, isLoggedIn,
-      login, logout, updateProfile, buyStock, sellStock, updateSavings, setSavingsGoal
+      login, logout, updateProfile, buyStock, sellStock, updateSavings, setSavingsGoal,
+      formatValue, convertToCurrent, convertFromCurrent
     }}>
       {children}
     </UserContext.Provider>

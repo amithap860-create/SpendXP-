@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 
 export function MainNav() {
   const pathname = usePathname();
-  const { logout, balance, currency } = useUser();
+  const { logout, balance, formatValue } = useUser();
 
   const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -34,7 +34,7 @@ export function MainNav() {
         <h1 className="text-2xl font-bold text-primary tracking-tight">SpendXP</h1>
         <div className="bg-secondary p-3 rounded-lg">
           <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Virtual Balance</p>
-          <p className="text-xl font-bold text-primary">{currency} {balance.toLocaleString()}</p>
+          <p className="text-lg font-bold text-primary truncate">{formatValue(balance)}</p>
         </div>
       </div>
 

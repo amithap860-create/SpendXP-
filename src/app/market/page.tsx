@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -14,7 +13,6 @@ import {
   Newspaper, 
   Info, 
   CheckCircle2,
-  ChevronRight,
   Loader2
 } from 'lucide-react';
 import { generateMarketNewsAndExplanations } from '@/ai/flows/generate-market-news-and-explanations-flow';
@@ -30,7 +28,7 @@ const INITIAL_STOCKS: Stock[] = [
 ];
 
 export default function MarketSimulation() {
-  const { ageGroup, balance, portfolio, buyStock, sellStock } = useUser();
+  const { ageGroup, balance, portfolio, buyStock, sellStock, formatValue, convertToCurrent, currency } = useUser();
   const { toast } = useToast();
   const [stocks, setStocks] = useState<Stock[]>(INITIAL_STOCKS);
   const [news, setNews] = useState<any>(null);
@@ -49,11 +47,10 @@ export default function MarketSimulation() {
       });
       setNews(result);
       
-      // Simulate price impact
       setStocks(prev => prev.map(stock => {
         if (stock.name === result.impactedCompany) {
-          const impact = result.impactDirection === 'positive' ? 5 : (result.impactDirection === 'negative' ? -5 : 0);
-          return { ...stock, price: Math.max(1, stock.price + impact), change: impact };
+          const impactPercent = result.impactDirection === 'positive' ? 1.05 : (result.impactDirection === 'negative' ? 0.95 : 1);
+          return { ...stock, price: Math.max(1, stock.price * impactPercent), change: (impactPercent - 1) * 100 };
         }
         return stock;
       }));
@@ -75,7 +72,8 @@ export default function MarketSimulation() {
       toast({ title: "Invalid Amount", description: "Please enter a valid number of shares.", variant: "destructive" });
       return;
     }
-    if (balance < selectedStock.price * amount) {
+    const totalCostUsd = selectedStock.price * amount;
+    if (balance < totalCostUsd) {
       toast({ title: "Insufficient Balance", variant: "destructive" });
       return;
     }
@@ -106,7 +104,7 @@ export default function MarketSimulation() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h2 className="text-3xl font-bold text-primary">Market Simulator</h2>
-            <p className="text-muted-foreground">Learn how the world invests by trading fictional companies.</p>
+            <p className="text-muted-foreground">Learn how the world invests by trading fictional companies. Prices auto-adjust to {currency}.</p>
           </div>
           <Button onClick={fetchNews} disabled={isLoadingNews} variant="outline" className="gap-2">
             {isLoadingNews ? <Loader2 className="h-4 w-4 animate-spin" /> : <Newspaper className="h-4 w-4" />}
@@ -137,7 +135,7 @@ export default function MarketSimulation() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-bold">${stock.price.toFixed(2)}</div>
+                      <div className="font-bold">{formatValue(stock.price)}</div>
                       <div className={`flex items-center justify-end text-xs font-bold ${stock.change >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                         {stock.change >= 0 ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
                         {Math.abs(stock.change).toFixed(1)}%
@@ -184,11 +182,11 @@ export default function MarketSimulation() {
                     <div className="bg-white/10 p-4 rounded-lg space-y-2">
                       <div className="flex justify-between text-sm">
                         <span>Current Price</span>
-                        <span className="font-bold">${selectedStock.price.toFixed(2)}</span>
+                        <span className="font-bold">{formatValue(selectedStock.price)}</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span>Your Balance</span>
-                        <span className="font-bold">${balance.toLocaleString()}</span>
+                        <span className="font-bold">{formatValue(balance)}</span>
                       </div>
                     </div>
                     
@@ -200,6 +198,7 @@ export default function MarketSimulation() {
                         onChange={(e) => setTradeAmount(e.target.value)}
                         min="1"
                         className="bg-white/20 border-white/30 text-white placeholder:text-white/50"
+                        suppressHydrationWarning
                       />
                     </div>
 
@@ -232,7 +231,6 @@ export default function MarketSimulation() {
           </div>
         </div>
 
-        {/* AI Explanation Modal */}
         <Dialog open={showExplanation} onOpenChange={setShowExplanation}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>

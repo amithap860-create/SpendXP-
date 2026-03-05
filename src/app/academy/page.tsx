@@ -6,8 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useUser } from '@/lib/store';
 import { 
-  BookOpen, 
   Wallet, 
   TrendingUp, 
   ArrowDownCircle, 
@@ -30,27 +30,30 @@ interface BudgetItem {
   id: string;
   name: string;
   type: 'income' | 'expense';
-  amount: number;
+  amountUsd: number;
 }
 
 export default function Academy() {
+  const { formatValue, convertFromCurrent, convertToCurrent } = useUser();
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([
-    { id: '1', name: 'Weekly Allowance', type: 'income', amount: 20 },
-    { id: '2', name: 'Streaming Subscription', type: 'expense', amount: 15 },
+    { id: '1', name: 'Weekly Allowance', type: 'income', amountUsd: 20 },
+    { id: '2', name: 'Streaming Subscription', type: 'expense', amountUsd: 15 },
   ]);
   const [newItemName, setNewItemName] = useState('');
   const [newItemAmount, setNewItemAmount] = useState('');
   const [newItemType, setNewItemType] = useState<'income' | 'expense'>('income');
 
   const addItem = () => {
-    const amount = parseFloat(newItemAmount);
-    if (!newItemName || isNaN(amount)) return;
+    const currentAmount = parseFloat(newItemAmount);
+    if (!newItemName || isNaN(currentAmount)) return;
+
+    const amountUsd = convertFromCurrent(currentAmount);
 
     const newItem: BudgetItem = {
       id: Math.random().toString(36).substr(2, 9),
       name: newItemName,
       type: newItemType,
-      amount: amount
+      amountUsd: amountUsd
     };
 
     setBudgetItems([...budgetItems, newItem]);
@@ -62,15 +65,15 @@ export default function Academy() {
     setBudgetItems(budgetItems.filter(item => item.id !== id));
   };
 
-  const totalIncome = budgetItems
+  const totalIncomeUsd = budgetItems
     .filter(i => i.type === 'income')
-    .reduce((acc, curr) => acc + curr.amount, 0);
+    .reduce((acc, curr) => acc + curr.amountUsd, 0);
   
-  const totalExpenses = budgetItems
+  const totalExpensesUsd = budgetItems
     .filter(i => i.type === 'expense')
-    .reduce((acc, curr) => acc + curr.amount, 0);
+    .reduce((acc, curr) => acc + curr.amountUsd, 0);
   
-  const netBalance = totalIncome - totalExpenses;
+  const netBalanceUsd = totalIncomeUsd - totalExpensesUsd;
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -82,7 +85,6 @@ export default function Academy() {
         </header>
 
         <div className="grid gap-8 lg:grid-cols-12">
-          {/* Lessons Section */}
           <div className="lg:col-span-7 space-y-6">
             <Tabs defaultValue="income" className="w-full">
               <TabsList className="grid w-full grid-cols-4 bg-white/50 border h-auto p-1 rounded-xl">
@@ -209,7 +211,6 @@ export default function Academy() {
             </Tabs>
           </div>
 
-          {/* Spreadsheet Section */}
           <div className="lg:col-span-5 space-y-6">
             <Card className="border-none shadow-xl bg-white h-full flex flex-col">
               <CardHeader className="bg-slate-50 border-b">
@@ -220,33 +221,32 @@ export default function Academy() {
                 <CardDescription>Practice by tracking your real or fictional finances.</CardDescription>
               </CardHeader>
               <CardContent className="p-0 flex-1 flex flex-col">
-                {/* Summary Strip */}
                 <div className="grid grid-cols-3 border-b">
                   <div className="p-4 text-center border-r">
                     <div className="text-[10px] font-bold uppercase text-muted-foreground">Income</div>
-                    <div className="text-lg font-bold text-emerald-600">${totalIncome}</div>
+                    <div className="text-sm font-bold text-emerald-600">{formatValue(totalIncomeUsd)}</div>
                   </div>
                   <div className="p-4 text-center border-r">
                     <div className="text-[10px] font-bold uppercase text-muted-foreground">Expenses</div>
-                    <div className="text-lg font-bold text-rose-600">${totalExpenses}</div>
+                    <div className="text-sm font-bold text-rose-600">{formatValue(totalExpensesUsd)}</div>
                   </div>
                   <div className="p-4 text-center">
                     <div className="text-[10px] font-bold uppercase text-muted-foreground">Net</div>
-                    <div className={`text-lg font-bold ${netBalance >= 0 ? 'text-primary' : 'text-rose-600'}`}>
-                      ${netBalance}
+                    <div className={`text-sm font-bold ${netBalanceUsd >= 0 ? 'text-primary' : 'text-rose-600'}`}>
+                      {formatValue(netBalanceUsd)}
                     </div>
                   </div>
                 </div>
 
-                {/* Entry Form */}
                 <div className="p-4 space-y-4 border-b bg-slate-50/50">
                   <div className="grid grid-cols-12 gap-2">
                     <div className="col-span-6">
                       <Input 
-                        placeholder="Item name (e.g. Pizza)" 
+                        placeholder="Item name" 
                         value={newItemName}
                         onChange={(e) => setNewItemName(e.target.value)}
                         className="bg-white"
+                        suppressHydrationWarning
                       />
                     </div>
                     <div className="col-span-4">
@@ -256,6 +256,7 @@ export default function Academy() {
                         value={newItemAmount}
                         onChange={(e) => setNewItemAmount(e.target.value)}
                         className="bg-white"
+                        suppressHydrationWarning
                       />
                     </div>
                     <div className="col-span-2">
@@ -285,7 +286,6 @@ export default function Academy() {
                   </div>
                 </div>
 
-                {/* Spreadsheet Table */}
                 <div className="flex-1 overflow-auto max-h-[400px]">
                   <Table>
                     <TableHeader className="bg-slate-50 sticky top-0">
@@ -305,7 +305,7 @@ export default function Academy() {
                             </div>
                           </TableCell>
                           <TableCell className={`text-right font-bold ${item.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                            {item.type === 'income' ? '+' : '-'}${item.amount}
+                            {item.type === 'income' ? '+' : '-'}{formatValue(item.amountUsd)}
                           </TableCell>
                           <TableCell>
                             <Button 

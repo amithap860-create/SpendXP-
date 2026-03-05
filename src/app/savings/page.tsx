@@ -9,43 +9,44 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { 
   PiggyBank, 
-  Coins, 
   Target, 
   Trophy, 
   Plus, 
-  Minus,
-  PartyPopper
+  PartyPopper,
+  Coins
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export default function SavingsTracker() {
-  const { savingsCurrent, savingsGoal, updateSavings, setSavingsGoal, balance } = useUser();
+  const { savingsCurrent, savingsGoal, updateSavings, setSavingsGoal, balance, formatValue, convertToCurrent, convertFromCurrent } = useUser();
   const { toast } = useToast();
   const [addAmount, setAddAmount] = useState('10');
-  const [newGoal, setNewGoal] = useState(savingsGoal.toString());
+  const [newGoal, setNewGoal] = useState(convertToCurrent(savingsGoal).toFixed(0));
 
   const progress = Math.min(100, (savingsCurrent / savingsGoal) * 100);
   const isComplete = progress >= 100;
 
   const handleAddSavings = () => {
-    const amount = parseInt(addAmount);
-    if (isNaN(amount) || amount <= 0) return;
-    if (balance < amount) {
+    const amountCurrent = parseFloat(addAmount);
+    if (isNaN(amountCurrent) || amountCurrent <= 0) return;
+    const amountUsd = convertFromCurrent(amountCurrent);
+    if (balance < amountUsd) {
       toast({ title: "Oops!", description: "You don't have enough in your virtual wallet.", variant: "destructive" });
       return;
     }
-    updateSavings(amount);
-    toast({ title: "Savings Boosted!", description: `Added $${amount} to your piggy bank.` });
-    if (savingsCurrent + amount >= savingsGoal) {
+    updateSavings(amountUsd);
+    toast({ title: "Savings Boosted!", description: `Added ${formatValue(amountUsd)} to your piggy bank.` });
+    if (savingsCurrent + amountUsd >= savingsGoal) {
       toast({ title: "GOAL REACHED! 🏆", description: "You've crushed your savings goal!" });
     }
   };
 
   const handleUpdateGoal = () => {
-    const goal = parseInt(newGoal);
-    if (isNaN(goal) || goal <= 0) return;
-    setSavingsGoal(goal);
-    toast({ title: "Goal Updated", description: `Your new target is $${goal}.` });
+    const goalCurrent = parseFloat(newGoal);
+    if (isNaN(goalCurrent) || goalCurrent <= 0) return;
+    const goalUsd = convertFromCurrent(goalCurrent);
+    setSavingsGoal(goalUsd);
+    toast({ title: "Goal Updated", description: `Your new target is ${formatValue(goalUsd)}.` });
   };
 
   return (
@@ -77,8 +78,8 @@ export default function SavingsTracker() {
                 <PiggyBank className="h-12 w-12" />
                </div>
                <h3 className="text-xl font-bold mb-2">Current Piggy Bank</h3>
-               <div className="text-5xl font-black mb-4">${savingsCurrent.toLocaleString()}</div>
-               <div className="text-sm font-medium opacity-80">of ${savingsGoal.toLocaleString()} Target</div>
+               <div className="text-4xl font-black mb-4">{formatValue(savingsCurrent)}</div>
+               <div className="text-sm font-medium opacity-80">of {formatValue(savingsGoal)} Target</div>
             </div>
             
             <CardContent className="p-8 space-y-8">
@@ -99,6 +100,7 @@ export default function SavingsTracker() {
                       value={addAmount} 
                       onChange={(e) => setAddAmount(e.target.value)}
                       className="h-12 rounded-xl border-2 focus:border-accent"
+                      suppressHydrationWarning
                     />
                     <Button onClick={handleAddSavings} className="h-12 px-6 rounded-xl font-bold gap-2">
                       <Plus className="h-4 w-4" /> Save Now
@@ -125,24 +127,28 @@ export default function SavingsTracker() {
                     value={newGoal} 
                     onChange={(e) => setNewGoal(e.target.value)}
                     className="h-12"
+                    suppressHydrationWarning
                   />
                   <Button onClick={handleUpdateGoal} variant="outline" className="h-12">Update Goal</Button>
                 </div>
                 <div className="grid grid-cols-2 gap-4 mt-4">
                   {[
-                    { label: 'Video Game', amount: 60 },
-                    { label: 'New Shoes', amount: 120 },
-                    { label: 'Tablet', amount: 450 },
-                    { label: 'College Fund', amount: 10000 }
+                    { label: 'Video Game', amountUsd: 60 },
+                    { label: 'New Shoes', amountUsd: 120 },
+                    { label: 'Tablet', amountUsd: 450 },
+                    { label: 'College Fund', amountUsd: 10000 }
                   ].map(preset => (
                     <Button 
                       key={preset.label} 
                       variant="ghost" 
                       className="justify-start h-auto p-4 border border-secondary hover:bg-secondary rounded-xl flex flex-col items-start gap-1"
-                      onClick={() => setNewGoal(preset.amount.toString())}
+                      onClick={() => {
+                        const currentVal = convertToCurrent(preset.amountUsd);
+                        setNewGoal(currentVal.toFixed(0));
+                      }}
                     >
                       <span className="text-xs text-muted-foreground font-bold uppercase">{preset.label}</span>
-                      <span className="text-lg font-bold">${preset.amount.toLocaleString()}</span>
+                      <span className="text-lg font-bold">{formatValue(preset.amountUsd)}</span>
                     </Button>
                   ))}
                 </div>

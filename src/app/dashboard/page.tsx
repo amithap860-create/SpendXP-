@@ -15,10 +15,10 @@ import {
 import Link from 'next/link';
 
 export default function Dashboard() {
-  const { ageGroup, balance, portfolio, savingsCurrent, savingsGoal } = useUser();
+  const { ageGroup, balance, portfolio, savingsCurrent, savingsGoal, formatValue } = useUser();
 
   const savingsProgress = Math.min(100, (savingsCurrent / savingsGoal) * 100);
-  const portfolioValue = portfolio.reduce((acc, item) => acc + (item.shares * 150), 0); // Simulated current price
+  const portfolioValueUsd = portfolio.reduce((acc, item) => acc + (item.shares * 150), 0); // Simulated current price in USD
   
   return (
     <div className="flex min-h-screen bg-background">
@@ -43,7 +43,7 @@ export default function Dashboard() {
               <CardTitle className="text-sm font-medium text-primary-foreground/80">Virtual Wallet</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">${balance.toLocaleString()}</div>
+              <div className="text-3xl font-bold">{formatValue(balance)}</div>
               <p className="text-xs text-primary-foreground/60 mt-1">Available for investing</p>
             </CardContent>
           </Card>
@@ -54,7 +54,7 @@ export default function Dashboard() {
               <TrendingUp className="h-4 w-4 text-emerald-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">${portfolioValue.toLocaleString()}</div>
+              <div className="text-3xl font-bold">{formatValue(portfolioValueUsd)}</div>
               <div className="flex items-center gap-1 text-emerald-500 text-xs mt-1">
                 <ArrowUpRight className="h-3 w-3" />
                 <span>+12.4% all time</span>
@@ -69,8 +69,8 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between mb-2">
-                <div className="text-3xl font-bold">${savingsCurrent}</div>
-                <div className="text-xs text-muted-foreground">of ${savingsGoal}</div>
+                <div className="text-2xl font-bold">{formatValue(savingsCurrent)}</div>
+                <div className="text-[10px] text-muted-foreground">of {formatValue(savingsGoal)}</div>
               </div>
               <Progress value={savingsProgress} className="h-2" />
             </CardContent>
