@@ -11,8 +11,8 @@ import Link from 'next/link';
 import { 
   Wallet, 
   TrendingUp, 
-  ArrowDownCircle, 
-  ArrowUpCircle, 
+  CircleArrowDown, 
+  CircleArrowUp, 
   Plus, 
   Trash2, 
   Calculator,
@@ -109,7 +109,7 @@ export default function Academy() {
                   <div className="bg-emerald-500 h-2 w-full" />
                   <CardHeader>
                     <div className="flex items-center gap-2 text-emerald-600 mb-2">
-                      <ArrowUpCircle className="h-5 w-5" />
+                      <CircleArrowUp className="h-5 w-5" />
                       <span className="text-xs font-bold uppercase tracking-wider">Concept One</span>
                     </div>
                     <CardTitle className="text-2xl">What is Income?</CardTitle>
@@ -146,7 +146,7 @@ export default function Academy() {
                   <div className="bg-rose-500 h-2 w-full" />
                   <CardHeader>
                     <div className="flex items-center gap-2 text-rose-600 mb-2">
-                      <ArrowDownCircle className="h-5 w-5" />
+                      <CircleArrowDown className="h-5 w-5" />
                       <span className="text-xs font-bold uppercase tracking-wider">Concept Two</span>
                     </div>
                     <CardTitle className="text-2xl">Understanding Outcome (Expenses)</CardTitle>

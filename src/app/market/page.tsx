@@ -12,8 +12,8 @@ import {
   TrendingDown, 
   Newspaper, 
   Info, 
-  CheckCircle2,
-  Loader2
+  CircleCheckBig,
+  LoaderCircle
 } from 'lucide-react';
 import { generateMarketNewsAndExplanations } from '@/ai/flows/generate-market-news-and-explanations-flow';
 import { useToast } from '@/hooks/use-toast';
@@ -107,7 +107,7 @@ export default function MarketSimulation() {
             <p className="text-muted-foreground">Learn how the world invests by trading fictional companies. Prices auto-adjust to {currency}.</p>
           </div>
           <Button onClick={fetchNews} disabled={isLoadingNews} variant="outline" className="gap-2">
-            {isLoadingNews ? <Loader2 className="h-4 w-4 animate-spin" /> : <Newspaper className="h-4 w-4" />}
+            {isLoadingNews ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Newspaper className="h-4 w-4" />}
             Refresh News
           </Button>
         </div>
@@ -235,7 +235,7 @@ export default function MarketSimulation() {
           <DialogContent className="max-w-2xl">
             <DialogHeader>
               <div className="h-12 w-12 bg-accent/20 rounded-xl flex items-center justify-center mb-2">
-                <CheckCircle2 className="h-6 w-6 text-accent" />
+                <CircleCheckBig className="h-6 w-6 text-accent" />
               </div>
               <DialogTitle className="text-2xl font-bold text-primary">{news?.explanationTitle}</DialogTitle>
               <DialogDescription className="text-lg">

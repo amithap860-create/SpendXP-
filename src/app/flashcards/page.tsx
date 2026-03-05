@@ -6,7 +6,7 @@ import { useUser } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { generatePersonalizedFlashcards } from '@/ai/flows/generate-personalized-flashcards';
-import { Loader2, RefreshCw, ChevronLeft, ChevronRight, Zap } from 'lucide-react';
+import { LoaderCircle, RefreshCw, ChevronLeft, ChevronRight, Zap } from 'lucide-react';
 
 export default function Flashcards() {
   const { age } = useUser();
@@ -62,7 +62,7 @@ export default function Flashcards() {
 
         {isLoading ? (
           <div className="flex flex-col items-center gap-4 py-20">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+            <LoaderCircle className="h-12 w-12 animate-spin text-primary" />
             <p className="text-lg font-medium text-primary">Creating personalized study set...</p>
           </div>
         ) : flashcards.length > 0 ? (

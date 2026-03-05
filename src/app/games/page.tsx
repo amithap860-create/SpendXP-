@@ -10,10 +10,10 @@ import { Badge } from '@/components/ui/badge';
 import { 
   Gamepad2, 
   Coins, 
-  BrainCircle, 
+  Brain, 
   Zap, 
   GraduationCap, 
-  AlertCircle, 
+  CircleAlert, 
   TrendingUp,
   Heart,
   Wallet,
@@ -103,7 +103,7 @@ export default function GamesHub() {
                 <Card className="hover:shadow-lg transition-all cursor-pointer border-none bg-white overflow-hidden group" onClick={() => toast({ title: "Math Quest Loading..." })}>
                   <div className="h-2 bg-sky-400" />
                   <CardHeader>
-                    <BrainCircle className="h-8 w-8 text-sky-500 mb-2 group-hover:scale-110 transition-transform" />
+                    <Brain className="h-8 w-8 text-sky-500 mb-2 group-hover:scale-110 transition-transform" />
                     <CardTitle>Math Money Quest</CardTitle>
                     <CardDescription>Solve shopping puzzles! Calculate change and total costs against the clock.</CardDescription>
                   </CardHeader>
@@ -145,7 +145,7 @@ export default function GamesHub() {
                 <Card className="hover:shadow-lg transition-all cursor-pointer border-none bg-white overflow-hidden group" onClick={() => toast({ title: "Paycheck survival mode loading..." })}>
                   <div className="h-2 bg-rose-400" />
                   <CardHeader>
-                    <AlertCircle className="h-8 w-8 text-rose-500 mb-2 group-hover:scale-110 transition-transform" />
+                    <CircleAlert className="h-8 w-8 text-rose-500 mb-2 group-hover:scale-110 transition-transform" />
                     <CardTitle>Paycheck to Paycheck</CardTitle>
                     <CardDescription>Tough choices! One unexpected bill can change everything. Manage the stress.</CardDescription>
                   </CardHeader>
