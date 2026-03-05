@@ -10,7 +10,8 @@ import {
   PiggyBank, 
   LogOut,
   GraduationCap,
-  UserCircle
+  UserCircle,
+  Gamepad2
 } from 'lucide-react';
 import { useUser } from '@/lib/store';
 import { Button } from '@/components/ui/button';
@@ -22,6 +23,7 @@ export function MainNav() {
   const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Academy', href: '/academy', icon: GraduationCap },
+    { name: 'Games', href: '/games', icon: Gamepad2 },
     { name: 'Market', href: '/market', icon: TrendingUp },
     { name: 'Flashcards', href: '/flashcards', icon: Library },
     { name: 'Savings', href: '/savings', icon: PiggyBank },

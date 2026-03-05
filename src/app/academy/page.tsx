@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useUser } from '@/lib/store';
+import Link from 'next/link';
 import { 
   Wallet, 
   TrendingUp, 
@@ -15,7 +16,8 @@ import {
   Plus, 
   Trash2, 
   Calculator,
-  Lightbulb
+  Lightbulb,
+  Gamepad2
 } from 'lucide-react';
 import { 
   Table, 
@@ -79,9 +81,17 @@ export default function Academy() {
     <div className="flex min-h-screen bg-background">
       <MainNav />
       <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8">
-        <header className="mb-8">
-          <h2 className="text-3xl font-bold text-primary">Financial Academy</h2>
-          <p className="text-muted-foreground">Knowledge is your most valuable asset. Learn, practice, and master your money.</p>
+        <header className="mb-8 flex justify-between items-start">
+          <div>
+            <h2 className="text-3xl font-bold text-primary">Financial Academy</h2>
+            <p className="text-muted-foreground">Knowledge is your most valuable asset. Learn, practice, and master your money.</p>
+          </div>
+          <Link href="/games">
+            <Button className="gap-2 bg-accent hover:bg-accent/90">
+              <Gamepad2 className="h-4 w-4" />
+              Interactive Games
+            </Button>
+          </Link>
         </header>
 
         <div className="grid gap-8 lg:grid-cols-12">
@@ -319,13 +329,6 @@ export default function Academy() {
                           </TableCell>
                         </TableRow>
                       ))}
-                      {budgetItems.length === 0 && (
-                        <TableRow>
-                          <TableCell colSpan={3} className="text-center py-8 text-muted-foreground italic">
-                            No items added yet. Start your budget above!
-                          </TableCell>
-                        </TableRow>
-                      )}
                     </TableBody>
                   </Table>
                 </div>
