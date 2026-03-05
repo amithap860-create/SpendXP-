@@ -8,7 +8,8 @@ import {
   TrendingUp, 
   Library, 
   PiggyBank, 
-  LogOut 
+  LogOut,
+  GraduationCap
 } from 'lucide-react';
 import { useUser } from '@/lib/store';
 import { Button } from '@/components/ui/button';
@@ -19,6 +20,7 @@ export function MainNav() {
 
   const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Academy', href: '/academy', icon: GraduationCap },
     { name: 'Market', href: '/market', icon: TrendingUp },
     { name: 'Flashcards', href: '/flashcards', icon: Library },
     { name: 'Savings', href: '/savings', icon: PiggyBank },
@@ -34,13 +36,13 @@ export function MainNav() {
         </div>
       </div>
 
-      <div className="flex w-full justify-around md:flex-col md:gap-2">
+      <div className="flex w-full justify-around md:flex-col md:gap-2 overflow-x-auto no-scrollbar">
         {navItems.map((item) => (
           <Link
             key={item.name}
             href={item.href}
             className={cn(
-              "flex flex-col items-center gap-1 rounded-md px-3 py-2 text-xs font-medium transition-colors md:flex-row md:gap-3 md:text-sm md:px-4 md:py-3",
+              "flex flex-col items-center gap-1 rounded-md px-3 py-2 text-[10px] font-medium transition-colors md:flex-row md:gap-3 md:text-sm md:px-4 md:py-3",
               pathname === item.href
                 ? "bg-primary text-white"
                 : "text-muted-foreground hover:bg-secondary hover:text-primary"
