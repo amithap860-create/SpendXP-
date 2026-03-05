@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
@@ -30,6 +31,14 @@ export interface PortfolioItem {
   avgPrice: number; // Stored in USD
 }
 
+export interface AppTask {
+  id: string;
+  title: string;
+  category: string;
+  xpReward: number;
+  completed: boolean;
+}
+
 interface UserContextType {
   name: string;
   email: string;
@@ -41,7 +50,10 @@ interface UserContextType {
   portfolio: PortfolioItem[];
   savingsGoal: number; // Stored in USD
   savingsCurrent: number; // Stored in USD
-  liabilities: number; // Stored in USD (new)
+  liabilities: number; // Stored in USD
+  xp: number;
+  level: number;
+  tasks: AppTask[];
   isLoggedIn: boolean;
   login: (email: string, age: number) => void;
   logout: () => void;
@@ -51,11 +63,23 @@ interface UserContextType {
   updateSavings: (amountUsd: number) => void;
   setSavingsGoal: (amountUsd: number) => void;
   updateLiabilities: (amountUsd: number) => void;
+  addXP: (amount: number) => void;
+  completeTask: (taskId: string) => void;
   // Helpers
   formatValue: (usdAmount: number) => string;
   convertToCurrent: (usdAmount: number) => number;
   convertFromCurrent: (currentAmount: number) => number;
 }
+
+const DEFAULT_TASKS: AppTask[] = [
+  { id: 'academy-income', title: 'Learn about Income', category: 'Academy', xpReward: 50, completed: false },
+  { id: 'academy-outcome', title: 'Understand Expenses', category: 'Academy', xpReward: 50, completed: false },
+  { id: 'academy-budget', title: 'Master the Budget', category: 'Academy', xpReward: 50, completed: false },
+  { id: 'game-dash', title: 'Win Denomination Dash', category: 'Games', xpReward: 100, completed: false },
+  { id: 'game-advisor', title: 'Complete Wealth Architect', category: 'Games', xpReward: 150, completed: false },
+  { id: 'market-first-trade', title: 'Make your first trade', category: 'Market', xpReward: 100, completed: false },
+  { id: 'flashcards-set', title: 'Complete a Flashcard set', category: 'Study', xpReward: 75, completed: false },
+];
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
@@ -66,11 +90,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [ageGroup, setAgeGroup] = useState<AgeGroup>('11-15');
   const [country, setCountry] = useState('United States');
   const [currency, setCurrency] = useState('USD');
-  const [balance, setBalance] = useState(1000); // Internal USD
+  const [balance, setBalance] = useState(1000); 
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
-  const [savingsGoal, setSavingsGoalValue] = useState(500); // Internal USD
-  const [savingsCurrent, setSavingsCurrent] = useState(0); // Internal USD
-  const [liabilities, setLiabilities] = useState(0); // Internal USD
+  const [savingsGoal, setSavingsGoalValue] = useState(500); 
+  const [savingsCurrent, setSavingsCurrent] = useState(0); 
+  const [liabilities, setLiabilities] = useState(0);
+  const [xp, setXP] = useState(0);
+  const [level, setLevel] = useState(1);
+  const [tasks, setTasks] = useState<AppTask[]>(DEFAULT_TASKS);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const isInitialized = useRef(false);
 
@@ -90,6 +117,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSavingsGoalValue(data.savingsGoal ?? 500);
         setSavingsCurrent(data.savingsCurrent ?? 0);
         setLiabilities(data.liabilities ?? 0);
+        setXP(data.xp ?? 0);
+        setLevel(data.level ?? 1);
+        setTasks(data.tasks ?? DEFAULT_TASKS);
         setIsLoggedIn(!!data.email);
       } catch (e) {
         console.error("Failed to parse saved user state", e);
@@ -101,11 +131,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (isInitialized.current && isLoggedIn) {
       const state = {
-        name, email, age, ageGroup, country, currency, balance, portfolio, savingsGoal, savingsCurrent, liabilities
+        name, email, age, ageGroup, country, currency, balance, portfolio, savingsGoal, savingsCurrent, liabilities, xp, level, tasks
       };
       localStorage.setItem('spendxp_user', JSON.stringify(state));
     }
-  }, [name, email, age, ageGroup, country, currency, balance, portfolio, savingsGoal, savingsCurrent, liabilities, isLoggedIn]);
+  }, [name, email, age, ageGroup, country, currency, balance, portfolio, savingsGoal, savingsCurrent, liabilities, xp, level, tasks, isLoggedIn]);
 
   const login = (newEmail: string, newAge: number) => {
     let group: AgeGroup = '11-15';
@@ -130,6 +160,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSavingsGoalValue(500);
     setSavingsCurrent(0);
     setLiabilities(0);
+    setXP(0);
+    setLevel(1);
+    setTasks(DEFAULT_TASKS);
     setIsLoggedIn(false);
     localStorage.removeItem('spendxp_user');
   };
@@ -145,6 +178,26 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (data.age <= 11) group = '8-11';
     else if (data.age >= 16) group = '16-20';
     setAgeGroup(group);
+  };
+
+  const addXP = (amount: number) => {
+    setXP(prev => {
+      const newXP = prev + amount;
+      const newLevel = Math.floor(newXP / 500) + 1;
+      if (newLevel > level) setLevel(newLevel);
+      return newXP;
+    });
+  };
+
+  const completeTask = (taskId: string) => {
+    setTasks(prev => {
+      const task = prev.find(t => t.id === taskId);
+      if (task && !task.completed) {
+        addXP(task.xpReward);
+        return prev.map(t => t.id === taskId ? { ...t, completed: true } : t);
+      }
+      return prev;
+    });
   };
 
   const convertToCurrent = (usdAmount: number) => {
@@ -179,6 +232,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       return [...prev, { symbol, shares, avgPrice: priceUsd }];
     });
+    completeTask('market-first-trade');
   };
 
   const sellStock = (symbol: string, shares: number, priceUsd: number) => {
@@ -215,8 +269,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <UserContext.Provider value={{ 
-      name, email, age, ageGroup, country, currency, balance, portfolio, savingsGoal, savingsCurrent, liabilities, isLoggedIn,
-      login, logout, updateProfile, buyStock, sellStock, updateSavings, setSavingsGoal, updateLiabilities,
+      name, email, age, ageGroup, country, currency, balance, portfolio, savingsGoal, savingsCurrent, liabilities, xp, level, tasks, isLoggedIn,
+      login, logout, updateProfile, buyStock, sellStock, updateSavings, setSavingsGoal, updateLiabilities, addXP, completeTask,
       formatValue, convertToCurrent, convertFromCurrent
     }}>
       {children}

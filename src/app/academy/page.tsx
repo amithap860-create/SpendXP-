@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from 'react';
@@ -17,7 +18,8 @@ import {
   Trash2, 
   Calculator,
   Lightbulb,
-  Gamepad2
+  Gamepad2,
+  CheckCircle2
 } from 'lucide-react';
 import { 
   Table, 
@@ -36,7 +38,7 @@ interface BudgetItem {
 }
 
 export default function Academy() {
-  const { formatValue, convertFromCurrent, convertToCurrent } = useUser();
+  const { formatValue, convertFromCurrent, completeTask, tasks } = useUser();
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([
     { id: '1', name: 'Weekly Allowance', type: 'income', amountUsd: 20 },
     { id: '2', name: 'Streaming Subscription', type: 'expense', amountUsd: 15 },
@@ -61,11 +63,14 @@ export default function Academy() {
     setBudgetItems([...budgetItems, newItem]);
     setNewItemName('');
     setNewItemAmount('');
+    completeTask('academy-budget');
   };
 
   const removeItem = (id: string) => {
     setBudgetItems(budgetItems.filter(item => item.id !== id));
   };
+
+  const isTaskCompleted = (id: string) => tasks.find(t => t.id === id)?.completed;
 
   const totalIncomeUsd = budgetItems
     .filter(i => i.type === 'income')
@@ -108,9 +113,12 @@ export default function Academy() {
                 <Card className="border-none shadow-sm bg-white overflow-hidden">
                   <div className="bg-emerald-500 h-2 w-full" />
                   <CardHeader>
-                    <div className="flex items-center gap-2 text-emerald-600 mb-2">
-                      <CircleArrowUp className="h-5 w-5" />
-                      <span className="text-xs font-bold uppercase tracking-wider">Concept One</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-emerald-600">
+                        <CircleArrowUp className="h-5 w-5" />
+                        <span className="text-xs font-bold uppercase tracking-wider">Concept One</span>
+                      </div>
+                      {isTaskCompleted('academy-income') && <CheckCircle2 className="h-5 w-5 text-emerald-500" />}
                     </div>
                     <CardTitle className="text-2xl">What is Income?</CardTitle>
                     <CardDescription>Income is the money you receive or earn from various sources.</CardDescription>
@@ -128,15 +136,14 @@ export default function Academy() {
                         <Plus className="h-4 w-4 text-emerald-600" />
                         <span className="text-sm font-medium">Gifts (Birthday/Holidays)</span>
                       </li>
-                      <li className="p-3 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center gap-3">
-                        <Plus className="h-4 w-4 text-emerald-600" />
-                        <span className="text-sm font-medium">Part-time Jobs</span>
-                      </li>
-                      <li className="p-3 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center gap-3">
-                        <Plus className="h-4 w-4 text-emerald-600" />
-                        <span className="text-sm font-medium">Selling old items</span>
-                      </li>
                     </ul>
+                    <Button 
+                      className="w-full mt-4" 
+                      onClick={() => completeTask('academy-income')}
+                      disabled={isTaskCompleted('academy-income')}
+                    >
+                      {isTaskCompleted('academy-income') ? 'Concept Learned' : 'I Understand Income (+50 XP)'}
+                    </Button>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -145,27 +152,37 @@ export default function Academy() {
                 <Card className="border-none shadow-sm bg-white overflow-hidden">
                   <div className="bg-rose-500 h-2 w-full" />
                   <CardHeader>
-                    <div className="flex items-center gap-2 text-rose-600 mb-2">
-                      <CircleArrowDown className="h-5 w-5" />
-                      <span className="text-xs font-bold uppercase tracking-wider">Concept Two</span>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-rose-600">
+                        <CircleArrowDown className="h-5 w-5" />
+                        <span className="text-xs font-bold uppercase tracking-wider">Concept Two</span>
+                      </div>
+                      {isTaskCompleted('academy-outcome') && <CheckCircle2 className="h-5 w-5 text-emerald-500" />}
                     </div>
                     <CardTitle className="text-2xl">Understanding Outcome (Expenses)</CardTitle>
                     <CardDescription>Outcome is the money you spend to buy things or pay for services.</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <p className="text-slate-600 leading-relaxed">
-                      Every time you buy a snack, pay for a subscription, or get a new game, that's an outcome. The key is distinguishing between:
+                      Every time you buy a snack, pay for a subscription, or get a new game, that's an outcome.
                     </p>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-4 rounded-xl border-2 border-dashed border-slate-200">
                         <h4 className="font-bold text-primary mb-1">Needs</h4>
-                        <p className="text-xs text-muted-foreground">Things you must have to live and function (Food, school supplies).</p>
+                        <p className="text-xs text-muted-foreground">Food, school supplies.</p>
                       </div>
                       <div className="p-4 rounded-xl border-2 border-dashed border-slate-200">
                         <h4 className="font-bold text-accent mb-1">Wants</h4>
-                        <p className="text-xs text-muted-foreground">Things you'd like to have but can live without (Video games, extra snacks).</p>
+                        <p className="text-xs text-muted-foreground">Video games, extra snacks.</p>
                       </div>
                     </div>
+                    <Button 
+                      className="w-full mt-4 bg-rose-600 hover:bg-rose-700" 
+                      onClick={() => completeTask('academy-outcome')}
+                      disabled={isTaskCompleted('academy-outcome')}
+                    >
+                      {isTaskCompleted('academy-outcome') ? 'Concept Learned' : 'I Understand Expenses (+50 XP)'}
+                    </Button>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -186,12 +203,13 @@ export default function Academy() {
                       <Lightbulb className="h-6 w-6 text-amber-600 mt-1" />
                       <div>
                         <h4 className="font-bold text-amber-900">The 50/30/20 Rule</h4>
-                        <p className="text-sm text-amber-800">A popular way to budget: 50% for Needs, 30% for Wants, and 20% for Savings!</p>
+                        <p className="text-sm text-amber-800">50% for Needs, 30% for Wants, and 20% for Savings!</p>
                       </div>
                     </div>
                     <p className="text-sm text-slate-600 italic">
                       "A budget doesn't tell you what you can't do, it tells you what you CAN do with your money."
                     </p>
+                    <p className="text-center font-bold text-amber-600">Practice below in the Budget Lab to earn XP!</p>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -213,7 +231,7 @@ export default function Academy() {
                     </p>
                     <div className="bg-primary/5 p-4 rounded-xl border border-primary/10">
                       <h4 className="font-bold text-primary mb-2">Why start early?</h4>
-                      <p className="text-sm">The earlier you start, the more time your money has to multiply. Even $10 today could be worth much more in 10 years thanks to the "Magic of Compounding."</p>
+                      <p className="text-sm">The earlier you start, the more time your money has to multiply.</p>
                     </div>
                   </CardContent>
                 </Card>

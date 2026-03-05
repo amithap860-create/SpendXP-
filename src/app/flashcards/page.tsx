@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -9,7 +10,7 @@ import { generatePersonalizedFlashcards } from '@/ai/flows/generate-personalized
 import { LoaderCircle, RefreshCw, ChevronLeft, ChevronRight, Zap } from 'lucide-react';
 
 export default function Flashcards() {
-  const { age } = useUser();
+  const { age, completeTask } = useUser();
   const [flashcards, setFlashcards] = useState<any[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -37,6 +38,9 @@ export default function Flashcards() {
     if (currentIndex < flashcards.length - 1) {
       setCurrentIndex(prev => prev + 1);
       setIsFlipped(false);
+      if (currentIndex + 1 === flashcards.length - 1) {
+        completeTask('flashcards-set');
+      }
     }
   };
 
