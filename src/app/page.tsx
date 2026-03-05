@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -17,8 +16,10 @@ export default function LandingPage() {
   const { login, isLoggedIn } = useUser();
   const [email, setEmail] = useState('');
   const [age, setAge] = useState('');
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     if (isLoggedIn) {
       router.push('/dashboard');
     }
@@ -42,6 +43,10 @@ export default function LandingPage() {
     getPlaceholderById('avatar-3'),
     getPlaceholderById('avatar-4')
   ];
+
+  if (!isMounted) {
+    return null; // Prevent hydration mismatch by only rendering after mount
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-100 via-blue-50 to-white">
@@ -97,6 +102,7 @@ export default function LandingPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   className="h-12 rounded-lg bg-white/50"
+                  suppressHydrationWarning
                 />
               </div>
               <div className="space-y-2">
@@ -111,6 +117,7 @@ export default function LandingPage() {
                   onChange={(e) => setAge(e.target.value)}
                   required
                   className="h-12 rounded-lg bg-white/50"
+                  suppressHydrationWarning
                 />
                 <p className="text-[10px] text-muted-foreground pt-1">We customize SpendXP based on your age!</p>
               </div>
