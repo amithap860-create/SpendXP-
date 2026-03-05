@@ -9,14 +9,15 @@ import {
   Library, 
   PiggyBank, 
   LogOut,
-  GraduationCap
+  GraduationCap,
+  UserCircle
 } from 'lucide-react';
 import { useUser } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 
 export function MainNav() {
   const pathname = usePathname();
-  const { logout, balance } = useUser();
+  const { logout, balance, currency } = useUser();
 
   const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -24,6 +25,7 @@ export function MainNav() {
     { name: 'Market', href: '/market', icon: TrendingUp },
     { name: 'Flashcards', href: '/flashcards', icon: Library },
     { name: 'Savings', href: '/savings', icon: PiggyBank },
+    { name: 'Profile', href: '/profile', icon: UserCircle },
   ];
 
   return (
@@ -32,7 +34,7 @@ export function MainNav() {
         <h1 className="text-2xl font-bold text-primary tracking-tight">SpendXP</h1>
         <div className="bg-secondary p-3 rounded-lg">
           <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Virtual Balance</p>
-          <p className="text-xl font-bold text-primary">${balance.toLocaleString()}</p>
+          <p className="text-xl font-bold text-primary">{currency} {balance.toLocaleString()}</p>
         </div>
       </div>
 

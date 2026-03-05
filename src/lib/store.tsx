@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
@@ -20,9 +19,12 @@ export interface PortfolioItem {
 }
 
 interface UserContextType {
+  name: string;
   email: string;
   age: number;
   ageGroup: AgeGroup;
+  country: string;
+  currency: string;
   balance: number;
   portfolio: PortfolioItem[];
   savingsGoal: number;
@@ -30,6 +32,7 @@ interface UserContextType {
   isLoggedIn: boolean;
   login: (email: string, age: number) => void;
   logout: () => void;
+  updateProfile: (data: { name: string; email: string; age: number; country: string; currency: string }) => void;
   buyStock: (symbol: string, shares: number, price: number) => void;
   sellStock: (symbol: string, shares: number, price: number) => void;
   updateSavings: (amount: number) => void;
@@ -39,9 +42,12 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [age, setAge] = useState(0);
   const [ageGroup, setAgeGroup] = useState<AgeGroup>('11-15');
+  const [country, setCountry] = useState('United States');
+  const [currency, setCurrency] = useState('USD');
   const [balance, setBalance] = useState(1000);
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
   const [savingsGoal, setSavingsGoalValue] = useState(500);
@@ -55,9 +61,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (saved) {
       try {
         const data = JSON.parse(saved);
+        setName(data.name || '');
         setEmail(data.email || '');
         setAge(data.age || 0);
         setAgeGroup(data.ageGroup || '11-15');
+        setCountry(data.country || 'United States');
+        setCurrency(data.currency || 'USD');
         setBalance(data.balance ?? 1000);
         setPortfolio(data.portfolio ?? []);
         setSavingsGoalValue(data.savingsGoal ?? 500);
@@ -74,11 +83,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (isInitialized.current && isLoggedIn) {
       const state = {
-        email, age, ageGroup, balance, portfolio, savingsGoal, savingsCurrent
+        name, email, age, ageGroup, country, currency, balance, portfolio, savingsGoal, savingsCurrent
       };
       localStorage.setItem('spendxp_user', JSON.stringify(state));
     }
-  }, [email, age, ageGroup, balance, portfolio, savingsGoal, savingsCurrent, isLoggedIn]);
+  }, [name, email, age, ageGroup, country, currency, balance, portfolio, savingsGoal, savingsCurrent, isLoggedIn]);
 
   const login = (newEmail: string, newAge: number) => {
     let group: AgeGroup = '11-15';
@@ -92,15 +101,31 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
+    setName('');
     setEmail('');
     setAge(0);
     setAgeGroup('11-15');
+    setCountry('United States');
+    setCurrency('USD');
     setBalance(1000);
     setPortfolio([]);
     setSavingsGoalValue(500);
     setSavingsCurrent(0);
     setIsLoggedIn(false);
     localStorage.removeItem('spendxp_user');
+  };
+
+  const updateProfile = (data: { name: string; email: string; age: number; country: string; currency: string }) => {
+    setName(data.name);
+    setEmail(data.email);
+    setAge(data.age);
+    setCountry(data.country);
+    setCurrency(data.currency);
+    
+    let group: AgeGroup = '11-15';
+    if (data.age <= 11) group = '8-11';
+    else if (data.age >= 16) group = '16-20';
+    setAgeGroup(group);
   };
 
   const buyStock = (symbol: string, shares: number, price: number) => {
@@ -149,8 +174,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <UserContext.Provider value={{ 
-      email, age, ageGroup, balance, portfolio, savingsGoal, savingsCurrent, isLoggedIn,
-      login, logout, buyStock, sellStock, updateSavings, setSavingsGoal
+      name, email, age, ageGroup, country, currency, balance, portfolio, savingsGoal, savingsCurrent, isLoggedIn,
+      login, logout, updateProfile, buyStock, sellStock, updateSavings, setSavingsGoal
     }}>
       {children}
     </UserContext.Provider>
