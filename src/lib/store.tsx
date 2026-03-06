@@ -156,8 +156,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [db, user]);
   const { data: portfolioData, isLoading: isPortfolioLoading } = useCollection<PortfolioItem>(portfolioQuery);
   
-  // Explicitly fallback to an empty array to prevent null-pointer errors during initial load
-  const portfolio = useMemo(() => portfolioData || [], [portfolioData]);
+  // Robust array fallback
+  const portfolio = useMemo(() => Array.isArray(portfolioData) ? portfolioData : [], [portfolioData]);
 
   // Firestore Sync: Tasks/Progress
   const tasksQuery = useMemoFirebase(() => {
@@ -165,8 +165,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [db, user]);
   const { data: remoteTasksData, isLoading: isTasksLoading } = useCollection<AppTask>(tasksQuery);
   
-  // Explicitly fallback to an empty array to prevent null-pointer errors during initial load
-  const remoteTasks = useMemo(() => remoteTasksData || [], [remoteTasksData]);
+  // Robust array fallback
+  const remoteTasks = useMemo(() => Array.isArray(remoteTasksData) ? remoteTasksData : [], [remoteTasksData]);
 
   const isInitialLoading = isUserLoading || isProfileLoading || isPortfolioLoading || isTasksLoading;
 
@@ -319,9 +319,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const getPortfolioValue = () => {
-    // Robust safety check to prevent reduce() calls on null or non-array types
-    const safePortfolio = Array.isArray(portfolio) ? portfolio : [];
-    return safePortfolio.reduce((acc, item) => {
+    if (!Array.isArray(portfolio)) return 0;
+    return portfolio.reduce((acc, item) => {
       if (!item) return acc;
       const stock = stocks.find(s => s.symbol === item.symbol);
       return acc + ((item.shares || 0) * (stock?.price || 0));

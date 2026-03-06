@@ -44,9 +44,11 @@ export default function Dashboard() {
     );
   }
 
+  // Ensure tasks is always an array before operating on it
   const safeTasks = Array.isArray(tasks) ? tasks : [];
   const savingsProgress = Math.min(100, (savingsCurrent / (savingsGoal || 1)) * 100);
   const portfolioValueUsd = typeof getPortfolioValue === 'function' ? getPortfolioValue() : 0;
+  
   const xpInCurrentLevel = (xp || 0) % 500;
   const levelProgress = (xpInCurrentLevel / 500) * 100;
   
@@ -144,22 +146,22 @@ export default function Dashboard() {
               
               <div className="space-y-3">
                 {safeTasks.map((task) => (
-                  <div key={task.id} className={`flex items-center justify-between p-3 rounded-lg border ${task.completed ? 'bg-emerald-50 border-emerald-100' : 'bg-slate-50 border-slate-100'}`}>
+                  <div key={task.id} className={`flex items-center justify-between p-3 rounded-lg border ${task?.completed ? 'bg-emerald-50 border-emerald-100' : 'bg-slate-50 border-slate-100'}`}>
                     <div className="flex items-center gap-3">
-                      {task.completed ? (
+                      {task?.completed ? (
                         <CircleCheckBig className="h-5 w-5 text-emerald-500" />
                       ) : (
                         <div className="h-5 w-5 rounded-full border-2 border-slate-300" />
                       )}
                       <div>
-                        <p className={`text-sm font-bold ${task.completed ? 'text-emerald-900 line-through opacity-60' : 'text-slate-900'}`}>
-                          {task.title}
+                        <p className={`text-sm font-bold ${task?.completed ? 'text-emerald-900 line-through opacity-60' : 'text-slate-900'}`}>
+                          {task?.title}
                         </p>
-                        <p className="text-[10px] uppercase font-bold text-muted-foreground">{task.category}</p>
+                        <p className="text-[10px] uppercase font-bold text-muted-foreground">{task?.category}</p>
                       </div>
                     </div>
-                    <Badge variant="outline" className={`text-[10px] ${task.completed ? 'bg-emerald-100 text-emerald-700' : 'bg-white'}`}>
-                      +{task.xpReward} XP
+                    <Badge variant="outline" className={`text-[10px] ${task?.completed ? 'bg-emerald-100 text-emerald-700' : 'bg-white'}`}>
+                      +{task?.xpReward} XP
                     </Badge>
                   </div>
                 ))}
