@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
@@ -153,13 +154,15 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const portfolioQuery = useMemoFirebase(() => {
     return user ? collection(db, 'users', user.uid, 'virtualInvestments') : null;
   }, [db, user]);
-  const { data: portfolio = [], isLoading: isPortfolioLoading } = useCollection<PortfolioItem>(portfolioQuery);
+  const { data: portfolioData, isLoading: isPortfolioLoading } = useCollection<PortfolioItem>(portfolioQuery);
+  const portfolio = portfolioData || [];
 
   // Firestore Sync: Tasks/Progress
   const tasksQuery = useMemoFirebase(() => {
     return user ? collection(db, 'users', user.uid, 'lessonProgress') : null;
   }, [db, user]);
-  const { data: remoteTasks = [], isLoading: isTasksLoading } = useCollection<AppTask>(tasksQuery);
+  const { data: remoteTasksData, isLoading: isTasksLoading } = useCollection<AppTask>(tasksQuery);
+  const remoteTasks = remoteTasksData || [];
 
   const isInitialLoading = isUserLoading || isProfileLoading || isPortfolioLoading || isTasksLoading;
 
