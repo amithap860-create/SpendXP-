@@ -155,14 +155,18 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return user ? collection(db, 'users', user.uid, 'virtualInvestments') : null;
   }, [db, user]);
   const { data: portfolioData, isLoading: isPortfolioLoading } = useCollection<PortfolioItem>(portfolioQuery);
-  const portfolio = portfolioData ?? [];
+  
+  // Explicitly fallback to an empty array to prevent null-pointer errors during initial load
+  const portfolio = useMemo(() => portfolioData || [], [portfolioData]);
 
   // Firestore Sync: Tasks/Progress
   const tasksQuery = useMemoFirebase(() => {
     return user ? collection(db, 'users', user.uid, 'lessonProgress') : null;
   }, [db, user]);
   const { data: remoteTasksData, isLoading: isTasksLoading } = useCollection<AppTask>(tasksQuery);
-  const remoteTasks = remoteTasksData ?? [];
+  
+  // Explicitly fallback to an empty array to prevent null-pointer errors during initial load
+  const remoteTasks = useMemo(() => remoteTasksData || [], [remoteTasksData]);
 
   const isInitialLoading = isUserLoading || isProfileLoading || isPortfolioLoading || isTasksLoading;
 
@@ -217,7 +221,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const addXP = (amount: number) => {
     if (!profileRef || !profile) return;
-    const newXP = profile.xp + amount;
+    const newXP = (profile.xp || 0) + amount;
     const newLevel = Math.floor(newXP / 500) + 1;
     updateDocumentNonBlocking(profileRef, { xp: newXP, level: newLevel });
   };
@@ -232,15 +236,15 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const buyStock = (symbol: string, shares: number, priceUsd: number) => {
-    if (!user || !profile || profile.balance < (shares * priceUsd)) return;
+    if (!user || !profile || (profile.balance || 0) < (shares * priceUsd)) return;
     
     const cost = shares * priceUsd;
-    updateDocumentNonBlocking(profileRef!, { balance: profile.balance - cost });
+    updateDocumentNonBlocking(profileRef!, { balance: (profile.balance || 0) - cost });
     
     const investmentId = `inv-${symbol}`;
     const invRef = doc(db, 'users', user.uid, 'virtualInvestments', investmentId);
     
-    const existing = (portfolio || []).find(p => p.symbol === symbol);
+    const existing = portfolio.find(p => p.symbol === symbol);
     if (existing) {
       const newShares = existing.shares + shares;
       const newAvg = (existing.shares * existing.avgPrice + cost) / newShares;
@@ -261,11 +265,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const sellStock = (symbol: string, shares: number, priceUsd: number) => {
     if (!user || !profile) return;
-    const existing = (portfolio || []).find(p => p.symbol === symbol);
+    const existing = portfolio.find(p => p.symbol === symbol);
     if (!existing || existing.shares < shares) return;
 
     const gain = shares * priceUsd;
-    updateDocumentNonBlocking(profileRef!, { balance: profile.balance + gain });
+    updateDocumentNonBlocking(profileRef!, { balance: (profile.balance || 0) + gain });
     
     const invRef = doc(db, 'users', user.uid, 'virtualInvestments', existing.id);
     if (existing.shares === shares) {
@@ -277,12 +281,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateSavings = (amountUsd: number) => {
     if (!profileRef || !profile) return;
-    if (amountUsd > 0 && profile.balance < amountUsd) return;
-    if (amountUsd < 0 && profile.savingsCurrent < Math.abs(amountUsd)) return;
+    if (amountUsd > 0 && (profile.balance || 0) < amountUsd) return;
+    if (amountUsd < 0 && (profile.savingsCurrent || 0) < Math.abs(amountUsd)) return;
 
     updateDocumentNonBlocking(profileRef, {
-      balance: profile.balance - amountUsd,
-      savingsCurrent: profile.savingsCurrent + amountUsd
+      balance: (profile.balance || 0) - amountUsd,
+      savingsCurrent: (profile.savingsCurrent || 0) + amountUsd
     });
   };
 
@@ -293,7 +297,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateLiabilities = (amountUsd: number) => {
     if (!profileRef || !profile) return;
-    updateDocumentNonBlocking(profileRef, { liabilities: Math.max(0, profile.liabilities + amountUsd) });
+    updateDocumentNonBlocking(profileRef, { liabilities: Math.max(0, (profile.liabilities || 0) + amountUsd) });
   };
 
   const convertToCurrent = (usdAmount: number) => {
@@ -315,9 +319,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const getPortfolioValue = () => {
-    const safePortfolio = portfolio || [];
-    if (!Array.isArray(safePortfolio)) return 0;
-    
+    // Robust safety check to prevent reduce() calls on null or non-array types
+    const safePortfolio = Array.isArray(portfolio) ? portfolio : [];
     return safePortfolio.reduce((acc, item) => {
       if (!item) return acc;
       const stock = stocks.find(s => s.symbol === item.symbol);
