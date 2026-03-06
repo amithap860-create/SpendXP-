@@ -1,3 +1,4 @@
+
 "use client"
 
 import { MainNav } from '@/components/layout/main-nav';
@@ -18,10 +19,10 @@ import {
 import Link from 'next/link';
 
 export default function Dashboard() {
-  const { ageGroup, balance, portfolio, savingsCurrent, savingsGoal, formatValue, xp, level, tasks } = useUser();
+  const { ageGroup, balance, getPortfolioValue, savingsCurrent, savingsGoal, formatValue, xp, level, tasks } = useUser();
 
   const savingsProgress = Math.min(100, (savingsCurrent / savingsGoal) * 100);
-  const portfolioValueUsd = portfolio.reduce((acc, item) => acc + (item.shares * 150), 0);
+  const portfolioValueUsd = getPortfolioValue();
   const xpInCurrentLevel = xp % 500;
   const levelProgress = (xpInCurrentLevel / 500) * 100;
   
@@ -79,7 +80,7 @@ export default function Dashboard() {
               <div className="text-3xl font-bold">{formatValue(portfolioValueUsd)}</div>
               <div className="flex items-center gap-1 text-emerald-500 text-xs mt-1">
                 <ArrowUpRight className="h-3 w-3" />
-                <span>+12.4% all time</span>
+                <span>Real-time Market Value</span>
               </div>
             </CardContent>
           </Card>

@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -19,23 +20,14 @@ import { generateMarketNewsAndExplanations } from '@/ai/flows/generate-market-ne
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 
-const INITIAL_STOCKS: Stock[] = [
-  { symbol: 'ECO', name: 'EcoGrow', price: 120.50, change: 2.5, history: [115, 118, 120, 119, 120.50] },
-  { symbol: 'SOL', name: 'Solaris Tech', price: 245.10, change: -1.2, history: [250, 248, 246, 247, 245.10] },
-  { symbol: 'AQUA', name: 'AquaLife', price: 56.75, change: 0.8, history: [55, 56, 55.5, 56.2, 56.75] },
-  { symbol: 'CYBER', name: 'CyberNest', price: 89.20, change: 4.1, history: [82, 85, 87, 88, 89.20] },
-  { symbol: 'BRIO', name: 'BrioFoods', price: 15.40, change: -0.5, history: [16, 15.8, 15.5, 15.6, 15.40] },
-];
-
 export default function MarketSimulation() {
-  const { ageGroup, balance, portfolio, buyStock, sellStock, formatValue, convertToCurrent, currency } = useUser();
+  const { ageGroup, balance, portfolio, buyStock, sellStock, formatValue, stocks, updateStocks, currency } = useUser();
   const { toast } = useToast();
-  const [stocks, setStocks] = useState<Stock[]>(INITIAL_STOCKS);
-  const [news, setNews] = useState<any>(null);
   const [isLoadingNews, setIsLoadingNews] = useState(false);
   const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
   const [tradeAmount, setTradeAmount] = useState('1');
   const [showExplanation, setShowExplanation] = useState(false);
+  const [news, setNews] = useState<any>(null);
 
   const fetchNews = async () => {
     setIsLoadingNews(true);
@@ -47,13 +39,14 @@ export default function MarketSimulation() {
       });
       setNews(result);
       
-      setStocks(prev => prev.map(stock => {
+      const updatedStocks = stocks.map(stock => {
         if (stock.name === result.impactedCompany) {
           const impactPercent = result.impactDirection === 'positive' ? 1.05 : (result.impactDirection === 'negative' ? 0.95 : 1);
           return { ...stock, price: Math.max(1, stock.price * impactPercent), change: (impactPercent - 1) * 100 };
         }
         return stock;
-      }));
+      });
+      updateStocks(updatedStocks);
     } catch (error) {
       console.error(error);
     } finally {
@@ -62,7 +55,9 @@ export default function MarketSimulation() {
   };
 
   useEffect(() => {
-    fetchNews();
+    if (news === null) {
+      fetchNews();
+    }
   }, []);
 
   const handleBuy = () => {
