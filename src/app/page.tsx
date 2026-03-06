@@ -7,34 +7,42 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { WalletCards, Sparkles } from 'lucide-react';
+import { WalletCards, Sparkles, LoaderCircle } from 'lucide-react';
 import Image from 'next/image';
 import { getPlaceholderById } from '@/lib/placeholder-images';
 
 export default function LandingPage() {
   const router = useRouter();
-  const { login, isLoggedIn } = useUser();
+  const { login, isLoggedIn, isInitialLoading } = useUser();
   const [email, setEmail] = useState('');
   const [age, setAge] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
     if (isLoggedIn) {
       router.push('/dashboard');
     }
-    const savedEmail = localStorage.getItem('spendxp_email_memory');
-    if (savedEmail) setEmail(savedEmail);
   }, [isLoggedIn, router]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const ageNum = parseInt(age);
     if (!email || isNaN(ageNum)) return;
     
-    localStorage.setItem('spendxp_email_memory', email);
-    login(email, ageNum);
-    router.push('/dashboard');
+    setIsSubmitting(true);
+    try {
+      await login(email, ageNum);
+      router.push('/dashboard');
+    } catch (error) {
+      console.error("Login failed", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const avatars = [
@@ -44,8 +52,12 @@ export default function LandingPage() {
     getPlaceholderById('avatar-4')
   ];
 
-  if (!isMounted) {
-    return null; // Prevent hydration mismatch by only rendering after mount
+  if (!isMounted || isInitialLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <LoaderCircle className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
   }
 
   return (
@@ -121,7 +133,8 @@ export default function LandingPage() {
                 />
                 <p className="text-[10px] text-muted-foreground pt-1">We customize SpendXP based on your age!</p>
               </div>
-              <Button type="submit" className="w-full h-12 text-lg font-bold shadow-lg shadow-primary/20">
+              <Button type="submit" className="w-full h-12 text-lg font-bold shadow-lg shadow-primary/20" disabled={isSubmitting}>
+                {isSubmitting ? <LoaderCircle className="h-5 w-5 animate-spin mr-2" /> : null}
                 Unlock My XP
               </Button>
             </form>

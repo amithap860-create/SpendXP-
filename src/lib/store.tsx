@@ -1,7 +1,30 @@
-
 "use client"
 
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import { 
+  useUser as useFirebaseUser, 
+  useFirestore, 
+  useAuth,
+  useDoc,
+  useCollection,
+  useMemoFirebase
+} from '@/firebase';
+import { 
+  doc, 
+  setDoc, 
+  updateDoc, 
+  collection, 
+  query, 
+  where,
+  serverTimestamp,
+  type DocumentReference
+} from 'firebase/firestore';
+import { 
+  signInAnonymously, 
+  updateProfile as updateAuthProfile,
+  signOut
+} from 'firebase/auth';
+import { setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 export type AgeGroup = '8-11' | '11-15' | '16-20';
 
@@ -20,15 +43,17 @@ export const EXCHANGE_RATES: Record<string, number> = {
 export interface Stock {
   symbol: string;
   name: string;
-  price: number; // Stored in USD
+  price: number;
   change: number;
   history: number[];
 }
 
 export interface PortfolioItem {
+  id: string;
   symbol: string;
   shares: number;
-  avgPrice: number; // Stored in USD
+  avgPrice: number;
+  userId: string;
 }
 
 export interface AppTask {
@@ -37,6 +62,23 @@ export interface AppTask {
   category: string;
   xpReward: number;
   completed: boolean;
+  userId?: string;
+}
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  name: string;
+  age: number;
+  country: string;
+  currency: string;
+  balance: number;
+  savingsGoal: number;
+  savingsCurrent: number;
+  liabilities: number;
+  xp: number;
+  level: number;
+  createdAt: any;
 }
 
 const INITIAL_STOCKS: Stock[] = [
@@ -47,6 +89,16 @@ const INITIAL_STOCKS: Stock[] = [
   { symbol: 'BRIO', name: 'BrioFoods', price: 15.40, change: -0.5, history: [16, 15.8, 15.5, 15.6, 15.40] },
 ];
 
+const DEFAULT_TASKS: Omit<AppTask, 'id'>[] = [
+  { title: 'Learn about Income', category: 'Academy', xpReward: 50, completed: false },
+  { title: 'Understand Expenses', category: 'Academy', xpReward: 50, completed: false },
+  { title: 'Master the Budget', category: 'Academy', xpReward: 50, completed: false },
+  { title: 'Win Denomination Dash', category: 'Games', xpReward: 100, completed: false },
+  { title: 'Complete Wealth Architect', category: 'Games', xpReward: 150, completed: false },
+  { title: 'Make your first trade', category: 'Market', xpReward: 100, completed: false },
+  { title: 'Complete a Flashcard set', category: 'Study', xpReward: 75, completed: false },
+];
+
 interface UserContextType {
   name: string;
   email: string;
@@ -54,17 +106,18 @@ interface UserContextType {
   ageGroup: AgeGroup;
   country: string;
   currency: string;
-  balance: number; // Stored in USD
+  balance: number;
   portfolio: PortfolioItem[];
   stocks: Stock[];
-  savingsGoal: number; // Stored in USD
-  savingsCurrent: number; // Stored in USD
-  liabilities: number; // Stored in USD
+  savingsGoal: number;
+  savingsCurrent: number;
+  liabilities: number;
   xp: number;
   level: number;
   tasks: AppTask[];
   isLoggedIn: boolean;
-  login: (email: string, age: number) => void;
+  isInitialLoading: boolean;
+  login: (email: string, age: number) => Promise<void>;
   logout: () => void;
   updateProfile: (data: { name: string; email: string; age: number; country: string; currency: string }) => void;
   updateStocks: (newStocks: Stock[]) => void;
@@ -76,163 +129,178 @@ interface UserContextType {
   addXP: (amount: number) => void;
   completeTask: (taskId: string) => void;
   getPortfolioValue: () => number;
-  // Helpers
   formatValue: (usdAmount: number) => string;
   convertToCurrent: (usdAmount: number) => number;
   convertFromCurrent: (currentAmount: number) => number;
 }
 
-const DEFAULT_TASKS: AppTask[] = [
-  { id: 'academy-income', title: 'Learn about Income', category: 'Academy', xpReward: 50, completed: false },
-  { id: 'academy-outcome', title: 'Understand Expenses', category: 'Academy', xpReward: 50, completed: false },
-  { id: 'academy-budget', title: 'Master the Budget', category: 'Academy', xpReward: 50, completed: false },
-  { id: 'game-dash', title: 'Win Denomination Dash', category: 'Games', xpReward: 100, completed: false },
-  { id: 'game-advisor', title: 'Complete Wealth Architect', category: 'Games', xpReward: 150, completed: false },
-  { id: 'market-first-trade', title: 'Make your first trade', category: 'Market', xpReward: 100, completed: false },
-  { id: 'flashcards-set', title: 'Complete a Flashcard set', category: 'Study', xpReward: 75, completed: false },
-];
-
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [age, setAge] = useState(0);
-  const [ageGroup, setAgeGroup] = useState<AgeGroup>('11-15');
-  const [country, setCountry] = useState('United States');
-  const [currency, setCurrency] = useState('USD');
-  const [balance, setBalance] = useState(1000); 
-  const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
+  const { user, isUserLoading } = useFirebaseUser();
+  const db = useFirestore();
+  const auth = useAuth();
+  
   const [stocks, setStocks] = useState<Stock[]>(INITIAL_STOCKS);
-  const [savingsGoal, setSavingsGoalValue] = useState(500); 
-  const [savingsCurrent, setSavingsCurrent] = useState(0); 
-  const [liabilities, setLiabilities] = useState(0);
-  const [xp, setXP] = useState(0);
-  const [level, setLevel] = useState(1);
-  const [tasks, setTasks] = useState<AppTask[]>(DEFAULT_TASKS);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const isInitialized = useRef(false);
 
-  useEffect(() => {
-    const saved = localStorage.getItem('spendxp_user');
-    if (saved) {
-      try {
-        const data = JSON.parse(saved);
-        setName(data.name || '');
-        setEmail(data.email || '');
-        setAge(data.age || 0);
-        setAgeGroup(data.ageGroup || '11-15');
-        setCountry(data.country || 'United States');
-        setCurrency(data.currency || 'USD');
-        setBalance(data.balance ?? 1000);
-        setPortfolio(data.portfolio ?? []);
-        setStocks(data.stocks ?? INITIAL_STOCKS);
-        setSavingsGoalValue(data.savingsGoal ?? 500);
-        setSavingsCurrent(data.savingsCurrent ?? 0);
-        setLiabilities(data.liabilities ?? 0);
-        setXP(data.xp ?? 0);
-        setLevel(data.level ?? 1);
-        
-        // Merge saved tasks with default tasks to handle new missions added in updates
-        const savedTasks = data.tasks || [];
-        const mergedTasks = DEFAULT_TASKS.map(defTask => {
-          const savedTask = savedTasks.find((t: AppTask) => t.id === defTask.id);
-          return savedTask ? { ...defTask, completed: savedTask.completed } : defTask;
-        });
-        setTasks(mergedTasks);
-        
-        setIsLoggedIn(!!data.email);
-      } catch (e) {
-        console.error("Failed to parse saved user state", e);
-      }
-    }
-    isInitialized.current = true;
-  }, []);
+  // Firestore Sync: Profile
+  const profileRef = useMemoFirebase(() => {
+    return user ? doc(db, 'users', user.uid) : null;
+  }, [db, user]);
+  const { data: profile, isLoading: isProfileLoading } = useDoc<UserProfile>(profileRef);
 
-  useEffect(() => {
-    if (isInitialized.current && isLoggedIn) {
-      const state = {
-        name, email, age, ageGroup, country, currency, balance, portfolio, stocks, savingsGoal, savingsCurrent, liabilities, xp, level, tasks
-      };
-      localStorage.setItem('spendxp_user', JSON.stringify(state));
-    }
-  }, [name, email, age, ageGroup, country, currency, balance, portfolio, stocks, savingsGoal, savingsCurrent, liabilities, xp, level, tasks, isLoggedIn]);
+  // Firestore Sync: Portfolio
+  const portfolioQuery = useMemoFirebase(() => {
+    return user ? collection(db, 'users', user.uid, 'virtualInvestments') : null;
+  }, [db, user]);
+  const { data: portfolio = [], isLoading: isPortfolioLoading } = useCollection<PortfolioItem>(portfolioQuery);
 
-  const login = (newEmail: string, newAge: number) => {
-    let group: AgeGroup = '11-15';
-    if (newAge <= 11) group = '8-11';
-    else if (newAge >= 16) group = '16-20';
+  // Firestore Sync: Tasks/Progress
+  const tasksQuery = useMemoFirebase(() => {
+    return user ? collection(db, 'users', user.uid, 'lessonProgress') : null;
+  }, [db, user]);
+  const { data: remoteTasks = [], isLoading: isTasksLoading } = useCollection<AppTask>(tasksQuery);
+
+  const isInitialLoading = isUserLoading || isProfileLoading || isPortfolioLoading || isTasksLoading;
+
+  const age = profile?.age || 0;
+  const ageGroup = useMemo((): AgeGroup => {
+    if (age <= 11) return '8-11';
+    if (age >= 16) return '16-20';
+    return '11-15';
+  }, [age]);
+
+  const login = async (email: string, age: number) => {
+    const result = await signInAnonymously(auth);
+    const userId = result.user.uid;
     
-    setEmail(newEmail);
-    setAge(newAge);
-    setAgeGroup(group);
-    setIsLoggedIn(true);
+    // Initialize profile in Firestore
+    const userRef = doc(db, 'users', userId);
+    setDocumentNonBlocking(userRef, {
+      id: userId,
+      email,
+      name: email.split('@')[0],
+      age,
+      country: 'United States',
+      currency: 'USD',
+      balance: 1000,
+      savingsGoal: 500,
+      savingsCurrent: 0,
+      liabilities: 0,
+      xp: 0,
+      level: 1,
+      createdAt: serverTimestamp(),
+    }, { merge: true });
+
+    // Initialize default tasks
+    DEFAULT_TASKS.forEach((t, index) => {
+      const taskRef = doc(db, 'users', userId, 'lessonProgress', `task-${index}`);
+      setDocumentNonBlocking(taskRef, {
+        ...t,
+        id: `task-${index}`,
+        userId,
+        status: 'not_started',
+        lastAccessedAt: new Date().toISOString()
+      }, { merge: true });
+    });
   };
 
-  const logout = () => {
-    setName('');
-    setEmail('');
-    setAge(0);
-    setAgeGroup('11-15');
-    setCountry('United States');
-    setCurrency('USD');
-    setBalance(1000);
-    setPortfolio([]);
-    setStocks(INITIAL_STOCKS);
-    setSavingsGoalValue(500);
-    setSavingsCurrent(0);
-    setLiabilities(0);
-    setXP(0);
-    setLevel(1);
-    setTasks(DEFAULT_TASKS);
-    setIsLoggedIn(false);
-    localStorage.removeItem('spendxp_user');
-  };
+  const logout = () => signOut(auth);
 
-  const updateProfile = (data: { name: string; email: string; age: number; country: string; currency: string }) => {
-    setName(data.name);
-    setEmail(data.email);
-    setAge(data.age);
-    setCountry(data.country);
-    setCurrency(data.currency);
-    
-    let group: AgeGroup = '11-15';
-    if (data.age <= 11) group = '8-11';
-    else if (data.age >= 16) group = '16-20';
-    setAgeGroup(group);
-  };
-
-  const updateStocks = (newStocks: Stock[]) => {
-    setStocks(newStocks);
+  const updateProfile = (data: any) => {
+    if (!profileRef) return;
+    updateDocumentNonBlocking(profileRef, { ...data });
   };
 
   const addXP = (amount: number) => {
-    setXP(prev => {
-      const newXP = prev + amount;
-      const newLevel = Math.floor(newXP / 500) + 1;
-      if (newLevel > level) setLevel(newLevel);
-      return newXP;
-    });
+    if (!profileRef || !profile) return;
+    const newXP = profile.xp + amount;
+    const newLevel = Math.floor(newXP / 500) + 1;
+    updateDocumentNonBlocking(profileRef, { xp: newXP, level: newLevel });
   };
 
   const completeTask = (taskId: string) => {
-    setTasks(prev => {
-      const task = prev.find(t => t.id === taskId);
-      if (task && !task.completed) {
-        addXP(task.xpReward);
-        return prev.map(t => t.id === taskId ? { ...t, completed: true } : t);
-      }
-      return prev;
+    const task = remoteTasks.find(t => t.id === taskId);
+    if (task && !task.completed && user) {
+      const taskRef = doc(db, 'users', user.uid, 'lessonProgress', taskId);
+      updateDocumentNonBlocking(taskRef, { completed: true, status: 'completed', completedAt: new Date().toISOString() });
+      addXP(task.xpReward);
+    }
+  };
+
+  const buyStock = (symbol: string, shares: number, priceUsd: number) => {
+    if (!user || !profile || profile.balance < (shares * priceUsd)) return;
+    
+    const cost = shares * priceUsd;
+    updateDocumentNonBlocking(profileRef!, { balance: profile.balance - cost });
+    
+    const investmentId = `inv-${symbol}`;
+    const invRef = doc(db, 'users', user.uid, 'virtualInvestments', investmentId);
+    
+    const existing = portfolio.find(p => p.symbol === symbol);
+    if (existing) {
+      const newShares = existing.shares + shares;
+      const newAvg = (existing.shares * existing.avgPrice + cost) / newShares;
+      updateDocumentNonBlocking(invRef, { shares: newShares, avgPrice: newAvg, lastTransactionAt: new Date().toISOString() });
+    } else {
+      setDocumentNonBlocking(invRef, {
+        id: investmentId,
+        userId: user.uid,
+        symbol,
+        shares,
+        avgPrice: priceUsd,
+        totalInvestmentAmount: cost,
+        lastTransactionAt: new Date().toISOString()
+      }, { merge: true });
+    }
+    completeTask('market-first-trade');
+  };
+
+  const sellStock = (symbol: string, shares: number, priceUsd: number) => {
+    if (!user || !profile) return;
+    const existing = portfolio.find(p => p.symbol === symbol);
+    if (!existing || existing.shares < shares) return;
+
+    const gain = shares * priceUsd;
+    updateDocumentNonBlocking(profileRef!, { balance: profile.balance + gain });
+    
+    const invRef = doc(db, 'users', user.uid, 'virtualInvestments', existing.id);
+    if (existing.shares === shares) {
+      // In this app we don't really delete for simplicity, just set to 0
+      updateDocumentNonBlocking(invRef, { shares: 0 });
+    } else {
+      updateDocumentNonBlocking(invRef, { shares: existing.shares - shares });
+    }
+  };
+
+  const updateSavings = (amountUsd: number) => {
+    if (!profileRef || !profile) return;
+    if (amountUsd > 0 && profile.balance < amountUsd) return;
+    if (amountUsd < 0 && profile.savingsCurrent < Math.abs(amountUsd)) return;
+
+    updateDocumentNonBlocking(profileRef, {
+      balance: profile.balance - amountUsd,
+      savingsCurrent: profile.savingsCurrent + amountUsd
     });
   };
 
+  const setSavingsGoal = (amountUsd: number) => {
+    if (!profileRef) return;
+    updateDocumentNonBlocking(profileRef, { savingsGoal: amountUsd });
+  };
+
+  const updateLiabilities = (amountUsd: number) => {
+    if (!profileRef || !profile) return;
+    updateDocumentNonBlocking(profileRef, { liabilities: Math.max(0, profile.liabilities + amountUsd) });
+  };
+
   const convertToCurrent = (usdAmount: number) => {
-    const rate = EXCHANGE_RATES[currency] || 1;
+    const rate = EXCHANGE_RATES[profile?.currency || 'USD'] || 1;
     return usdAmount * rate;
   };
 
   const convertFromCurrent = (currentAmount: number) => {
-    const rate = EXCHANGE_RATES[currency] || 1;
+    const rate = EXCHANGE_RATES[profile?.currency || 'USD'] || 1;
     return currentAmount / rate;
   };
 
@@ -240,7 +308,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const converted = convertToCurrent(usdAmount);
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: currency,
+      currency: profile?.currency || 'USD',
     }).format(converted);
   };
 
@@ -251,64 +319,43 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, 0);
   };
 
-  const buyStock = (symbol: string, shares: number, priceUsd: number) => {
-    const totalCost = shares * priceUsd;
-    if (balance < totalCost) return;
-
-    setBalance(prev => prev - totalCost);
-    setPortfolio(prev => {
-      const existing = prev.find(i => i.symbol === symbol);
-      if (existing) {
-        const newShares = existing.shares + shares;
-        const newAvg = (existing.shares * existing.avgPrice + totalCost) / newShares;
-        return prev.map(i => i.symbol === symbol ? { ...i, shares: newShares, avgPrice: newAvg } : i);
-      }
-      return [...prev, { symbol, shares, avgPrice: priceUsd }];
-    });
-    completeTask('market-first-trade');
-  };
-
-  const sellStock = (symbol: string, shares: number, priceUsd: number) => {
-    const existing = portfolio.find(i => i.symbol === symbol);
-    if (!existing || existing.shares < shares) return;
-
-    const totalGain = shares * priceUsd;
-    setBalance(prev => prev + totalGain);
-    setPortfolio(prev => {
-      return prev.map(i => i.symbol === symbol ? { ...i, shares: i.shares - shares } : i).filter(i => i.shares > 0);
-    });
-  };
-
-  const updateSavings = (amountUsd: number) => {
-    // If saving (depositing)
-    if (amountUsd > 0) {
-      if (balance < amountUsd) return;
-      setBalance(prev => prev - amountUsd);
-      setSavingsCurrent(prev => prev + amountUsd);
-    } 
-    // If withdrawing
-    else if (amountUsd < 0) {
-      const absAmount = Math.abs(amountUsd);
-      if (savingsCurrent < absAmount) return;
-      setBalance(prev => prev + absAmount);
-      setSavingsCurrent(prev => prev - absAmount);
-    }
-  };
-
-  const setSavingsGoal = (amountUsd: number) => {
-    setSavingsGoalValue(amountUsd);
-  };
-
-  const updateLiabilities = (amountUsd: number) => {
-    setLiabilities(prev => Math.max(0, prev + amountUsd));
+  const value: UserContextType = {
+    name: profile?.name || '',
+    email: profile?.email || '',
+    age,
+    ageGroup,
+    country: profile?.country || 'United States',
+    currency: profile?.currency || 'USD',
+    balance: profile?.balance || 0,
+    portfolio,
+    stocks,
+    savingsGoal: profile?.savingsGoal || 500,
+    savingsCurrent: profile?.savingsCurrent || 0,
+    liabilities: profile?.liabilities || 0,
+    xp: profile?.xp || 0,
+    level: profile?.level || 1,
+    tasks: remoteTasks,
+    isLoggedIn: !!user,
+    isInitialLoading,
+    login,
+    logout,
+    updateProfile,
+    updateStocks: setStocks,
+    buyStock,
+    sellStock,
+    updateSavings,
+    setSavingsGoal,
+    updateLiabilities,
+    addXP,
+    completeTask,
+    getPortfolioValue,
+    formatValue,
+    convertToCurrent,
+    convertFromCurrent
   };
 
   return (
-    <UserContext.Provider value={{ 
-      name, email, age, ageGroup, country, currency, balance, portfolio, stocks, savingsGoal, savingsCurrent, liabilities, xp, level, tasks, isLoggedIn,
-      login, logout, updateProfile, updateStocks, buyStock, sellStock, updateSavings, setSavingsGoal, updateLiabilities, addXP, completeTask, getPortfolioValue,
-      formatValue, convertToCurrent, convertFromCurrent
-    }}>
+    <UserContext.Provider value={value}>
       {children}
     </UserContext.Provider>
   );
