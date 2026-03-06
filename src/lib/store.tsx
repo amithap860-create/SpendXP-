@@ -155,14 +155,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return user ? collection(db, 'users', user.uid, 'virtualInvestments') : null;
   }, [db, user]);
   const { data: portfolioData, isLoading: isPortfolioLoading } = useCollection<PortfolioItem>(portfolioQuery);
-  const portfolio = portfolioData || [];
+  const portfolio = portfolioData ?? [];
 
   // Firestore Sync: Tasks/Progress
   const tasksQuery = useMemoFirebase(() => {
     return user ? collection(db, 'users', user.uid, 'lessonProgress') : null;
   }, [db, user]);
   const { data: remoteTasksData, isLoading: isTasksLoading } = useCollection<AppTask>(tasksQuery);
-  const remoteTasks = remoteTasksData || [];
+  const remoteTasks = remoteTasksData ?? [];
 
   const isInitialLoading = isUserLoading || isProfileLoading || isPortfolioLoading || isTasksLoading;
 
@@ -240,7 +240,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const investmentId = `inv-${symbol}`;
     const invRef = doc(db, 'users', user.uid, 'virtualInvestments', investmentId);
     
-    const existing = portfolio.find(p => p.symbol === symbol);
+    const existing = (portfolio || []).find(p => p.symbol === symbol);
     if (existing) {
       const newShares = existing.shares + shares;
       const newAvg = (existing.shares * existing.avgPrice + cost) / newShares;
@@ -261,7 +261,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const sellStock = (symbol: string, shares: number, priceUsd: number) => {
     if (!user || !profile) return;
-    const existing = portfolio.find(p => p.symbol === symbol);
+    const existing = (portfolio || []).find(p => p.symbol === symbol);
     if (!existing || existing.shares < shares) return;
 
     const gain = shares * priceUsd;
@@ -269,7 +269,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     const invRef = doc(db, 'users', user.uid, 'virtualInvestments', existing.id);
     if (existing.shares === shares) {
-      // In this app we don't really delete for simplicity, just set to 0
       updateDocumentNonBlocking(invRef, { shares: 0 });
     } else {
       updateDocumentNonBlocking(invRef, { shares: existing.shares - shares });
@@ -299,12 +298,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const convertToCurrent = (usdAmount: number) => {
     const rate = EXCHANGE_RATES[profile?.currency || 'USD'] || 1;
-    return usdAmount * rate;
+    return (usdAmount || 0) * rate;
   };
 
   const convertFromCurrent = (currentAmount: number) => {
     const rate = EXCHANGE_RATES[profile?.currency || 'USD'] || 1;
-    return currentAmount / rate;
+    return (currentAmount || 0) / rate;
   };
 
   const formatValue = (usdAmount: number) => {
@@ -316,9 +315,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const getPortfolioValue = () => {
-    return portfolio.reduce((acc, item) => {
+    const safePortfolio = portfolio || [];
+    return safePortfolio.reduce((acc, item) => {
       const stock = stocks.find(s => s.symbol === item.symbol);
-      return acc + (item.shares * (stock?.price || 0));
+      return acc + ((item.shares || 0) * (stock?.price || 0));
     }, 0);
   };
 

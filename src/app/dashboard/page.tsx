@@ -21,14 +21,15 @@ import Link from 'next/link';
 export default function Dashboard() {
   const { ageGroup, balance, getPortfolioValue, savingsCurrent, savingsGoal, formatValue, xp, level, tasks } = useUser();
 
-  const savingsProgress = Math.min(100, (savingsCurrent / savingsGoal) * 100);
-  const portfolioValueUsd = getPortfolioValue();
-  const xpInCurrentLevel = xp % 500;
+  const safeTasks = tasks || [];
+  const savingsProgress = Math.min(100, (savingsCurrent / (savingsGoal || 1)) * 100);
+  const portfolioValueUsd = getPortfolioValue ? getPortfolioValue() : 0;
+  const xpInCurrentLevel = (xp || 0) % 500;
   const levelProgress = (xpInCurrentLevel / 500) * 100;
   
-  const completedTasksCount = tasks.filter(t => t.completed).length;
-  const totalTasksCount = tasks.length;
-  const taskProgress = (completedTasksCount / totalTasksCount) * 100;
+  const completedTasksCount = safeTasks.filter(t => t.completed).length;
+  const totalTasksCount = safeTasks.length;
+  const taskProgress = totalTasksCount > 0 ? (completedTasksCount / totalTasksCount) * 100 : 0;
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -41,7 +42,7 @@ export default function Dashboard() {
                 {ageGroup} MODE
               </span>
               <Badge variant="secondary" className="bg-primary/10 text-primary border-none">
-                LEVEL {level}
+                LEVEL {level || 1}
               </Badge>
             </div>
             <h2 className="text-3xl font-bold text-primary">Welcome back, Strategist!</h2>
@@ -50,7 +51,7 @@ export default function Dashboard() {
           
           <div className="w-full md:w-64 space-y-2 bg-white p-4 rounded-xl shadow-sm">
             <div className="flex justify-between text-xs font-bold uppercase text-muted-foreground">
-              <span>Level {level} Progress</span>
+              <span>Level {level || 1} Progress</span>
               <span>{xpInCurrentLevel}/500 XP</span>
             </div>
             <Progress value={levelProgress} className="h-2" />
@@ -66,7 +67,7 @@ export default function Dashboard() {
               <CardTitle className="text-sm font-medium text-primary-foreground/80">Virtual Wallet</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{formatValue(balance)}</div>
+              <div className="text-3xl font-bold">{formatValue(balance || 0)}</div>
               <p className="text-xs text-primary-foreground/60 mt-1">Available for investing</p>
             </CardContent>
           </Card>
@@ -92,8 +93,8 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between mb-2">
-                <div className="text-2xl font-bold">{formatValue(savingsCurrent)}</div>
-                <div className="text-[10px] text-muted-foreground">of {formatValue(savingsGoal)}</div>
+                <div className="text-2xl font-bold">{formatValue(savingsCurrent || 0)}</div>
+                <div className="text-[10px] text-muted-foreground">of {formatValue(savingsGoal || 0)} Target</div>
               </div>
               <Progress value={savingsProgress} className="h-2" />
             </CardContent>
@@ -119,7 +120,7 @@ export default function Dashboard() {
               </div>
               
               <div className="space-y-3">
-                {tasks.map((task) => (
+                {safeTasks.map((task) => (
                   <div key={task.id} className={`flex items-center justify-between p-3 rounded-lg border ${task.completed ? 'bg-emerald-50 border-emerald-100' : 'bg-slate-50 border-slate-100'}`}>
                     <div className="flex items-center gap-3">
                       {task.completed ? (
