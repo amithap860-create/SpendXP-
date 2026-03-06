@@ -1,0 +1,775 @@
+{
+  "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Represents a student user's profile, containing personal details and virtual currency balance.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserProfile entity."
+        },
+        "email": {
+          "type": "string",
+          "description": "User's email address, used for remembering login. (Not for authentication storage)",
+          "format": "email"
+        },
+        "age": {
+          "type": "number",
+          "description": "The user's age, used to determine content difficulty and personalize learning."
+        },
+        "virtualCurrencyBalance": {
+          "type": "number",
+          "description": "The current balance of virtual money the user possesses for simulations and savings goals."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the user profile was created.",
+          "format": "date-time"
+        },
+        "lastLoginAt": {
+          "type": "string",
+          "description": "Timestamp of the user's last login.",
+          "format": "date-time"
+        },
+        "progressDashboardId": {
+          "type": "string",
+          "description": "Reference to the UserProgressDashboard associated with this user. (Relationship: UserProfile 1:1 UserProgressDashboard)"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "age",
+        "virtualCurrencyBalance",
+        "createdAt",
+        "lastLoginAt",
+        "progressDashboardId"
+      ]
+    },
+    "Lesson": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Lesson",
+      "type": "object",
+      "description": "Represents a single educational lesson covering a financial concept.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Lesson entity."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the lesson."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief summary of the lesson's content."
+        },
+        "contentBody": {
+          "type": "string",
+          "description": "The main content of the lesson, which could include text, simplified HTML, or markdown."
+        },
+        "difficultyLevel": {
+          "type": "string",
+          "description": "The target difficulty level for the lesson (e.g., simple, medium, normal).",
+          "format": "enum"
+        },
+        "category": {
+          "type": "string",
+          "description": "The financial category the lesson belongs to (e.g., 'Income', 'Expenses', 'Savings', 'Investing')."
+        },
+        "flashcardIds": {
+          "type": "array",
+          "description": "References to Flashcards associated with this lesson. (Relationship: Lesson N:N Flashcard)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "description",
+        "contentBody",
+        "difficultyLevel",
+        "category",
+        "flashcardIds"
+      ]
+    },
+    "Flashcard": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Flashcard",
+      "type": "object",
+      "description": "Represents a single flashcard used for learning financial terms and definitions.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Flashcard entity."
+        },
+        "term": {
+          "type": "string",
+          "description": "The financial term or concept on the front of the flashcard."
+        },
+        "definition": {
+          "type": "string",
+          "description": "The definition or explanation on the back of the flashcard."
+        },
+        "difficultyLevel": {
+          "type": "string",
+          "description": "The target difficulty level for the flashcard (e.g., simple, medium, normal).",
+          "format": "enum"
+        },
+        "lessonId": {
+          "type": "string",
+          "description": "Reference to the Lesson this flashcard belongs to. (Relationship: Lesson 1:N Flashcard)"
+        }
+      },
+      "required": [
+        "id",
+        "term",
+        "definition",
+        "difficultyLevel",
+        "lessonId"
+      ]
+    },
+    "UserProgressDashboard": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProgressDashboard",
+      "type": "object",
+      "description": "Aggregates a user's overall progress, investment performance, and savings achievements for display on the dashboard.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserProgressDashboard entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile this dashboard belongs to. (Relationship: UserProfile 1:1 UserProgressDashboard)"
+        },
+        "totalLessonsCompleted": {
+          "type": "number",
+          "description": "The total count of lessons the user has completed."
+        },
+        "totalFlashcardsMastered": {
+          "type": "number",
+          "description": "The total count of flashcards the user has mastered."
+        },
+        "totalVirtualProfitLoss": {
+          "type": "number",
+          "description": "The total virtual profit or loss from market simulation investments."
+        },
+        "totalSavingsAchieved": {
+          "type": "number",
+          "description": "The total amount of virtual currency saved across all goals."
+        },
+        "lastUpdatedAt": {
+          "type": "string",
+          "description": "Timestamp of the last update to the user's progress dashboard.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "totalLessonsCompleted",
+        "totalFlashcardsMastered",
+        "totalVirtualProfitLoss",
+        "totalSavingsAchieved",
+        "lastUpdatedAt"
+      ]
+    },
+    "LessonProgressRecord": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "LessonProgressRecord",
+      "type": "object",
+      "description": "Tracks a user's progress on a specific lesson.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the LessonProgressRecord entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who owns this progress record. (Relationship: UserProfile 1:N LessonProgressRecord)"
+        },
+        "lessonId": {
+          "type": "string",
+          "description": "Reference to the Lesson being tracked. (Relationship: Lesson 1:N LessonProgressRecord)"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the lesson for the user (e.g., 'not_started', 'in_progress', 'completed').",
+          "format": "enum"
+        },
+        "completedAt": {
+          "type": "string",
+          "description": "Timestamp when the lesson was completed, if applicable.",
+          "format": "date-time"
+        },
+        "lastAccessedAt": {
+          "type": "string",
+          "description": "Timestamp of the last time the user accessed this lesson.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "lessonId",
+        "status",
+        "lastAccessedAt"
+      ]
+    },
+    "FlashcardMastery": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FlashcardMastery",
+      "type": "object",
+      "description": "Tracks a user's mastery level for a specific flashcard.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the FlashcardMastery entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who is learning this flashcard. (Relationship: UserProfile 1:N FlashcardMastery)"
+        },
+        "flashcardId": {
+          "type": "string",
+          "description": "Reference to the Flashcard being mastered. (Relationship: Flashcard 1:N FlashcardMastery)"
+        },
+        "masteryLevel": {
+          "type": "number",
+          "description": "A numerical representation of the user's mastery of the flashcard (e.g., 0-5, where 5 is fully mastered)."
+        },
+        "lastReviewedAt": {
+          "type": "string",
+          "description": "Timestamp of the last time the user reviewed this flashcard.",
+          "format": "date-time"
+        },
+        "correctAttempts": {
+          "type": "number",
+          "description": "The number of times the user answered this flashcard correctly."
+        },
+        "incorrectAttempts": {
+          "type": "number",
+          "description": "The number of times the user answered this flashcard incorrectly."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "flashcardId",
+        "masteryLevel",
+        "lastReviewedAt",
+        "correctAttempts",
+        "incorrectAttempts"
+      ]
+    },
+    "VirtualCompany": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "VirtualCompany",
+      "type": "object",
+      "description": "Represents a fictional company in the virtual stock market simulation.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the VirtualCompany entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the virtual company."
+        },
+        "industry": {
+          "type": "string",
+          "description": "The industry sector the company operates in (e.g., 'Tech', 'Energy', 'Retail')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the virtual company and its business."
+        },
+        "currentStockPrice": {
+          "type": "number",
+          "description": "The current virtual stock price per share for this company."
+        },
+        "logoUrl": {
+          "type": "string",
+          "description": "URL to the company's logo graphic.",
+          "format": "uri"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the virtual company was created in the simulation.",
+          "format": "date-time"
+        },
+        "lastPriceUpdateAt": {
+          "type": "string",
+          "description": "Timestamp of the last update to the company's stock price.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "industry",
+        "description",
+        "currentStockPrice",
+        "createdAt",
+        "lastPriceUpdateAt"
+      ]
+    },
+    "VirtualStockPriceHistory": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "VirtualStockPriceHistory",
+      "type": "object",
+      "description": "Records historical stock prices for a virtual company over time.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the VirtualStockPriceHistory entity."
+        },
+        "companyId": {
+          "type": "string",
+          "description": "Reference to the VirtualCompany whose stock price is being recorded. (Relationship: VirtualCompany 1:N VirtualStockPriceHistory)"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "The date and time of the recorded stock price.",
+          "format": "date-time"
+        },
+        "price": {
+          "type": "number",
+          "description": "The stock price at the given timestamp."
+        },
+        "simulatedNewsEventId": {
+          "type": "string",
+          "description": "Optional reference to a SimulatedNewsEvent that influenced this price change. (Relationship: SimulatedNewsEvent 1:N VirtualStockPriceHistory)"
+        }
+      },
+      "required": [
+        "id",
+        "companyId",
+        "timestamp",
+        "price"
+      ]
+    },
+    "SimulatedNewsEvent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SimulatedNewsEvent",
+      "type": "object",
+      "description": "Represents a simulated news event that impacts virtual stock prices and provides educational insights.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the SimulatedNewsEvent entity."
+        },
+        "headline": {
+          "type": "string",
+          "description": "The headline of the simulated news event."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the news event."
+        },
+        "impactFactor": {
+          "type": "number",
+          "description": "A numerical factor indicating the magnitude and direction (positive/negative) of the impact on stock prices."
+        },
+        "affectedCompanyIds": {
+          "type": "array",
+          "description": "References to VirtualCompanies affected by this news event. (Relationship: SimulatedNewsEvent N:N VirtualCompany)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "educationalPopupText": {
+          "type": "string",
+          "description": "Text for an educational pop-up explaining the market concept related to this news event (e.g., volatility, supply/demand)."
+        },
+        "eventDate": {
+          "type": "string",
+          "description": "The simulated date and time when the news event occurred.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "headline",
+        "description",
+        "impactFactor",
+        "affectedCompanyIds",
+        "educationalPopupText",
+        "eventDate"
+      ]
+    },
+    "UserVirtualInvestment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserVirtualInvestment",
+      "type": "object",
+      "description": "Records a user's virtual investment in a specific company's stock.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserVirtualInvestment entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile making the investment. (Relationship: UserProfile 1:N UserVirtualInvestment)"
+        },
+        "companyId": {
+          "type": "string",
+          "description": "Reference to the VirtualCompany whose shares are owned. (Relationship: VirtualCompany 1:N UserVirtualInvestment)"
+        },
+        "sharesOwned": {
+          "type": "number",
+          "description": "The number of shares of the virtual company owned by the user."
+        },
+        "averagePurchasePricePerShare": {
+          "type": "number",
+          "description": "The average price per share at which the user purchased the shares."
+        },
+        "totalInvestmentAmount": {
+          "type": "number",
+          "description": "The total virtual currency amount invested in these shares."
+        },
+        "lastTransactionAt": {
+          "type": "string",
+          "description": "Timestamp of the last transaction (buy or sell) affecting this investment.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "companyId",
+        "sharesOwned",
+        "averagePurchasePricePerShare",
+        "totalInvestmentAmount",
+        "lastTransactionAt"
+      ]
+    },
+    "SavingsGoal": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SavingsGoal",
+      "type": "object",
+      "description": "Allows users to set and track virtual savings goals.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the SavingsGoal entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who set this savings goal. (Relationship: UserProfile 1:N SavingsGoal)"
+        },
+        "goalName": {
+          "type": "string",
+          "description": "A descriptive name for the savings goal (e.g., 'New Bike', 'Video Game')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of what the user is saving for."
+        },
+        "targetAmount": {
+          "type": "number",
+          "description": "The total virtual currency amount the user aims to save."
+        },
+        "currentSavedAmount": {
+          "type": "number",
+          "description": "The current amount of virtual currency saved towards the goal."
+        },
+        "startDate": {
+          "type": "string",
+          "description": "The date when the savings goal was initiated.",
+          "format": "date-time"
+        },
+        "targetDate": {
+          "type": "string",
+          "description": "The optional target date by which the user aims to achieve the goal.",
+          "format": "date-time"
+        },
+        "isAchieved": {
+          "type": "boolean",
+          "description": "Indicates whether the savings goal has been achieved."
+        },
+        "achievedAt": {
+          "type": "string",
+          "description": "Timestamp when the savings goal was achieved, if applicable.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "goalName",
+        "description",
+        "targetAmount",
+        "currentSavedAmount",
+        "startDate",
+        "isAchieved"
+      ]
+    },
+    "VirtualTransaction": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "VirtualTransaction",
+      "type": "object",
+      "description": "Records all virtual money movements made by a user within the app.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the VirtualTransaction entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who performed the transaction. (Relationship: UserProfile 1:N VirtualTransaction)"
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of virtual transaction (e.g., 'deposit', 'withdrawal', 'stock_buy', 'stock_sell', 'savings_contribution', 'savings_withdrawal').",
+          "format": "enum"
+        },
+        "amount": {
+          "type": "number",
+          "description": "The amount of virtual currency involved in the transaction."
+        },
+        "transactionDate": {
+          "type": "string",
+          "description": "The date and time when the transaction occurred.",
+          "format": "date-time"
+        },
+        "relatedEntityId": {
+          "type": "string",
+          "description": "Optional reference to an entity related to this transaction (e.g., UserVirtualInvestment ID, SavingsGoal ID)."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the transaction."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "type",
+        "amount",
+        "transactionDate",
+        "description"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores individual user profiles. Access is restricted to the owning user. The 'id' field in the document MUST match the '{userId}' parameter in the path.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, corresponding to Firebase Authentication's UID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/dashboard",
+        "definition": {
+          "entityName": "UserProgressDashboard",
+          "schema": {
+            "$ref": "#/backend/entities/UserProgressDashboard"
+          },
+          "description": "Stores the aggregated progress dashboard for a specific user. This is a 1:1 relationship where the document ID is 'dashboard'. Access is restricted to the owning user. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, corresponding to Firebase Authentication's UID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/lessonProgress/{recordId}",
+        "definition": {
+          "entityName": "LessonProgressRecord",
+          "schema": {
+            "$ref": "#/backend/entities/LessonProgressRecord"
+          },
+          "description": "Tracks a user's progress on individual lessons. Access is restricted to the owning user. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, corresponding to Firebase Authentication's UID."
+            },
+            {
+              "name": "recordId",
+              "description": "The unique identifier for a specific lesson progress record."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/flashcardMastery/{masteryId}",
+        "definition": {
+          "entityName": "FlashcardMastery",
+          "schema": {
+            "$ref": "#/backend/entities/FlashcardMastery"
+          },
+          "description": "Tracks a user's mastery level for individual flashcards. Access is restricted to the owning user. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, corresponding to Firebase Authentication's UID."
+            },
+            {
+              "name": "masteryId",
+              "description": "The unique identifier for a specific flashcard mastery record."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/virtualInvestments/{investmentId}",
+        "definition": {
+          "entityName": "UserVirtualInvestment",
+          "schema": {
+            "$ref": "#/backend/entities/UserVirtualInvestment"
+          },
+          "description": "Records a user's virtual stock investments. Access is restricted to the owning user. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, corresponding to Firebase Authentication's UID."
+            },
+            {
+              "name": "investmentId",
+              "description": "The unique identifier for a specific user virtual investment."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/savingsGoals/{goalId}",
+        "definition": {
+          "entityName": "SavingsGoal",
+          "schema": {
+            "$ref": "#/backend/entities/SavingsGoal"
+          },
+          "description": "Records a user's personal virtual savings goals. Access is restricted to the owning user. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, corresponding to Firebase Authentication's UID."
+            },
+            {
+              "name": "goalId",
+              "description": "The unique identifier for a specific savings goal."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/virtualTransactions/{transactionId}",
+        "definition": {
+          "entityName": "VirtualTransaction",
+          "schema": {
+            "$ref": "#/backend/entities/VirtualTransaction"
+          },
+          "description": "Records all virtual financial transactions made by a user. Access is restricted to the owning user. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, corresponding to Firebase Authentication's UID."
+            },
+            {
+              "name": "transactionId",
+              "description": "The unique identifier for a specific virtual transaction."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/lessons/{lessonId}",
+        "definition": {
+          "entityName": "Lesson",
+          "schema": {
+            "$ref": "#/backend/entities/Lesson"
+          },
+          "description": "Stores educational lessons. These are globally accessible (read-only) for all authenticated users."
+        }
+      },
+      {
+        "path": "/flashcards/{flashcardId}",
+        "definition": {
+          "entityName": "Flashcard",
+          "schema": {
+            "$ref": "#/backend/entities/Flashcard"
+          },
+          "description": "Stores individual flashcards. These are globally accessible (read-only) for all authenticated users."
+        }
+      },
+      {
+        "path": "/virtualCompanies/{companyId}",
+        "definition": {
+          "entityName": "VirtualCompany",
+          "schema": {
+            "$ref": "#/backend/entities/VirtualCompany"
+          },
+          "description": "Stores information about fictional companies for the stock market simulation. These are globally accessible (read-only) for all authenticated users.",
+          "params": [
+            {
+              "name": "companyId",
+              "description": "The unique identifier for a specific virtual company."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/virtualCompanies/{companyId}/priceHistory/{historyRecordId}",
+        "definition": {
+          "entityName": "VirtualStockPriceHistory",
+          "schema": {
+            "$ref": "#/backend/entities/VirtualStockPriceHistory"
+          },
+          "description": "Records historical stock prices for a specific virtual company. Globally accessible (read-only) for all authenticated users, inheriting access from its parent '/virtualCompanies' collection.",
+          "params": [
+            {
+              "name": "companyId",
+              "description": "The unique identifier of the parent virtual company."
+            },
+            {
+              "name": "historyRecordId",
+              "description": "The unique identifier for a specific historical stock price record."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/simulatedNewsEvents/{newsEventId}",
+        "definition": {
+          "entityName": "SimulatedNewsEvent",
+          "schema": {
+            "$ref": "#/backend/entities/SimulatedNewsEvent"
+          },
+          "description": "Stores simulated news events that impact virtual stock prices. These are globally accessible (read-only) for all authenticated users.",
+          "params": [
+            {
+              "name": "newsEventId",
+              "description": "The unique identifier for a specific simulated news event."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The proposed Firestore structure prioritizes security, scalability, and debuggability by strictly adhering to the core design principles and strategy mandates. \n\n**Authorization Independence and Denormalization (Mandate A):**\nFor all user-specific data (UserProfile, UserProgressDashboard, LessonProgressRecord, FlashcardMastery, UserVirtualInvestment, SavingsGoal, VirtualTransaction), a hierarchical path based on the user's ID is used: `/users/{userId}/<subcollection>/<documentId>`. Crucially, for every document within these user-specific subcollections (e.g., `lessonProgress`, `flashcardMastery`, `virtualInvestments`), the `userId` is explicitly denormalized into the document itself (e.g., `LessonProgressRecord.userId`, `FlashcardMastery.userId`). This is a critical implementation of **Authorization Independence**. It allows Firestore Security Rules to authorize access by simply comparing `request.auth.uid` with `resource.data.userId`, eliminating the need for expensive and complex `get()` calls to parent documents. This design ensures that atomic operations (transactions and batched writes) remain robust and secure, as rule evaluation for a child document does not depend on reading its parent.\n\n**Querying and Authorization Posture (QAPs - Mandate B & C):**\n1.  **User-Specific Data:** All user-owned data is stored in dedicated subcollections under `/users/{userId}/`. This creates a strong **Path-Based Ownership** model, making it trivial for security rules to ensure that a user can only access their own data (`request.auth.uid == userId`). `list` operations on these subcollections (e.g., `/users/{userId}/lessonProgress`) are inherently secure and efficient because the query is scoped to the authenticated user's ID, fulfilling QAPs without rules acting as filters.\n2.  **Global/Public Content:** Entities like `Lesson`, `Flashcard`, `VirtualCompany`, and `SimulatedNewsEvent` represent shared educational content or simulation data. These are placed in top-level collections (e.g., `/lessons/{lessonId}`). This ensures a **Homogeneous Security Posture** (Mandate B): all documents within these collections share the same security requirements, typically read-only access for all authenticated users. `list` queries on these collections are secure and efficient as all documents are intended to be broadly accessible to authenticated users.\n3.  **Nested Global Data:** `VirtualStockPriceHistory` is stored as a subcollection under `VirtualCompany` (`/virtualCompanies/{companyId}/priceHistory/{historyRecordId}`). Since `VirtualCompany` documents are globally readable, their subcollections also inherit this simple read access without requiring complex `get()` calls.\n\n**Overall Benefits:**\nThe structure explicitly maps data ownership and access patterns, greatly simplifying security rule development. Rules will be concise, focusing on `request.auth.uid` checks for user-specific data and simple `allow read: if request.auth != null;` for global content. This approach minimizes complexity, enhances security, and ensures the scalability and debuggability of the Firestore application."
+  }
+}
