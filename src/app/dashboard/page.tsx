@@ -1,4 +1,3 @@
-
 "use client"
 
 import { MainNav } from '@/components/layout/main-nav';
@@ -13,7 +12,7 @@ import {
   Zap, 
   Star,
   ArrowUpRight,
-  CheckCircle2,
+  CircleCheckBig,
   Lock
 } from 'lucide-react';
 import Link from 'next/link';
@@ -123,7 +122,7 @@ export default function Dashboard() {
                   <div key={task.id} className={`flex items-center justify-between p-3 rounded-lg border ${task.completed ? 'bg-emerald-50 border-emerald-100' : 'bg-slate-50 border-slate-100'}`}>
                     <div className="flex items-center gap-3">
                       {task.completed ? (
-                        <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                        <CircleCheckBig className="h-5 w-5 text-emerald-500" />
                       ) : (
                         <div className="h-5 w-5 rounded-full border-2 border-slate-300" />
                       )}

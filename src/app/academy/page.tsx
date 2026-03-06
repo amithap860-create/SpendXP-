@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from 'react';
@@ -19,7 +18,7 @@ import {
   Calculator,
   Lightbulb,
   Gamepad2,
-  CheckCircle2
+  CircleCheckBig
 } from 'lucide-react';
 import { 
   Table, 
@@ -118,7 +117,7 @@ export default function Academy() {
                         <CircleArrowUp className="h-5 w-5" />
                         <span className="text-xs font-bold uppercase tracking-wider">Concept One</span>
                       </div>
-                      {isTaskCompleted('academy-income') && <CheckCircle2 className="h-5 w-5 text-emerald-500" />}
+                      {isTaskCompleted('academy-income') && <CircleCheckBig className="h-5 w-5 text-emerald-500" />}
                     </div>
                     <CardTitle className="text-2xl">What is Income?</CardTitle>
                     <CardDescription>Income is the money you receive or earn from various sources.</CardDescription>
@@ -157,7 +156,7 @@ export default function Academy() {
                         <CircleArrowDown className="h-5 w-5" />
                         <span className="text-xs font-bold uppercase tracking-wider">Concept Two</span>
                       </div>
-                      {isTaskCompleted('academy-outcome') && <CheckCircle2 className="h-5 w-5 text-emerald-500" />}
+                      {isTaskCompleted('academy-outcome') && <CircleCheckBig className="h-5 w-5 text-emerald-500" />}
                     </div>
                     <CardTitle className="text-2xl">Understanding Outcome (Expenses)</CardTitle>
                     <CardDescription>Outcome is the money you spend to buy things or pay for services.</CardDescription>
