@@ -14,11 +14,17 @@ import {
   Newspaper, 
   Info, 
   CircleCheckBig,
-  LoaderCircle
+  LoaderCircle,
+  HelpCircle,
+  Lightbulb,
+  ArrowRight,
+  Target,
+  BarChart3
 } from 'lucide-react';
 import { generateMarketNewsAndExplanations } from '@/ai/flows/generate-market-news-and-explanations-flow';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 export default function MarketSimulation() {
   const { ageGroup, balance, portfolio, buyStock, sellStock, formatValue, stocks, updateStocks, currency } = useUser();
@@ -27,6 +33,7 @@ export default function MarketSimulation() {
   const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
   const [tradeAmount, setTradeAmount] = useState('1');
   const [showExplanation, setShowExplanation] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
   const [news, setNews] = useState<any>(null);
 
   const fetchNews = async () => {
@@ -101,17 +108,26 @@ export default function MarketSimulation() {
             <h2 className="text-3xl font-bold text-primary">Market Simulator</h2>
             <p className="text-muted-foreground">Learn how the world invests by trading fictional companies. Prices auto-adjust to {currency}.</p>
           </div>
-          <Button onClick={fetchNews} disabled={isLoadingNews} variant="outline" className="gap-2">
-            {isLoadingNews ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Newspaper className="h-4 w-4" />}
-            Refresh News
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={() => setShowGuide(true)} variant="secondary" className="gap-2 bg-white border">
+              <HelpCircle className="h-4 w-4 text-primary" />
+              Investor's Guide
+            </Button>
+            <Button onClick={fetchNews} disabled={isLoadingNews} variant="outline" className="gap-2">
+              {isLoadingNews ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Newspaper className="h-4 w-4" />}
+              Refresh News
+            </Button>
+          </div>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-6">
             <Card className="border-none shadow-sm overflow-hidden">
               <CardHeader className="bg-white">
-                <CardTitle className="text-lg">Live Market Feed</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5 text-primary" />
+                  Live Market Feed
+                </CardTitle>
               </CardHeader>
               <div className="bg-white">
                 {stocks.map((stock) => (
@@ -226,6 +242,7 @@ export default function MarketSimulation() {
           </div>
         </div>
 
+        {/* AI Explanation Dialog */}
         <Dialog open={showExplanation} onOpenChange={setShowExplanation}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
@@ -246,6 +263,92 @@ export default function MarketSimulation() {
             </div>
             <DialogFooter>
               <Button onClick={() => setShowExplanation(false)} className="w-full h-12 text-lg">I Got It! +10 XP</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Investor's Guide Dialog */}
+        <Dialog open={showGuide} onOpenChange={setShowGuide}>
+          <DialogContent className="max-w-3xl overflow-y-auto max-h-[90vh]">
+            <DialogHeader>
+              <div className="h-12 w-12 bg-primary/10 rounded-xl flex items-center justify-center mb-2 text-primary">
+                <HelpCircle className="h-6 w-6" />
+              </div>
+              <DialogTitle className="text-3xl font-bold text-primary">Investor's Playbook</DialogTitle>
+              <DialogDescription className="text-lg">
+                Your step-by-step guide to mastering the virtual market.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="how-to">
+                <AccordionTrigger className="text-lg font-bold">1. How to Invest</AccordionTrigger>
+                <AccordionContent className="space-y-4 pt-2">
+                  <div className="flex items-start gap-4">
+                    <div className="h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center font-bold shrink-0">1</div>
+                    <p className="text-slate-600">**Select a Company**: Click on any company in the "Live Market Feed". You'll see its details in the Trade Panel.</p>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center font-bold shrink-0">2</div>
+                    <p className="text-slate-600">**Enter Shares**: Decide how many "pieces" (shares) of the company you want to own. Your total cost is shown automatically.</p>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center font-bold shrink-0">3</div>
+                    <p className="text-slate-600">**Execute Trade**: Click "Buy". The money is taken from your Virtual Balance, and the shares move to your Portfolio.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="when-buy">
+                <AccordionTrigger className="text-lg font-bold">2. When to Buy</AccordionTrigger>
+                <AccordionContent className="space-y-4 pt-2">
+                  <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-start gap-3">
+                    <Lightbulb className="h-5 w-5 text-emerald-600 mt-1" />
+                    <div>
+                      <h4 className="font-bold text-emerald-900">Strategy: Buy Low</h4>
+                      <p className="text-sm text-emerald-800">The best time to buy is when a company has strong potential but the price is still low. Look for **Positive Breaking News** stories at the bottom of the screen—these often indicate a price jump is coming!</p>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="when-sell">
+                <AccordionTrigger className="text-lg font-bold">3. When to Sell</AccordionTrigger>
+                <AccordionContent className="space-y-4 pt-2">
+                  <div className="p-4 bg-rose-50 border border-rose-100 rounded-xl flex items-start gap-3">
+                    <Target className="h-5 w-5 text-rose-600 mt-1" />
+                    <div>
+                      <h4 className="font-bold text-rose-900">Strategy: Sell High</h4>
+                      <p className="text-sm text-rose-800">Once your shares have grown in value (check the Green percentage on your dashboard), you might want to sell to "lock in" your profit. You should also consider selling if **Negative News** breaks about that specific company.</p>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="best-company">
+                <AccordionTrigger className="text-lg font-bold">4. Finding the Best Company</AccordionTrigger>
+                <AccordionContent className="space-y-4 pt-2">
+                  <p className="text-slate-600 mb-4">A "good" company for investment usually has:</p>
+                  <ul className="grid gap-3">
+                    <li className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border">
+                      <ArrowRight className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-medium">A history of positive daily growth (%)</span>
+                    </li>
+                    <li className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border">
+                      <ArrowRight className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-medium">Positive media attention in the News Feed</span>
+                    </li>
+                    <li className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border">
+                      <ArrowRight className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-medium">Lower volatility (less extreme price swings)</span>
+                    </li>
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+            
+            <DialogFooter className="mt-6">
+              <Button onClick={() => setShowGuide(false)} className="w-full">Start Trading Like a Pro</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

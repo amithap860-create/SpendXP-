@@ -29,16 +29,17 @@ import { setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/no
 
 export type AgeGroup = '8-11' | '11-15' | '16-20';
 
+// Current approximate exchange rates (USD base)
 export const EXCHANGE_RATES: Record<string, number> = {
   USD: 1.0,
-  EUR: 0.92,
+  EUR: 0.94,
   GBP: 0.79,
-  CAD: 1.35,
-  AUD: 1.52,
-  JPY: 150.12,
-  INR: 82.95,
-  BRL: 4.97,
-  ZAR: 19.10
+  CAD: 1.37,
+  AUD: 1.54,
+  JPY: 154.20,
+  INR: 83.50,
+  BRL: 5.10,
+  ZAR: 19.05
 };
 
 export interface Stock {
@@ -64,6 +65,7 @@ export interface AppTask {
   xpReward: number;
   completed: boolean;
   userId?: string;
+  status?: string;
 }
 
 export interface UserProfile {
@@ -150,22 +152,18 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [db, user]);
   const { data: profile, isLoading: isProfileLoading } = useDoc<UserProfile>(profileRef);
 
-  // Firestore Sync: Portfolio
+  // Firestore Sync: Portfolio - Guaranteed Array
   const portfolioQuery = useMemoFirebase(() => {
     return user ? collection(db, 'users', user.uid, 'virtualInvestments') : null;
   }, [db, user]);
   const { data: portfolioData, isLoading: isPortfolioLoading } = useCollection<PortfolioItem>(portfolioQuery);
-  
-  // Robust array fallback
   const portfolio = useMemo(() => Array.isArray(portfolioData) ? portfolioData : [], [portfolioData]);
 
-  // Firestore Sync: Tasks/Progress
+  // Firestore Sync: Tasks/Progress - Guaranteed Array
   const tasksQuery = useMemoFirebase(() => {
     return user ? collection(db, 'users', user.uid, 'lessonProgress') : null;
   }, [db, user]);
   const { data: remoteTasksData, isLoading: isTasksLoading } = useCollection<AppTask>(tasksQuery);
-  
-  // Robust array fallback
   const remoteTasks = useMemo(() => Array.isArray(remoteTasksData) ? remoteTasksData : [], [remoteTasksData]);
 
   const isInitialLoading = isUserLoading || isProfileLoading || isPortfolioLoading || isTasksLoading;
@@ -181,7 +179,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const result = await signInAnonymously(auth);
     const userId = result.user.uid;
     
-    // Initialize profile in Firestore
+    // Initialize profile in Firestore with $1000 balance
     const userRef = doc(db, 'users', userId);
     setDocumentNonBlocking(userRef, {
       id: userId,
@@ -201,10 +199,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Initialize default tasks
     DEFAULT_TASKS.forEach((t, index) => {
-      const taskRef = doc(db, 'users', userId, 'lessonProgress', `task-${index}`);
+      const taskId = `task-${index}`;
+      const taskRef = doc(db, 'users', userId, 'lessonProgress', taskId);
       setDocumentNonBlocking(taskRef, {
         ...t,
-        id: `task-${index}`,
+        id: taskId,
         userId,
         status: 'not_started',
         lastAccessedAt: new Date().toISOString()
@@ -246,8 +245,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     const existing = portfolio.find(p => p.symbol === symbol);
     if (existing) {
-      const newShares = existing.shares + shares;
-      const newAvg = (existing.shares * existing.avgPrice + cost) / newShares;
+      const newShares = (existing.shares || 0) + shares;
+      const newAvg = ((existing.shares || 0) * (existing.avgPrice || 0) + cost) / newShares;
       updateDocumentNonBlocking(invRef, { shares: newShares, avgPrice: newAvg, lastTransactionAt: new Date().toISOString() });
     } else {
       setDocumentNonBlocking(invRef, {
@@ -260,13 +259,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         lastTransactionAt: new Date().toISOString()
       }, { merge: true });
     }
-    completeTask('market-first-trade');
+    completeTask('task-5'); // "Make your first trade" is task-5
   };
 
   const sellStock = (symbol: string, shares: number, priceUsd: number) => {
     if (!user || !profile) return;
     const existing = portfolio.find(p => p.symbol === symbol);
-    if (!existing || existing.shares < shares) return;
+    if (!existing || (existing.shares || 0) < shares) return;
 
     const gain = shares * priceUsd;
     updateDocumentNonBlocking(profileRef!, { balance: (profile.balance || 0) + gain });
@@ -275,7 +274,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (existing.shares === shares) {
       updateDocumentNonBlocking(invRef, { shares: 0 });
     } else {
-      updateDocumentNonBlocking(invRef, { shares: existing.shares - shares });
+      updateDocumentNonBlocking(invRef, { shares: (existing.shares || 0) - shares });
     }
   };
 

@@ -44,9 +44,11 @@ export default function Dashboard() {
     );
   }
 
-  // Ensure tasks is always an array before operating on it
+  // Ensure tasks and portfolio are always handled as arrays
   const safeTasks = Array.isArray(tasks) ? tasks : [];
   const savingsProgress = Math.min(100, (savingsCurrent / (savingsGoal || 1)) * 100);
+  
+  // Safe calculation of portfolio value
   const portfolioValueUsd = typeof getPortfolioValue === 'function' ? getPortfolioValue() : 0;
   
   const xpInCurrentLevel = (xp || 0) % 500;
