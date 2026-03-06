@@ -316,7 +316,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const getPortfolioValue = () => {
     const safePortfolio = portfolio || [];
+    if (!Array.isArray(safePortfolio)) return 0;
+    
     return safePortfolio.reduce((acc, item) => {
+      if (!item) return acc;
       const stock = stocks.find(s => s.symbol === item.symbol);
       return acc + ((item.shares || 0) * (stock?.price || 0));
     }, 0);

@@ -14,20 +14,43 @@ import {
   Star,
   ArrowUpRight,
   CircleCheckBig,
-  Lock
+  Lock,
+  LoaderCircle
 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Dashboard() {
-  const { ageGroup, balance, getPortfolioValue, savingsCurrent, savingsGoal, formatValue, xp, level, tasks } = useUser();
+  const { 
+    ageGroup, 
+    balance, 
+    getPortfolioValue, 
+    savingsCurrent, 
+    savingsGoal, 
+    formatValue, 
+    xp, 
+    level, 
+    tasks,
+    isInitialLoading 
+  } = useUser();
 
-  const safeTasks = tasks || [];
+  if (isInitialLoading) {
+    return (
+      <div className="flex min-h-screen bg-background">
+        <MainNav />
+        <main className="flex-1 flex items-center justify-center">
+          <LoaderCircle className="h-12 w-12 animate-spin text-primary" />
+        </main>
+      </div>
+    );
+  }
+
+  const safeTasks = Array.isArray(tasks) ? tasks : [];
   const savingsProgress = Math.min(100, (savingsCurrent / (savingsGoal || 1)) * 100);
-  const portfolioValueUsd = getPortfolioValue ? getPortfolioValue() : 0;
+  const portfolioValueUsd = typeof getPortfolioValue === 'function' ? getPortfolioValue() : 0;
   const xpInCurrentLevel = (xp || 0) % 500;
   const levelProgress = (xpInCurrentLevel / 500) * 100;
   
-  const completedTasksCount = safeTasks.filter(t => t.completed).length;
+  const completedTasksCount = safeTasks.filter(t => t?.completed).length;
   const totalTasksCount = safeTasks.length;
   const taskProgress = totalTasksCount > 0 ? (completedTasksCount / totalTasksCount) * 100 : 0;
 
