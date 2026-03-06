@@ -18,6 +18,7 @@ import {
   query, 
   where,
   serverTimestamp,
+  deleteDoc,
   type DocumentReference
 } from 'firebase/firestore';
 import { 
@@ -25,7 +26,7 @@ import {
   updateProfile as updateAuthProfile,
   signOut
 } from 'firebase/auth';
-import { setDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { setDocumentNonBlocking, updateDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 export type AgeGroup = '8-11' | '11-15' | '16-20';
 
@@ -122,6 +123,7 @@ interface UserContextType {
   isInitialLoading: boolean;
   login: (email: string, age: number) => Promise<void>;
   logout: () => void;
+  resetAccount: () => Promise<void>;
   updateProfile: (data: { name: string; email: string; age: number; country: string; currency: string }) => void;
   updateStocks: (newStocks: Stock[]) => void;
   buyStock: (symbol: string, shares: number, priceUsd: number) => void;
@@ -152,14 +154,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [db, user]);
   const { data: profile, isLoading: isProfileLoading } = useDoc<UserProfile>(profileRef);
 
-  // Firestore Sync: Portfolio - Guaranteed Array
+  // Firestore Sync: Portfolio
   const portfolioQuery = useMemoFirebase(() => {
     return user ? collection(db, 'users', user.uid, 'virtualInvestments') : null;
   }, [db, user]);
   const { data: portfolioData, isLoading: isPortfolioLoading } = useCollection<PortfolioItem>(portfolioQuery);
   const portfolio = useMemo(() => Array.isArray(portfolioData) ? portfolioData : [], [portfolioData]);
 
-  // Firestore Sync: Tasks/Progress - Guaranteed Array
+  // Firestore Sync: Tasks/Progress
   const tasksQuery = useMemoFirebase(() => {
     return user ? collection(db, 'users', user.uid, 'lessonProgress') : null;
   }, [db, user]);
@@ -167,6 +169,19 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const remoteTasks = useMemo(() => Array.isArray(remoteTasksData) ? remoteTasksData : [], [remoteTasksData]);
 
   const isInitialLoading = isUserLoading || isProfileLoading || isPortfolioLoading || isTasksLoading;
+
+  // Auto-initialize balance if it's a new or empty profile
+  useEffect(() => {
+    if (!isInitialLoading && user && profile && (profile.balance === undefined || profile.balance === null)) {
+      updateDocumentNonBlocking(profileRef!, {
+        balance: 1000,
+        currency: 'USD',
+        savingsGoal: 500,
+        xp: 0,
+        level: 1
+      });
+    }
+  }, [isInitialLoading, user, profile, profileRef]);
 
   const age = profile?.age || 0;
   const ageGroup = useMemo((): AgeGroup => {
@@ -179,7 +194,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const result = await signInAnonymously(auth);
     const userId = result.user.uid;
     
-    // Initialize profile in Firestore with $1000 balance
     const userRef = doc(db, 'users', userId);
     setDocumentNonBlocking(userRef, {
       id: userId,
@@ -197,7 +211,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       createdAt: serverTimestamp(),
     }, { merge: true });
 
-    // Initialize default tasks
     DEFAULT_TASKS.forEach((t, index) => {
       const taskId = `task-${index}`;
       const taskRef = doc(db, 'users', userId, 'lessonProgress', taskId);
@@ -212,6 +225,32 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => signOut(auth);
+
+  const resetAccount = async () => {
+    if (!user || !profileRef) return;
+    
+    // Reset core profile with $1000
+    updateDocumentNonBlocking(profileRef, {
+      balance: 1000,
+      savingsCurrent: 0,
+      liabilities: 0,
+      xp: 0,
+      level: 1,
+      savingsGoal: 500
+    });
+
+    // Reset tasks
+    remoteTasks.forEach(task => {
+      const taskRef = doc(db, 'users', user.uid, 'lessonProgress', task.id);
+      updateDocumentNonBlocking(taskRef, { completed: false, status: 'not_started' });
+    });
+
+    // Clear portfolio
+    portfolio.forEach(item => {
+      const invRef = doc(db, 'users', user.uid, 'virtualInvestments', item.id);
+      deleteDocumentNonBlocking(invRef);
+    });
+  };
 
   const updateProfile = (data: any) => {
     if (!profileRef) return;
@@ -259,7 +298,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         lastTransactionAt: new Date().toISOString()
       }, { merge: true });
     }
-    completeTask('task-5'); // "Make your first trade" is task-5
+    completeTask('task-5'); 
   };
 
   const sellStock = (symbol: string, shares: number, priceUsd: number) => {
@@ -333,7 +372,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     ageGroup,
     country: profile?.country || 'United States',
     currency: profile?.currency || 'USD',
-    balance: profile?.balance || 0,
+    balance: profile?.balance !== undefined ? profile.balance : 0,
     portfolio,
     stocks,
     savingsGoal: profile?.savingsGoal || 500,
@@ -346,6 +385,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isInitialLoading,
     login,
     logout,
+    resetAccount,
     updateProfile,
     updateStocks: setStocks,
     buyStock,
