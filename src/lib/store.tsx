@@ -97,7 +97,6 @@ const DEFAULT_TASKS: AppTask[] = [
   { id: 'academy-income', title: 'Learn about Income', category: 'Academy', xpReward: 50, completed: false },
   { id: 'academy-outcome', title: 'Understand Expenses', category: 'Academy', xpReward: 50, completed: false },
   { id: 'academy-budget', title: 'Master the Budget', category: 'Academy', xpReward: 50, completed: false },
-  { id: 'game-dash', title: 'Win Denomination Dash', category: 'Games', xpReward: 100, completed: false },
   { id: 'game-advisor', title: 'Complete Wealth Architect', category: 'Games', xpReward: 150, completed: false },
   { id: 'market-trade', title: 'Make your first trade', category: 'Market', xpReward: 100, completed: false },
   { id: 'flashcards-set', title: 'Complete a Flashcard set', category: 'Study', xpReward: 75, completed: false },

@@ -1,20 +1,16 @@
 
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { MainNav } from '@/components/layout/main-nav';
 import { useUser } from '@/lib/store';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { 
   Gamepad2, 
-  Coins, 
   Zap, 
   GraduationCap, 
-  TrendingUp,
-  Wallet,
   ShieldCheck,
   Calendar,
   Sparkles
@@ -84,40 +80,14 @@ const ADVISOR_SCENARIOS: Scenario[] = [
 ];
 
 export default function GamesHub() {
-  const { balance, portfolio, liabilities, formatValue, completeTask } = useUser();
+  const { balance, getPortfolioValue, liabilities, formatValue, completeTask } = useUser();
   const { toast } = useToast();
   const [activeGame, setActiveGame] = useState<string | null>(null);
-
-  // Dash Game State
-  const [dashTarget, setDashTarget] = useState(0);
-  const [dashCurrent, setDashCurrent] = useState(0);
 
   // Advisor Game State
   const [currentScenarioIdx, setCurrentScenarioIdx] = useState(0);
   const [simulationHistory, setSimulationHistory] = useState<any[]>([]);
   const [showAdvisorResult, setShowAdvisorResult] = useState(false);
-
-  useEffect(() => {
-    if (activeGame === 'dash') {
-      setDashTarget(Math.floor(Math.random() * 10) + 1);
-      setDashCurrent(0);
-    }
-  }, [activeGame]);
-
-  const handleDashClick = (val: number) => {
-    const next = parseFloat((dashCurrent + val).toFixed(2));
-    if (next === dashTarget) {
-      toast({ title: "Perfect Change! 🌟", description: "+50 XP earned." });
-      setDashTarget(Math.floor(Math.random() * 15) + 1);
-      setDashCurrent(0);
-      completeTask('game-dash');
-    } else if (next > dashTarget) {
-      toast({ title: "Too much!", variant: "destructive" });
-      setDashCurrent(0);
-    } else {
-      setDashCurrent(next);
-    }
-  };
 
   const handleAdvisorChoice = (optionIdx: number) => {
     const scenario = ADVISOR_SCENARIOS[currentScenarioIdx];
@@ -140,7 +110,7 @@ export default function GamesHub() {
     toast({ title: "Choice Recorded" });
   };
 
-  const totalAssets = balance + portfolio.reduce((acc, curr) => acc + (curr.shares * 150), 0);
+  const totalAssets = balance + getPortfolioValue();
   const netWorth = totalAssets - liabilities;
 
   return (
@@ -159,18 +129,6 @@ export default function GamesHub() {
 
         {!activeGame ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <Card className="hover:shadow-lg transition-all cursor-pointer border-none bg-white overflow-hidden group" onClick={() => setActiveGame('dash')}>
-              <div className="h-2 bg-emerald-400" />
-              <CardHeader>
-                <Coins className="h-8 w-8 text-emerald-500 mb-2 group-hover:scale-110 transition-transform" />
-                <CardTitle>Denomination Dash</CardTitle>
-                <CardDescription>Match the coins to the target! Learn money values and addition.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Starter Mission</Badge>
-              </CardContent>
-            </Card>
-
             <Card className="hover:shadow-lg transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/20" onClick={() => setActiveGame('advisor')}>
               <div className="h-2 bg-primary" />
               <CardHeader>
@@ -200,36 +158,6 @@ export default function GamesHub() {
             <Button variant="ghost" className="mb-4" onClick={() => { setActiveGame(null); setShowAdvisorResult(false); setSimulationHistory([]); setCurrentScenarioIdx(0); }}>
               ← Exit Simulation
             </Button>
-
-            {activeGame === 'dash' && (
-              <Card className="border-none shadow-xl bg-white overflow-hidden">
-                <CardHeader className="bg-emerald-50 text-center">
-                  <CardTitle className="text-3xl text-emerald-700">Denomination Dash</CardTitle>
-                  <CardDescription>Target: ${dashTarget}.00</CardDescription>
-                </CardHeader>
-                <CardContent className="p-8 space-y-8">
-                  <div className="flex flex-col items-center gap-4">
-                    <div className="text-5xl font-black text-primary">${dashCurrent.toFixed(2)}</div>
-                    <Progress value={(dashCurrent / dashTarget) * 100} className="w-full h-4" />
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    {[0.01, 0.05, 0.10, 0.25, 1, 5].map(coin => (
-                      <Button 
-                        key={coin} 
-                        onClick={() => handleDashClick(coin)}
-                        variant="outline"
-                        className="h-20 text-lg font-bold flex flex-col gap-1 border-2 hover:border-emerald-500 hover:bg-emerald-50"
-                      >
-                        <Coins className="h-5 w-5 text-emerald-500" />
-                        {coin < 1 ? `${coin * 100}¢` : `$${coin}`}
-                      </Button>
-                    ))}
-                  </div>
-                  <Button variant="secondary" className="w-full" onClick={() => setDashCurrent(0)}>Reset Current</Button>
-                </CardContent>
-              </Card>
-            )}
 
             {activeGame === 'advisor' && !showAdvisorResult && (
               <div className="grid gap-8 lg:grid-cols-12">
