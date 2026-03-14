@@ -93,14 +93,14 @@ const INITIAL_STOCKS: Stock[] = [
   { symbol: 'BRIO', name: 'BrioFoods', price: 15.40, change: -0.5, history: [16, 15.8, 15.5, 15.6, 15.40] },
 ];
 
-const DEFAULT_TASKS: Omit<AppTask, 'id'>[] = [
-  { title: 'Learn about Income', category: 'Academy', xpReward: 50, completed: false },
-  { title: 'Understand Expenses', category: 'Academy', xpReward: 50, completed: false },
-  { title: 'Master the Budget', category: 'Academy', xpReward: 50, completed: false },
-  { title: 'Win Denomination Dash', category: 'Games', xpReward: 100, completed: false },
-  { title: 'Complete Wealth Architect', category: 'Games', xpReward: 150, completed: false },
-  { title: 'Make your first trade', category: 'Market', xpReward: 100, completed: false },
-  { title: 'Complete a Flashcard set', category: 'Study', xpReward: 75, completed: false },
+const DEFAULT_TASKS: AppTask[] = [
+  { id: 'academy-income', title: 'Learn about Income', category: 'Academy', xpReward: 50, completed: false },
+  { id: 'academy-outcome', title: 'Understand Expenses', category: 'Academy', xpReward: 50, completed: false },
+  { id: 'academy-budget', title: 'Master the Budget', category: 'Academy', xpReward: 50, completed: false },
+  { id: 'game-dash', title: 'Win Denomination Dash', category: 'Games', xpReward: 100, completed: false },
+  { id: 'game-advisor', title: 'Complete Wealth Architect', category: 'Games', xpReward: 150, completed: false },
+  { id: 'market-trade', title: 'Make your first trade', category: 'Market', xpReward: 100, completed: false },
+  { id: 'flashcards-set', title: 'Complete a Flashcard set', category: 'Study', xpReward: 75, completed: false },
 ];
 
 interface UserContextType {
@@ -211,12 +211,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       createdAt: serverTimestamp(),
     }, { merge: true });
 
-    DEFAULT_TASKS.forEach((t, index) => {
-      const taskId = `task-${index}`;
-      const taskRef = doc(db, 'users', userId, 'lessonProgress', taskId);
+    DEFAULT_TASKS.forEach((t) => {
+      const taskRef = doc(db, 'users', userId, 'lessonProgress', t.id);
       setDocumentNonBlocking(taskRef, {
         ...t,
-        id: taskId,
         userId,
         status: 'not_started',
         lastAccessedAt: new Date().toISOString()
@@ -298,7 +296,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         lastTransactionAt: new Date().toISOString()
       }, { merge: true });
     }
-    completeTask('task-5'); 
+    completeTask('market-trade'); 
   };
 
   const sellStock = (symbol: string, shares: number, priceUsd: number) => {

@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from 'react';
@@ -69,7 +70,7 @@ export default function Academy() {
     setBudgetItems(budgetItems.filter(item => item.id !== id));
   };
 
-  const isTaskCompleted = (id: string) => tasks.find(t => t.id === id)?.completed;
+  const isTaskCompleted = (id: string) => (Array.isArray(tasks) ? tasks : []).find(t => t.id === id)?.completed;
 
   const totalIncomeUsd = budgetItems
     .filter(i => i.type === 'income')
