@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "UserProfile": {
@@ -18,6 +19,10 @@
         "age": {
           "type": "number",
           "description": "The user's age, used to determine content difficulty and personalize learning."
+        },
+        "birthYear": {
+          "type": "number",
+          "description": "The user's year of birth, used for age group classification."
         },
         "virtualCurrencyBalance": {
           "type": "number",
@@ -42,6 +47,7 @@
         "id",
         "email",
         "age",
+        "birthYear",
         "virtualCurrencyBalance",
         "createdAt",
         "lastLoginAt",

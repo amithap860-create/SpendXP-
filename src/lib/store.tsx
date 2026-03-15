@@ -12,18 +12,11 @@ import {
 } from '@/firebase';
 import { 
   doc, 
-  setDoc, 
-  updateDoc, 
   collection, 
-  query, 
-  where,
   serverTimestamp,
-  deleteDoc,
-  type DocumentReference
 } from 'firebase/firestore';
 import { 
   signInAnonymously, 
-  updateProfile as updateAuthProfile,
   signOut
 } from 'firebase/auth';
 import { setDocumentNonBlocking, updateDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
@@ -74,6 +67,7 @@ export interface UserProfile {
   email: string;
   name: string;
   age: number;
+  birthYear: number;
   country: string;
   currency: string;
   balance: number;
@@ -108,6 +102,7 @@ interface UserContextType {
   name: string;
   email: string;
   age: number;
+  birthYear: number;
   ageGroup: AgeGroup;
   country: string;
   currency: string;
@@ -125,7 +120,7 @@ interface UserContextType {
   login: (email: string, age: number) => Promise<void>;
   logout: () => void;
   resetAccount: () => Promise<void>;
-  updateProfile: (data: { name: string; email: string; age: number; country: string; currency: string }) => void;
+  updateProfile: (data: { name: string; email: string; age: number; birthYear?: number; country: string; currency: string }) => void;
   updateStocks: (newStocks: Stock[]) => void;
   buyStock: (symbol: string, shares: number, priceUsd: number) => void;
   sellStock: (symbol: string, shares: number, priceUsd: number) => void;
@@ -174,12 +169,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Auto-initialize balance if it's a new or empty profile
   useEffect(() => {
     if (!isInitialLoading && user && profile && (profile.balance === undefined || profile.balance === null)) {
+      const birthYear = profile.birthYear || (new Date().getFullYear() - (profile.age || 10));
       updateDocumentNonBlocking(profileRef!, {
         balance: 1000,
         currency: 'USD',
         savingsGoal: 500,
         xp: 0,
-        level: 1
+        level: 1,
+        birthYear
       });
     }
   }, [isInitialLoading, user, profile, profileRef]);
@@ -194,6 +191,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, age: number) => {
     const result = await signInAnonymously(auth);
     const userId = result.user.uid;
+    const birthYear = new Date().getFullYear() - age;
     
     const userRef = doc(db, 'users', userId);
     setDocumentNonBlocking(userRef, {
@@ -201,6 +199,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       email,
       name: email.split('@')[0],
       age,
+      birthYear,
       country: 'United States',
       currency: 'USD',
       balance: 1000,
@@ -368,7 +367,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const getPortfolioValue = () => {
-    // Ultimate safety check to prevent TypeError: Cannot read properties of null (reading 'reduce')
     if (!Array.isArray(portfolio)) return 0;
     
     return portfolio.reduce((acc, item) => {
@@ -383,6 +381,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     name: profile?.name || '',
     email: profile?.email || '',
     age,
+    birthYear: profile?.birthYear || (new Date().getFullYear() - age),
     ageGroup,
     country: profile?.country || 'United States',
     currency: profile?.currency || 'USD',
