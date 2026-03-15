@@ -1,10 +1,10 @@
-
 import type {Metadata} from 'next';
 import './globals.css';
 import { UserProvider } from '@/lib/store';
 import { Toaster } from '@/components/ui/toaster';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { AgeGroupProvider } from '@/lib/ageAdapt';
+import { AuthProvider } from '@/context/AuthContext';
 
 export const metadata: Metadata = {
   title: 'SpendXP - Financial Literacy for Future Pros',
@@ -25,12 +25,14 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased bg-background text-foreground" suppressHydrationWarning>
         <FirebaseClientProvider>
-          <UserProvider>
-            <AgeGroupProvider>
-              {children}
-              <Toaster />
-            </AgeGroupProvider>
-          </UserProvider>
+          <AuthProvider>
+            <UserProvider>
+              <AgeGroupProvider>
+                {children}
+                <Toaster />
+              </AgeGroupProvider>
+            </UserProvider>
+          </AuthProvider>
         </FirebaseClientProvider>
       </body>
     </html>

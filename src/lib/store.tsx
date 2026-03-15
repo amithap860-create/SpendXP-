@@ -4,7 +4,6 @@ import React, { createContext, useContext, useState, useEffect, useMemo } from '
 import { 
   useUser as useFirebaseUser, 
   useFirestore, 
-  useAuth,
   useDoc,
   useCollection,
   useMemoFirebase
@@ -14,25 +13,10 @@ import {
   collection, 
   serverTimestamp,
 } from 'firebase/firestore';
-import { 
-  signInAnonymously, 
-  signOut
-} from 'firebase/auth';
-import { setDocumentNonBlocking, updateDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { updateDocumentNonBlocking, deleteDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { useAuthContext } from '@/context/AuthContext';
 
 export type AgeGroup = '8-11' | '11-15' | '16-20';
-
-export const EXCHANGE_RATES: Record<string, number> = {
-  USD: 1.0,
-  EUR: 0.94,
-  GBP: 0.79,
-  CAD: 1.37,
-  AUD: 1.54,
-  JPY: 154.20,
-  INR: 83.50,
-  BRL: 5.10,
-  ZAR: 19.05
-};
 
 export interface Stock {
   symbol: string;
@@ -57,13 +41,12 @@ export interface AppTask {
   xpReward: number;
   completed: boolean;
   userId?: string;
-  status?: string;
 }
 
 export interface UserProfile {
   id: string;
   email: string;
-  name: string;
+  displayName: string;
   age: number;
   birthYear: number;
   country: string;
@@ -74,71 +57,43 @@ export interface UserProfile {
   liabilities: number;
   xp: number;
   level: number;
-  createdAt: any;
+  onboardingComplete: boolean;
 }
 
 const INITIAL_STOCKS: Stock[] = [
-  { symbol: 'ECO', name: 'EcoGrow', price: 120.50, change: 2.5, history: [115, 118, 120, 119, 120.50] },
-  { symbol: 'SOL', name: 'Solaris Tech', price: 245.10, change: -1.2, history: [250, 248, 246, 247, 245.10] },
-  { symbol: 'AQUA', name: 'AquaLife', price: 56.75, change: 0.8, history: [55, 56, 55.5, 56.2, 56.75] },
-  { symbol: 'CYBER', name: 'CyberNest', price: 89.20, change: 4.1, history: [82, 85, 87, 88, 89.20] },
-  { symbol: 'BRIO', name: 'BrioFoods', price: 15.40, change: -0.5, history: [16, 15.8, 15.5, 15.6, 15.40] },
+  { symbol: 'ECO', name: 'EcoGrow', price: 12050, change: 2.5, history: [11500, 11800, 12000, 11900, 12050] },
+  { symbol: 'SOL', name: 'Solaris Tech', price: 24510, change: -1.2, history: [25000, 24800, 24600, 24700, 24510] },
+  { symbol: 'AQUA', name: 'AquaLife', price: 5675, change: 0.8, history: [5500, 5600, 5550, 5620, 5675] },
+  { symbol: 'CYBER', name: 'CyberNest', price: 8920, change: 4.1, history: [8200, 8500, 8700, 8800, 8920] },
+  { symbol: 'BRIO', name: 'BrioFoods', price: 1540, change: -0.5, history: [1600, 1580, 1550, 1560, 1540] },
 ];
 
 const DEFAULT_TASKS: AppTask[] = [
   { id: 'academy-income', title: 'Learn about Income', category: 'Academy', xpReward: 50, completed: false },
   { id: 'academy-outcome', title: 'Understand Expenses', category: 'Academy', xpReward: 50, completed: false },
   { id: 'academy-budget', title: 'Master the Budget', category: 'Academy', xpReward: 50, completed: false },
-  { id: 'game-advisor', title: 'Complete Wealth Architect', category: 'Games', xpReward: 100, completed: false },
-  { id: 'game-loan-sim', title: 'Loan Specialist', category: 'Games', xpReward: 100, completed: false },
-  { id: 'game-credit-sim', title: 'Credit Specialist', category: 'Games', xpReward: 200, completed: false },
   { id: 'market-trade', title: 'Make your first trade', category: 'Market', xpReward: 100, completed: false },
   { id: 'flashcards-set', title: 'Complete a Flashcard set', category: 'Study', xpReward: 75, completed: false },
 ];
 
 interface UserContextType {
   name: string;
-  email: string;
-  age: number;
-  birthYear: number;
-  ageGroup: AgeGroup;
-  country: string;
-  currency: string;
   balance: number;
-  portfolio: PortfolioItem[];
-  stocks: Stock[];
-  savingsGoal: number;
-  savingsCurrent: number;
-  liabilities: number;
   xp: number;
   level: number;
   tasks: AppTask[];
-  isLoggedIn: boolean;
-  isInitialLoading: boolean;
-  login: (email: string, age: number) => Promise<void>;
-  logout: () => void;
-  resetAccount: () => Promise<void>;
-  updateProfile: (data: { name: string; email: string; age: number; birthYear?: number; country: string; currency: string }) => void;
-  updateStocks: (newStocks: Stock[]) => void;
-  buyStock: (symbol: string, shares: number, priceUsd: number) => void;
-  sellStock: (symbol: string, shares: number, priceUsd: number) => void;
-  updateSavings: (amountUsd: number) => void;
-  setSavingsGoal: (amountUsd: number) => void;
-  updateLiabilities: (amountUsd: number) => void;
-  addXP: (amount: number) => void;
+  stocks: Stock[];
+  portfolio: PortfolioItem[];
+  formatValue: (amount: number) => string;
   completeTask: (taskId: string) => void;
-  getPortfolioValue: () => number;
-  formatValue: (usdAmount: number) => string;
-  convertToCurrent: (usdAmount: number) => number;
-  convertFromCurrent: (currentAmount: number) => number;
+  isInitialLoading: boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, isUserLoading } = useFirebaseUser();
+  const { user } = useAuthContext();
   const db = useFirestore();
-  const auth = useAuth();
   
   const [stocks, setStocks] = useState<Stock[]>(INITIAL_STOCKS);
 
@@ -159,250 +114,51 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { data: remoteTasksData, isLoading: isTasksLoading } = useCollection<AppTask>(tasksQuery);
   const remoteTasks = useMemo(() => Array.isArray(remoteTasksData) ? remoteTasksData : [], [remoteTasksData]);
 
-  const isInitialLoading = isUserLoading || isProfileLoading || isPortfolioLoading || isTasksLoading;
+  const isInitialLoading = isProfileLoading || isPortfolioLoading || isTasksLoading;
 
   useEffect(() => {
-    if (!isInitialLoading && user && profile && (profile.balance === undefined || profile.balance === null)) {
-      const birthYear = profile.birthYear || (new Date().getFullYear() - (profile.age || 10));
-      updateDocumentNonBlocking(profileRef!, {
-        balance: 1000,
-        currency: 'USD',
-        savingsGoal: 500,
-        xp: 0,
-        level: 1,
-        birthYear
+    if (user && !isInitialLoading && remoteTasks.length === 0) {
+      DEFAULT_TASKS.forEach((t) => {
+        const taskRef = doc(db, 'users', user.uid, 'lessonProgress', t.id);
+        setDocumentNonBlocking(taskRef, { ...t, userId: user.uid }, { merge: true });
       });
     }
-  }, [isInitialLoading, user, profile, profileRef]);
+  }, [user, isInitialLoading, remoteTasks.length, db]);
 
-  const age = profile?.age || 0;
-  const ageGroup = useMemo((): AgeGroup => {
-    if (age <= 11) return '8-11';
-    if (age >= 16) return '16-20';
-    return '11-15';
-  }, [age]);
-
-  const login = async (email: string, age: number) => {
-    const result = await signInAnonymously(auth);
-    const userId = result.user.uid;
-    const birthYear = new Date().getFullYear() - age;
-    
-    const userRef = doc(db, 'users', userId);
-    setDocumentNonBlocking(userRef, {
-      id: userId,
-      email,
-      name: email.split('@')[0],
-      age,
-      birthYear,
-      country: 'United States',
-      currency: 'USD',
-      balance: 1000,
-      savingsGoal: 500,
-      savingsCurrent: 0,
-      liabilities: 0,
-      xp: 0,
-      level: 1,
-      createdAt: serverTimestamp(),
-    }, { merge: true });
-
-    DEFAULT_TASKS.forEach((t) => {
-      const taskRef = doc(db, 'users', userId, 'lessonProgress', t.id);
-      setDocumentNonBlocking(taskRef, {
-        ...t,
-        userId,
-        status: 'not_started',
-        lastAccessedAt: new Date().toISOString()
-      }, { merge: true });
-    });
-  };
-
-  const logout = () => signOut(auth);
-
-  const resetAccount = async () => {
-    if (!user || !profileRef) return;
-    
-    updateDocumentNonBlocking(profileRef, {
-      balance: 1000,
-      savingsCurrent: 0,
-      liabilities: 0,
-      xp: 0,
-      level: 1,
-      savingsGoal: 500
-    });
-
-    remoteTasks.forEach(task => {
-      const taskRef = doc(db, 'users', user.uid, 'lessonProgress', task.id);
-      updateDocumentNonBlocking(taskRef, { completed: false, status: 'not_started' });
-    });
-
-    portfolio.forEach(item => {
-      const invRef = doc(db, 'users', user.uid, 'virtualInvestments', item.id);
-      deleteDocumentNonBlocking(invRef);
-    });
-  };
-
-  const updateProfile = (data: any) => {
-    if (!profileRef) return;
-    updateDocumentNonBlocking(profileRef, { ...data });
-  };
-
-  const addXP = (amount: number) => {
-    if (!profileRef || !profile) return;
-    const currentXP = profile.xp || 0;
-    const newXP = currentXP + amount;
-    const newLevel = Math.floor(newXP / 500) + 1;
-    updateDocumentNonBlocking(profileRef, { xp: newXP, level: newLevel });
+  const formatValue = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount);
   };
 
   const completeTask = (taskId: string) => {
+    if (!user) return;
     const task = remoteTasks.find(t => t.id === taskId);
-    if (task && !task.completed && user) {
+    if (task && !task.completed) {
       const taskRef = doc(db, 'users', user.uid, 'lessonProgress', taskId);
-      updateDocumentNonBlocking(taskRef, { completed: true, status: 'completed', completedAt: serverTimestamp() });
-      addXP(task.xpReward);
+      updateDocumentNonBlocking(taskRef, { completed: true });
+      
+      const userRef = doc(db, 'users', user.uid);
+      updateDocumentNonBlocking(userRef, { 
+        xp: (profile?.xp || 0) + task.xpReward,
+        level: Math.floor(((profile?.xp || 0) + task.xpReward) / 500) + 1
+      });
     }
   };
 
-  const buyStock = (symbol: string, shares: number, priceUsd: number) => {
-    if (!user || !profile || (profile.balance || 0) < (shares * priceUsd)) return;
-    
-    const cost = shares * priceUsd;
-    const currentBalance = profile.balance || 0;
-    updateDocumentNonBlocking(profileRef!, { balance: currentBalance - cost });
-    
-    const investmentId = `inv-${symbol}`;
-    const invRef = doc(db, 'users', user.uid, 'virtualInvestments', investmentId);
-    
-    const existing = portfolio.find(p => p.symbol === symbol);
-    if (existing) {
-      const currentShares = existing.shares || 0;
-      const currentAvgPrice = existing.avgPrice || 0;
-      const newShares = currentShares + shares;
-      const newAvg = (currentShares * currentAvgPrice + cost) / newShares;
-      updateDocumentNonBlocking(invRef, { shares: newShares, avgPrice: newAvg, lastTransactionAt: new Date().toISOString() });
-    } else {
-      setDocumentNonBlocking(invRef, {
-        id: investmentId,
-        userId: user.uid,
-        symbol,
-        shares,
-        avgPrice: priceUsd,
-        totalInvestmentAmount: cost,
-        lastTransactionAt: new Date().toISOString()
-      }, { merge: true });
-    }
-    completeTask('market-trade'); 
-  };
-
-  const sellStock = (symbol: string, shares: number, priceUsd: number) => {
-    if (!user || !profile) return;
-    const existing = portfolio.find(p => p.symbol === symbol);
-    if (!existing || (existing.shares || 0) < shares) return;
-
-    const gain = shares * priceUsd;
-    const currentBalance = profile.balance || 0;
-    updateDocumentNonBlocking(profileRef!, { balance: currentBalance + gain });
-    
-    const invRef = doc(db, 'users', user.uid, 'virtualInvestments', existing.id);
-    if (existing.shares === shares) {
-      updateDocumentNonBlocking(invRef, { shares: 0 });
-    } else {
-      updateDocumentNonBlocking(invRef, { shares: (existing.shares || 0) - shares });
-    }
-  };
-
-  const updateSavings = (amountUsd: number) => {
-    if (!profileRef || !profile) return;
-    const currentBalance = profile.balance || 0;
-    const currentSavings = profile.savingsCurrent || 0;
-    
-    if (amountUsd > 0 && currentBalance < amountUsd) return;
-    if (amountUsd < 0 && currentSavings < Math.abs(amountUsd)) return;
-
-    updateDocumentNonBlocking(profileRef, {
-      balance: currentBalance - amountUsd,
-      savingsCurrent: currentSavings + amountUsd
-    });
-  };
-
-  const setSavingsGoal = (amountUsd: number) => {
-    if (!profileRef) return;
-    updateDocumentNonBlocking(profileRef, { savingsGoal: amountUsd });
-  };
-
-  const updateLiabilities = (amountUsd: number) => {
-    if (!profileRef || !profile) return;
-    const currentLiabilities = profile.liabilities || 0;
-    updateDocumentNonBlocking(profileRef, { liabilities: Math.max(0, currentLiabilities + amountUsd) });
-  };
-
-  const convertToCurrent = (usdAmount: number) => {
-    const currency = profile?.currency || 'USD';
-    const rate = EXCHANGE_RATES[currency] || 1.0;
-    return (usdAmount || 0) * rate;
-  };
-
-  const convertFromCurrent = (currentAmount: number) => {
-    const currency = profile?.currency || 'USD';
-    const rate = EXCHANGE_RATES[currency] || 1.0;
-    return (currentAmount || 0) / rate;
-  };
-
-  const formatValue = (usdAmount: number) => {
-    const converted = convertToCurrent(usdAmount);
-    const currency = profile?.currency || 'USD';
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency,
-    }).format(converted || 0);
-  };
-
-  const getPortfolioValue = () => {
-    if (!Array.isArray(portfolio)) return 0;
-    
-    return portfolio.reduce((acc, item) => {
-      if (!item || typeof item.shares !== 'number') return acc;
-      const stock = stocks.find(s => s.symbol === item.symbol);
-      const stockPrice = stock?.price || 0;
-      return acc + (item.shares * stockPrice);
-    }, 0);
-  };
-
-  const value: UserContextType = {
-    name: profile?.name || '',
-    email: profile?.email || '',
-    age,
-    birthYear: profile?.birthYear || (new Date().getFullYear() - age),
-    ageGroup,
-    country: profile?.country || 'United States',
-    currency: profile?.currency || 'USD',
-    balance: typeof profile?.balance === 'number' ? profile.balance : 0,
-    portfolio,
-    stocks,
-    savingsGoal: typeof profile?.savingsGoal === 'number' ? profile.savingsGoal : 500,
-    savingsCurrent: typeof profile?.savingsCurrent === 'number' ? profile.savingsCurrent : 0,
-    liabilities: typeof profile?.liabilities === 'number' ? profile.liabilities : 0,
-    xp: typeof profile?.xp === 'number' ? profile.xp : 0,
-    level: typeof profile?.level === 'number' ? profile.level : 1,
+  const value = {
+    name: profile?.displayName || user?.displayName || '',
+    balance: profile?.balance || 0,
+    xp: profile?.xp || 0,
+    level: profile?.level || 1,
     tasks: remoteTasks,
-    isLoggedIn: !!user,
-    isInitialLoading,
-    login,
-    logout,
-    resetAccount,
-    updateProfile,
-    updateStocks: setStocks,
-    buyStock,
-    sellStock,
-    updateSavings,
-    setSavingsGoal,
-    updateLiabilities,
-    addXP,
-    completeTask,
-    getPortfolioValue,
+    stocks,
+    portfolio,
     formatValue,
-    convertToCurrent,
-    convertFromCurrent
+    completeTask,
+    isInitialLoading
   };
 
   return (
