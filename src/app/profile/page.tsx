@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -27,7 +28,6 @@ import {
   reauthenticateWithPopup,
   GoogleAuthProvider,
   User,
-  linkWithPopup,
   reauthenticateWithCredential
 } from 'firebase/auth';
 import { Card, CardContent } from '@/components/ui/card';
@@ -181,8 +181,6 @@ export default function ProfilePage() {
                 user={user as User} 
                 providers={providers} 
                 onRefresh={() => setProviderRefreshKey(k => k + 1)}
-                setError={setError}
-                setSuccess={setSuccess}
               />
             </SectionErrorBoundary>
 
@@ -214,128 +212,275 @@ export default function ProfilePage() {
   );
 }
 
-function PasswordContainer({ user, providers, onRefresh, setError, setSuccess }: { 
+function PasswordContainer({ user, providers, onRefresh }: { 
   user: User, 
-  providers: any, 
-  onRefresh: () => void,
-  setError: (m: string | null) => void,
-  setSuccess: (m: string | null) => void
+  providers: { hasPassword: boolean }, 
+  onRefresh: () => void
 }) {
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [showSetPasswordForm, setShowSetPasswordForm] = useState(false);
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [confirmError, setConfirmError] = useState('');
 
-  if (!providers.hasPassword && !providers.hasGoogle) {
-    return (
-      <Card className="border-none shadow-sm bg-white p-6">
-        <h3 className="text-[15px] font-medium text-primary border-b border-slate-100 pb-3 mb-4">Account security</h3>
-        <p className="text-xs text-slate-500 mb-4">You haven't set up a password or linked a permanent provider yet.</p>
-        <div className="flex gap-2">
-          <Button size="sm" onClick={() => setShowAddForm(true)}>Add a password</Button>
-          <Button size="sm" variant="outline" onClick={async () => {
-            try {
-              const provider = new GoogleAuthProvider();
-              await linkWithPopup(user, provider);
-              await user.reload();
-              await safeUpdateDoc(doc(db, 'users', user.uid), { 
-                provider: 'google.com',
-                updatedAt: serverTimestamp()
-              });
-              onRefresh();
-              setSuccess('Google account linked!');
-            } catch (err: any) {
-              if (err.code !== 'auth/popup-closed-by-user') setError('Could not link Google account.');
-            }
-          }}>Link Google</Button>
-        </div>
-        {showAddForm && (
-          <AddPasswordForm 
-            user={user} 
-            onClose={() => setShowAddForm(false)} 
-            onSuccess={(m) => { setSuccess(m); onRefresh(); }}
-            onError={setError}
-          />
-        )}
-      </Card>
-    );
+  useEffect(() => {
+    if (!passwordSuccess) return;
+    const t = setTimeout(() => setPasswordSuccess(''), 4000);
+    return () => clearTimeout(t);
+  }, [passwordSuccess]);
+
+  function closePasswordForm() {
+    setShowSetPasswordForm(false);
+    setNewPassword('');
+    setConfirmPassword('');
+    setPasswordError('');
+    setConfirmError('');
+    setPasswordLoading(false);
   }
 
-  if (providers.hasGoogle && !providers.hasPassword) {
+  async function setPasswordForFirstTime(): Promise<void> {
+    if (!user || !user.email) {
+      setPasswordError('Could not find your account email. Please sign out and sign back in.');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setConfirmError('Passwords do not match');
+      return;
+    }
+
+    const validation = validatePassword(newPassword);
+    if (!validation.valid) {
+      setPasswordError(validation.error ?? 'Invalid password.');
+      return;
+    }
+
+    setPasswordLoading(true);
+    setPasswordError('');
+
+    try {
+      const credential = EmailAuthProvider.credential(user.email, newPassword);
+      await linkWithCredential(user, credential);
+      await user.reload();
+      
+      await safeUpdateDoc(doc(db, 'users', user.uid), {
+        provider: 'email+password',
+        updatedAt: serverTimestamp()
+      });
+
+      onRefresh();
+      setPasswordSuccess(`Password set! You can now sign in with ${user.email} and this password.`);
+      setShowSetPasswordForm(false);
+      setPasswordLoading(false);
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (err: any) {
+      setPasswordLoading(false);
+      if (err.code === 'auth/email-already-in-use') {
+        setPasswordError('This email already has a password linked. Try signing in with email and password.');
+      } else if (err.code === 'auth/weak-password') {
+        setPasswordError('Password is too weak. Use at least 8 characters with numbers and letters.');
+      } else if (err.code === 'auth/requires-recent-login') {
+        setPasswordError('Your session has expired. Please sign out, sign back in with Google, then set your password again.');
+      } else if (err.code === 'auth/provider-already-linked') {
+        onRefresh();
+        setShowSetPasswordForm(false);
+        setPasswordError('');
+      } else {
+        setPasswordError('Something went wrong. Please try again.');
+        console.error('[SpendXP] setPasswordForFirstTime error:', err);
+      }
+    }
+  }
+
+  if (!providers.hasPassword) {
     return (
       <Card className="border-none shadow-sm bg-white p-6">
         <h3 className="text-[15px] font-medium text-primary border-b border-slate-100 pb-3 mb-4">Account password</h3>
-        <div className="p-4 bg-slate-50 rounded-xl mb-4">
-          <div className="flex items-center gap-2 text-sm font-bold text-slate-700">
-            <Info className="h-4 w-4 text-primary" /> Signed in with Google
+        
+        {!showSetPasswordForm ? (
+          <div className="space-y-4">
+            <div className="p-4 bg-slate-50 rounded-xl">
+              <p className="text-sm text-slate-600 font-medium">You haven't set a password yet.</p>
+            </div>
+            <Button onClick={() => setShowSetPasswordForm(true)} className="w-full font-black h-12 bg-primary">Set a password</Button>
           </div>
-          <p className="text-xs text-slate-500 mt-1">You haven't set a password yet. You can add one to enable email sign-in.</p>
-        </div>
-        {!showAddForm ? (
-          <Button size="sm" variant="outline" onClick={() => setShowAddForm(true)} className="font-bold">Add a password</Button>
         ) : (
-          <AddPasswordForm 
-            user={user} 
-            onClose={() => setShowAddForm(false)} 
-            onSuccess={(m) => { setSuccess(m); onRefresh(); }}
-            onError={setError}
-          />
+          <div className="space-y-4 animate-in slide-in-from-top-2">
+            <p className="text-[13px] text-slate-400 font-medium">Setting password for: <span className="font-bold">{user.email}</span></p>
+            
+            <div className="space-y-2">
+              <Input 
+                type="password" 
+                placeholder="New password" 
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="h-12 text-base"
+                autoComplete="new-password"
+                suppressHydrationWarning
+              />
+              <PasswordStrengthBars password={newPassword} />
+            </div>
+
+            <div className="space-y-1">
+              <Input 
+                type="password" 
+                placeholder="Confirm password" 
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                onBlur={() => setConfirmError(confirmPassword && newPassword !== confirmPassword ? 'Passwords do not match' : '')}
+                className={cn("h-12 text-base", confirmError ? "border-rose-500" : "")}
+                autoComplete="new-password"
+                suppressHydrationWarning
+              />
+              {confirmError && <p className="text-[11px] text-rose-600 font-bold">{confirmError}</p>}
+            </div>
+
+            <Button 
+              onClick={setPasswordForFirstTime} 
+              disabled={passwordLoading || !newPassword || newPassword !== confirmPassword}
+              className="w-full h-12 bg-primary font-black"
+            >
+              {passwordLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Set password'}
+            </Button>
+            
+            <div className="text-center">
+              <button onClick={closePasswordForm} className="text-xs font-bold text-slate-400 hover:underline">Cancel</button>
+            </div>
+          </div>
+        )}
+
+        {passwordSuccess && (
+          <div className="mt-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-[13px] text-[#085041] animate-in fade-in">
+            {passwordSuccess}
+          </div>
+        )}
+        
+        {passwordError && (
+          <div className="mt-4 p-3 bg-rose-50 border border-rose-200 rounded-lg text-[13px] text-[#712B13] animate-in fade-in">
+            {passwordError}
+          </div>
         )}
       </Card>
     );
   }
 
-  return <PasswordSection user={user} linkedProviders={providers.list} onRefresh={onRefresh} />;
+  return <PasswordSection user={user} onRefresh={onRefresh} />;
 }
 
-function AddPasswordForm({ user, onClose, onSuccess, onError }: { 
-  user: User, 
-  onClose: () => void, 
-  onSuccess: (m: string) => void,
-  onError: (m: string) => void
-}) {
-  const [pass, setPass] = useState('');
-  const [confirm, setConfirm] = useState('');
-  const [loading, setLoading] = useState(false);
+function PasswordStrengthBars({ password }: { password: string }) {
+  const hasLength = password.length >= 8;
+  const hasNumber = /\d/.test(password);
+  const hasSpecial = /[^a-zA-Z0-9]/.test(password);
 
-  const handleSet = async () => {
-    if (pass !== confirm) { onError("Passwords don't match."); return; }
-    const val = validatePassword(pass);
-    if (!val.valid) { onError(val.error!); return; }
+  const strength = hasLength && hasNumber && hasSpecial
+    ? 'strong'
+    : hasLength && hasNumber
+    ? 'fair'
+    : 'weak';
+
+  const barStyle = (filled: boolean, color: string) => ({
+    height: '4px',
+    flex: 1,
+    borderRadius: '2px',
+    background: filled ? color : 'var(--border)',
+    transition: 'background 0.2s'
+  });
+
+  return (
+    <div>
+      <div className="flex gap-1 mt-1.5">
+        <div style={barStyle(hasLength, '#EF9F27')}/>
+        <div style={barStyle(hasNumber, '#EF9F27')}/>
+        <div style={barStyle(hasSpecial, '#1D9E75')}/>
+      </div>
+      {password.length > 0 && (
+        <p className={cn(
+          "text-[11px] font-bold mt-1",
+          strength === 'strong' ? "text-[#0F6E56]" : strength === 'fair' ? "text-[#854F0B]" : "text-[#A32D2D]"
+        )}>
+          {strength === 'strong' ? 'Strong password' : strength === 'fair' ? 'Fair — add a symbol' : 'Weak — add numbers and symbols'}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function PasswordSection({ user, onRefresh }: { user: User, onRefresh: () => void }) {
+  const router = useRouter();
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentPass, setCurrentPass] = useState('');
+  const [newPass, setNewPass] = useState('');
+  const [confirmPass, setConfirmPass] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const handleUpdatePassword = async () => {
+    if (newPass !== confirmPass) { setError("Passwords don't match."); return; }
+    const validation = validatePassword(newPass);
+    if (!validation.valid) { setError(validation.error!); return; }
 
     setLoading(true);
+    setError(null);
     try {
-      const credential = EmailAuthProvider.credential(user.email!, pass);
-      await linkWithCredential(user, credential);
-      await safeUpdateDoc(doc(db, 'users', user.uid), { 
-        provider: user.providerData.some(p => p.providerId === 'google.com') ? 'google+password' : 'password',
-        updatedAt: serverTimestamp()
-      });
-      await user.reload();
-      onSuccess('Password added successfully!');
-      onClose();
+      const credential = EmailAuthProvider.credential(user.email!, currentPass);
+      await reauthenticateWithCredential(user, credential);
+      await updatePassword(user, newPass);
+      setSuccess('Password updated!');
+      setIsEditing(false);
+      setCurrentPass('');
+      setNewPass('');
+      setConfirmPass('');
     } catch (err: any) {
-      if (err.code === 'auth/email-already-in-use') {
-        onError('This email already has a password account. Sign in with that account to merge.');
-      } else if (err.code === 'auth/requires-recent-login') {
-        onError('Session expired. Please sign out and back in, then try again.');
+      if (err.code === 'auth/requires-recent-login') {
+        await auth.signOut();
+        router.push('/login?reason=reauth_required');
       } else {
-        onError('Failed to set password. Try again later.');
+        setError('Incorrect current password.');
+        await recordFailedAttempt(db, user.email!);
       }
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   return (
-    <div className="mt-4 space-y-4 p-4 border-2 border-dashed rounded-2xl animate-in slide-in-from-top-2">
-      <div className="space-y-2">
-        <Label className="text-xs font-black uppercase text-slate-400">Set new password</Label>
-        <Input type="password" value={pass} onChange={e => setPass(e.target.value)} className="h-12" placeholder="Password" />
-        <Input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} className="h-12" placeholder="Confirm Password" />
-      </div>
-      <div className="flex gap-2">
-        <Button size="sm" onClick={handleSet} disabled={loading}>{loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Set Password'}</Button>
-        <Button size="sm" variant="ghost" onClick={onClose} disabled={loading}>Cancel</Button>
-      </div>
-    </div>
+    <Card className="border-none shadow-sm bg-white p-6">
+      <h3 className="text-[15px] font-medium text-primary border-b border-slate-100 pb-3 mb-4">Account password</h3>
+      {success && <p className="mb-4 text-xs text-emerald-600 font-bold">{success}</p>}
+      
+      {!isEditing ? (
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-bold text-slate-700">••••••••••••</span>
+          <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary font-bold">Change</Button>
+        </div>
+      ) : (
+        <div className="space-y-4 animate-in slide-in-from-top-2">
+          <div className="space-y-2">
+            <Label className="text-xs font-black uppercase text-slate-400">Current Password</Label>
+            <Input type="password" value={currentPass} onChange={(e) => setCurrentPass(e.target.value)} className="h-12 text-base" />
+          </div>
+          
+          <div className="space-y-2">
+            <Label className="text-xs font-black uppercase text-slate-400">New Password</Label>
+            <Input type="password" value={newPass} onChange={(e) => setNewPass(e.target.value)} className="h-12 text-base" />
+            <PasswordStrengthBars password={newPass} />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-xs font-black uppercase text-slate-400">Confirm New Password</Label>
+            <Input type="password" value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} className="h-12 text-base" />
+          </div>
+
+          {error && <p className="text-xs text-rose-500 font-bold">{error}</p>}
+          <div className="flex gap-2">
+            <Button onClick={handleUpdatePassword} disabled={loading} size="sm" className="font-bold">Update</Button>
+            <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-slate-400">Cancel</Button>
+          </div>
+        </div>
+      )}
+    </Card>
   );
 }
 
@@ -710,63 +855,6 @@ function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { use
             <CheckCircle2 className="h-5 w-5" />
           </div>
           <div className="font-bold text-emerald-900 text-sm">Email updated!</div>
-        </div>
-      )}
-    </Card>
-  );
-}
-
-function PasswordSection({ user, linkedProviders, onRefresh }: { user: User, linkedProviders: string[], onRefresh: () => void }) {
-  const router = useRouter();
-  const [isEditing, setIsEditing] = useState(false);
-  const [currentPass, setCurrentPass] = useState('');
-  const [newPass, setNewPass] = useState('');
-  const [confirmPass, setConfirmPass] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-
-  const handleUpdatePassword = async () => {
-    if (newPass !== confirmPass) { setError("Passwords don't match."); return; }
-    const validation = validatePassword(newPass);
-    if (!validation.valid) { setError(validation.error); return; }
-
-    setLoading(true);
-    setError(null);
-    try {
-      const credential = EmailAuthProvider.credential(user.email!, currentPass);
-      await reauthenticateWithCredential(user, credential);
-      await updatePassword(user, newPass);
-      setSuccess('Password updated!');
-      setIsEditing(false);
-    } catch (err: any) {
-      if (err.code === 'auth/requires-recent-login') {
-        await auth.signOut();
-        router.push('/login?reason=reauth_required');
-      } else setError('Incorrect current password.');
-    } finally { setLoading(false); }
-  };
-
-  return (
-    <Card className="border-none shadow-sm bg-white p-6">
-      <h3 className="text-[15px] font-medium text-primary border-b border-slate-100 pb-3 mb-4">Account password</h3>
-      {success && <p className="mb-4 text-xs text-emerald-600 font-bold">{success}</p>}
-      
-      {!isEditing ? (
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-bold text-slate-700">••••••••••••</span>
-          <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary font-bold">Change</Button>
-        </div>
-      ) : (
-        <div className="space-y-4 animate-in slide-in-from-top-2">
-          <Input type="password" placeholder="Current Password" value={currentPass} onChange={(e) => setCurrentPass(e.target.value)} className="h-12 text-base" />
-          <Input type="password" placeholder="New Password" value={newPass} onChange={(e) => setNewPass(e.target.value)} className="h-12 text-base" />
-          <Input type="password" placeholder="Confirm Password" value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} className="h-12 text-base" />
-          {error && <p className="text-xs text-rose-500 font-bold">{error}</p>}
-          <div className="flex gap-2">
-            <Button onClick={handleUpdatePassword} disabled={loading} size="sm" className="font-bold">Update</Button>
-            <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-slate-400">Cancel</Button>
-          </div>
         </div>
       )}
     </Card>

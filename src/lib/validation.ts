@@ -63,23 +63,19 @@ export function validatePassword(password: string): {
   const hasNumber = /\d/.test(password)
   const hasLetter = /[a-zA-Z]/.test(password)
   const hasSpecial = /[^a-zA-Z0-9]/.test(password)
-  const hasUpperAndLower =
-    /[A-Z]/.test(password) && /[a-z]/.test(password)
 
   if (!hasNumber || !hasLetter) {
     return {
       valid: false,
-      error: 'Password must contain letters and numbers.',
+      error: 'Use a mix of letters and numbers.',
       strength: 'weak'
     }
   }
 
-  const strength =
-    hasSpecial && hasUpperAndLower ? 'strong' :
-    hasNumber && hasLetter ? 'fair' :
-    'weak'
-
-  return { valid: true, strength }
+  return {
+    valid: true,
+    strength: hasSpecial ? 'strong' : 'fair'
+  }
 }
 
 export const GAME_MAX_SCORES: Record<string, number> = {
