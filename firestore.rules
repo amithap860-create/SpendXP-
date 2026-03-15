@@ -2,35 +2,6 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    /**
-     * FIREBASE SECURITY RULES DOCUMENTATION
-     *
-     * Core Philosophy:
-     * This ruleset implements a strict user-ownership model for all student-generated data
-     * and a read-only model for global educational content and market simulation data. 
-     * Security is enforced primarily through path-based authorization and denormalized 
-     * user IDs within documents to ensure authorization independence.
-     *
-     * Data Structure:
-     * 1. /users/{userId}: Root user profiles.
-     * 2. /users/{userId}/...: User-specific subcollections for dashboard data, lesson progress, 
-     *    flashcard mastery, investments, savings goals, and transactions.
-     * 3. /lessons, /flashcards, /virtualCompanies, /simulatedNewsEvents: Global collections 
-     *    containing educational and simulation content.
-     *
-     * Key Security Decisions:
-     * - User-Owned Data: Strictly restricted to the authenticated user whose UID matches 
-     *   the {userId} in the path. All writes require the document to have a userId 
-     *   field matching the path and the auth token.
-     * - Global Content: Authenticated users have read-only access (get and list). 
-     *   Writes are explicitly disabled for client-side SDKs, assuming data is 
-     *   managed by administrative processes or backend logic.
-     * - Denormalization: All user-scoped documents include a 'userId' field to 
-     *   allow for fast, non-recursive authorization checks without using get() calls.
-     * - Immutability: Critical relational fields (like userId) are made immutable 
-     *   during updates to prevent data being transferred between users.
-     */
-
     // --- Helper Functions ---
 
     /** @description Checks if the request is from an authenticated user. */
@@ -38,179 +9,122 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    /** @description Checks if the authenticated user's UID matches the provided userId. */
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
+    /** @description Checks if the authenticated user's UID matches the provided uid. */
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
     }
 
-    /** @description Checks if a document exists and the current user is the owner. */
-    function isExistingOwner(userId) {
-      return resource != null && isOwner(userId);
+    /** @description Checks if the current user is the registered parent of the child. */
+    function isParentOf(childUid) {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/users/$(childUid)) &&
+        get(/databases/$(database)/documents/users/$(childUid)).data.parentUid == request.auth.uid;
     }
 
-    /** @description Validates that the internal data field matches the path parameter. */
-    function matchesPath(field, pathValue) {
-      return field == pathValue;
-    }
-
-    /** @description Ensures a field remains unchanged during an update. */
-    function isUnchanged(fieldName) {
-      return request.resource.data[fieldName] == resource.data[fieldName];
+    /** @description Checks if the current user profile is marked as a parent account. */
+    function isParent() {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isParent == true;
     }
 
     // --- Collection Rules ---
 
     /**
-     * @description Rules for UserProfile documents.
-     * @path /users/{userId}
-     * @allow (get, list, create, update) if user is the owner and ID matches.
-     * @deny (delete) always.
-     * @principle Path-based ownership and relational integrity for root user document.
+     * @description USER PROFILES
+     * Users manage their own profiles. Parents have read access to linked children.
      */
-    match /users/{userId} {
-      allow get, list: if isOwner(userId);
-      allow create: if isOwner(userId) && matchesPath(request.resource.data.id, userId);
-      allow update: if isExistingOwner(userId) && isUnchanged('id');
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isParentOf(uid);
+      allow create: if isOwner(uid);
+      allow update: if isOwner(uid);
       allow delete: if false;
 
-      /**
-       * @description Rules for the user's aggregated progress dashboard.
-       * @path /users/{userId}/dashboard/{dashboardId}
-       * @allow (create, update, get, list) if user owns the parent path.
-       * @deny (delete) always.
-       * @principle User-scoped subcollection access with relational field validation.
-       */
-      match /dashboard/{dashboardId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && matchesPath(request.resource.data.userId, userId);
-        allow update: if isExistingOwner(userId) && isUnchanged('userId');
-        allow delete: if false;
+      // Game scores subcollection (History of every game played)
+      match /gameScores/{gameId} {
+        allow read: if isOwner(uid) || isParentOf(uid);
+        allow write: if isOwner(uid);
       }
 
-      /**
-       * @description Rules for tracking lesson progress records.
-       * @path /users/{userId}/lessonProgress/{recordId}
-       * @allow (create, update, get, list, delete) if user owns the parent path.
-       * @deny (create) if data userId doesn't match path.
-       * @principle Enforces document ownership for individual progress tracking.
-       */
-      match /lessonProgress/{recordId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && matchesPath(request.resource.data.userId, userId);
-        allow update: if isExistingOwner(userId) && isUnchanged('userId');
-        allow delete: if isExistingOwner(userId);
+      // Progression subcollection (Aggregated stats and levels)
+      match /progression/{doc} {
+        allow read: if isOwner(uid) || isParentOf(uid);
+        allow write: if isOwner(uid);
       }
 
-      /**
-       * @description Rules for flashcard mastery tracking.
-       * @path /users/{userId}/flashcardMastery/{masteryId}
-       * @allow (all) if user is owner and userId is consistent.
-       * @principle Path-based ownership for mastery levels.
-       */
-      match /flashcardMastery/{masteryId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && matchesPath(request.resource.data.userId, userId);
-        allow update: if isExistingOwner(userId) && isUnchanged('userId');
-        allow delete: if isExistingOwner(userId);
+      // Lesson progress subcollection (Academy tracking)
+      match /lessonProgress/{lessonId} {
+        allow read: if isOwner(uid) || isParentOf(uid);
+        allow write: if isOwner(uid);
       }
 
-      /**
-       * @description Rules for user-specific virtual stock investments.
-       * @path /users/{userId}/virtualInvestments/{investmentId}
-       * @allow (all) if user is owner and userId is consistent.
-       * @principle Secure management of simulated financial assets.
-       */
-      match /virtualInvestments/{investmentId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && matchesPath(request.resource.data.userId, userId);
-        allow update: if isExistingOwner(userId) && isUnchanged('userId');
-        allow delete: if isExistingOwner(userId);
+      // Activity log subcollection (Feed for parent dashboard)
+      match /activityLog/{logId} {
+        allow read: if isOwner(uid) || isParentOf(uid);
+        allow write: if isOwner(uid);
       }
 
-      /**
-       * @description Rules for user-defined savings goals.
-       * @path /users/{userId}/savingsGoals/{goalId}
-       * @allow (all) if user is owner and userId is consistent.
-       * @principle User-scoped control over personal goal data.
-       */
-      match /savingsGoals/{goalId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && matchesPath(request.resource.data.userId, userId);
-        allow update: if isExistingOwner(userId) && isUnchanged('userId');
-        allow delete: if isExistingOwner(userId);
+      // Parent controls subcollection (Screen time and limits)
+      match /parentControls/{doc} {
+        allow read: if isOwner(uid) || isParentOf(uid);
+        allow write: if isOwner(uid) || isParentOf(uid);
       }
 
-      /**
-       * @description Rules for recording virtual financial transactions.
-       * @path /users/{userId}/virtualTransactions/{transactionId}
-       * @allow (get, list, create) if user is owner.
-       * @deny (update, delete) to maintain transaction history integrity.
-       * @principle Write-once transaction history for auditability.
-       */
-      match /virtualTransactions/{transactionId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && matchesPath(request.resource.data.userId, userId);
-        allow update, delete: if false;
+      // Legacy/Additional User Subcollections
+      match /virtualInvestments/{id} { allow read: if isOwner(uid) || isParentOf(uid); allow write: if isOwner(uid); }
+      match /savingsGoals/{id} { allow read: if isOwner(uid) || isParentOf(uid); allow write: if isOwner(uid); }
+      match /virtualTransactions/{id} { allow read: if isOwner(uid) || isParentOf(uid); allow write: if isOwner(uid); }
+      match /flashcardMastery/{id} { allow read: if isOwner(uid) || isParentOf(uid); allow write: if isOwner(uid); }
+      match /linkRequests/{id} { allow read, write: if isOwner(uid) || isParentOf(uid); }
+    }
+
+    /**
+     * @description GLOBAL CONTENT
+     * Lessons, market data, and events are read-only for all authenticated users.
+     */
+    match /lessons/{id} { allow read: if isSignedIn(); }
+    match /flashcards/{id} { allow read: if isSignedIn(); }
+    match /virtualCompanies/{id} { 
+      allow read: if isSignedIn(); 
+      match /priceHistory/{historyId} { allow read: if isSignedIn(); }
+    }
+    match /simulatedNewsEvents/{id} { allow read: if isSignedIn(); }
+
+    /**
+     * @description LEADERBOARD
+     * Publicly readable for all signed-in users. Writable by the user themselves.
+     */
+    match /leaderboard/{uid} {
+      allow read: if isSignedIn();
+      allow write: if isOwner(uid);
+    }
+
+    /**
+     * @description DAILY CHALLENGES
+     * Global challenges and user-specific score entries.
+     */
+    match /dailyChallenges/{date} {
+      allow read: if isSignedIn();
+      match /scores/{uid} {
+        allow read: if isSignedIn();
+        allow write: if isOwner(uid);
       }
     }
 
     /**
-     * @description Rules for global financial lessons.
-     * @path /lessons/{lessonId}
-     * @allow (get, list) if user is signed in.
-     * @deny (write) always from client.
-     * @principle Global read-only content for authenticated students.
+     * @description LINK REQUESTS
+     * Dedicated collection for handling the parent-child account linking process.
      */
-    match /lessons/{lessonId} {
-      allow get, list: if isSignedIn();
-      allow create, update, delete: if false;
+    match /linkRequests/{requestId} {
+      allow create: if isSignedIn() && request.resource.data.parentUid == request.auth.uid;
+      allow read: if isSignedIn() && (resource.data.parentUid == request.auth.uid || resource.data.childUid == request.auth.uid);
+      allow update: if isSignedIn() && (resource.data.parentUid == request.auth.uid || resource.data.childUid == request.auth.uid);
+      allow delete: if false;
     }
 
-    /**
-     * @description Rules for global financial flashcards.
-     * @path /flashcards/{flashcardId}
-     * @allow (get, list) if user is signed in.
-     * @deny (write) always from client.
-     * @principle Global read-only content for authenticated students.
-     */
-    match /flashcards/{flashcardId} {
-      allow get, list: if isSignedIn();
-      allow create, update, delete: if false;
-    }
-
-    /**
-     * @description Rules for virtual companies in the stock market simulation.
-     * @path /virtualCompanies/{companyId}
-     * @allow (get, list) if user is signed in.
-     * @deny (write) always from client.
-     * @principle Shared simulation data restricted to read-only access.
-     */
-    match /virtualCompanies/{companyId} {
-      allow get, list: if isSignedIn();
-      allow create, update, delete: if false;
-
-      /**
-       * @description Rules for historical stock prices of a company.
-       * @path /virtualCompanies/{companyId}/priceHistory/{historyRecordId}
-       * @allow (get, list) if user is signed in.
-       * @principle Inherited read-only access for nested simulation history.
-       */
-      match /priceHistory/{historyRecordId} {
-        allow get, list: if isSignedIn();
-        allow create, update, delete: if false;
-      }
-    }
-
-    /**
-     * @description Rules for simulated news events affecting the market.
-     * @path /simulatedNewsEvents/{newsEventId}
-     * @allow (get, list) if user is signed in.
-     * @deny (write) always from client.
-     * @principle Publicly readable simulation event data.
-     */
-    match /simulatedNewsEvents/{newsEventId} {
-      allow get, list: if isSignedIn();
-      allow create, update, delete: if false;
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
