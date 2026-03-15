@@ -48,6 +48,40 @@ export function validateEmail(email: string): { valid: boolean; error?: string }
   return { valid: true };
 }
 
+export function validatePassword(password: string): {
+  valid: boolean
+  error?: string
+  strength: 'weak' | 'fair' | 'strong'
+} {
+  if (!password || password.length < 8) {
+    return {
+      valid: false,
+      error: 'Password must be at least 8 characters.',
+      strength: 'weak'
+    }
+  }
+  const hasNumber = /\d/.test(password)
+  const hasLetter = /[a-zA-Z]/.test(password)
+  const hasSpecial = /[^a-zA-Z0-9]/.test(password)
+  const hasUpperAndLower =
+    /[A-Z]/.test(password) && /[a-z]/.test(password)
+
+  if (!hasNumber || !hasLetter) {
+    return {
+      valid: false,
+      error: 'Password must contain letters and numbers.',
+      strength: 'weak'
+    }
+  }
+
+  const strength =
+    hasSpecial && hasUpperAndLower ? 'strong' :
+    hasNumber && hasLetter ? 'fair' :
+    'weak'
+
+  return { valid: true, strength }
+}
+
 export const GAME_MAX_SCORES: Record<string, number> = {
   budgetBlitz: 50000,
   finIQ: 10000,

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -7,6 +8,7 @@ import {
   useMemoFirebase,
   safeUpdateDoc,
   db,
+  auth,
   googleProvider
 } from '@/firebase';
 import { 
@@ -20,7 +22,8 @@ import {
   reauthenticateWithCredential,
   EmailAuthProvider,
   linkWithCredential,
-  reauthenticateWithPopup
+  reauthenticateWithPopup,
+  GoogleAuthProvider
 } from 'firebase/auth';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -37,9 +40,10 @@ import {
   ShieldCheck,
   Lock,
   Globe,
-  ChevronRight
+  ChevronRight,
+  Info
 } from 'lucide-react';
-import { validateDisplayName, validateEmail } from '@/lib/validation';
+import { validateDisplayName, validateEmail, validatePassword } from '@/lib/validation';
 import { rateLimiter } from '@/lib/rateLimiter';
 import { useUser } from '@/lib/store';
 import { XPWallet } from '@/components/XPWallet';
@@ -50,11 +54,17 @@ import { scaleAmount, formatCurrency } from '@/lib/formatCurrency';
 import { cn } from '@/lib/utils';
 
 export default function ProfilePage() {
-  const { user, loading: authLoading, linkedProviders } = useAuthContext();
+  const { user, loading: authLoading } = useAuthContext();
   const { level } = useUser();
+  const [providerRefreshKey, setProviderRefreshKey] = useState(0);
 
   const profileRef = useMemoFirebase(() => user ? doc(db, 'users', user.uid) : null, [user]);
   const { data: profile, isLoading: profileLoading } = useDoc(profileRef);
+
+  const linkedProviders = useMemo(() => {
+    if (!user) return [];
+    return user.providerData.map(p => p.providerId);
+  }, [user, providerRefreshKey]);
 
   if (authLoading || profileLoading) {
     return <ProfileSkeleton />;
@@ -103,7 +113,11 @@ export default function ProfilePage() {
             <DisplayNameSection profile={profile} uid={user?.uid!} />
             <CurrencySection profile={profile} uid={user?.uid!} />
             <EmailSection user={user} isGoogleUser={isGoogleUser} profile={profile} />
-            <PasswordSection user={user} linkedProviders={linkedProviders} />
+            <PasswordSection 
+              user={user} 
+              linkedProviders={linkedProviders} 
+              onRefresh={() => setProviderRefreshKey(k => k + 1)} 
+            />
             <ParentSection profile={profile} uid={user?.uid!} displayName={profile?.displayName} />
           </div>
 
@@ -130,8 +144,6 @@ function CurrencySection({ profile, uid }: { profile: any, uid: string }) {
   const handleSelect = async (option: CurrencyOption) => {
     if (option.code === profile.currencyCode) return;
 
-    // Optimistic Update handled by profile listener usually, 
-    // but we can set UI immediately if needed.
     const success = await safeUpdateDoc(doc(db, 'users', uid), {
       currencyCode: option.code,
       updatedAt: serverTimestamp()
@@ -348,7 +360,15 @@ function EmailSection({ user, isGoogleUser, profile }: { user: any, isGoogleUser
   );
 }
 
-function PasswordSection({ user, linkedProviders }: { user: any, linkedProviders: string[] }) {
+function PasswordSection({ 
+  user, 
+  linkedProviders, 
+  onRefresh 
+}: { 
+  user: any, 
+  linkedProviders: string[], 
+  onRefresh: () => void 
+}) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [currentPass, setCurrentPass] = useState('');
@@ -356,33 +376,61 @@ function PasswordSection({ user, linkedProviders }: { user: any, linkedProviders
   const [confirmPass, setConfirmPass] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [success, setSuccess] = useState<string | null>(null);
 
-  const isGoogleOnly = linkedProviders.includes('google.com') && !linkedProviders.includes('password');
-  const isEmailOnly = !linkedProviders.includes('google.com') && linkedProviders.includes('password');
-  const isBoth = linkedProviders.includes('google.com') && linkedProviders.includes('password');
+  const hasPassword = linkedProviders.includes('password');
+  const hasGoogle = linkedProviders.includes('google.com');
+
+  type PasswordSectionState = 'loading' | 'google_only' | 'email_only' | 'google_and_password' | 'no_provider';
+
+  const passwordState: PasswordSectionState = useMemo(() => {
+    if (!user) return 'loading';
+    if (hasGoogle && !hasPassword) return 'google_only';
+    if (!hasGoogle && hasPassword) return 'email_only';
+    if (hasGoogle && hasPassword) return 'google_and_password';
+    return 'no_provider';
+  }, [user, hasGoogle, hasPassword]);
+
+  const passwordValidation = useMemo(() => validatePassword(newPass), [newPass]);
 
   const handleAddPassword = async () => {
     if (newPass !== confirmPass) { setError("Passwords don't match."); return; }
-    if (newPass.length < 8) { setError("Password too short."); return; }
+    const validation = validatePassword(newPass);
+    if (!validation.valid) { setError(validation.error); return; }
+
     setLoading(true);
     setError(null);
     try {
-      const credential = EmailAuthProvider.credential(user.email, newPass);
+      const credential = EmailAuthProvider.credential(user.email!, newPass);
       await linkWithCredential(user, credential);
       await safeUpdateDoc(doc(db, 'users', user.uid), {
         provider: 'google+email',
         updatedAt: serverTimestamp()
       });
-      setSuccess(true);
-      window.location.reload();
+      await user.reload();
+      onRefresh();
+      setSuccess('Password set! You can now sign in with either Google or email.');
+      setIsEditing(false);
     } catch (err: any) {
-      if (err.code === 'auth/email-already-in-use') setError('This email already has a password account.');
-      else if (err.code === 'auth/requires-recent-login') {
-        await user.auth.signOut();
-        router.push('/login?reason=reauth_required');
+      if (err.code === 'auth/email-already-in-use') {
+        setError('This email already has a password account.');
+      } else if (err.code === 'auth/requires-recent-login') {
+        try {
+          const provider = new GoogleAuthProvider();
+          await reauthenticateWithPopup(user, provider);
+          // Retry
+          const credential = EmailAuthProvider.credential(user.email!, newPass);
+          await linkWithCredential(user, credential);
+          await user.reload();
+          onRefresh();
+          setSuccess('Password set successfully!');
+          setIsEditing(false);
+        } catch (reAuthErr) {
+          setError('Please sign out and back in to add a password.');
+        }
+      } else {
+        setError('Failed to add password.');
       }
-      else setError('Failed to add password.');
     } finally {
       setLoading(false);
     }
@@ -390,21 +438,25 @@ function PasswordSection({ user, linkedProviders }: { user: any, linkedProviders
 
   const handleUpdatePassword = async () => {
     if (newPass !== confirmPass) { setError("New passwords don't match."); return; }
+    const validation = validatePassword(newPass);
+    if (!validation.valid) { setError(validation.error); return; }
+
     setLoading(true);
     setError(null);
     try {
-      const credential = EmailAuthProvider.credential(user.email, currentPass);
+      const credential = EmailAuthProvider.credential(user.email!, currentPass);
       await reauthenticateWithCredential(user, credential);
       await updatePassword(user, newPass);
-      setSuccess(true);
+      setSuccess('Password updated successfully!');
+      setIsEditing(false);
     } catch (err: any) {
       if (err.code === 'auth/requires-recent-login') {
-        await user.auth.signOut();
+        await auth.signOut();
         router.push('/login?reason=reauth_required');
       } else if (err.code === 'auth/wrong-password') {
         setError('Current password is incorrect.');
       } else {
-        setError('Update failed.');
+        setError('Update failed. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -414,9 +466,11 @@ function PasswordSection({ user, linkedProviders }: { user: any, linkedProviders
   const handleGoogleReauth = async () => {
     setLoading(true);
     try {
-      await reauthenticateWithPopup(user, googleProvider);
+      const provider = new GoogleAuthProvider();
+      await reauthenticateWithPopup(user, provider);
       await updatePassword(user, newPass);
-      setSuccess(true);
+      setSuccess('Password updated with Google confirmation!');
+      setIsEditing(false);
     } catch (err: any) {
       setError('Google re-authentication failed.');
     } finally {
@@ -424,45 +478,86 @@ function PasswordSection({ user, linkedProviders }: { user: any, linkedProviders
     }
   };
 
+  if (passwordState === 'loading') {
+    return (
+      <Card className="border-none shadow-sm bg-white p-6 space-y-4">
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-10 w-full" />
+      </Card>
+    );
+  }
+
+  if (passwordState === 'no_provider') return null;
+
   return (
     <Card className="border-none shadow-sm bg-white p-6">
       <h3 className="text-[15px] font-medium text-primary border-b border-slate-100 pb-3 mb-4">Account password</h3>
       
-      {isGoogleOnly ? (
+      {success && (
+        <div className="mb-4 p-3 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-100 flex items-center gap-2">
+          <CheckCircle2 className="h-4 w-4" /> {success}
+        </div>
+      )}
+
+      {passwordState === 'google_only' && (
         <div className="space-y-4">
-          <p className="text-sm text-slate-500">Your account uses Google Sign-In.</p>
+          <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-start gap-3">
+            <Info className="h-5 w-5 text-slate-400 shrink-0 mt-0.5" />
+            <p className="text-sm text-slate-600 leading-tight">
+              You signed in with Google. You haven't set a password yet.
+            </p>
+          </div>
           {!isEditing ? (
             <Button onClick={() => setIsEditing(true)} variant="outline" className="gap-2 font-bold" suppressHydrationWarning>
               <Plus className="h-4 w-4" /> Add a password
             </Button>
           ) : (
             <div className="space-y-4 animate-in slide-in-from-top-2">
-              <Input type="password" placeholder="New Password" value={newPass} onChange={(e) => setNewPass(e.target.value)} className="h-12" suppressHydrationWarning />
-              <Input type="password" placeholder="Confirm Password" value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} className="h-12" suppressHydrationWarning />
+              <div className="space-y-3">
+                <Input type="password" placeholder="New Password" value={newPass} onChange={(e) => setNewPass(e.target.value)} className="h-12" suppressHydrationWarning />
+                {newPass && (
+                  <div className="flex gap-1 h-1 px-1">
+                    <div className={cn("flex-1 rounded-full", passwordValidation.strength === 'weak' ? "bg-rose-500" : "bg-emerald-500")} />
+                    <div className={cn("flex-1 rounded-full", ['fair', 'strong'].includes(passwordValidation.strength) ? "bg-emerald-500" : "bg-slate-100")} />
+                    <div className={cn("flex-1 rounded-full", passwordValidation.strength === 'strong' ? "bg-emerald-500" : "bg-slate-100")} />
+                  </div>
+                )}
+                <Input type="password" placeholder="Confirm Password" value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} className="h-12" suppressHydrationWarning />
+              </div>
               {error && <p className="text-xs text-rose-500 font-bold">{error}</p>}
               <div className="flex gap-2">
-                <Button onClick={handleAddPassword} disabled={loading} size="sm" className="font-bold" suppressHydrationWarning>Link Password</Button>
+                <Button onClick={handleAddPassword} disabled={loading} size="sm" className="font-bold" suppressHydrationWarning>
+                  {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Set Password'}
+                </Button>
                 <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-slate-400" suppressHydrationWarning>Cancel</Button>
               </div>
             </div>
           )}
         </div>
-      ) : (
+      )}
+
+      {(passwordState === 'email_only' || passwordState === 'google_and_password') && (
         <div className="space-y-4">
+          {passwordState === 'google_and_password' && (
+            <Badge variant="secondary" className="bg-teal-50 text-teal-700 border-teal-100 gap-1 font-bold">
+              <ShieldCheck className="h-3 w-3" /> Google + Password linked
+            </Badge>
+          )}
+          
           {!isEditing ? (
             <div className="flex items-center justify-between">
               <span className="text-sm font-bold text-slate-700">••••••••••••</span>
               <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary font-bold" suppressHydrationWarning>Change</Button>
             </div>
-          ) : !success ? (
+          ) : (
             <div className="space-y-4 animate-in slide-in-from-top-2">
               <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-4">
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Re-authenticate to proceed</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Confirm identity</p>
                 <Input type="password" placeholder="Current Password" value={currentPass} onChange={(e) => setCurrentPass(e.target.value)} className="h-12 bg-white" suppressHydrationWarning />
-                {isBoth && (
+                {passwordState === 'google_and_password' && (
                   <Button variant="outline" onClick={handleGoogleReauth} className="w-full gap-2 font-bold h-12 bg-white border-2" suppressHydrationWarning>
                     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="h-4 w-4" alt="" />
-                    Confirm with Google
+                    Or: Confirm with Google
                   </Button>
                 )}
               </div>
@@ -473,13 +568,8 @@ function PasswordSection({ user, linkedProviders }: { user: any, linkedProviders
               {error && <p className="text-xs text-rose-500 font-bold">{error}</p>}
               <div className="flex gap-2">
                 <Button onClick={handleUpdatePassword} disabled={loading} size="sm" className="font-bold" suppressHydrationWarning>Update Password</Button>
-                <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-slate-400" suppressHydrationWarning>Cancel</Button>
+                <Button variant="ghost" size="sm" onClick={() => { setIsEditing(false); setError(null); }} className="text-slate-400" suppressHydrationWarning>Cancel</Button>
               </div>
-            </div>
-          ) : (
-            <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100 text-center space-y-2 animate-in zoom-in">
-              <p className="text-sm font-bold text-emerald-900">Password updated!</p>
-              <Button variant="ghost" size="sm" onClick={() => { setIsEditing(false); setSuccess(false); }} className="text-emerald-800 font-black uppercase" suppressHydrationWarning>Dismiss</Button>
             </div>
           )}
         </div>
@@ -528,7 +618,7 @@ function ParentSection({ profile, uid, displayName }: { profile: any, uid: strin
 function ProfileSkeleton() {
   return (
     <div className="flex min-h-screen bg-background p-8">
-      <div className="max-w-6xl mx-auto w-full space-y-8">
+      <div className="max-w-6xl auto w-full space-y-8">
         <Skeleton className="h-32 w-full rounded-2xl" />
         <div className="grid md:grid-cols-2 gap-8">
           <div className="space-y-8"><Skeleton className="h-48 w-full rounded-2xl" /><Skeleton className="h-48 w-full rounded-2xl" /></div>

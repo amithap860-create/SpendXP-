@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -78,10 +79,15 @@ export function useAuth() {
     setError(null);
     try {
       const isMobile = window.innerWidth < 768;
+      let res;
       if (isMobile) {
         await signInWithRedirect(auth, googleProvider);
       } else {
-        await signInWithPopup(auth, googleProvider);
+        res = await signInWithPopup(auth, googleProvider);
+        if (res.user) {
+          const userRef = doc(db, 'users', res.user.uid);
+          await safeSetDoc(userRef, { provider: 'google.com' }, { merge: true });
+        }
       }
     } catch (err: any) {
       setError(err.message);
@@ -101,12 +107,16 @@ export function useAuth() {
     try {
       const res = await createUserWithEmailAndPassword(auth, email, pass);
       await updateProfile(res.user, { displayName });
+      
+      const userRef = doc(db, 'users', res.user.uid);
+      await safeSetDoc(userRef, { provider: 'password' }, { merge: true });
+
       const actionCodeSettings: ActionCodeSettings = {
         url: `${window.location.origin}/verify-email`,
         handleCodeInApp: true,
       };
       await sendEmailVerification(res.user, actionCodeSettings);
-      return { success: true };
+      return { success: true, userId: res.user.uid };
     } catch (err: any) {
       let msg = 'Something went wrong. Please try again.';
       if (err.code === 'auth/email-already-in-use') msg = 'An account with this email already exists.';
