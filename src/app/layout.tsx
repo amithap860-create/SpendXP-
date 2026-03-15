@@ -24,6 +24,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
     { label: 'Home', href: '/dashboard', icon: 'grid' },
     { label: 'Quests', href: '/quests', icon: 'flag' },
     { label: 'Games', href: '/games', icon: 'arcade' },
+    { label: 'Tools', href: '/tools', icon: 'wrench' },
     { label: 'Learn', href: '/learn', icon: 'book' },
     { label: 'Profile', href: '/profile', icon: 'user' }
   ];
@@ -82,6 +83,11 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
                 <div className="w-5 h-3.5 bg-current rounded-sm relative overflow-hidden">
                   <div className="absolute top-1 left-1 w-1 h-1 bg-white rounded-full opacity-50" />
                   <div className="absolute top-1 right-1 w-1 h-1 bg-white rounded-full opacity-50" />
+                </div>
+              )}
+              {link.icon === 'wrench' && (
+                <div className="w-4 h-4 border-2 border-current rounded-sm relative flex items-center justify-center">
+                  <div className="w-1.5 h-1.5 bg-current rounded-full" />
                 </div>
               )}
               {link.icon === 'book' && (
