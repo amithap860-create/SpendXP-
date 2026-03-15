@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { BudgetBlitz } from '@/components/games/BudgetBlitz';
 import { FinIQQuiz } from '@/components/games/FinIQQuiz';
+import { MoneyMaze } from '@/components/games/MoneyMaze';
 import { 
   Gamepad2, 
   Zap, 
@@ -27,7 +28,8 @@ import {
   HeartPulse,
   ShoppingBag,
   Brain,
-  Trophy
+  Trophy,
+  Puzzle
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -132,7 +134,7 @@ const PRO_SCENARIOS: Scenario[] = [
 ];
 
 export default function GamesHub() {
-  const { ageGroup, balance, getPortfolioValue, liabilities, formatValue, completeTask } = useUser();
+  const { ageGroup, formatValue, completeTask } = useUser();
   const { toast } = useToast();
   const [activeGame, setActiveGame] = useState<string | null>(null);
 
@@ -241,6 +243,18 @@ export default function GamesHub() {
               </CardContent>
             </Card>
 
+            <Card className="hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/5" onClick={() => setActiveGame('maze')}>
+              <div className="h-3 bg-indigo-500" />
+              <CardHeader>
+                <Puzzle className="h-10 w-10 text-indigo-500 mb-2 group-hover:scale-110 transition-transform" />
+                <CardTitle className="text-2xl">Money Maze</CardTitle>
+                <CardDescription className="text-sm">Logic puzzles for debt payoff and investment portfolio building.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Badge className="bg-indigo-50 text-indigo-600">Strategy Engine</Badge>
+              </CardContent>
+            </Card>
+
             <Card className="hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/5" onClick={() => setActiveGame('advisor')}>
               <div className="h-3 bg-primary" />
               <CardHeader>
@@ -303,6 +317,10 @@ export default function GamesHub() {
 
             {activeGame === 'finIQ' && (
               <FinIQQuiz onExit={() => setActiveGame(null)} />
+            )}
+
+            {activeGame === 'maze' && (
+              <MoneyMaze onExit={() => setActiveGame(null)} />
             )}
 
             {activeGame === 'dailyIQ' && (
