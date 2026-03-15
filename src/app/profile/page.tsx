@@ -14,7 +14,10 @@ import {
   doc, 
   serverTimestamp, 
   Timestamp,
-  deleteDoc
+  deleteDoc,
+  writeBatch,
+  collection,
+  getDocs
 } from 'firebase/firestore';
 import { 
   verifyBeforeUpdateEmail, 
@@ -23,7 +26,9 @@ import {
   linkWithCredential,
   reauthenticateWithPopup,
   GoogleAuthProvider,
-  User
+  User,
+  linkWithPopup,
+  reauthenticateWithCredential
 } from 'firebase/auth';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -41,7 +46,9 @@ import {
   Info,
   Trash2,
   ArrowRight,
-  X
+  X,
+  AlertTriangle,
+  Lock
 } from 'lucide-react';
 import { validateDisplayName, validateEmail, validatePassword } from '@/lib/validation';
 import { rateLimiter } from '@/lib/rateLimiter';
@@ -55,29 +62,46 @@ import { cn } from '@/lib/utils';
 import { SectionErrorBoundary } from '@/components/profile/SectionErrorBoundary';
 
 type ReauthMethod = 'password' | 'google' | 'both';
+type EmailChangeStep = 'idle' | 'form' | 'reauth' | 'pending' | 'success';
+type DeletionReauthState = 'idle' | 'confirm_warning' | 'reauth' | 'type_delete' | 'deleting' | 'error';
 
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuthContext();
   const { level } = useUser();
+  const router = useRouter();
   const [providerRefreshKey, setProviderRefreshKey] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const profileRef = useMemoFirebase(() => user ? doc(db, 'users', user.uid) : null, [user]);
   const { data: profile, isLoading: profileLoading } = useDoc(profileRef);
 
-  const linkedProviders = useMemo(() => {
-    if (!user) return [];
-    return user.providerData.map(p => p.providerId);
-  }, [user, providerRefreshKey]);
+  function getActualProviders(): {
+    hasPassword: boolean
+    hasGoogle: boolean
+    hasCustom: boolean
+    hasAny: boolean
+    list: string[]
+  } {
+    const providerData = auth.currentUser?.providerData ?? [];
+    const list = providerData.map(p => p.providerId);
+    return {
+      hasPassword: list.includes('password'),
+      hasGoogle: list.includes('google.com'),
+      hasCustom: list.includes('custom') || list.length === 0,
+      hasAny: list.length > 0,
+      list,
+    };
+  }
 
-  const hasPassword = linkedProviders.includes('password');
-  const hasGoogle = linkedProviders.includes('google.com');
+  const providers = useMemo(() => getActualProviders(), [providerRefreshKey, user]);
 
   const reauthMethod = useMemo((): ReauthMethod => {
-    if (hasGoogle && !hasPassword) return 'google';
-    if (!hasGoogle && hasPassword) return 'password';
-    if (hasGoogle && hasPassword) return 'both';
+    if (providers.hasGoogle && !providers.hasPassword) return 'google';
+    if (!providers.hasGoogle && providers.hasPassword) return 'password';
+    if (providers.hasGoogle && providers.hasPassword) return 'both';
     return 'google';
-  }, [hasGoogle, hasPassword]);
+  }, [providers]);
 
   if (authLoading || profileLoading) {
     return <ProfileSkeleton />;
@@ -119,6 +143,20 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
 
+        {error && (
+          <div className="p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-xl font-bold text-sm flex items-center gap-2 animate-in fade-in">
+            <AlertTriangle className="h-4 w-4" /> {error}
+            <button onClick={() => setError(null)} className="ml-auto"><X className="h-4 w-4" /></button>
+          </div>
+        )}
+
+        {success && (
+          <div className="p-4 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-xl font-bold text-sm flex items-center gap-2 animate-in fade-in">
+            <CheckCircle2 className="h-4 w-4" /> {success}
+            <button onClick={() => setSuccess(null)} className="ml-auto"><X className="h-4 w-4" /></button>
+          </div>
+        )}
+
         <div className="grid md:grid-cols-2 gap-8">
           <div className="space-y-8">
             <SectionErrorBoundary sectionName="Display name">
@@ -139,10 +177,12 @@ export default function ProfilePage() {
             </SectionErrorBoundary>
 
             <SectionErrorBoundary sectionName="Account password">
-              <PasswordSection 
+              <PasswordContainer 
                 user={user as User} 
-                linkedProviders={linkedProviders} 
-                onRefresh={() => setProviderRefreshKey(k => k + 1)} 
+                providers={providers} 
+                onRefresh={() => setProviderRefreshKey(k => k + 1)}
+                setError={setError}
+                setSuccess={setSuccess}
               />
             </SectionErrorBoundary>
 
@@ -151,7 +191,12 @@ export default function ProfilePage() {
             </SectionErrorBoundary>
 
             <SectionErrorBoundary sectionName="Danger zone">
-              <DangerZone user={user as User} reauthMethod={reauthMethod} />
+              <DangerZone 
+                user={user as User} 
+                reauthMethod={reauthMethod} 
+                providers={providers}
+                router={router}
+              />
             </SectionErrorBoundary>
           </div>
 
@@ -165,6 +210,131 @@ export default function ProfilePage() {
           </div>
         </div>
       </main>
+    </div>
+  );
+}
+
+function PasswordContainer({ user, providers, onRefresh, setError, setSuccess }: { 
+  user: User, 
+  providers: any, 
+  onRefresh: () => void,
+  setError: (m: string | null) => void,
+  setSuccess: (m: string | null) => void
+}) {
+  const [showAddForm, setShowAddForm] = useState(false);
+
+  if (!providers.hasPassword && !providers.hasGoogle) {
+    return (
+      <Card className="border-none shadow-sm bg-white p-6">
+        <h3 className="text-[15px] font-medium text-primary border-b border-slate-100 pb-3 mb-4">Account security</h3>
+        <p className="text-xs text-slate-500 mb-4">You haven't set up a password or linked a permanent provider yet.</p>
+        <div className="flex gap-2">
+          <Button size="sm" onClick={() => setShowAddForm(true)}>Add a password</Button>
+          <Button size="sm" variant="outline" onClick={async () => {
+            try {
+              const provider = new GoogleAuthProvider();
+              await linkWithPopup(user, provider);
+              await user.reload();
+              await safeUpdateDoc(doc(db, 'users', user.uid), { 
+                provider: 'google.com',
+                updatedAt: serverTimestamp()
+              });
+              onRefresh();
+              setSuccess('Google account linked!');
+            } catch (err: any) {
+              if (err.code !== 'auth/popup-closed-by-user') setError('Could not link Google account.');
+            }
+          }}>Link Google</Button>
+        </div>
+        {showAddForm && (
+          <AddPasswordForm 
+            user={user} 
+            onClose={() => setShowAddForm(false)} 
+            onSuccess={(m) => { setSuccess(m); onRefresh(); }}
+            onError={setError}
+          />
+        )}
+      </Card>
+    );
+  }
+
+  if (providers.hasGoogle && !providers.hasPassword) {
+    return (
+      <Card className="border-none shadow-sm bg-white p-6">
+        <h3 className="text-[15px] font-medium text-primary border-b border-slate-100 pb-3 mb-4">Account password</h3>
+        <div className="p-4 bg-slate-50 rounded-xl mb-4">
+          <div className="flex items-center gap-2 text-sm font-bold text-slate-700">
+            <Info className="h-4 w-4 text-primary" /> Signed in with Google
+          </div>
+          <p className="text-xs text-slate-500 mt-1">You haven't set a password yet. You can add one to enable email sign-in.</p>
+        </div>
+        {!showAddForm ? (
+          <Button size="sm" variant="outline" onClick={() => setShowAddForm(true)} className="font-bold">Add a password</Button>
+        ) : (
+          <AddPasswordForm 
+            user={user} 
+            onClose={() => setShowAddForm(false)} 
+            onSuccess={(m) => { setSuccess(m); onRefresh(); }}
+            onError={setError}
+          />
+        )}
+      </Card>
+    );
+  }
+
+  return <PasswordSection user={user} linkedProviders={providers.list} onRefresh={onRefresh} />;
+}
+
+function AddPasswordForm({ user, onClose, onSuccess, onError }: { 
+  user: User, 
+  onClose: () => void, 
+  onSuccess: (m: string) => void,
+  onError: (m: string) => void
+}) {
+  const [pass, setPass] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSet = async () => {
+    if (pass !== confirm) { onError("Passwords don't match."); return; }
+    const val = validatePassword(pass);
+    if (!val.valid) { onError(val.error!); return; }
+
+    setLoading(true);
+    try {
+      const credential = EmailAuthProvider.credential(user.email!, pass);
+      await linkWithCredential(user, credential);
+      await safeUpdateDoc(doc(db, 'users', user.uid), { 
+        provider: user.providerData.some(p => p.providerId === 'google.com') ? 'google+password' : 'password',
+        updatedAt: serverTimestamp()
+      });
+      await user.reload();
+      onSuccess('Password added successfully!');
+      onClose();
+    } catch (err: any) {
+      if (err.code === 'auth/email-already-in-use') {
+        onError('This email already has a password account. Sign in with that account to merge.');
+      } else if (err.code === 'auth/requires-recent-login') {
+        onError('Session expired. Please sign out and back in, then try again.');
+      } else {
+        onError('Failed to set password. Try again later.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="mt-4 space-y-4 p-4 border-2 border-dashed rounded-2xl animate-in slide-in-from-top-2">
+      <div className="space-y-2">
+        <Label className="text-xs font-black uppercase text-slate-400">Set new password</Label>
+        <Input type="password" value={pass} onChange={e => setPass(e.target.value)} className="h-12" placeholder="Password" />
+        <Input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} className="h-12" placeholder="Confirm Password" />
+      </div>
+      <div className="flex gap-2">
+        <Button size="sm" onClick={handleSet} disabled={loading}>{loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Set Password'}</Button>
+        <Button size="sm" variant="ghost" onClick={onClose} disabled={loading}>Cancel</Button>
+      </div>
     </div>
   );
 }
@@ -341,15 +511,12 @@ function DisplayNameSection({ profile, uid }: { profile: any, uid: string }) {
   );
 }
 
-type EmailChangeStep = 'idle' | 'form' | 'reauth' | 'pending' | 'success';
-
 function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { user: User, profile: any, reauthMethod: ReauthMethod, providerRefreshKey: number }) {
   const [emailChangeStep, setEmailChangeStep] = useState<EmailChangeStep>('idle');
   const [newEmail, setNewEmail] = useState('');
   const [reauthPassword, setReauthPassword] = useState('');
   const [emailChangeError, setEmailChangeError] = useState('');
   const [emailChangeLoading, setEmailChangeLoading] = useState(false);
-  const [resendCooldown, setResendCooldown] = useState(0);
 
   useEffect(() => {
     if (profile?.pendingEmail && profile.pendingEmail !== user.email && emailChangeStep === 'idle') {
@@ -406,7 +573,6 @@ function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { use
     setEmailChangeError('');
     try {
       const credential = EmailAuthProvider.credential(user.email!, password);
-      const { reauthenticateWithCredential } = await import('firebase/auth');
       await reauthenticateWithCredential(user, credential);
       setEmailChangeLoading(false);
       return true;
@@ -560,9 +726,6 @@ function PasswordSection({ user, linkedProviders, onRefresh }: { user: User, lin
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const hasPassword = linkedProviders.includes('password');
-  const hasGoogle = linkedProviders.includes('google.com');
-
   const handleUpdatePassword = async () => {
     if (newPass !== confirmPass) { setError("Passwords don't match."); return; }
     const validation = validatePassword(newPass);
@@ -598,6 +761,7 @@ function PasswordSection({ user, linkedProviders, onRefresh }: { user: User, lin
         <div className="space-y-4 animate-in slide-in-from-top-2">
           <Input type="password" placeholder="Current Password" value={currentPass} onChange={(e) => setCurrentPass(e.target.value)} className="h-12 text-base" />
           <Input type="password" placeholder="New Password" value={newPass} onChange={(e) => setNewPass(e.target.value)} className="h-12 text-base" />
+          <Input type="password" placeholder="Confirm Password" value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} className="h-12 text-base" />
           {error && <p className="text-xs text-rose-500 font-bold">{error}</p>}
           <div className="flex gap-2">
             <Button onClick={handleUpdatePassword} disabled={loading} size="sm" className="font-bold">Update</Button>
@@ -641,52 +805,205 @@ function ParentSection({ profile, uid }: { profile: any, uid: string }) {
   );
 }
 
-function DangerZone({ user, reauthMethod }: { user: User, reauthMethod: ReauthMethod }) {
-  const [step, setStep] = useState(1);
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+function DangerZone({ user, reauthMethod, providers, router }: { 
+  user: User, 
+  reauthMethod: ReauthMethod, 
+  providers: any,
+  router: any
+}) {
+  const [deletionState, setDeletionState] = useState<DeletionReauthState>('idle');
+  const [deletionError, setDeletionError] = useState('');
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [reauthPassword, setReauthPassword] = useState('');
 
-  const handleDelete = async () => {
-    setLoading(true);
-    try {
-      if (reauthMethod === 'google') {
-        const provider = new GoogleAuthProvider();
-        await reauthenticateWithPopup(user, provider);
-      } else {
-        const credential = EmailAuthProvider.credential(user.email!, password);
-        const { reauthenticateWithCredential } = await import('firebase/auth');
-        await reauthenticateWithCredential(user, credential);
-      }
-      await deleteDoc(doc(db, 'users', user.uid));
-      await user.delete();
-      window.location.href = '/login?reason=account_deleted';
-    } catch (err: any) {
-      setError('Failed to delete account. Try again later.');
-    } finally {
-      setLoading(false);
+  async function reauthForDeletion(): Promise<boolean> {
+    const currentUser = auth.currentUser;
+    if (!currentUser) return false;
+
+    if (providers.hasCustom || (!providers.hasPassword && !providers.hasGoogle)) {
+      return true;
     }
-  };
+
+    if (providers.hasGoogle && !providers.hasPassword) {
+      try {
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+        await reauthenticateWithPopup(currentUser, provider);
+        return true;
+      } catch (err: any) {
+        if (err.code !== 'auth/popup-closed-by-user') {
+          setDeletionError('Could not verify your identity. Please try again.');
+        }
+        return false;
+      }
+    }
+
+    if (providers.hasPassword) {
+      if (!reauthPassword) {
+        setDeletionError('Please enter your password.');
+        return false;
+      }
+      try {
+        const credential = EmailAuthProvider.credential(currentUser.email!, reauthPassword);
+        await reauthenticateWithCredential(currentUser, credential);
+        return true;
+      } catch (err: any) {
+        if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+          setDeletionError('Incorrect password.');
+        } else if (err.code === 'auth/requires-recent-login') {
+          setDeletionError('Session expired. Please sign out and sign back in, then try deleting again.');
+        } else {
+          setDeletionError('Could not verify your identity. Please try again.');
+        }
+        return false;
+      }
+    }
+
+    return false;
+  }
+
+  async function executeAccountDeletion(): Promise<void> {
+    const currentUser = auth.currentUser;
+    if (!currentUser || deleteConfirmText !== 'DELETE') return;
+
+    setDeletionState('deleting');
+    setDeletionError('');
+
+    try {
+      const uid = currentUser.uid;
+      
+      const subcollections = [
+        'gameScores', 'progression', 'lessonProgress',
+        'activityLog', 'parentControls', 'questProgress',
+        'savingsGoals', 'virtualInvestments', 'toolsUsed',
+        'healthHistory', 'notifications', 'profile'
+      ];
+
+      for (const sub of subcollections) {
+        const colRef = collection(db, 'users', uid, sub);
+        const snap = await getDocs(colRef);
+        if (snap.empty) continue;
+        const batch = writeBatch(db);
+        snap.docs.forEach(d => batch.delete(d.ref));
+        await batch.commit();
+      }
+
+      await deleteDoc(doc(db, 'users', uid));
+      try {
+        await deleteDoc(doc(db, 'leaderboard', uid));
+      } catch {}
+
+      await currentUser.delete();
+      router.push('/?deleted=true');
+
+    } catch (err: any) {
+      console.error('[SpendXP] Account deletion error:', err);
+      if (err.code === 'auth/requires-recent-login') {
+        setDeletionState('reauth');
+        setDeletionError('Session expired. Please re-verify your identity to complete deletion.');
+      } else {
+        setDeletionState('type_delete');
+        setDeletionError('Something went wrong deleting your account. Please try again.');
+      }
+    }
+  }
 
   return (
     <Card className="border-none shadow-sm bg-rose-50/50 p-6 border-rose-100 border">
       <h3 className="text-[15px] font-bold text-rose-600 border-b border-rose-100 pb-3 mb-4">Danger Zone</h3>
       
-      {step === 1 ? (
+      {deletionState === 'idle' && (
         <Button 
           variant="outline" 
-          onClick={() => setStep(2)} 
+          onClick={() => setDeletionState('confirm_warning')} 
           className="w-full h-12 border-rose-200 text-rose-600 hover:bg-rose-100 font-bold gap-2 text-sm"
         >
           <Trash2 className="h-4 w-4" /> Delete Account
         </Button>
-      ) : (
+      )}
+
+      {deletionState === 'confirm_warning' && (
         <div className="space-y-4 animate-in slide-in-from-top-2">
-          <p className="text-xs text-rose-700 font-bold">This is permanent. Confirm to proceed.</p>
-          {reauthMethod === 'password' && <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="h-12 bg-white text-base" placeholder="Password" />}
-          {error && <p className="text-xs text-rose-600 font-bold">{error}</p>}
-          <Button onClick={handleDelete} disabled={loading} className="w-full h-12 bg-rose-600 hover:bg-rose-700 text-white font-black uppercase text-xs">Confirm Deletion</Button>
-          <Button variant="ghost" onClick={() => setStep(1)} className="w-full text-xs">Cancel</Button>
+          <p className="text-xs text-rose-700 font-bold leading-relaxed">
+            This will permanently delete your SpendXP profile, all earned XP, badges, game history, and settings. This cannot be undone.
+          </p>
+          <div className="flex gap-2">
+            <Button variant="destructive" size="sm" className="font-bold" onClick={() => setDeletionState('reauth')}>Continue</Button>
+            <Button variant="ghost" size="sm" onClick={() => setDeletionState('idle')}>Cancel</Button>
+          </div>
+        </div>
+      )}
+
+      {deletionState === 'reauth' && (
+        <div className="space-y-4 animate-in slide-in-from-top-2">
+          {providers.hasCustom || (!providers.hasPassword && !providers.hasGoogle) ? (
+            <div className="hidden">{useEffect(() => { setDeletionState('type_delete'); }, [])}</div>
+          ) : providers.hasGoogle && !providers.hasPassword ? (
+            <div>
+              <p className="text-xs text-slate-500 mb-3 font-bold">Confirm with Google to continue:</p>
+              <Button 
+                variant="outline" 
+                className="w-full gap-2 border-slate-200 bg-white"
+                onClick={async () => {
+                  const ok = await reauthForDeletion();
+                  if (ok) setDeletionState('type_delete');
+                }}
+              >
+                <Plus className="h-4 w-4 rotate-45" /> Continue with Google
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <p className="text-xs text-slate-500 mb-2 font-bold">Enter password to continue:</p>
+              <Input 
+                type="password" 
+                value={reauthPassword} 
+                onChange={e => setReauthPassword(e.target.value)} 
+                className="h-12 bg-white" 
+                placeholder="Current Password" 
+              />
+              <Button 
+                className="w-full mt-3 font-black"
+                onClick={async () => {
+                  const ok = await reauthForDeletion();
+                  if (ok) setDeletionState('type_delete');
+                }}
+              >
+                Confirm
+              </Button>
+            </div>
+          )}
+          {deletionError && <p className="text-xs text-rose-600 font-bold">{deletionError}</p>}
+          <Button variant="ghost" size="xs" onClick={() => setDeletionState('idle')} className="w-full text-slate-400">Cancel</Button>
+        </div>
+      )}
+
+      {deletionState === 'type_delete' && (
+        <div className="space-y-4 animate-in slide-in-from-top-2">
+          <p className="text-xs text-rose-700 font-bold">Type <strong>DELETE</strong> to confirm:</p>
+          <Input 
+            value={deleteConfirmText} 
+            onChange={e => setDeleteConfirmText(e.target.value)} 
+            placeholder="DELETE" 
+            className={cn("h-12 bg-white uppercase", deleteConfirmText === 'DELETE' ? "border-rose-500" : "")} 
+          />
+          <Button 
+            variant="destructive" 
+            className="w-full h-12 font-black"
+            disabled={deleteConfirmText !== 'DELETE'}
+            onClick={executeAccountDeletion}
+          >
+            Permanently delete my account
+          </Button>
+          {deletionError && <p className="text-xs text-rose-600 font-bold">{deletionError}</p>}
+          <Button variant="ghost" size="xs" onClick={() => setDeletionState('idle')} className="w-full">Cancel</Button>
+        </div>
+      )}
+
+      {deletionState === 'deleting' && (
+        <div className="flex items-center gap-3 p-4">
+          <RefreshCw className="h-5 w-5 animate-spin text-rose-500" />
+          <p className="text-sm font-bold text-slate-600">Cleaning up your data...</p>
         </div>
       )}
     </Card>

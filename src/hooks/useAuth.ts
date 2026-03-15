@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -86,7 +85,10 @@ export function useAuth() {
         res = await signInWithPopup(auth, googleProvider);
         if (res.user) {
           const userRef = doc(db, 'users', res.user.uid);
-          await safeSetDoc(userRef, { provider: 'google.com' }, { merge: true });
+          await safeSetDoc(userRef, { 
+            provider: 'google.com',
+            updatedAt: serverTimestamp()
+          }, { merge: true });
         }
       }
     } catch (err: any) {
@@ -109,7 +111,10 @@ export function useAuth() {
       await updateProfile(res.user, { displayName });
       
       const userRef = doc(db, 'users', res.user.uid);
-      await safeSetDoc(userRef, { provider: 'password' }, { merge: true });
+      await safeSetDoc(userRef, { 
+        provider: 'password',
+        updatedAt: serverTimestamp()
+      }, { merge: true });
 
       const actionCodeSettings: ActionCodeSettings = {
         url: `${window.location.origin}/verify-email`,
