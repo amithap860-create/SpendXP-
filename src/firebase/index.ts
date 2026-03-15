@@ -60,3 +60,11 @@ export * from './non-blocking-updates';
 export * from './non-blocking-login';
 export * from './errors';
 export * from './error-emitter';
+
+// Re-export safe Firestore wrappers for convenient access via @/firebase
+export {
+  safeSetDoc,
+  safeUpdateDoc,
+  safeGetDoc,
+  safeOnSnapshot
+} from '@/lib/firestoreSafe';
