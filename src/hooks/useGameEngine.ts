@@ -7,7 +7,7 @@ import { useFirestore, useUser } from '@/firebase';
 export type GameStatus = 'IDLE' | 'COUNTDOWN' | 'PLAYING' | 'PAUSED' | 'GAME_OVER' | 'RESULTS';
 
 export interface GameConfig {
-  gameName: 'budgetBlitz' | 'finIQ' | 'moneyMaze';
+  gameName: 'budgetBlitz' | 'finIQ' | 'moneyMaze' | 'stockMarketSim' | 'creditScoreBuilder';
   totalRounds: number;
   timePerRound?: number;
   livesEnabled: boolean;
@@ -39,6 +39,7 @@ type Action =
   | { type: 'CORRECT_ANSWER'; bonusXp?: number; xpPerCorrectAnswer: number }
   | { type: 'WRONG_ANSWER'; livesEnabled: boolean }
   | { type: 'NEXT_ROUND'; totalRounds: number; timePerRound?: number; xpPerWin: number }
+  | { type: 'SET_SCORE'; score: number }
   | { type: 'END_GAME' }
   | { type: 'RESET_COMBO' }
   | { type: 'RESET_GAME'; config: GameConfig };
@@ -115,6 +116,9 @@ function gameReducer(state: GameState, action: Action): GameState {
       };
     }
 
+    case 'SET_SCORE':
+      return { ...state, score: action.score };
+
     case 'NEXT_ROUND':
       if (state.currentRound >= action.totalRounds) {
         return {
@@ -127,7 +131,7 @@ function gameReducer(state: GameState, action: Action): GameState {
         ...state,
         currentRound: state.currentRound + 1,
         timeLeft: action.timePerRound ?? 0,
-        streak: 0, // Optional: reset streak between rounds
+        streak: 0,
       };
 
     case 'END_GAME':
@@ -190,6 +194,10 @@ export function useGameEngine(config: GameConfig) {
   const pauseGame = useCallback(() => dispatch({ type: 'PAUSE' }), []);
   const resumeGame = useCallback(() => dispatch({ type: 'RESUME' }), []);
 
+  const setScore = useCallback((score: number) => {
+    dispatch({ type: 'SET_SCORE', score });
+  }, []);
+
   const correctAnswer = useCallback((bonusXp?: number) => {
     dispatch({
       type: 'CORRECT_ANSWER',
@@ -214,7 +222,7 @@ export function useGameEngine(config: GameConfig) {
     });
   }, [config.totalRounds, config.timePerRound, config.xpPerWin]);
 
-  const endGame = useCallback(async () => {
+  const endGame = useCallback(async (finalXpBonus = 0) => {
     if (!user || !db) return;
     
     // Transition state locally
@@ -222,6 +230,8 @@ export function useGameEngine(config: GameConfig) {
 
     const gameScoreRef = doc(db, 'users', user.uid, 'gameScores', config.gameName);
     const userRef = doc(db, 'users', user.uid);
+
+    const totalXp = state.xpEarned + finalXpBonus;
 
     try {
       // Fetch existing high score
@@ -234,17 +244,16 @@ export function useGameEngine(config: GameConfig) {
         gameName: config.gameName,
         lastScore: state.score,
         highScore: newHighScore,
-        lastXpEarned: state.xpEarned,
-        totalXpEarnedInGame: increment(state.xpEarned),
+        lastXpEarned: totalXp,
+        totalXpEarnedInGame: increment(totalXp),
         lastPlayedAt: new Date().toISOString()
       }, { merge: true });
 
       // Save global XP increment
       await updateDoc(userRef, {
-        xp: increment(state.xpEarned)
+        xp: increment(totalXp)
       });
     } catch (error) {
-      // Errors are handled by the global FirebaseErrorListener via the standard pattern
       console.error('Failed to save game results:', error);
     }
   }, [db, user, config.gameName, state.score, state.xpEarned]);
@@ -263,6 +272,7 @@ export function useGameEngine(config: GameConfig) {
     startGame,
     pauseGame,
     resumeGame,
+    setScore,
     correctAnswer,
     wrongAnswer,
     nextRound,

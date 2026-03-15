@@ -11,6 +11,7 @@ import { BudgetBlitz } from '@/components/games/BudgetBlitz';
 import { FinIQQuiz } from '@/components/games/FinIQQuiz';
 import { MoneyMaze } from '@/components/games/MoneyMaze';
 import { CreditScoreBuilder } from '@/components/games/CreditScoreBuilder';
+import { StockMarketSim } from '@/components/games/StockMarketSim';
 import { 
   Gamepad2, 
   Zap, 
@@ -31,62 +32,15 @@ import {
   Brain,
   Trophy,
   Puzzle,
-  CreditCard
+  CreditCard,
+  BarChart3
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-interface Scenario {
-  title: string;
-  description: string;
-  options: {
-    label: string;
-    impact: {
-      balance?: number;
-      portfolio?: number;
-      liabilities?: number;
-      income?: number;
-    };
-    advice: string;
-    projection: string;
-  }[];
-}
-
-const ADVISOR_SCENARIOS: Scenario[] = [
-  {
-    title: "The Shiny New Gadget",
-    description: "A brand new smartphone just launched. It costs $800. You really want it, but your current phone works fine.",
-    options: [
-      {
-        label: "Buy it full price",
-        impact: { balance: -800 },
-        advice: "Buying luxury items outright is better than debt, but it significantly reduces your liquid assets.",
-        projection: "In 5 years, that $800 could have been $1,200 if invested."
-      },
-      {
-        label: "Buy on Credit",
-        impact: { liabilities: 1000 },
-        advice: "Installment plans often include hidden interest. You're trading future income for current pleasure.",
-        projection: "You'll pay $200 extra in interest over 24 months."
-      },
-      {
-        label: "Skip it & Invest",
-        impact: { portfolio: 800 },
-        advice: "Delayed gratification is the cornerstone of wealth.",
-        projection: "This $800 asset could grow to $2,500 by the time you're ready for college."
-      }
-    ]
-  }
-];
-
 export default function GamesHub() {
-  const { ageGroup, formatValue, completeTask } = useUser();
+  const { formatValue, completeTask } = useUser();
   const { toast } = useToast();
   const [activeGame, setActiveGame] = useState<string | null>(null);
-
-  // Advisor Game State
-  const [currentScenarioIdx, setCurrentScenarioIdx] = useState(0);
-  const [simulationHistory, setSimulationHistory] = useState<any[]>([]);
-  const [showAdvisorResult, setShowAdvisorResult] = useState(false);
 
   // Loan Sim State
   const [loanPrincipal, setLoanPrincipal] = useState(1000);
@@ -102,28 +56,6 @@ export default function GamesHub() {
   const monthlyPayment = calculateMonthlyPayment();
   const totalPaid = monthlyPayment * loanTerm;
   const totalInterest = totalPaid - loanPrincipal;
-
-  const handleAdvisorChoice = (optionIdx: number) => {
-    const scenarioList = ADVISOR_SCENARIOS;
-    const scenario = scenarioList[currentScenarioIdx];
-    const option = scenario.options[optionIdx];
-    
-    setSimulationHistory([...simulationHistory, {
-      scenario: scenario.title,
-      choice: option.label,
-      advice: option.advice,
-      projection: option.projection
-    }]);
-
-    if (currentScenarioIdx < scenarioList.length - 1) {
-      setCurrentScenarioIdx(prev => prev + 1);
-    } else {
-      setShowAdvisorResult(true);
-      completeTask('game-advisor');
-    }
-    
-    toast({ title: "Choice Recorded" });
-  };
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -151,6 +83,18 @@ export default function GamesHub() {
 
         {!activeGame ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <Card className="hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/5" onClick={() => setActiveGame('stock')}>
+              <div className="h-3 bg-indigo-600" />
+              <CardHeader>
+                <BarChart3 className="h-10 w-10 text-indigo-600 mb-2 group-hover:scale-110 transition-transform" />
+                <CardTitle className="text-2xl">Stock Market Sim</CardTitle>
+                <CardDescription className="text-sm">Trade 6 companies over 5 days. React to headlines and volatility.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Badge className="bg-indigo-50 text-indigo-700">Market Engine</Badge>
+              </CardContent>
+            </Card>
+
             <Card className="hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/5" onClick={() => setActiveGame('credit')}>
               <div className="h-3 bg-blue-600" />
               <CardHeader>
@@ -188,14 +132,14 @@ export default function GamesHub() {
             </Card>
 
             <Card className="hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/5" onClick={() => setActiveGame('maze')}>
-              <div className="h-3 bg-indigo-500" />
+              <div className="h-3 bg-violet-500" />
               <CardHeader>
-                <Puzzle className="h-10 w-10 text-indigo-500 mb-2 group-hover:scale-110 transition-transform" />
+                <Puzzle className="h-10 w-10 text-violet-500 mb-2 group-hover:scale-110 transition-transform" />
                 <CardTitle className="text-2xl">Money Maze</CardTitle>
                 <CardDescription className="text-sm">Logic puzzles for debt payoff and investment portfolio building.</CardDescription>
               </CardHeader>
               <CardContent>
-                <Badge className="bg-indigo-50 text-indigo-600">Strategy Engine</Badge>
+                <Badge className="bg-violet-50 text-violet-600">Strategy Engine</Badge>
               </CardContent>
             </Card>
 
@@ -213,9 +157,13 @@ export default function GamesHub() {
           </div>
         ) : (
           <div className="max-w-4xl mx-auto">
-            <Button variant="ghost" className="mb-6 gap-2 text-muted-foreground hover:text-primary" onClick={() => { setActiveGame(null); setShowAdvisorResult(false); setSimulationHistory([]); setCurrentScenarioIdx(0); }}>
+            <Button variant="ghost" className="mb-6 gap-2 text-muted-foreground hover:text-primary" onClick={() => { setActiveGame(null); }}>
               <ArrowRight className="h-4 w-4 rotate-180" /> Exit to Games Hub
             </Button>
+
+            {activeGame === 'stock' && (
+              <StockMarketSim onExit={() => setActiveGame(null)} />
+            )}
 
             {activeGame === 'credit' && (
               <CreditScoreBuilder onExit={() => setActiveGame(null)} />
