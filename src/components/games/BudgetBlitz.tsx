@@ -26,13 +26,6 @@ import { useUser } from '@/lib/store';
 import { doc, setDoc } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 
-interface FallingCard {
-  id: string;
-  item: BudgetItem;
-  x: number;
-  y: number;
-}
-
 export function BudgetBlitz({ onExit }: { onExit: () => void }) {
   const { difficultyConfig } = useAgeAdapt();
   const { formatValue, user } = useUser();
@@ -53,7 +46,6 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
     xpEarned,
     lives,
     timeLeft,
-    comboActive,
     countdown,
     startGame,
     correctAnswer,
@@ -61,7 +53,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
     endGame
   } = useGameEngine(gameConfig);
 
-  const [cards, setCards] = useState<FallingCard[]>([]);
+  const [cards, setCards] = useState<any[]>([]);
   const [stats, setStats] = useState({ NEED: 0, WANT: 0, SAVE: 0, total: 0 });
   const [speedTier, setSpeedTier] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -82,7 +74,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
     const spawnInterval = setInterval(() => {
       const randomItem = budgetBlitzItems[Math.floor(Math.random() * budgetBlitzItems.length)];
       const xPos = Math.random() * 80 + 10;
-      const newCard: FallingCard = {
+      const newCard = {
         id: Math.random().toString(36).substring(7),
         item: randomItem,
         x: xPos,
@@ -114,7 +106,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
   }, [gameState, speedTier, wrongAnswer]);
 
   useEffect(() => {
-    if (gameState === 'PLAYING' && timeLeft <= 0) {
+    if (gameState === 'PLAYING' && (timeLeft <= 0)) {
       handleFinish();
     }
     if (gameState === 'GAME_OVER') {
@@ -123,7 +115,17 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
   }, [gameState, timeLeft]);
 
   const handleFinish = async () => {
-    await endGame();
+    const { isHighScore } = await endGame();
+    if (isHighScore) {
+      import('https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js' as any).then((module: any) => {
+        module.default({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#10b981', '#3b82f6', '#f59e0b']
+        });
+      });
+    }
     if (user && db) {
       const budgetSplit = stats.total > 0 ? {
         need: Math.round((stats.NEED / stats.total) * 100),

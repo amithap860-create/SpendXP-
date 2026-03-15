@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect, useMemo } from 'react';
@@ -17,6 +16,8 @@ import { CreditScoreBuilder } from '@/components/games/CreditScoreBuilder';
 import { StockMarketSim } from '@/components/games/StockMarketSim';
 import { CompoundClicker } from '@/components/games/CompoundClicker';
 import { XPWallet } from '@/components/XPWallet';
+import { Skeleton } from '@/components/ui/skeleton';
+import { toggleSound } from '@/lib/sounds';
 import { 
   Gamepad2, 
   Zap, 
@@ -30,24 +31,60 @@ import {
   CreditCard,
   BarChart3,
   MousePointer2,
-  Info,
   Users,
   Timer,
-  Lightbulb
+  Lightbulb,
+  Volume2,
+  VolumeX,
+  Sparkles,
+  ChevronRight
 } from 'lucide-react';
-import { collection, query, orderBy, limit, onSnapshot, doc } from 'firebase/firestore';
+import { collection, query, orderBy, limit, onSnapshot, doc, updateDoc } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { cn } from '@/lib/utils';
 
 export default function GamesHub() {
-  const { name, balance, formatValue } = useUser();
+  const { name, balance, formatValue, user } = useUser();
   const { data: progression, isLoading: isProgLoading } = useProgression();
-  const { ageGroup } = useAgeAdapt();
+  const { ageGroup, difficultyConfig } = useAgeAdapt();
   const db = useFirestore();
   
   const [activeGame, setActiveGame] = useState<string | null>(null);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [challengeStats, setChallengeStats] = useState({ players: 0, timeRemaining: '' });
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState(1);
+  const [birthYearInput, setBirthYearInput] = useState('2010');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setSoundEnabled(localStorage.getItem('spendxp_sound') !== 'false');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isProgLoading && !progression.lastActivityAt) {
+      setShowOnboarding(true);
+    }
+  }, [isProgLoading, progression]);
+
+  const handleToggleSound = () => {
+    const newState = toggleSound();
+    setSoundEnabled(newState);
+  };
+
+  const completeOnboarding = async () => {
+    if (!user || !db) return;
+    const year = parseInt(birthYearInput);
+    if (isNaN(year) || year < 1900 || year > new Date().getFullYear()) return;
+
+    await updateDoc(doc(db, 'users', user.uid), {
+      birthYear: year,
+      onboardingCompleted: true
+    });
+    setShowOnboarding(false);
+  };
 
   // Leaderboard Subscription
   useEffect(() => {
@@ -96,7 +133,7 @@ export default function GamesHub() {
   };
 
   const currentTip = useMemo(() => {
-    const tips = FINANCE_TIPS[ageGroup] || FINANCE_TIPS.teen;
+    const tips = FINANCE_TIPS[ageGroup as keyof typeof FINANCE_TIPS] || FINANCE_TIPS.teen;
     const day = new Date().getDate();
     return tips[day % tips.length];
   }, [ageGroup]);
@@ -164,6 +201,56 @@ export default function GamesHub() {
     }
   ];
 
+  if (showOnboarding) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="max-w-md w-full border-none shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-500">
+          <div className="bg-primary p-8 text-white text-center">
+            <Sparkles className="h-12 w-12 mx-auto mb-4 animate-pulse" />
+            <h2 className="text-3xl font-black">Welcome to SpendXP!</h2>
+          </div>
+          <CardContent className="p-8">
+            {onboardingStep === 1 && (
+              <div className="space-y-6 text-center">
+                <p className="text-slate-600 font-medium leading-relaxed">
+                  Earn XP and level up your virtual wallet by making smart financial decisions in our arcade.
+                </p>
+                <Button onClick={() => setOnboardingStep(2)} className="w-full h-12 text-lg font-bold">Get Started</Button>
+              </div>
+            )}
+            {onboardingStep === 2 && (
+              <div className="space-y-6">
+                <div className="text-center">
+                  <label className="text-sm font-black uppercase text-slate-400">What is your birth year?</label>
+                  <input 
+                    type="number" 
+                    value={birthYearInput}
+                    onChange={(e) => setBirthYearInput(e.target.value)}
+                    className="w-full text-center text-4xl font-black text-primary bg-slate-50 border-none rounded-xl mt-2 h-20"
+                  />
+                  <p className="text-xs text-muted-foreground mt-2">We use this to customize the games for your age group.</p>
+                </div>
+                <Button onClick={() => setOnboardingStep(3)} className="w-full h-12 text-lg font-bold">Continue</Button>
+              </div>
+            )}
+            {onboardingStep === 3 && (
+              <div className="space-y-6 text-center">
+                <Badge className="bg-accent text-white border-none px-4 py-1 text-lg mb-2">
+                  {difficultyConfig.vocabularyLevel.toUpperCase()} MODE
+                </Badge>
+                <p className="text-slate-600 font-medium">
+                  We've tailored your experience to <span className="font-bold text-primary">{ageGroup}</span> level. 
+                  Expect {difficultyConfig.vocabularyLevel} vocabulary and age-appropriate financial goals.
+                </p>
+                <Button onClick={completeOnboarding} className="w-full h-12 text-lg font-bold">Start Playing</Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   if (activeGame) {
     return (
       <div className="flex min-h-screen bg-background">
@@ -195,7 +282,19 @@ export default function GamesHub() {
               <Gamepad2 className="h-10 w-10 text-primary" />
             </div>
             <div>
-              <h2 className="text-3xl font-black text-primary tracking-tight">Financial Arcade</h2>
+              <div className="flex items-center gap-3">
+                <h2 className="text-3xl font-black text-primary tracking-tight">Financial Arcade</h2>
+                <button 
+                  onClick={handleToggleSound}
+                  className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors"
+                >
+                  {soundEnabled ? (
+                    <Volume2 className="h-4 w-4 text-slate-600" />
+                  ) : (
+                    <VolumeX className="h-4 w-4 text-slate-400" />
+                  )}
+                </button>
+              </div>
               <div className="flex items-center gap-2 mt-1">
                 <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Welcome back, {name}</span>
@@ -245,57 +344,61 @@ export default function GamesHub() {
 
             {/* Games Grid */}
             <div className="grid gap-6 md:grid-cols-2">
-              {games.map((game) => {
-                const isLocked = progression.totalXP < game.minXP;
-                return (
-                  <Card 
-                    key={game.id} 
-                    className={cn(
-                      "group hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden relative",
-                      isLocked && "grayscale opacity-75 cursor-not-allowed"
-                    )}
-                    onClick={() => !isLocked && setActiveGame(game.id)}
-                  >
-                    <div className={cn("h-3", game.color)} />
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <div className={cn("h-12 w-12 rounded-xl flex items-center justify-center text-white mb-2 shadow-lg", game.color)}>
-                          <game.icon className="h-6 w-6" />
+              {isProgLoading ? (
+                Array(4).fill(0).map((_, i) => <Skeleton key={i} className="h-64 rounded-2xl" />)
+              ) : (
+                games.map((game) => {
+                  const isLocked = progression.totalXP < game.minXP;
+                  return (
+                    <Card 
+                      key={game.id} 
+                      className={cn(
+                        "group hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden relative",
+                        isLocked && "grayscale opacity-75 cursor-not-allowed"
+                      )}
+                      onClick={() => !isLocked && setActiveGame(game.id)}
+                    >
+                      <div className={cn("h-3", game.color)} />
+                      <CardHeader>
+                        <div className="flex justify-between items-start">
+                          <div className={cn("h-12 w-12 rounded-xl flex items-center justify-center text-white mb-2 shadow-lg", game.color)}>
+                            <game.icon className="h-6 w-6" />
+                          </div>
+                          <Badge variant="secondary" className="bg-slate-50 text-slate-500 border-none font-bold">
+                            {game.badge}
+                          </Badge>
                         </div>
-                        <Badge variant="secondary" className="bg-slate-50 text-slate-500 border-none font-bold">
-                          {game.badge}
-                        </Badge>
-                      </div>
-                      <CardTitle className="text-2xl font-black text-slate-900 group-hover:text-primary transition-colors">
-                        {game.title}
-                      </CardTitle>
-                      <CardDescription className="text-slate-500 font-medium leading-snug">
-                        {game.desc}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center justify-between mt-2">
-                        <div className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
-                          Best: <span className="text-slate-900">{game.highScore}</span>
+                        <CardTitle className="text-2xl font-black text-slate-900 group-hover:text-primary transition-colors">
+                          {game.title}
+                        </CardTitle>
+                        <CardDescription className="text-slate-500 font-medium leading-snug">
+                          {game.desc}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center justify-between mt-2">
+                          <div className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                            Best: <span className="text-slate-900">{game.highScore}</span>
+                          </div>
+                          <div className="flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                            <span className="text-xs font-bold text-primary">Play Now</span>
+                            <ChevronRight className="h-3 w-3 text-primary" />
+                          </div>
                         </div>
-                        <div className="flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                          <span className="text-xs font-bold text-primary">Play Now</span>
-                          <ArrowRight className="h-3 w-3 text-primary" />
+                      </CardContent>
+                      {isLocked && (
+                        <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex flex-col items-center justify-center text-center p-6">
+                          <div className="h-14 w-14 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-2 border-2 border-dashed border-slate-300">
+                            <Lock className="h-6 w-6" />
+                          </div>
+                          <h4 className="font-black text-slate-900">Rank Locked</h4>
+                          <p className="text-xs font-bold text-slate-500">Unlocks at {game.minXP} XP</p>
                         </div>
-                      </div>
-                    </CardContent>
-                    {isLocked && (
-                      <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex flex-col items-center justify-center text-center p-6">
-                        <div className="h-14 w-14 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-2 border-2 border-dashed border-slate-300">
-                          <Lock className="h-6 w-6" />
-                        </div>
-                        <h4 className="font-black text-slate-900">Rank Locked</h4>
-                        <p className="text-xs font-bold text-slate-500">Unlocks at {game.minXP} XP</p>
-                      </div>
-                    )}
-                  </Card>
-                );
-              })}
+                      )}
+                    </Card>
+                  );
+                })
+              )}
             </div>
 
             {/* Tip of the Day */}
@@ -329,8 +432,8 @@ export default function GamesHub() {
               <CardContent className="p-0 flex-1">
                 {isProgLoading ? (
                   <div className="p-6 space-y-4">
-                    {[1, 2, 3, 4, 5].map(i => (
-                      <div key={i} className="h-12 w-full bg-slate-100 animate-pulse rounded-lg" />
+                    {Array(8).fill(0).map((_, i) => (
+                      <Skeleton key={i} className="h-12 w-full" />
                     ))}
                   </div>
                 ) : (

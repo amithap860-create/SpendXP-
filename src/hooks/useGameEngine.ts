@@ -3,6 +3,7 @@
 import { useReducer, useCallback, useEffect, useRef } from 'react';
 import { doc, getDoc, increment, writeBatch, serverTimestamp, arrayUnion } from 'firebase/firestore';
 import { useFirestore, useUser } from '@/firebase';
+import { playCorrect, playWrong, playGameOver, playCombo } from '@/lib/sounds';
 
 export type GameStatus = 'IDLE' | 'COUNTDOWN' | 'PLAYING' | 'PAUSED' | 'GAME_OVER' | 'RESULTS';
 
@@ -88,6 +89,9 @@ function gameReducer(state: GameState, action: Action): GameState {
       if (newTimestamps.length === 3 && now - newTimestamps[0] <= 2500) {
         comboBonus = 50;
         comboActive = true;
+        playCombo();
+      } else {
+        playCorrect();
       }
 
       const totalXpGain = action.xpPerCorrectAnswer + (action.bonusXp || 0) + comboBonus;
@@ -105,8 +109,10 @@ function gameReducer(state: GameState, action: Action): GameState {
     }
 
     case 'WRONG_ANSWER': {
+      playWrong();
       const newLives = action.livesEnabled ? state.lives - 1 : state.lives;
       const shouldGameOver = action.livesEnabled && newLives <= 0;
+      if (shouldGameOver) playGameOver();
       return {
         ...state,
         lives: newLives,
@@ -216,7 +222,7 @@ export function useGameEngine(config: GameConfig) {
   }, [config.totalRounds, config.timePerRound, config.xpPerWin]);
 
   const endGame = useCallback(async (finalXpBonus = 0) => {
-    if (!user || !db) return;
+    if (!user || !db) return { isHighScore: false };
     
     dispatch({ type: 'END_GAME' });
 
@@ -231,6 +237,7 @@ export function useGameEngine(config: GameConfig) {
     try {
       const gameSnap = await getDoc(gameScoreRef);
       const existingGameData = gameSnap.exists() ? gameSnap.data() : { highScore: 0 };
+      const isHighScore = state.score > (existingGameData.highScore || 0);
       const newHighScore = Math.max(existingGameData.highScore || 0, state.score);
 
       // Path 1: Per-game scores
@@ -277,8 +284,10 @@ export function useGameEngine(config: GameConfig) {
       });
 
       await batch.commit();
+      return { isHighScore };
     } catch (error) {
       console.error('Failed to save game results via batch:', error);
+      return { isHighScore: false };
     }
   }, [db, user, config, state.score, state.xpEarned, state.bestStreak]);
 
