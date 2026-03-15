@@ -36,8 +36,8 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
             </Link>
             <nav className="flex gap-1">
               {[
-                { label: 'Games', href: '/games' },
                 { label: 'Dashboard', href: '/dashboard' },
+                { label: 'Games', href: '/games' },
                 { label: 'Learn', href: '/learn' },
                 { label: 'Profile', href: '/profile' }
               ].map((link) => (
@@ -62,6 +62,12 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
       {/* BOTTOM NAV (Mobile) */}
       {!loading && user && !isAuthPage && (
         <nav className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-white border-t border-slate-200 flex items-center justify-around px-2 z-50">
+          <NavLink href="/dashboard" label="Home" active={pathname === '/dashboard'}>
+            <div className="grid grid-cols-2 gap-0.5 p-0.5">
+              {[1,2,3,4].map(i => <div key={i} className="w-2 h-2 bg-current rounded-sm" />)}
+            </div>
+          </NavLink>
+
           <NavLink href="/games" label="Games" active={pathname === '/games'}>
             <div className="w-6 h-4 bg-current rounded-sm relative overflow-hidden">
               <div className="absolute top-1 left-1 w-1 h-1 bg-white rounded-full opacity-50" />
@@ -69,12 +75,6 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
             </div>
           </NavLink>
           
-          <NavLink href="/dashboard" label="Home" active={pathname === '/dashboard'}>
-            <div className="grid grid-cols-2 gap-0.5 p-0.5">
-              {[1,2,3,4].map(i => <div key={i} className="w-2 h-2 bg-current rounded-sm" />)}
-            </div>
-          </NavLink>
-
           <NavLink href="/learn" label="Learn" active={pathname === '/learn'}>
             <div className="w-5 h-6 bg-current rounded-sm relative">
               <div className="absolute top-1 left-1 right-1 h-0.5 bg-white opacity-30" />
