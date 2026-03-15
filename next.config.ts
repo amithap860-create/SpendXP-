@@ -1,10 +1,6 @@
-import type {NextConfig} from 'next';
+import type { NextConfig } from 'next';
 
 const securityHeaders = [
-  {
-    key: 'Content-Security-Policy',
-    value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com https://*.firebaseapp.com https://*.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://*.googleusercontent.com https://*.googleapis.com https://images.unsplash.com https://picsum.photos; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; frame-src https://accounts.google.com https://*.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;",
-  },
   {
     key: 'X-Frame-Options',
     value: 'DENY',
@@ -29,31 +25,13 @@ const securityHeaders = [
     key: 'Strict-Transport-Security',
     value: 'max-age=63072000; includeSubDomains; preload',
   },
-  {
-    key: 'Cross-Origin-Opener-Policy',
-    value: 'same-origin',
-  },
-  {
-    key: 'Cross-Origin-Embedder-Policy',
-    value: 'require-corp',
-  },
-  {
-    key: 'Cross-Origin-Resource-Policy',
-    value: 'same-origin',
-  },
 ];
 
 const nextConfig: NextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  compress: true, // Fix 10: Compress responses for mobile
+  compress: true,
   images: {
     formats: ['image/webp'],
-    deviceSizes: [360, 414, 768, 1024, 1280], // Fix 10: Mobile image optimization
+    deviceSizes: [360, 414, 768, 1024, 1280],
     remotePatterns: [
       {
         protocol: 'https',
@@ -73,13 +51,19 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: '*.googleusercontent.com',
+      },
     ],
   },
   experimental: {
-    optimizePackageImports: [ // Fix 10: Reduce bundle sizes
+    optimizePackageImports: [
       'firebase',
-      '@firebase/firestore',
+      '@firebase/app',
       '@firebase/auth',
+      '@firebase/firestore',
+      '@firebase/app-check',
       'lucide-react',
       'date-fns'
     ],
