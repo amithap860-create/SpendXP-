@@ -44,14 +44,18 @@ export default function Dashboard() {
     );
   }
 
-  // Ensure tasks and portfolio are always handled as arrays
+  // Final safety checks for arrays and calculations
   const safeTasks = Array.isArray(tasks) ? tasks : [];
-  const savingsProgress = Math.min(100, (savingsCurrent / (savingsGoal || 1)) * 100);
+  const currentSavings = typeof savingsCurrent === 'number' ? savingsCurrent : 0;
+  const targetSavings = (typeof savingsGoal === 'number' && savingsGoal > 0) ? savingsGoal : 1;
+  const savingsProgress = Math.min(100, (currentSavings / targetSavings) * 100);
   
-  // Safe calculation of portfolio value
   const portfolioValueUsd = typeof getPortfolioValue === 'function' ? getPortfolioValue() : 0;
+  const walletBalance = typeof balance === 'number' ? balance : 0;
+  const currentXP = typeof xp === 'number' ? xp : 0;
+  const currentLevel = typeof level === 'number' ? level : 1;
   
-  const xpInCurrentLevel = (xp || 0) % 500;
+  const xpInCurrentLevel = currentXP % 500;
   const levelProgress = (xpInCurrentLevel / 500) * 100;
   
   const completedTasksCount = safeTasks.filter(t => t?.completed).length;
@@ -66,10 +70,10 @@ export default function Dashboard() {
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="px-2 py-0.5 rounded-full bg-accent/20 text-accent text-xs font-bold uppercase">
-                {ageGroup} MODE
+                {ageGroup || '8-11'} MODE
               </span>
               <Badge variant="secondary" className="bg-primary/10 text-primary border-none">
-                LEVEL {level || 1}
+                LEVEL {currentLevel}
               </Badge>
             </div>
             <h2 className="text-3xl font-bold text-primary">Welcome back, Strategist!</h2>
@@ -78,7 +82,7 @@ export default function Dashboard() {
           
           <div className="w-full md:w-64 space-y-2 bg-white p-4 rounded-xl shadow-sm">
             <div className="flex justify-between text-xs font-bold uppercase text-muted-foreground">
-              <span>Level {level || 1} Progress</span>
+              <span>Level {currentLevel} Progress</span>
               <span>{xpInCurrentLevel}/500 XP</span>
             </div>
             <Progress value={levelProgress} className="h-2" />
@@ -94,7 +98,7 @@ export default function Dashboard() {
               <CardTitle className="text-sm font-medium text-primary-foreground/80">Virtual Wallet</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{formatValue(balance || 0)}</div>
+              <div className="text-3xl font-bold">{formatValue(walletBalance)}</div>
               <p className="text-xs text-primary-foreground/60 mt-1">Available for investing</p>
             </CardContent>
           </Card>
@@ -120,8 +124,8 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between mb-2">
-                <div className="text-2xl font-bold">{formatValue(savingsCurrent || 0)}</div>
-                <div className="text-[10px] text-muted-foreground">of {formatValue(savingsGoal || 0)} Target</div>
+                <div className="text-2xl font-bold">{formatValue(currentSavings)}</div>
+                <div className="text-[10px] text-muted-foreground">of {formatValue(targetSavings)} Target</div>
               </div>
               <Progress value={savingsProgress} className="h-2" />
             </CardContent>
@@ -167,6 +171,11 @@ export default function Dashboard() {
                     </Badge>
                   </div>
                 ))}
+                {safeTasks.length === 0 && (
+                  <div className="py-8 text-center text-muted-foreground text-sm italic">
+                    Loading missions...
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

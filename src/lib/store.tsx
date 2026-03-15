@@ -258,7 +258,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const addXP = (amount: number) => {
     if (!profileRef || !profile) return;
-    const newXP = (profile.xp || 0) + amount;
+    const currentXP = profile.xp || 0;
+    const newXP = currentXP + amount;
     const newLevel = Math.floor(newXP / 500) + 1;
     updateDocumentNonBlocking(profileRef, { xp: newXP, level: newLevel });
   };
@@ -276,15 +277,18 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user || !profile || (profile.balance || 0) < (shares * priceUsd)) return;
     
     const cost = shares * priceUsd;
-    updateDocumentNonBlocking(profileRef!, { balance: (profile.balance || 0) - cost });
+    const currentBalance = profile.balance || 0;
+    updateDocumentNonBlocking(profileRef!, { balance: currentBalance - cost });
     
     const investmentId = `inv-${symbol}`;
     const invRef = doc(db, 'users', user.uid, 'virtualInvestments', investmentId);
     
     const existing = portfolio.find(p => p.symbol === symbol);
     if (existing) {
-      const newShares = (existing.shares || 0) + shares;
-      const newAvg = ((existing.shares || 0) * (existing.avgPrice || 0) + cost) / newShares;
+      const currentShares = existing.shares || 0;
+      const currentAvgPrice = existing.avgPrice || 0;
+      const newShares = currentShares + shares;
+      const newAvg = (currentShares * currentAvgPrice + cost) / newShares;
       updateDocumentNonBlocking(invRef, { shares: newShares, avgPrice: newAvg, lastTransactionAt: new Date().toISOString() });
     } else {
       setDocumentNonBlocking(invRef, {
@@ -306,7 +310,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!existing || (existing.shares || 0) < shares) return;
 
     const gain = shares * priceUsd;
-    updateDocumentNonBlocking(profileRef!, { balance: (profile.balance || 0) + gain });
+    const currentBalance = profile.balance || 0;
+    updateDocumentNonBlocking(profileRef!, { balance: currentBalance + gain });
     
     const invRef = doc(db, 'users', user.uid, 'virtualInvestments', existing.id);
     if (existing.shares === shares) {
@@ -318,12 +323,15 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateSavings = (amountUsd: number) => {
     if (!profileRef || !profile) return;
-    if (amountUsd > 0 && (profile.balance || 0) < amountUsd) return;
-    if (amountUsd < 0 && (profile.savingsCurrent || 0) < Math.abs(amountUsd)) return;
+    const currentBalance = profile.balance || 0;
+    const currentSavings = profile.savingsCurrent || 0;
+    
+    if (amountUsd > 0 && currentBalance < amountUsd) return;
+    if (amountUsd < 0 && currentSavings < Math.abs(amountUsd)) return;
 
     updateDocumentNonBlocking(profileRef, {
-      balance: (profile.balance || 0) - amountUsd,
-      savingsCurrent: (profile.savingsCurrent || 0) + amountUsd
+      balance: currentBalance - amountUsd,
+      savingsCurrent: currentSavings + amountUsd
     });
   };
 
@@ -334,33 +342,40 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateLiabilities = (amountUsd: number) => {
     if (!profileRef || !profile) return;
-    updateDocumentNonBlocking(profileRef, { liabilities: Math.max(0, (profile.liabilities || 0) + amountUsd) });
+    const currentLiabilities = profile.liabilities || 0;
+    updateDocumentNonBlocking(profileRef, { liabilities: Math.max(0, currentLiabilities + amountUsd) });
   };
 
   const convertToCurrent = (usdAmount: number) => {
-    const rate = EXCHANGE_RATES[profile?.currency || 'USD'] || 1;
+    const currency = profile?.currency || 'USD';
+    const rate = EXCHANGE_RATES[currency] || 1.0;
     return (usdAmount || 0) * rate;
   };
 
   const convertFromCurrent = (currentAmount: number) => {
-    const rate = EXCHANGE_RATES[profile?.currency || 'USD'] || 1;
+    const currency = profile?.currency || 'USD';
+    const rate = EXCHANGE_RATES[currency] || 1.0;
     return (currentAmount || 0) / rate;
   };
 
   const formatValue = (usdAmount: number) => {
     const converted = convertToCurrent(usdAmount);
+    const currency = profile?.currency || 'USD';
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: profile?.currency || 'USD',
-    }).format(converted);
+      currency: currency,
+    }).format(converted || 0);
   };
 
   const getPortfolioValue = () => {
+    // Ultimate safety check to prevent TypeError: Cannot read properties of null (reading 'reduce')
     if (!Array.isArray(portfolio)) return 0;
+    
     return portfolio.reduce((acc, item) => {
-      if (!item) return acc;
+      if (!item || typeof item.shares !== 'number') return acc;
       const stock = stocks.find(s => s.symbol === item.symbol);
-      return acc + ((item.shares || 0) * (stock?.price || 0));
+      const stockPrice = stock?.price || 0;
+      return acc + (item.shares * stockPrice);
     }, 0);
   };
 
@@ -371,14 +386,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     ageGroup,
     country: profile?.country || 'United States',
     currency: profile?.currency || 'USD',
-    balance: profile?.balance !== undefined ? profile.balance : 0,
+    balance: typeof profile?.balance === 'number' ? profile.balance : 0,
     portfolio,
     stocks,
-    savingsGoal: profile?.savingsGoal || 500,
-    savingsCurrent: profile?.savingsCurrent || 0,
-    liabilities: profile?.liabilities || 0,
-    xp: profile?.xp || 0,
-    level: profile?.level || 1,
+    savingsGoal: typeof profile?.savingsGoal === 'number' ? profile.savingsGoal : 500,
+    savingsCurrent: typeof profile?.savingsCurrent === 'number' ? profile.savingsCurrent : 0,
+    liabilities: typeof profile?.liabilities === 'number' ? profile.liabilities : 0,
+    xp: typeof profile?.xp === 'number' ? profile.xp : 0,
+    level: typeof profile?.level === 'number' ? profile.level : 1,
     tasks: remoteTasks,
     isLoggedIn: !!user,
     isInitialLoading,
