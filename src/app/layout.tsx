@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Inter } from 'next/font/google';
@@ -12,7 +13,11 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const inter = Inter({ 
+  subsets: ['latin'], 
+  variable: '--font-inter',
+  display: 'swap'
+});
 
 function RootLayoutContent({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthContext();
@@ -30,7 +35,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen-safe">
       {/* TOP NAV (Desktop) */}
       {!loading && user && !isAuthPage && (
         <header className="hidden md:block bg-white border-b border-slate-200 sticky top-0 z-50">
@@ -61,11 +66,19 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
         </header>
       )}
 
-      <div className={cn("flex-1", !isAuthPage && user && "pb-24 md:pb-0")}>{children}</div>
+      <div className={cn("flex-1", !isAuthPage && user && "pb-[calc(80px+env(safe-area-inset-bottom,0px))] md:pb-0")}>
+        {children}
+      </div>
 
       {/* BOTTOM NAV (Mobile) */}
       {!loading && user && !isAuthPage && (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-white border-t border-slate-200 flex items-center justify-around px-2 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+        <nav 
+          className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex items-center justify-around px-2 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]"
+          style={{ 
+            height: 'calc(80px + env(safe-area-inset-bottom, 0px))',
+            paddingBottom: 'env(safe-area-inset-bottom, 0px)' 
+          }}
+        >
           {navLinks.map((link) => (
             <NavLink key={link.href} href={link.href} label={link.label} active={pathname === link.href}>
               {link.icon === 'grid' && (
@@ -126,6 +139,9 @@ function NavLink({ href, label, active, children }: { href: string; label: strin
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+      </head>
       <body 
         className={cn(inter.variable, "font-sans antialiased bg-slate-50 text-slate-900")}
         suppressHydrationWarning

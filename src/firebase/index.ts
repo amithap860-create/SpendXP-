@@ -1,3 +1,4 @@
+
 'use client';
 
 // SPENDXP FIREBASE BARREL — single import source
@@ -23,23 +24,25 @@ export {
   auth, 
   db, 
   googleProvider, 
-  emailProvider 
+  emailProvider,
+  isFirebaseReady
 } from '@/lib/firebase';
 
 import { app } from '@/lib/firebase';
-import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 
 /**
  * Initializes secondary Firebase services like App Check.
  * This is called by the FirebaseClientProvider.
+ * Made fault-tolerant for mobile browsers/ad-blockers.
  */
-export function initializeFirebase() {
+export async function initializeFirebase() {
   if (typeof window !== 'undefined') {
     if (process.env.NODE_ENV !== 'production') {
       (self as any).FIREBASE_APPCHECK_DEBUG_TOKEN = true;
     }
     
     try {
+      const { initializeAppCheck, ReCaptchaV3Provider } = await import('firebase/app-check');
       initializeAppCheck(app, {
         provider: new ReCaptchaV3Provider(
           process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
@@ -47,15 +50,18 @@ export function initializeFirebase() {
         isTokenAutoRefreshEnabled: true
       });
     } catch (err) {
-      console.warn('[SpendXP] App Check initialization skipped or already running.');
+      console.warn('[SpendXP] App Check initialization skipped or blocked by browser:', err);
     }
   }
 
+  // Use dynamic imports for services to ensure app is initialized first
+  const { auth: authInstance, db: dbInstance } = await import('@/lib/firebase');
+
   return {
     firebaseApp: app,
-    auth: require('@/lib/firebase').auth,
-    firestore: require('@/lib/firebase').db,
-    db: require('@/lib/firebase').db
+    auth: authInstance,
+    firestore: dbInstance,
+    db: dbInstance
   };
 }
 

@@ -39,6 +39,10 @@
     --chart-3: 193 86% 95%;
     --chart-4: 222 47% 11%;
     --chart-5: 0 0% 100%;
+
+    /* Mobile Safe Areas */
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-top: env(safe-area-inset-top, 0px);
   }
 
   .dark {

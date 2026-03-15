@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -18,7 +19,6 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const pathname = usePathname();
   const db = useFirestore();
   
-  // Logic 10: Retry mechanism for profile race conditions
   const [retried, setRetried] = useState(false);
 
   const profileRef = useMemoFirebase(() => {
@@ -35,7 +35,6 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
     if (!loading && user && !isProfileLoading) {
       if (profile) {
-        // Reset retry if profile found
         setRetried(false);
 
         // 1. Consent Check (DPDP Compliance)
@@ -53,14 +52,12 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
         // 3. Parent specific protection
         if (pathname.startsWith('/parent') && !profile.isParent) {
-          router.push('/games');
+          router.push('/dashboard');
         }
       } else if (!retried) {
-        // Logic 10: Wait once for race condition
         const timeout = setTimeout(() => setRetried(true), 1500);
         return () => clearTimeout(timeout);
       } else {
-        // Final fallback to onboarding if still no profile after retry
         if (!['/onboarding', '/consent', '/login', '/signup'].includes(pathname)) {
           router.push('/onboarding');
         }
@@ -68,10 +65,18 @@ export function AuthGuard({ children }: AuthGuardProps) {
     }
   }, [user, loading, isProfileLoading, profile, router, pathname, retried]);
 
-  if (loading || (isProfileLoading && !retried)) {
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen-safe flex flex-col items-center justify-center bg-slate-50 gap-5 p-4">
+        <div className="text-3xl font-black text-primary tracking-tighter">
+          SpendXP
+        </div>
+        <div className="w-9 h-9 border-4 border-primary/10 border-t-primary rounded-full animate-spin" />
+        <style>{`
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     );
   }

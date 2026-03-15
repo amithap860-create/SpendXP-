@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useReducer, useCallback, useEffect, useRef } from 'react';
@@ -132,10 +133,8 @@ export function useGameEngine(config: GameConfig) {
   const [state, dispatch] = useReducer(gameReducer, config, initialState);
   const comboTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Logic 2: XP Guard
   const hasEnded = useRef(false);
   
-  // Logic 5: Timestamp anchored timer
   const timerStartRef = useRef<number>(0);
   const timerDurationRef = useRef<number>(0);
 
@@ -148,7 +147,7 @@ export function useGameEngine(config: GameConfig) {
     if (state.status === 'PLAYING' && config.timePerRound !== undefined) {
       startTimer(state.timeLeft);
     }
-  }, [state.status, config.timePerRound, state.currentRound]);
+  }, [state.status, config.timePerRound, state.currentRound, startTimer, state.timeLeft]);
 
   useEffect(() => {
     if (state.status !== 'PLAYING') return;
@@ -185,7 +184,7 @@ export function useGameEngine(config: GameConfig) {
   }, [state.comboActive]);
 
   const startGame = useCallback(() => {
-    hasEnded.current = false; // Logic 2: Reset guard
+    hasEnded.current = false;
     dispatch({ type: 'RESET_GAME', config });
     dispatch({ type: 'START_COUNTDOWN' });
   }, [config]);
@@ -198,7 +197,6 @@ export function useGameEngine(config: GameConfig) {
   const nextRound = useCallback(() => dispatch({ type: 'NEXT_ROUND', totalRounds: config.totalRounds, timePerRound: config.timePerRound, xpPerWin: config.xpPerWin }), [config.totalRounds, config.timePerRound, config.xpPerWin]);
 
   const endGame = useCallback(async (finalXpBonus = 0) => {
-    // Logic 2 & 8: Guards and Clamping
     if (!user || hasEnded.current) return { isHighScore: false };
     hasEnded.current = true;
 
@@ -218,8 +216,26 @@ export function useGameEngine(config: GameConfig) {
 
     dispatch({ type: 'END_GAME' });
 
+    // Mobile-safe confetti logic
+    if (typeof window !== 'undefined') {
+      import('https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js' as any).then((module: any) => {
+        const isMobile = window.innerWidth < 768;
+        module.default({
+          particleCount: isMobile ? 60 : 120,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#10b981', '#3b82f6', '#f59e0b']
+        });
+        
+        // Prevent confetti canvas from stealing touch events on mobile
+        setTimeout(() => {
+          const canvas = document.querySelector('canvas[style*="position: fixed"]') as HTMLCanvasElement | null;
+          if (canvas) canvas.style.pointerEvents = 'none';
+        }, 100);
+      });
+    }
+
     try {
-      // Logic 2: Idempotent Increment
       const gameScoreRef = doc(db, 'users', user.uid, 'gameScores', config.gameName);
       const prevDoc = await safeGetDoc(gameScoreRef);
       const prevXP = prevDoc?.xpEarned ?? 0;
@@ -231,7 +247,7 @@ export function useGameEngine(config: GameConfig) {
       batch.set(gameScoreRef, {
         gameName: config.gameName,
         lastScore: safeScore,
-        highScore: increment(0), // Placeholder for server-side logic or client comparison
+        highScore: increment(0),
         xpEarned: safeXP,
         lastPlayedAt: serverTimestamp(),
       }, { merge: true });
@@ -242,8 +258,6 @@ export function useGameEngine(config: GameConfig) {
       }, { merge: true });
 
       await batch.commit();
-
-      // Logic 3: Update Leaderboard
       await updateLeaderboardEntry(user.uid, user.displayName || 'Strategist');
       
       return { isHighScore: true };

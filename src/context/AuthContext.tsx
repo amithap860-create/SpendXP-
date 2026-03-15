@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useContext, ReactNode, useEffect, useState } from 'react';
@@ -36,11 +37,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [emailVerified, setEmailVerified] = useState(false);
   const [currentAgeGroup, setCurrentAgeGroup] = useState<AgeGroup>('junior');
   const [currencyCode, setCurrencyCode] = useState<string>('INR');
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    if (!firebaseAuth) return;
+    if (!firebaseAuth) {
+      setLoading(false);
+      return;
+    }
+
+    // Mobile resilience: Timeout auth check if it hangs
+    const authTimeout = setTimeout(() => {
+      if (loading) {
+        console.warn('[SpendXP] Auth detection timed out. Proceeding as guest.');
+        setLoading(false);
+      }
+    }, 8000);
 
     const unsubscribe = onIdTokenChanged(firebaseAuth, async (firebaseUser) => {
+      clearTimeout(authTimeout);
+      setUser(firebaseUser);
+      
       if (firebaseUser) {
         const isVerified = firebaseUser.emailVerified;
         setEmailVerified(isVerified);
@@ -92,9 +109,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setEmailVerified(false);
         setFingerprint(null);
       }
+      setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      clearTimeout(authTimeout);
+      unsubscribe();
+    };
   }, [fingerprint]);
 
   useEffect(() => {
@@ -106,6 +127,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = {
     ...auth,
+    user,
+    loading,
     emailVerified,
     currentAgeGroup,
     currencyCode,

@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -19,8 +20,7 @@ import {
   RefreshCcw,
   Gamepad2,
   ChevronLeft,
-  ChevronRight,
-  Sparkles
+  ChevronRight
 } from 'lucide-react';
 import { useUser } from '@/lib/store';
 import { doc, setDoc } from 'firebase/firestore';
@@ -115,17 +115,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
   }, [gameState, timeLeft]);
 
   const handleFinish = async () => {
-    const { isHighScore } = await endGame();
-    if (isHighScore) {
-      import('https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js' as any).then((module: any) => {
-        module.default({
-          particleCount: 150,
-          spread: 70,
-          origin: { y: 0.6 },
-          colors: ['#10b981', '#3b82f6', '#f59e0b']
-        });
-      });
-    }
+    await endGame();
     if (user && db) {
       const budgetSplit = stats.total > 0 ? {
         need: Math.round((stats.NEED / stats.total) * 100),
@@ -151,23 +141,41 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
     setCards(prev => prev.filter(c => c.id !== cardId));
   }, [cards, correctAnswer, wrongAnswer]);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-  };
+  // Mobile Safe Area & Touch Events
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
 
-  const handleTouchEnd = (e: React.TouchEvent, cardId: string) => {
-    if (!touchStartRef.current) return;
-    const deltaX = e.changedTouches[0].clientX - touchStartRef.current.x;
-    const deltaY = e.changedTouches[0].clientY - touchStartRef.current.y;
+    const onTouchStart = (e: TouchEvent) => {
+      touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    };
 
-    if (Math.abs(deltaX) > 50) {
-      if (deltaX < 0) handleSort(cardId, 'NEED');
-      else handleSort(cardId, 'SAVE');
-    } else if (deltaY > 50) {
-      handleSort(cardId, 'WANT');
-    }
-    touchStartRef.current = null;
-  };
+    const onTouchEnd = (e: TouchEvent) => {
+      if (!touchStartRef.current || cards.length === 0) return;
+      const deltaX = e.changedTouches[0].clientX - touchStartRef.current.x;
+      const deltaY = e.changedTouches[0].clientY - touchStartRef.current.y;
+
+      // Identify target card (bottom-most falling card)
+      const sortedCards = [...cards].sort((a, b) => b.y - a.y);
+      const targetCard = sortedCards[0];
+
+      if (Math.abs(deltaX) > 50) {
+        if (deltaX < 0) handleSort(targetCard.id, 'NEED');
+        else handleSort(targetCard.id, 'SAVE');
+      } else if (deltaY > 50) {
+        handleSort(targetCard.id, 'WANT');
+      }
+      touchStartRef.current = null;
+    };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
+
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [cards, handleSort]);
 
   if (gameState === 'IDLE') {
     return (
@@ -194,7 +202,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
               <div className="text-xs font-bold text-blue-900 uppercase">Save</div>
             </div>
           </div>
-          <Button onClick={startGame} className="w-full h-16 text-2xl font-black rounded-2xl shadow-xl">START ARCADE</Button>
+          <Button onClick={startGame} className="w-full h-16 text-2xl font-black rounded-2xl shadow-xl min-h-[44px]">START ARCADE</Button>
         </CardContent>
       </Card>
     );
@@ -202,7 +210,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
 
   if (gameState === 'COUNTDOWN') {
     return (
-      <div className="flex flex-col items-center justify-center h-[60vh]">
+      <div className="flex flex-col items-center justify-center h-[60dvh]">
         <div className="text-9xl font-black text-primary animate-ping">{countdown}</div>
       </div>
     );
@@ -248,8 +256,8 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
                 </div>
               </div>
               <div className="flex gap-4 mt-8">
-                <Button variant="outline" onClick={startGame} className="flex-1 gap-2 h-12"><RefreshCcw className="h-4 w-4" /> Play Again</Button>
-                <Button onClick={onExit} className="flex-1 h-12">Return to Hub</Button>
+                <Button variant="outline" onClick={startGame} className="flex-1 gap-2 h-12 min-h-[44px]"><RefreshCcw className="h-4 w-4" /> Play Again</Button>
+                <Button onClick={onExit} className="flex-1 h-12 min-h-[44px]">Return to Hub</Button>
               </div>
             </CardContent>
           </Card>
@@ -262,7 +270,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
   }
 
   return (
-    <div className="relative w-full h-[80vh] bg-slate-100 rounded-3xl overflow-hidden border-4 border-white shadow-inner flex flex-col" ref={containerRef}>
+    <div className="relative w-full h-[80dvh] bg-slate-100 rounded-3xl overflow-hidden border-4 border-white shadow-inner flex flex-col" ref={containerRef}>
       <div className="p-4 bg-white/80 backdrop-blur-sm border-b flex items-center justify-between z-10">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1 bg-primary/10 px-3 py-1 rounded-full text-primary font-black"><TrendingUp className="h-4 w-4" />{score}</div>
@@ -276,14 +284,12 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
         <Badge variant="outline" className="border-primary text-primary">TIER {speedTier}</Badge>
       </div>
 
-      <div className="flex-1 relative">
+      <div className="flex-1 relative overflow-hidden">
         {cards.map(card => (
           <div
             key={card.id}
-            className="absolute p-3 bg-white rounded-xl shadow-lg border-2 border-slate-200 select-none cursor-grab active:cursor-grabbing w-32 md:w-40 text-center animate-in fade-in zoom-in duration-300"
+            className="absolute p-3 bg-white rounded-xl shadow-lg border-2 border-slate-200 select-none w-32 md:w-40 text-center animate-in fade-in zoom-in duration-300"
             style={{ left: `${card.x}%`, top: `${card.y}%`, transform: 'translateX(-50%)', touchAction: 'none' }}
-            onTouchStart={handleTouchStart}
-            onTouchEnd={(e) => handleTouchEnd(e, card.id)}
           >
             <div className="font-bold text-slate-800 leading-tight mb-1 truncate">{card.item.name}</div>
             <div className="text-sm font-black text-primary">{formatValue(difficultyConfig.moneyAmounts[card.item.basePrice])}</div>
@@ -292,13 +298,22 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
       </div>
 
       <div className="p-4 grid grid-cols-3 gap-4 z-10 bg-white/80 backdrop-blur-sm border-t">
-        <Button className="h-20 flex-col gap-1 bg-emerald-500 hover:bg-emerald-600 rounded-2xl shadow-lg" onClick={() => cards.length > 0 && handleSort([...cards].sort((a,b)=>b.y-a.y)[0].id, 'NEED')}>
+        <Button 
+          className="h-20 min-h-[44px] flex-col gap-1 bg-emerald-500 hover:bg-emerald-600 rounded-2xl shadow-lg" 
+          onClick={() => cards.length > 0 && handleSort([...cards].sort((a,b)=>b.y-a.y)[0].id, 'NEED')}
+        >
           <ChevronLeft className="h-4 w-4 text-white/50" /><ShoppingBag className="h-6 w-6" /><span className="text-[10px] font-black uppercase">NEED</span>
         </Button>
-        <Button className="h-20 flex-col gap-1 bg-amber-500 hover:bg-amber-600 rounded-2xl shadow-lg" onClick={() => cards.length > 0 && handleSort([...cards].sort((a,b)=>b.y-a.y)[0].id, 'WANT')}>
+        <Button 
+          className="h-20 min-h-[44px] flex-col gap-1 bg-amber-500 hover:bg-amber-600 rounded-2xl shadow-lg" 
+          onClick={() => cards.length > 0 && handleSort([...cards].sort((a,b)=>b.y-a.y)[0].id, 'WANT')}
+        >
           <Wallet className="h-6 w-6" /><span className="text-[10px] font-black uppercase">WANT</span>
         </Button>
-        <Button className="h-20 flex-col gap-1 bg-blue-500 hover:bg-blue-600 rounded-2xl shadow-lg" onClick={() => cards.length > 0 && handleSort([...cards].sort((a,b)=>b.y-a.y)[0].id, 'SAVE')}>
+        <Button 
+          className="h-20 min-h-[44px] flex-col gap-1 bg-blue-500 hover:bg-blue-600 rounded-2xl shadow-lg" 
+          onClick={() => cards.length > 0 && handleSort([...cards].sort((a,b)=>b.y-a.y)[0].id, 'SAVE')}
+        >
           <ChevronRight className="h-4 w-4 text-white/50" /><PiggyBank className="h-6 w-6" /><span className="text-[10px] font-black uppercase">SAVE</span>
         </Button>
       </div>

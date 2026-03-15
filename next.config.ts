@@ -51,7 +51,10 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  compress: true,
   images: {
+    formats: ['image/webp'],
+    deviceSizes: [360, 414, 768, 1024, 1280],
     remotePatterns: [
       {
         protocol: 'https',
@@ -71,6 +74,15 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+    ],
+  },
+  experimental: {
+    optimizePackageImports: [
+      'firebase',
+      '@firebase/firestore',
+      '@firebase/auth',
+      'lucide-react',
+      'date-fns'
     ],
   },
   async headers() {
