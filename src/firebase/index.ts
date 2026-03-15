@@ -1,5 +1,11 @@
-
 'use client';
+
+// SPENDXP FIREBASE BARREL EXPORT
+// Import all Firebase utilities and helpers from '@/firebase'
+// Do not import from @/lib/firestoreSafe, @/lib/authHelpers,
+// @/lib/rateLimiter, or @/lib/validation directly in components.
+// All those modules re-export from here so there is one
+// consistent import path across the entire app.
 
 import { firebaseConfig } from '@/firebase/config';
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
@@ -61,10 +67,8 @@ export * from './non-blocking-login';
 export * from './errors';
 export * from './error-emitter';
 
-// Re-export safe Firestore wrappers for convenient access via @/firebase
-export {
-  safeSetDoc,
-  safeUpdateDoc,
-  safeGetDoc,
-  safeOnSnapshot
-} from '@/lib/firestoreSafe';
+// Project Utility Re-exports
+export * from '@/lib/firestoreSafe';
+export * from '@/lib/authHelpers';
+export * from '@/lib/rateLimiter';
+export * from '@/lib/validation';
