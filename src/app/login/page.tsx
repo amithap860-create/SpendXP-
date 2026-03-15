@@ -147,6 +147,7 @@ export default function LoginPage() {
                   "flex-1 py-3 text-sm font-bold transition-all border-b-2",
                   activeTab === 'signin' ? "border-primary text-primary" : "border-transparent text-slate-400 hover:text-slate-600"
                 )}
+                suppressHydrationWarning
               >
                 Sign in
               </button>
@@ -156,6 +157,7 @@ export default function LoginPage() {
                   "flex-1 py-3 text-sm font-bold transition-all border-b-2",
                   activeTab === 'signup' ? "border-primary text-primary" : "border-transparent text-slate-400 hover:text-slate-600"
                 )}
+                suppressHydrationWarning
               >
                 Create account
               </button>
@@ -177,6 +179,7 @@ export default function LoginPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       required
                       autoComplete="email"
+                      suppressHydrationWarning
                     />
                   </div>
                   <div className="space-y-1">
@@ -190,11 +193,13 @@ export default function LoginPage() {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         autoComplete="current-password"
+                        suppressHydrationWarning
                       />
                       <button 
                         type="button"
                         onClick={() => setIsPasswordVisible(!isPasswordVisible)}
                         className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600"
+                        suppressHydrationWarning
                       >
                         <div className={cn(
                           "w-5 h-5 flex items-center justify-center border-2 border-current rounded-full relative",
@@ -210,6 +215,7 @@ export default function LoginPage() {
                         type="button"
                         onClick={() => setShowReset(true)}
                         className="text-xs font-bold text-primary hover:underline"
+                        suppressHydrationWarning
                       >
                         Forgot password?
                       </button>
@@ -232,7 +238,7 @@ export default function LoginPage() {
                   </p>
                 )}
 
-                <Button type="submit" disabled={loading || lockout.locked} className="w-full h-14 text-lg font-black rounded-2xl shadow-xl shadow-primary/10">
+                <Button type="submit" disabled={loading || lockout.locked} className="w-full h-14 text-lg font-black rounded-2xl shadow-xl shadow-primary/10" suppressHydrationWarning>
                   {loading ? <RefreshCw className="h-5 w-5 animate-spin" /> : 'Sign In'}
                 </Button>
 
@@ -246,6 +252,7 @@ export default function LoginPage() {
                   variant="outline" 
                   type="button"
                   className="w-full h-12 gap-3 font-bold border-2 hover:bg-slate-50 transition-all"
+                  suppressHydrationWarning
                 >
                   <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
                   Continue with Google
@@ -266,6 +273,7 @@ export default function LoginPage() {
                       onChange={(e) => setDisplayName(e.target.value)}
                       required
                       autoComplete="name"
+                      suppressHydrationWarning
                     />
                   </div>
                   <div className="relative">
@@ -278,6 +286,7 @@ export default function LoginPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       required
                       autoComplete="email"
+                      suppressHydrationWarning
                     />
                   </div>
                   <div className="space-y-2">
@@ -291,11 +300,13 @@ export default function LoginPage() {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         autoComplete="new-password"
+                        suppressHydrationWarning
                       />
                       <button 
                         type="button"
                         onClick={() => setIsPasswordVisible(!isPasswordVisible)}
                         className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600"
+                        suppressHydrationWarning
                       >
                         <div className={cn(
                           "w-5 h-5 flex items-center justify-center border-2 border-current rounded-full relative",
@@ -337,6 +348,7 @@ export default function LoginPage() {
                         if (password !== confirmPassword) setConfirmError("Passwords don't match");
                       }}
                       required
+                      suppressHydrationWarning
                     />
                     {confirmError && <p className="text-[10px] font-bold text-destructive mt-1 ml-1">{confirmError}</p>}
                   </div>
@@ -348,6 +360,7 @@ export default function LoginPage() {
                     checked={isParent} 
                     onCheckedChange={(val) => setIsParent(!!val)} 
                     className="mt-1"
+                    suppressHydrationWarning
                   />
                   <div className="grid gap-1.5 leading-none">
                     <Label htmlFor="isParent" className="text-sm font-bold cursor-pointer">
@@ -369,7 +382,7 @@ export default function LoginPage() {
                   </p>
                 )}
 
-                <Button type="submit" disabled={loading} className="w-full h-14 text-lg font-black rounded-2xl">
+                <Button type="submit" disabled={loading} className="w-full h-14 text-lg font-black rounded-2xl" suppressHydrationWarning>
                   {loading ? <RefreshCw className="h-5 w-5 animate-spin" /> : 'Create Account'}
                 </Button>
               </form>
@@ -392,6 +405,7 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    suppressHydrationWarning
                   />
                 </div>
 
@@ -402,13 +416,14 @@ export default function LoginPage() {
                 )}
 
                 <div className="space-y-3">
-                  <Button type="submit" disabled={loading} className="w-full h-14 font-black rounded-2xl">
+                  <Button type="submit" disabled={loading} className="w-full h-14 font-black rounded-2xl" suppressHydrationWarning>
                     {loading ? <RefreshCw className="h-5 w-5 animate-spin" /> : 'Send reset link'}
                   </Button>
                   <button 
                     type="button" 
                     onClick={() => { setShowReset(false); setResetMessage(null); }}
                     className="w-full text-sm font-bold text-slate-400 hover:text-primary transition-colors"
+                    suppressHydrationWarning
                   >
                     ← Back to sign in
                   </button>
@@ -434,6 +449,7 @@ export default function LoginPage() {
                   <Button 
                     onClick={() => router.push('/onboarding')} 
                     className="w-full h-16 text-xl font-black rounded-2xl gap-2 group shadow-xl shadow-primary/10"
+                    suppressHydrationWarning
                   >
                     Continue to setup <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
                   </Button>
@@ -446,6 +462,7 @@ export default function LoginPage() {
                         "text-xs font-bold transition-colors",
                         resendCooldown > 0 ? "text-slate-300" : "text-primary hover:underline"
                       )}
+                      suppressHydrationWarning
                     >
                       {resendCooldown > 0 ? `Resend email in ${resendCooldown}s` : "Didn't get the link? Resend email"}
                     </button>

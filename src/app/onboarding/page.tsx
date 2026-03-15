@@ -109,8 +109,9 @@ export default function OnboardingPage() {
               onChange={(e) => setName(e.target.value)}
               className="h-16 text-2xl font-bold text-center rounded-2xl border-2 focus:ring-4"
               placeholder="Your Name"
+              suppressHydrationWarning
             />
-            <Button onClick={nextStep} size="lg" className="w-full h-16 text-xl font-black rounded-2xl shadow-xl shadow-primary/20">
+            <Button onClick={nextStep} size="lg" className="w-full h-16 text-xl font-black rounded-2xl shadow-xl shadow-primary/20" suppressHydrationWarning>
               Next <ChevronRight className="ml-2" />
             </Button>
           </div>
@@ -134,6 +135,7 @@ export default function OnboardingPage() {
                     "flex-shrink-0 w-20 h-20 rounded-2xl border-2 flex items-center justify-center text-xl font-black transition-all",
                     birthYear === year ? "border-primary bg-primary text-white shadow-lg" : "border-slate-100 hover:border-slate-300"
                   )}
+                  suppressHydrationWarning
                 >
                   {year}
                 </button>
@@ -149,6 +151,7 @@ export default function OnboardingPage() {
               onClick={nextStep} 
               size="lg" 
               className="w-full h-16 text-xl font-black rounded-2xl"
+              suppressHydrationWarning
             >
               Next <ChevronRight className="ml-2" />
             </Button>
@@ -173,12 +176,13 @@ export default function OnboardingPage() {
                     "px-6 py-3 rounded-full border-2 font-bold transition-all",
                     interests.includes(topic.id) ? "bg-primary border-primary text-white shadow-lg" : "bg-white border-slate-100"
                   )}
+                  suppressHydrationWarning
                 >
                   {topic.label}
                 </button>
               ))}
             </div>
-            <Button onClick={nextStep} size="lg" className="w-full h-16 text-xl font-black rounded-2xl">
+            <Button onClick={nextStep} size="lg" className="w-full h-16 text-xl font-black rounded-2xl" suppressHydrationWarning>
               Next <ChevronRight className="ml-2" />
             </Button>
           </div>
@@ -210,7 +214,7 @@ export default function OnboardingPage() {
               </div>
             </div>
 
-            <Button onClick={completeOnboarding} disabled={loading} size="lg" className="w-full h-16 text-2xl font-black rounded-2xl shadow-2xl">
+            <Button onClick={completeOnboarding} disabled={loading} size="lg" className="w-full h-16 text-2xl font-black rounded-2xl shadow-2xl" suppressHydrationWarning>
               {loading ? 'Entering Arcade...' : "Let's go!"}
             </Button>
           </div>

@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -181,7 +180,7 @@ function DisplayNameSection({ profile, uid }: { profile: any, uid: string }) {
       {!isEditing ? (
         <div className="flex items-center justify-between">
           <span className="font-bold text-slate-700">{profile?.displayName}</span>
-          <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary font-bold">Edit</Button>
+          <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary font-bold" suppressHydrationWarning>Edit</Button>
         </div>
       ) : (
         <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -190,15 +189,16 @@ function DisplayNameSection({ profile, uid }: { profile: any, uid: string }) {
             onChange={(e) => setNewName(e.target.value)} 
             placeholder="New display name"
             className="h-12"
+            suppressHydrationWarning
           />
           <p className="text-[10px] text-slate-400">2–30 characters. Letters, numbers, spaces, hyphens only.</p>
           {error && <p className="text-xs text-rose-500 font-bold">{error}</p>}
           {success && <p className="text-xs text-emerald-500 font-bold">Name updated!</p>}
           <div className="flex gap-2">
-            <Button onClick={handleSave} disabled={loading || success} size="sm" className="font-bold">
+            <Button onClick={handleSave} disabled={loading || success} size="sm" className="font-bold" suppressHydrationWarning>
               {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Save'}
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-slate-400">Cancel</Button>
+            <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-slate-400" suppressHydrationWarning>Cancel</Button>
           </div>
         </div>
       )}
@@ -255,7 +255,7 @@ function EmailSection({ user, isGoogleUser, profile }: { user: any, isGoogleUser
             <AlertCircle className="h-3 w-3" /> Change pending: verify {profile.pendingEmail}
           </p>
           <div className="flex gap-2">
-            <button onClick={cancelPending} className="text-[10px] font-black uppercase text-amber-800 underline">Cancel Change</button>
+            <button onClick={cancelPending} className="text-[10px] font-black uppercase text-amber-800 underline" suppressHydrationWarning>Cancel Change</button>
           </div>
         </div>
       )}
@@ -265,7 +265,7 @@ function EmailSection({ user, isGoogleUser, profile }: { user: any, isGoogleUser
         {isGoogleUser ? (
           <Badge variant="outline" className="bg-slate-50 text-slate-400 border-slate-200">Managed by Google</Badge>
         ) : !isEditing ? (
-          <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary font-bold">Change</Button>
+          <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary font-bold" suppressHydrationWarning>Change</Button>
         ) : null}
       </div>
 
@@ -273,19 +273,19 @@ function EmailSection({ user, isGoogleUser, profile }: { user: any, isGoogleUser
         <div className="mt-4 space-y-4 animate-in slide-in-from-top-2">
           <div className="space-y-2">
             <Label className="text-xs font-bold uppercase text-slate-400">New Email</Label>
-            <Input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} className="h-12" />
+            <Input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} className="h-12" suppressHydrationWarning />
           </div>
           <div className="space-y-2">
             <Label className="text-xs font-bold uppercase text-slate-400">Current Password</Label>
-            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="h-12" />
+            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="h-12" suppressHydrationWarning />
             <p className="text-[10px] text-slate-400 italic">Required to confirm identity.</p>
           </div>
           {error && <p className="text-xs text-rose-500 font-bold">{error}</p>}
           <div className="flex gap-2">
-            <Button onClick={handleUpdate} disabled={loading} size="sm" className="font-bold">
+            <Button onClick={handleUpdate} disabled={loading} size="sm" className="font-bold" suppressHydrationWarning>
               {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Update Email'}
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-slate-400">Cancel</Button>
+            <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-slate-400" suppressHydrationWarning>Cancel</Button>
           </div>
         </div>
       )}
@@ -295,7 +295,7 @@ function EmailSection({ user, isGoogleUser, profile }: { user: any, isGoogleUser
           <CheckCircle2 className="h-8 w-8 text-emerald-500 mx-auto" />
           <p className="text-sm font-bold text-emerald-900">Check your new inbox!</p>
           <p className="text-xs text-emerald-700">We've sent a link to {newEmail}. Your email won't change until you click it.</p>
-          <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-emerald-800 font-black uppercase">Dismiss</Button>
+          <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-emerald-800 font-black uppercase" suppressHydrationWarning>Dismiss</Button>
         </div>
       )}
     </Card>
@@ -340,34 +340,34 @@ function PasswordSection({ user }: { user: any }) {
       {!isEditing ? (
         <div className="flex items-center justify-between">
           <span className="text-sm font-bold text-slate-700">••••••••••••</span>
-          <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary font-bold">Change</Button>
+          <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary font-bold" suppressHydrationWarning>Change</Button>
         </div>
       ) : !success ? (
         <div className="space-y-4 animate-in slide-in-from-top-2">
           <div className="space-y-2">
             <Label className="text-xs font-bold uppercase text-slate-400">Current Password</Label>
-            <Input type="password" value={currentPass} onChange={(e) => setCurrentPass(e.target.value)} className="h-12" />
+            <Input type="password" value={currentPass} onChange={(e) => setCurrentPass(e.target.value)} className="h-12" suppressHydrationWarning />
           </div>
           <div className="space-y-2">
             <Label className="text-xs font-bold uppercase text-slate-400">New Password</Label>
-            <Input type="password" value={newPass} onChange={(e) => setNewPass(e.target.value)} className="h-12" />
+            <Input type="password" value={newPass} onChange={(e) => setNewPass(e.target.value)} className="h-12" suppressHydrationWarning />
           </div>
           <div className="space-y-2">
             <Label className="text-xs font-bold uppercase text-slate-400">Confirm New Password</Label>
-            <Input type="password" value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} className="h-12" />
+            <Input type="password" value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} className="h-12" suppressHydrationWarning />
           </div>
           {error && <p className="text-xs text-rose-500 font-bold">{error}</p>}
           <div className="flex gap-2">
-            <Button onClick={handleUpdate} disabled={loading} size="sm" className="font-bold">
+            <Button onClick={handleUpdate} disabled={loading} size="sm" className="font-bold" suppressHydrationWarning>
               {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Update Password'}
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-slate-400">Cancel</Button>
+            <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-slate-400" suppressHydrationWarning>Cancel</Button>
           </div>
         </div>
       ) : (
         <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100 text-center space-y-2 animate-in zoom-in">
           <p className="text-sm font-bold text-emerald-900">Password updated!</p>
-          <Button variant="ghost" size="sm" onClick={() => { setIsEditing(false); setSuccess(false); }} className="text-emerald-800 font-black uppercase">Dismiss</Button>
+          <Button variant="ghost" size="sm" onClick={() => { setIsEditing(false); setSuccess(false); }} className="text-emerald-800 font-black uppercase" suppressHydrationWarning>Dismiss</Button>
         </div>
       )}
     </Card>
@@ -468,7 +468,7 @@ function ParentSection({ profile, uid, displayName }: { profile: any, uid: strin
             <CheckCircle2 className="h-4 w-4 text-emerald-500" />
             <span className="text-sm font-bold text-slate-700">Connected to {profile.parentEmail}</span>
           </div>
-          <Button variant="ghost" size="sm" onClick={handleDisconnect} className="text-rose-500 font-bold hover:bg-rose-50">Disconnect</Button>
+          <Button variant="ghost" size="sm" onClick={handleDisconnect} className="text-rose-500 font-bold hover:bg-rose-50" suppressHydrationWarning>Disconnect</Button>
         </div>
       </Card>
     );
@@ -483,7 +483,7 @@ function ParentSection({ profile, uid, displayName }: { profile: any, uid: strin
           <p className="text-xs font-bold text-amber-800">Waiting for {profile.pendingParentEmail} to accept your invite.</p>
           <Button variant="outline" size="sm" onClick={async () => {
             await safeUpdateDoc(doc(db, 'users', uid), { pendingParentEmail: null });
-          }} className="border-amber-200 text-amber-800">Cancel Invite</Button>
+          }} className="border-amber-200 text-amber-800" suppressHydrationWarning>Cancel Invite</Button>
         </div>
       </Card>
     );
@@ -503,8 +503,9 @@ function ParentSection({ profile, uid, displayName }: { profile: any, uid: strin
             value={parentEmail} 
             onChange={(e) => setParentEmail(e.target.value)} 
             className="h-12"
+            suppressHydrationWarning
           />
-          <Button onClick={handleInvite} disabled={loading} className="font-bold">
+          <Button onClick={handleInvite} disabled={loading} className="font-bold" suppressHydrationWarning>
             {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Invite'}
           </Button>
         </div>
@@ -561,7 +562,7 @@ function DangerZoneSection({ user }: { user: any }) {
       <h3 className="text-[15px] font-medium text-primary border-b border-slate-100 pb-3 mb-4">Danger zone</h3>
       
       {step === 0 && (
-        <Button variant="outline" onClick={handleNext} className="w-full text-rose-600 border-rose-200 hover:bg-rose-50 font-bold h-12">
+        <Button variant="outline" onClick={handleNext} className="w-full text-rose-600 border-rose-200 hover:bg-rose-50 font-bold h-12" suppressHydrationWarning>
           Delete my account
         </Button>
       )}
@@ -578,8 +579,8 @@ function DangerZoneSection({ user }: { user: any }) {
             <p className="font-bold">This cannot be undone.</p>
           </div>
           <div className="flex gap-2">
-            <Button onClick={handleNext} className="bg-rose-600 hover:bg-rose-700 font-bold flex-1">I understand, continue →</Button>
-            <Button variant="ghost" onClick={() => setStep(0)}>Cancel</Button>
+            <Button onClick={handleNext} className="bg-rose-600 hover:bg-rose-700 font-bold flex-1" suppressHydrationWarning>I understand, continue →</Button>
+            <Button variant="ghost" onClick={() => setStep(0)} suppressHydrationWarning>Cancel</Button>
           </div>
         </div>
       )}
@@ -590,25 +591,26 @@ function DangerZoneSection({ user }: { user: any }) {
           {user.providerData.some(p => p.providerId === 'google.com') ? (
             <p className="text-xs text-slate-500">Sign in with Google again when prompted after clicking next.</p>
           ) : (
-            <Input type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} className="h-12" />
+            <Input type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} className="h-12" suppressHydrationWarning />
           )}
           {error && <p className="text-xs text-rose-500 font-bold">{error}</p>}
-          <Button onClick={handleNext} className="w-full bg-rose-600 hover:bg-rose-700 font-bold">Next Step</Button>
+          <Button onClick={handleNext} className="w-full bg-rose-600 hover:bg-rose-700 font-bold" suppressHydrationWarning>Next Step</Button>
         </div>
       )}
 
       {step === 3 && (
         <div className="space-y-4 animate-in zoom-in">
           <p className="text-sm font-bold text-slate-700">Type <span className="text-rose-600 underline">DELETE</span> to confirm:</p>
-          <Input value={confirmDelete} onChange={(e) => setConfirmDelete(e.target.value)} className="h-12 border-rose-200" placeholder="DELETE" />
+          <Input value={confirmDelete} onChange={(e) => setConfirmDelete(e.target.value)} className="h-12 border-rose-200" placeholder="DELETE" suppressHydrationWarning />
           <Button 
             onClick={handleDelete} 
             disabled={confirmDelete !== 'DELETE' || loading} 
             className="w-full bg-rose-600 hover:bg-rose-700 h-14 text-lg font-black"
+            suppressHydrationWarning
           >
             {loading ? <RefreshCw className="h-5 w-5 animate-spin" /> : 'Permanently delete account'}
           </Button>
-          <Button variant="ghost" onClick={() => setStep(0)} className="w-full">Wait, take me back</Button>
+          <Button variant="ghost" onClick={() => setStep(0)} className="w-full" suppressHydrationWarning>Wait, take me back</Button>
         </div>
       )}
     </Card>

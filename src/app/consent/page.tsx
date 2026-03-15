@@ -93,14 +93,19 @@ export default function ConsentPage() {
                     className="pl-10 h-12"
                     value={parentEmail}
                     onChange={(e) => setParentEmail(e.target.value)}
+                    suppressHydrationWarning
                   />
                 </div>
-                <Button onClick={handleSendRequest} disabled={loading || !parentEmail} className="h-12 font-bold px-6">
+                <Button onClick={handleSendRequest} disabled={loading || !parentEmail} className="h-12 font-bold px-6" suppressHydrationWarning>
                   Send Request
                 </Button>
               </div>
               <div className="text-center">
-                <button onClick={handleSelfApprove} className="text-xs text-primary font-bold hover:underline">
+                <button 
+                  onClick={handleSelfApprove} 
+                  className="text-xs text-primary font-bold hover:underline"
+                  suppressHydrationWarning
+                >
                   I am the parent approving this account
                 </button>
               </div>
@@ -112,7 +117,7 @@ export default function ConsentPage() {
               </div>
               <h3 className="text-2xl font-black">Request Sent!</h3>
               <p className="text-slate-500">We've emailed your parent. You'll be able to play as soon as they click the link!</p>
-              <Button variant="outline" onClick={() => setSubmitted(false)}>Use a different email</Button>
+              <Button variant="outline" onClick={() => setSubmitted(false)} suppressHydrationWarning>Use a different email</Button>
             </div>
           )}
         </CardContent>

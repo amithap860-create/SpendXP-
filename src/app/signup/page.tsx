@@ -46,6 +46,7 @@ export default function SignupPage() {
             onClick={signInWithGoogle} 
             variant="outline" 
             className="w-full h-12 gap-3 text-lg font-bold border-2"
+            suppressHydrationWarning
           >
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
             Continue with Google
@@ -66,6 +67,7 @@ export default function SignupPage() {
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   required
+                  suppressHydrationWarning
                 />
               </div>
             </div>
@@ -79,6 +81,7 @@ export default function SignupPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  suppressHydrationWarning
                 />
               </div>
             </div>
@@ -92,6 +95,7 @@ export default function SignupPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  suppressHydrationWarning
                 />
               </div>
               <div className="flex gap-1 h-1.5 mt-2 px-1">
@@ -106,6 +110,7 @@ export default function SignupPage() {
                 id="isParent" 
                 checked={isParent} 
                 onCheckedChange={(val) => setIsParent(!!val)} 
+                suppressHydrationWarning
               />
               <Label htmlFor="isParent" className="text-sm cursor-pointer">
                 I am a parent creating an account for my child
@@ -118,7 +123,7 @@ export default function SignupPage() {
               </p>
             )}
 
-            <Button type="submit" className="w-full h-12 text-lg font-black" disabled={loading}>
+            <Button type="submit" className="w-full h-12 text-lg font-black" disabled={loading} suppressHydrationWarning>
               {loading ? 'Creating account...' : 'Sign up'}
             </Button>
           </form>
