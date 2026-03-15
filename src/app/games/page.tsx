@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from 'react';
@@ -9,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { BudgetBlitz } from '@/components/games/BudgetBlitz';
+import { FinIQQuiz } from '@/components/games/FinIQQuiz';
 import { 
   Gamepad2, 
   Zap, 
@@ -25,7 +25,9 @@ import {
   TrendingUp,
   FileText,
   HeartPulse,
-  ShoppingBag
+  ShoppingBag,
+  Brain,
+  Trophy
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -194,47 +196,69 @@ export default function GamesHub() {
       <MainNav />
       <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8">
         <header className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-white">
-              <Gamepad2 className="h-6 w-6" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-12 w-12 rounded-2xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20">
+                <Gamepad2 className="h-7 w-7" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-primary">XP Games Hub</h2>
+                <p className="text-muted-foreground">Master money through simulations and arcade challenges.</p>
+              </div>
             </div>
-            <h2 className="text-3xl font-bold text-primary">XP Games Hub</h2>
+            {!activeGame && (
+              <Button onClick={() => setActiveGame('dailyIQ')} className="gap-2 bg-accent hover:bg-accent/90 h-12 px-6 rounded-xl shadow-lg shadow-accent/20">
+                <Zap className="h-5 w-5" />
+                Daily Challenge
+              </Button>
+            )}
           </div>
-          <p className="text-muted-foreground">Master the rules of money through simulations and challenges.</p>
         </header>
 
         {!activeGame ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <Card className="hover:shadow-lg transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/20" onClick={() => setActiveGame('blitz')}>
-              <div className="h-2 bg-primary" />
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <Card className="hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/5" onClick={() => setActiveGame('blitz')}>
+              <div className="h-3 bg-emerald-500" />
               <CardHeader>
-                <ShoppingBag className="h-8 w-8 text-primary mb-2 group-hover:scale-110 transition-transform" />
-                <CardTitle>Budget Blitz</CardTitle>
-                <CardDescription>Arcade reflex game. Sort needs, wants, and savings at lightning speed!</CardDescription>
+                <ShoppingBag className="h-10 w-10 text-emerald-500 mb-2 group-hover:scale-110 transition-transform" />
+                <CardTitle className="text-2xl">Budget Blitz</CardTitle>
+                <CardDescription className="text-sm">Arcade sorting game. Categorise needs, wants, and savings at lightning speed!</CardDescription>
               </CardHeader>
               <CardContent>
                 <Badge className="bg-emerald-100 text-emerald-700">Arcade Action</Badge>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/20" onClick={() => setActiveGame('advisor')}>
-              <div className="h-2 bg-primary" />
+            <Card className="hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/5" onClick={() => setActiveGame('finIQ')}>
+              <div className="h-3 bg-primary" />
               <CardHeader>
-                <ShieldCheck className="h-8 w-8 text-primary mb-2 group-hover:scale-110 transition-transform" />
-                <CardTitle>Wealth Architect</CardTitle>
-                <CardDescription>A financial advisor simulator. See how lifestyle choices shape your assets.</CardDescription>
+                <Brain className="h-10 w-10 text-primary mb-2 group-hover:scale-110 transition-transform" />
+                <CardTitle className="text-2xl">FinIQ Quiz</CardTitle>
+                <CardDescription className="text-sm">Practice real-life scenario questions tailored to your age and level.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Badge className="bg-primary/10 text-primary">Scenario Based</Badge>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/5" onClick={() => setActiveGame('advisor')}>
+              <div className="h-3 bg-primary" />
+              <CardHeader>
+                <ShieldCheck className="h-10 w-10 text-primary mb-2 group-hover:scale-110 transition-transform" />
+                <CardTitle className="text-2xl">Wealth Architect</CardTitle>
+                <CardDescription className="text-sm">Financial advisor simulator. See how lifestyle choices shape your net worth.</CardDescription>
               </CardHeader>
               <CardContent>
                 <Badge className="bg-primary/10 text-primary">Strategic Sim</Badge>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-accent/20" onClick={() => setActiveGame('loan')}>
-              <div className="h-2 bg-accent" />
+            <Card className="hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/5" onClick={() => setActiveGame('loan')}>
+              <div className="h-3 bg-accent" />
               <CardHeader>
-                <Landmark className="h-8 w-8 text-accent mb-2 group-hover:scale-110 transition-transform" />
-                <CardTitle>The Loan Lab</CardTitle>
-                <CardDescription>{getLoanContextDesc()}</CardDescription>
+                <Landmark className="h-10 w-10 text-accent mb-2 group-hover:scale-110 transition-transform" />
+                <CardTitle className="text-2xl">The Loan Lab</CardTitle>
+                <CardDescription className="text-sm">{getLoanContextDesc()}</CardDescription>
               </CardHeader>
               <CardContent>
                 <Badge className="bg-accent/10 text-accent">Interest Sim</Badge>
@@ -242,24 +266,24 @@ export default function GamesHub() {
             </Card>
 
             {ageGroup === '16-20' ? (
-              <Card className="hover:shadow-lg transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-indigo-400/20" onClick={() => setActiveGame('pro')}>
-                <div className="h-2 bg-indigo-400" />
+              <Card className="hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/5" onClick={() => setActiveGame('pro')}>
+                <div className="h-3 bg-indigo-500" />
                 <CardHeader>
-                  <GraduationCap className="h-8 w-8 text-indigo-500 mb-2 group-hover:scale-110 transition-transform" />
-                  <CardTitle>Life Path: Pro</CardTitle>
-                  <CardDescription>Advanced simulation covering taxes, insurance, and student debt.</CardDescription>
+                  <GraduationCap className="h-10 w-10 text-indigo-500 mb-2 group-hover:scale-110 transition-transform" />
+                  <CardTitle className="text-2xl">Life Path: Pro</CardTitle>
+                  <CardDescription className="text-sm">Advanced simulation covering taxes, insurance, and student debt.</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Badge className="bg-indigo-50 text-indigo-600 border-indigo-100">Teen Special</Badge>
                 </CardContent>
               </Card>
             ) : (
-              <Card className="opacity-60 grayscale border-none bg-white overflow-hidden cursor-not-allowed">
-                <div className="h-2 bg-slate-300" />
+              <Card className="opacity-60 grayscale border-none bg-white overflow-hidden cursor-not-allowed border-2 border-slate-100">
+                <div className="h-3 bg-slate-300" />
                 <CardHeader>
-                  <Lock className="h-8 w-8 text-slate-400 mb-2" />
-                  <CardTitle>Life Path: Pro</CardTitle>
-                  <CardDescription>Unlocks at age 16. Covers taxes and college planning.</CardDescription>
+                  <Lock className="h-10 w-10 text-slate-400 mb-2" />
+                  <CardTitle className="text-2xl">Life Path: Pro</CardTitle>
+                  <CardDescription className="text-sm">Unlocks at age 16. Covers taxes and adulting essentials.</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Badge variant="outline">Age Restricted</Badge>
@@ -269,12 +293,20 @@ export default function GamesHub() {
           </div>
         ) : (
           <div className="max-w-4xl mx-auto">
-            <Button variant="ghost" className="mb-4" onClick={() => { setActiveGame(null); setShowAdvisorResult(false); setSimulationHistory([]); setCurrentScenarioIdx(0); }}>
-              ← Exit Simulation
+            <Button variant="ghost" className="mb-6 gap-2 text-muted-foreground hover:text-primary" onClick={() => { setActiveGame(null); setShowAdvisorResult(false); setSimulationHistory([]); setCurrentScenarioIdx(0); }}>
+              <ArrowRight className="h-4 w-4 rotate-180" /> Exit to Games Hub
             </Button>
 
             {activeGame === 'blitz' && (
               <BudgetBlitz onExit={() => setActiveGame(null)} />
+            )}
+
+            {activeGame === 'finIQ' && (
+              <FinIQQuiz onExit={() => setActiveGame(null)} />
+            )}
+
+            {activeGame === 'dailyIQ' && (
+              <FinIQQuiz isDailyChallenge onExit={() => setActiveGame(null)} />
             )}
 
             {activeGame === 'loan' && (
