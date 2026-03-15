@@ -12,6 +12,7 @@ import { FinIQQuiz } from '@/components/games/FinIQQuiz';
 import { MoneyMaze } from '@/components/games/MoneyMaze';
 import { CreditScoreBuilder } from '@/components/games/CreditScoreBuilder';
 import { StockMarketSim } from '@/components/games/StockMarketSim';
+import { CompoundClicker } from '@/components/games/CompoundClicker';
 import { 
   Gamepad2, 
   Zap, 
@@ -33,7 +34,8 @@ import {
   Trophy,
   Puzzle,
   CreditCard,
-  BarChart3
+  BarChart3,
+  MousePointer2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -83,6 +85,18 @@ export default function GamesHub() {
 
         {!activeGame ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <Card className="hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/5" onClick={() => setActiveGame('compound')}>
+              <div className="h-3 bg-pink-500" />
+              <CardHeader>
+                <MousePointer2 className="h-10 w-10 text-pink-500 mb-2 group-hover:scale-110 transition-transform" />
+                <CardTitle className="text-2xl">Compound Clicker</CardTitle>
+                <CardDescription className="text-sm">Click to save, unlock vehicles, and witness the power of compounding time.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Badge className="bg-pink-50 text-pink-700">Idle Engine</Badge>
+              </CardContent>
+            </Card>
+
             <Card className="hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/5" onClick={() => setActiveGame('stock')}>
               <div className="h-3 bg-indigo-600" />
               <CardHeader>
@@ -160,6 +174,10 @@ export default function GamesHub() {
             <Button variant="ghost" className="mb-6 gap-2 text-muted-foreground hover:text-primary" onClick={() => { setActiveGame(null); }}>
               <ArrowRight className="h-4 w-4 rotate-180" /> Exit to Games Hub
             </Button>
+
+            {activeGame === 'compound' && (
+              <CompoundClicker onExit={() => setActiveGame(null)} />
+            )}
 
             {activeGame === 'stock' && (
               <StockMarketSim onExit={() => setActiveGame(null)} />
