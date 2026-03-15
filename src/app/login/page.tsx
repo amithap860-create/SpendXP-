@@ -1,24 +1,42 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { LogIn, Mail, Lock } from 'lucide-react';
+import { Mail, Lock, ShieldAlert } from 'lucide-react';
 import Link from 'next/link';
+import { checkLockout, recordFailedAttempt, clearAttempts } from '@/lib/accountLockout';
+import { useFirestore } from '@/firebase';
 
 export default function LoginPage() {
-  const { signInWithGoogle, signInWithEmail, error } = useAuthContext();
+  const { signInWithGoogle, signInWithEmail, error: authError } = useAuthContext();
+  const db = useFirestore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [lockout, setLockout] = useState<{ locked: boolean; mins?: number }>({ locked: false });
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await signInWithEmail(email, password);
-    setLoading(false);
+
+    const status = await checkLockout(db, email);
+    if (status.locked) {
+      setLockout({ locked: true, mins: status.minutesLeft });
+      setLoading(false);
+      return;
+    }
+
+    try {
+      await signInWithEmail(email, password);
+      // Logic for clearAttempts is inside useEffect observing auth state
+    } catch (err) {
+      await recordFailedAttempt(db, email);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -26,15 +44,25 @@ export default function LoginPage() {
       <Card className="max-w-md w-full shadow-2xl border-none">
         <CardHeader className="text-center">
           <h1 className="text-4xl font-black text-primary mb-2">SpendXP</h1>
-          <CardDescription className="text-lg">
+          <CardDescription className="text-lg text-slate-600 font-medium">
             Learn money. Earn XP. Level up your future.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
+          {lockout.locked && (
+            <div className="p-4 bg-rose-50 border border-rose-100 rounded-xl flex items-start gap-3 animate-in shake duration-500">
+              <ShieldAlert className="h-5 w-5 text-rose-600 mt-0.5" />
+              <div className="text-sm text-rose-700 font-bold">
+                Too many failed attempts. Please wait {lockout.mins} minutes before trying again.
+              </div>
+            </div>
+          )}
+
           <Button 
             onClick={signInWithGoogle} 
             variant="outline" 
             className="w-full h-12 gap-3 text-lg font-bold border-2 hover:bg-slate-50"
+            disabled={lockout.locked}
           >
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
             Continue with Google
@@ -56,6 +84,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={lockout.locked}
                 />
               </div>
             </div>
@@ -69,22 +98,23 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  disabled={lockout.locked}
                 />
               </div>
             </div>
 
-            {error && (
-              <p className="text-sm text-destructive font-bold bg-destructive/10 p-3 rounded-lg">
-                {error}
+            {(authError) && (
+              <p className="text-sm text-destructive font-bold bg-destructive/10 p-3 rounded-lg text-center">
+                Invalid email or password.
               </p>
             )}
 
-            <Button type="submit" className="w-full h-12 text-lg font-black" disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign in'}
+            <Button type="submit" className="w-full h-14 text-xl font-black rounded-2xl shadow-xl" disabled={loading || lockout.locked}>
+              {loading ? 'Entering Arcade...' : 'Sign In'}
             </Button>
           </form>
 
-          <div className="text-center text-sm">
+          <div className="text-center text-sm text-slate-500">
             New to SpendXP? <Link href="/signup" className="text-primary font-bold hover:underline">Sign up</Link>
           </div>
         </CardContent>

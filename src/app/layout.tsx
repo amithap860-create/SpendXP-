@@ -1,4 +1,3 @@
-
 import type {Metadata} from 'next';
 import './globals.css';
 import { UserProvider } from '@/lib/store';
@@ -8,8 +7,8 @@ import { AgeGroupProvider } from '@/lib/ageAdapt';
 import { AuthProvider } from '@/context/AuthContext';
 import { FirestoreErrorBoundary } from '@/components/FirestoreErrorBoundary';
 import { validateEnv } from '@/lib/envValidation';
+import { ConsoleGuard } from '@/components/ConsoleGuard';
 
-// Run security checks
 validateEnv();
 
 export const metadata: Metadata = {
@@ -31,16 +30,17 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased bg-background text-foreground" suppressHydrationWarning>
         <FirebaseClientProvider>
-          <AuthProvider>
-            <FirestoreErrorBoundary>
-              <UserProvider>
-                <AgeGroupProvider>
+          <AgeGroupProvider>
+            <AuthProvider>
+              <FirestoreErrorBoundary>
+                <UserProvider>
+                  <ConsoleGuard />
                   {children}
                   <Toaster />
-                </AgeGroupProvider>
-              </UserProvider>
-            </FirestoreErrorBoundary>
-          </AuthProvider>
+                </UserProvider>
+              </FirestoreErrorBoundary>
+            </AuthProvider>
+          </AgeGroupProvider>
         </FirebaseClientProvider>
       </body>
     </html>

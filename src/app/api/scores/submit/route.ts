@@ -1,13 +1,13 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebaseAdmin';
 import { validateScore, validateXP } from '@/lib/validation';
+import { withSecurity } from '@/lib/apiSecurity';
 import * as admin from 'firebase-admin';
 
 /**
  * Server-side score verification and submission endpoint.
  */
-export async function POST(request: NextRequest) {
+async function handler(request: NextRequest) {
   try {
     const authHeader = request.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Impossible Score Detection
-    // Additional server-side rules could be added here...
+    // The validateScore helper already handles theoretical maxes per game
 
     const batch = adminDb.batch();
     const userRef = adminDb.collection('users').doc(uid);
@@ -38,10 +38,10 @@ export async function POST(request: NextRequest) {
     const progressionRef = userRef.collection('progression').doc('stats');
     const activityLogRef = userRef.collection('activityLog').doc();
 
-    // 3. Admin-side write (bypasses client rules)
+    // PRIVACY: stores score, xp, and timestamp. No IP or device IDs.
     batch.set(gameScoreRef, {
       lastScore: score,
-      highScore: admin.firestore.FieldValue.increment(0), // Handled by check below in real impl
+      highScore: admin.firestore.FieldValue.increment(0), // Logic handled by check if needed, but increment(0) is placeholder
       xpEarned: admin.firestore.FieldValue.increment(xpEarned),
       gamesPlayed: admin.firestore.FieldValue.increment(1),
       lastPlayedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -50,7 +50,6 @@ export async function POST(request: NextRequest) {
     batch.set(progressionRef, {
       totalXP: admin.firestore.FieldValue.increment(xpEarned),
       totalGamesPlayed: admin.firestore.FieldValue.increment(1),
-      walletBalance: admin.firestore.FieldValue.increment(score * 10),
       lastActivityAt: admin.firestore.FieldValue.serverTimestamp(),
     }, { merge: true });
 
@@ -73,3 +72,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export const POST = withSecurity(handler);
