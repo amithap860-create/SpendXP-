@@ -14,32 +14,27 @@ import { CreditScoreBuilder } from '@/components/games/CreditScoreBuilder';
 import { StockMarketSim } from '@/components/games/StockMarketSim';
 import { CompoundClicker } from '@/components/games/CompoundClicker';
 import { XPWallet } from '@/components/XPWallet';
-import { Skeleton } from '@/components/ui/skeleton';
 import { toggleSound } from '@/lib/sounds';
 import { AuthGuard } from '@/components/AuthGuard';
+import { useAuthContext } from '@/context/AuthContext';
+import { safeOnSnapshot } from '@/lib/firestoreSafe';
 import { 
   Gamepad2, 
   Zap, 
   Trophy, 
   Flame, 
-  Lock, 
   ShoppingBag,
   Brain,
   Puzzle,
   CreditCard,
   BarChart3,
   MousePointer2,
-  Users,
-  Timer,
   Volume2,
   VolumeX,
   ChevronRight,
-  ShieldCheck,
-  X,
-  GraduationCap,
-  Sparkles
+  GraduationCap
 } from 'lucide-react';
-import { collection, query, orderBy, limit, onSnapshot, doc, updateDoc, where } from 'firebase/firestore';
+import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { cn } from '@/lib/utils';
 import { lessons } from '@/data/lessons';
@@ -47,16 +42,14 @@ import { LessonViewer } from '@/components/learn/LessonViewer';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 
 export default function GamesHub() {
-  const { name, formatValue, tasks } = useUser();
+  const { name, tasks } = useUser();
   const { ageGroup } = useAgeAdapt();
   const db = useFirestore();
   const { user } = useAuthContext();
   
   const [activeGame, setActiveGame] = useState<string | null>(null);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
-  const [challengeStats, setChallengeStats] = useState({ players: 0, timeRemaining: '' });
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [linkRequest, setLinkRequest] = useState<any>(null);
   const [gatedGame, setGatedGame] = useState<{ id: string, lessonId: string } | null>(null);
   const [showLessonViewer, setShowLessonViewer] = useState(false);
 
@@ -66,15 +59,15 @@ export default function GamesHub() {
     }
   }, []);
 
-  // Leaderboard Subscription
+  // Leaderboard Subscription - Protected by safeOnSnapshot and user check
   useEffect(() => {
-    if (!db) return;
+    if (!db || !user) return;
     const q = query(collection(db, 'users'), orderBy('xp', 'desc'), limit(10));
-    const unsubscribe = onSnapshot(q, (snap) => {
+    const unsubscribe = safeOnSnapshot(q, (snap) => {
       setLeaderboard(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
     return () => unsubscribe();
-  }, [db]);
+  }, [db, user]);
 
   const handleGameSelect = (gameId: string) => {
     const lesson = lessons.find(l => l.relatedGame === gameId);

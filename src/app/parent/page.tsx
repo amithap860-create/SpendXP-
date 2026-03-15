@@ -3,14 +3,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, orderBy, limit } from 'firebase/firestore';
 import { MainNav } from '@/components/layout/main-nav';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { WeeklyReport } from '@/components/parent/WeeklyReport';
 import { getConceptStrengths, ConceptStrengths } from '@/lib/progressionService';
+import { safeOnSnapshot } from '@/lib/firestoreSafe';
 import { 
   Zap, 
   Gamepad2, 
@@ -31,6 +31,7 @@ export default function ParentDashboard() {
   const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
   const [showReport, setShowReport] = useState(false);
   const [strengths, setStrengths] = useState<ConceptStrengths | null>(null);
+  const [gameScores, setGameScores] = useState<any[]>([]);
 
   // Fetch linked children
   const childrenQuery = useMemoFirebase(() => {
@@ -56,21 +57,21 @@ export default function ParentDashboard() {
   }, [db, selectedChildId]);
   const { data: activityLog } = useCollection(activityQuery);
 
-  // Fetch Game Scores for Trend
-  const [gameScores, setGameScores] = useState<any[]>([]);
+  // Fetch Game Scores for Trend - Protected
   useEffect(() => {
-    if (!selectedChildId) return;
-    const unsubscribe = onSnapshot(collection(db, 'users', selectedChildId, 'gameScores'), (snap) => {
+    if (!selectedChildId || !user) return;
+    const ref = collection(db, 'users', selectedChildId, 'gameScores');
+    const unsubscribe = safeOnSnapshot(ref, (snap) => {
       setGameScores(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     });
     return () => unsubscribe();
-  }, [db, selectedChildId]);
+  }, [db, selectedChildId, user]);
 
   // Fetch Live Strengths
   useEffect(() => {
-    if (!selectedChildId || !db) return;
+    if (!selectedChildId || !db || !user) return;
     getConceptStrengths(db, selectedChildId).then(setStrengths);
-  }, [selectedChildId, db, activityLog]);
+  }, [selectedChildId, db, activityLog, user]);
 
   if (isChildrenLoading) return <div className="flex h-screen items-center justify-center"><Activity className="animate-spin text-primary" /></div>;
 
@@ -91,7 +92,6 @@ export default function ParentDashboard() {
     );
   }
 
-  // Radar Chart Calculation
   const radarItems = strengths ? [
     { label: 'Budgeting', score: strengths.budgeting },
     { label: 'Saving', score: strengths.saving },
@@ -264,17 +264,6 @@ export default function ParentDashboard() {
             </div>
 
             <div className="lg:col-span-4 space-y-8">
-              <Card className="border-none shadow-xl bg-white">
-                <CardHeader><CardTitle className="text-xl font-black flex items-center gap-2"><Clock className="h-5 w-5 text-accent" /> Play Usage</CardTitle></CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-end"><span className="text-xs font-bold uppercase text-slate-400">Minutes Used Today</span><span className="text-lg font-black text-slate-900">22 / 60</span></div>
-                    <Progress value={36} className="h-2" />
-                  </div>
-                  <Button variant="outline" className="w-full font-bold border-2">Edit Limits</Button>
-                </CardContent>
-              </Card>
-
               <Card className="border-none shadow-xl bg-white overflow-hidden">
                 <CardHeader className="bg-slate-50 border-b"><CardTitle className="text-xl font-black flex items-center gap-2"><Activity className="h-5 w-5 text-emerald-500" /> Recent Activity</CardTitle></CardHeader>
                 <div className="divide-y">

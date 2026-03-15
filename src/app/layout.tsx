@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { AgeGroupProvider } from '@/lib/ageAdapt';
 import { AuthProvider } from '@/context/AuthContext';
+import { FirestoreErrorBoundary } from '@/components/FirestoreErrorBoundary';
 
 export const metadata: Metadata = {
   title: 'SpendXP - Gamified Financial Literacy',
@@ -26,12 +27,14 @@ export default function RootLayout({
       <body className="font-body antialiased bg-background text-foreground" suppressHydrationWarning>
         <FirebaseClientProvider>
           <AuthProvider>
-            <UserProvider>
-              <AgeGroupProvider>
-                {children}
-                <Toaster />
-              </AgeGroupProvider>
-            </UserProvider>
+            <FirestoreErrorBoundary>
+              <UserProvider>
+                <AgeGroupProvider>
+                  {children}
+                  <Toaster />
+                </AgeGroupProvider>
+              </UserProvider>
+            </FirestoreErrorBoundary>
           </AuthProvider>
         </FirebaseClientProvider>
       </body>

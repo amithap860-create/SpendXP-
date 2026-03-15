@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { useFirestore } from '@/firebase';
-import { doc, collection, addDoc, query, where, getDocs, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,21 +11,18 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import { 
   Users, 
   Clock, 
   Bell, 
   ChevronRight, 
-  Search, 
   UserPlus, 
-  ShieldCheck,
   Mail,
-  Copy,
   CheckCircle2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { safeUpdateDoc } from '@/lib/firestoreSafe';
 
 export default function ParentSetup() {
   const { user } = useAuthContext();
@@ -38,7 +35,6 @@ export default function ParentSetup() {
   const [isSearching, setIsSearching] = useState(false);
   const [timeLimit, setTimeLimit] = useState([60]);
   const [notifs, setNotificationPrefs] = useState({ report: true, badges: true });
-  const [childCredentials, setChildCredentials] = useState<{ email: string; pass: string } | null>(null);
 
   const handleLinkChild = async () => {
     if (!user || !childEmail) return;
@@ -71,11 +67,11 @@ export default function ParentSetup() {
     if (!user) return;
     try {
       const parentRef = doc(db, 'users', user.uid);
-      await updateDoc(parentRef, {
+      const success = await safeUpdateDoc(parentRef, {
         notificationPrefs: notifs,
         setupComplete: true
       });
-      router.push('/parent');
+      if (success) router.push('/parent');
     } catch (err) {
       console.error(err);
     }

@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { useFirestore } from '@/firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, serverTimestamp } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { XPWallet } from '@/components/XPWallet';
 import { getAgeGroup } from '@/lib/ageAdapt';
+import { safeSetDoc } from '@/lib/firestoreSafe';
 import { Sparkles, ChevronRight, User, Calendar, Target, Wallet, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -23,6 +23,7 @@ export default function OnboardingPage() {
   const [birthYear, setBirthYear] = useState<number | null>(null);
   const [interests, setInterests] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const TOPICS = [
     { id: 'saving', label: 'Saving money' },
@@ -33,7 +34,7 @@ export default function OnboardingPage() {
   ];
 
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 13 }, (_, i) => currentYear - 8 - i); // 8 to 20 years old
+  const years = Array.from({ length: 13 }, (_, i) => currentYear - 8 - i);
 
   const nextStep = () => setStep(prev => prev + 1);
 
@@ -44,21 +45,36 @@ export default function OnboardingPage() {
   };
 
   const completeOnboarding = async () => {
-    if (!user) return;
+    if (!user) {
+      console.error('[SpendXP] completeOnboarding called without auth');
+      router.push('/login');
+      return;
+    }
+
     setLoading(true);
+    setError(null);
+
     try {
       const ageGroup = birthYear ? getAgeGroup(birthYear) : 'junior';
       const userRef = doc(db, 'users', user.uid);
-      await updateDoc(userRef, {
+      
+      const success = await safeSetDoc(userRef, {
         displayName: name,
         birthYear,
         ageGroup,
         interests,
-        onboardingComplete: true
-      });
-      router.push('/games');
+        onboardingComplete: true,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+
+      if (success) {
+        router.push('/games');
+      } else {
+        setError('Could not save your profile. Please try again.');
+      }
     } catch (err) {
       console.error(err);
+      setError('An unexpected error occurred.');
     } finally {
       setLoading(false);
     }
@@ -66,7 +82,6 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
-      {/* Progress Dots */}
       <div className="flex gap-2 mb-12">
         {[1, 2, 3, 4].map(i => (
           <div key={i} className={cn("w-3 h-3 rounded-full transition-all duration-500", step >= i ? "bg-primary w-8" : "bg-slate-200")} />
@@ -74,6 +89,12 @@ export default function OnboardingPage() {
       </div>
 
       <div className="max-w-xl w-full text-center space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        {error && (
+          <div className="p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-xl font-bold">
+            {error}
+          </div>
+        )}
+
         {step === 1 && (
           <div className="space-y-8">
             <div className="h-20 w-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto text-primary">

@@ -10,10 +10,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { User, LogOut, ShieldCheck, Sparkles, RefreshCw, Trophy, Gamepad2, Zap } from 'lucide-react';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc } from 'firebase/firestore';
+import { safeUpdateDoc } from '@/lib/firestoreSafe';
+import { cn } from '@/lib/utils';
 
 export default function Profile() {
   const { name, xp, level, tasks, portfolio } = useUser();
@@ -34,14 +36,13 @@ export default function Profile() {
   const handleUpdateName = async () => {
     if (!user || !newName || newName === name) return;
     setIsUpdating(true);
-    try {
-      await updateDoc(doc(db, 'users', user.uid), { displayName: newName });
+    const success = await safeUpdateDoc(doc(db, 'users', user.uid), { displayName: newName });
+    if (success) {
       toast({ title: "Name Updated", description: "Your strategist name has been changed." });
-    } catch (e) {
+    } else {
       toast({ title: "Error", description: "Failed to update name.", variant: "destructive" });
-    } finally {
-      setIsUpdating(false);
     }
+    setIsUpdating(false);
   };
 
   return (
@@ -145,8 +146,4 @@ export default function Profile() {
       </main>
     </div>
   );
-}
-
-function Badge({ children, className }: { children: React.ReactNode, className?: string }) {
-  return <span className={cn("px-2 py-0.5 rounded-full text-white text-[10px] font-bold", className)}>{children}</span>;
 }
