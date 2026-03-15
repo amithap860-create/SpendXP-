@@ -6,6 +6,7 @@ import { AuthProvider, useAuthContext } from '@/context/AuthContext';
 import { FirestoreErrorBoundary } from '@/components/FirestoreErrorBoundary';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { AgeGroupProvider } from '@/lib/ageAdapt';
+import { UserProvider } from '@/lib/store';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -116,9 +117,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <FirebaseClientProvider>
           <AgeGroupProvider>
             <AuthProvider>
-              <FirestoreErrorBoundary>
-                <RootLayoutContent>{children}</RootLayoutContent>
-              </FirestoreErrorBoundary>
+              <UserProvider>
+                <FirestoreErrorBoundary>
+                  <RootLayoutContent>{children}</RootLayoutContent>
+                </FirestoreErrorBoundary>
+              </UserProvider>
             </AuthProvider>
           </AgeGroupProvider>
         </FirebaseClientProvider>

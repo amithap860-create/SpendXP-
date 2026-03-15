@@ -6,7 +6,8 @@ import {
   useFirestore, 
   useDoc,
   useCollection,
-  useMemoFirebase
+  useMemoFirebase,
+  safeUpdateDoc
 } from '@/firebase';
 import { 
   doc, 
@@ -102,7 +103,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, { merge: true });
     
     const userRef = doc(db, 'users', user.uid);
-    updateDoc(userRef, { 
+    safeUpdateDoc(userRef, { 
       xp: (profile?.xp || 0) + 80, // Flat reward for lessons
       level: Math.floor(((profile?.xp || 0) + 80) / 500) + 1
     });
