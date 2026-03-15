@@ -4,6 +4,7 @@ import { safeGetDoc, safeSetDoc, safeUpdateDoc } from '@/lib/firestoreSafe';
 import { getISTDateKey } from './dateHelpers';
 import { clampHealth } from './financialHealth';
 import { awardBadge } from './badgeService';
+import { waitForAuth } from './waitForAuth';
 
 export interface UserProgression {
   totalXP: number;
@@ -69,6 +70,9 @@ export const DEFAULT_PROGRESSION: UserProgression = {
  * Client-side leaderboard update workaround
  */
 export async function updateLeaderboardEntry(uid: string, displayName: string) {
+  const user = await waitForAuth();
+  if (!user) return;
+
   try {
     const progression = await getProgression(uid);
     const simpleRef = doc(db, 'leaderboard', uid);
@@ -88,6 +92,9 @@ export function getProgressionRef(uid: string) {
 }
 
 export async function getProgression(uid: string): Promise<UserProgression> {
+  const user = await waitForAuth();
+  if (!user) return DEFAULT_PROGRESSION;
+
   const progressionRef = getProgressionRef(uid);
   
   try {
@@ -114,6 +121,9 @@ export async function getProgression(uid: string): Promise<UserProgression> {
  * Updates the user's Financial Health score and records history.
  */
 export async function updateFinancialHealth(uid: string, delta: number) {
+  const user = await waitForAuth();
+  if (!user) return;
+
   const ref = getProgressionRef(uid);
   const current = await getProgression(uid);
   const newScore = clampHealth(current.financialHealth + delta);
@@ -137,6 +147,9 @@ export async function updateFinancialHealth(uid: string, delta: number) {
 }
 
 export async function getAllGameScores(uid: string): Promise<GameScores> {
+  const authUser = await waitForAuth();
+  if (!authUser) return {};
+
   const games = ['budgetBlitz', 'finIQ', 'moneyMaze', 'stockMarketSim', 'creditScoreBuilder', 'compoundClicker'];
   const scores: GameScores = {};
 
@@ -159,6 +172,9 @@ export async function getAllGameScores(uid: string): Promise<GameScores> {
 }
 
 export async function getConceptStrengths(uid: string): Promise<ConceptStrengths> {
+  const authUser = await waitForAuth();
+  if (!authUser) return { budgeting: 0, saving: 0, investing: 0, credit: 0, taxes: 0, spending: 0 };
+
   const scores = await getAllGameScores(uid);
   const tasksSnap = await getDocs(collection(db, 'users', uid, 'lessonProgress'));
   const completedTasks = tasksSnap.docs.map(d => d.data()).filter(t => t.completed);

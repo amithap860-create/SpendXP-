@@ -2,127 +2,165 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // --- Helper Functions ---
+    // ─── HELPER FUNCTIONS ───────────────────────
 
-    /** @description Checks if the request is from an authenticated user. */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /** @description Checks if the authenticated user's UID matches the provided uid. */
     function isOwner(uid) {
       return isSignedIn() && request.auth.uid == uid;
     }
 
-    /** @description Checks if the current user is the registered parent of the child. */
     function isParentOf(childUid) {
-      return isSignedIn() &&
-        exists(/databases/$(database)/documents/users/$(childUid)) &&
-        get(/databases/$(database)/documents/users/$(childUid)).data.parentUid == request.auth.uid;
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(childUid))
+        && get(/databases/$(database)/documents/users/$(childUid)).data.parentUid == request.auth.uid;
     }
 
-    /** @description Checks if the current user profile is marked as a parent account. */
-    function isParent() {
-      return isSignedIn() &&
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isParent == true;
+    function isAdmin() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
 
-    // --- Collection Rules ---
+    function isVerified() {
+      return isSignedIn()
+        && request.auth.token.email_verified == true;
+    }
 
-    /**
-     * @description USER PROFILES
-     * Users manage their own profiles. Parents have read access to linked children.
-     */
+    // ─── USERS ──────────────────────────────────
+
     match /users/{uid} {
-      allow read: if isOwner(uid) || isParentOf(uid);
+      // User can read/write own doc.
+      // Parent can read child's doc.
+      // Admin can read any doc.
+      allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
+
+      // Create: only the user themselves, on signup.
       allow create: if isOwner(uid);
-      allow update: if isOwner(uid);
-      allow delete: if false;
 
-      // Game scores subcollection (History of every game played)
+      // Update: only the user themselves.
+      // Prevent users from setting isAdmin: true or isParent: true on themselves.
+      allow update: if isOwner(uid)
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin']));
+
+      allow delete: if isOwner(uid);
+
+      // ── Game Scores ──────────────────────────
       match /gameScores/{gameId} {
-        allow read: if isOwner(uid) || isParentOf(uid);
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
         allow write: if isOwner(uid);
       }
 
-      // Progression subcollection (Aggregated stats and levels)
+      // ── Progression ──────────────────────────
       match /progression/{doc} {
-        allow read: if isOwner(uid) || isParentOf(uid);
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
         allow write: if isOwner(uid);
       }
 
-      // Lesson progress subcollection (Academy tracking)
+      // ── Lesson Progress ───────────────────────
       match /lessonProgress/{lessonId} {
-        allow read: if isOwner(uid) || isParentOf(uid);
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
         allow write: if isOwner(uid);
       }
 
-      // Activity log subcollection (Feed for parent dashboard)
+      // ── Activity Log ──────────────────────────
       match /activityLog/{logId} {
-        allow read: if isOwner(uid) || isParentOf(uid);
-        allow write: if isOwner(uid);
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
+        allow create: if isOwner(uid);
+        allow update: if false;  // logs are immutable
+        allow delete: if isOwner(uid);
       }
 
-      // Parent controls subcollection (Screen time and limits)
+      // ── Parent Controls ───────────────────────
       match /parentControls/{doc} {
         allow read: if isOwner(uid) || isParentOf(uid);
         allow write: if isOwner(uid) || isParentOf(uid);
       }
 
-      // Legacy/Additional User Subcollections
-      match /virtualInvestments/{id} { allow read: if isOwner(uid) || isParentOf(uid); allow write: if isOwner(uid); }
-      match /savingsGoals/{id} { allow read: if isOwner(uid) || isParentOf(uid); allow write: if isOwner(uid); }
-      match /virtualTransactions/{id} { allow read: if isOwner(uid) || isParentOf(uid); allow write: if isOwner(uid); }
-      match /flashcardMastery/{id} { allow read: if isOwner(uid) || isParentOf(uid); allow write: if isOwner(uid); }
-      match /linkRequests/{id} { allow read, write: if isOwner(uid) || isParentOf(uid); }
+      // ── Quest Progress ────────────────────────
+      match /questProgress/{questId} {
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
+        allow write: if isOwner(uid);
+      }
+
+      // ── Savings Goals ─────────────────────────
+      match /savingsGoals/{goalId} {
+        allow read: if isOwner(uid);
+        allow write: if isOwner(uid);
+      }
+
+      // ── Profile (subcollection if used) ───────
+      match /profile/{doc} {
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
+        allow write: if isOwner(uid);
+      }
+
+      // ── Link Requests (nested if used) ────────
+      match /linkRequests/{id} {
+        allow read, write: if isOwner(uid) || isParentOf(uid);
+      }
     }
 
-    /**
-     * @description GLOBAL CONTENT
-     * Lessons, market data, and events are read-only for all authenticated users.
-     */
-    match /lessons/{id} { allow read: if isSignedIn(); }
-    match /flashcards/{id} { allow read: if isSignedIn(); }
-    match /virtualCompanies/{id} { 
-      allow read: if isSignedIn(); 
-      match /priceHistory/{historyId} { allow read: if isSignedIn(); }
-    }
-    match /simulatedNewsEvents/{id} { allow read: if isSignedIn(); }
-
-    /**
-     * @description LEADERBOARD
-     * Publicly readable for all signed-in users. Writable by the user themselves.
-     */
+    // ─── LEADERBOARD ────────────────────────────
     match /leaderboard/{uid} {
       allow read: if isSignedIn();
       allow write: if isOwner(uid);
     }
 
-    /**
-     * @description DAILY CHALLENGES
-     * Global challenges and user-specific score entries.
-     */
+    // ─── DAILY CHALLENGES ───────────────────────
     match /dailyChallenges/{date} {
       allow read: if isSignedIn();
+      allow write: if false;  // server-side only
+
       match /scores/{uid} {
         allow read: if isSignedIn();
-        allow write: if isOwner(uid);
+        allow create: if isOwner(uid);
+        allow update: if isOwner(uid);
+        allow delete: if false;
       }
     }
 
-    /**
-     * @description LINK REQUESTS
-     * Dedicated collection for handling the parent-child account linking process.
-     */
+    // ─── LINK REQUESTS (top-level) ──────────────
     match /linkRequests/{requestId} {
       allow create: if isSignedIn() && request.resource.data.parentUid == request.auth.uid;
       allow read: if isSignedIn() && (resource.data.parentUid == request.auth.uid || resource.data.childUid == request.auth.uid);
-      allow update: if isSignedIn() && (resource.data.parentUid == request.auth.uid || resource.data.childUid == request.auth.uid);
+      allow update: if isSignedIn() && (resource.data.parentUid == request.auth.uid || resource.data.childUid == request.auth.uid)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']);
+      allow delete: if isSignedIn() && (resource.data.parentUid == request.auth.uid || resource.data.childUid == request.auth.uid);
+    }
+
+    // ─── PENDING PARENT INVITES ─────────────────
+    match /pendingParentInvites/{inviteId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if isSignedIn();
+    }
+
+    // ─── CONSENT REQUESTS ───────────────────────
+    match /consentRequests/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid);
+      allow update: if isOwner(uid) || isAdmin();
       allow delete: if false;
     }
 
-    // Deny all other access
+    // ─── SECURITY LOG ────────────────────────────
+    match /securityLog/{uid} {
+      allow read: if isAdmin();
+      allow write: if false;
+
+      match /events/{eventId} {
+        allow read: if isAdmin();
+        allow create: if isOwner(uid);
+        allow update: if isAdmin();
+        allow delete: if false;
+      }
+    }
+
+    // ─── CATCH-ALL: DENY EVERYTHING ELSE ────────
     match /{document=**} {
       allow read, write: if false;
     }

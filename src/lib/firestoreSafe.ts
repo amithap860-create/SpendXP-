@@ -14,6 +14,7 @@ import {
   SetOptions, 
   UpdateData 
 } from 'firebase/firestore';
+import { handlePermissionsError } from './rulesValidator';
 
 /**
  * @fileOverview Wraps standard Firestore operations with error handling to prevent
@@ -25,13 +26,9 @@ export function safeOnSnapshot(
   onNext: (snapshot: any) => void,
   onError?: (error: FirestoreError) => void
 ): Unsubscribe {
-  // Swallows permission-denied errors to prevent cascading crashes.
   return onSnapshot(query, onNext, (error) => {
     if (error.code === 'permission-denied') {
-      console.warn(
-        '[SpendXP] Firestore permission denied on snapshot — listener detached.',
-        error.message
-      );
+      handlePermissionsError(error, 'safeOnSnapshot');
       return;
     }
     if (onError) onError(error);
@@ -45,11 +42,8 @@ export async function safeGetDoc<T>(
     const snap = await getDoc(ref);
     return snap.exists() ? (snap.data() as T) : null;
   } catch (error: any) {
-    if (error?.code === 'permission-denied') {
-      console.warn('[SpendXP] safeGetDoc permission denied:', ref.path);
-      return null;
-    }
-    throw error;
+    handlePermissionsError(error, 'safeGetDoc');
+    return null;
   }
 }
 
@@ -62,11 +56,8 @@ export async function safeSetDoc<T extends object>(
     await setDoc(ref, data, options ?? {});
     return true;
   } catch (error: any) {
-    if (error?.code === 'permission-denied') {
-      console.error('[SpendXP] safeSetDoc permission denied:', ref.path);
-      return false;
-    }
-    throw error;
+    handlePermissionsError(error, 'safeSetDoc');
+    return false;
   }
 }
 
@@ -78,11 +69,8 @@ export async function safeUpdateDoc(
     await updateDoc(ref, data);
     return true;
   } catch (error: any) {
-    if (error?.code === 'permission-denied') {
-      console.error('[SpendXP] safeUpdateDoc permission denied:', ref.path);
-      return false;
-    }
-    throw error;
+    handlePermissionsError(error, 'safeUpdateDoc');
+    return false;
   }
 }
 
@@ -93,10 +81,7 @@ export async function safeAddDoc<T extends object>(
   try {
     return await addDoc(ref, data);
   } catch (error: any) {
-    if (error?.code === 'permission-denied') {
-      console.error('[SpendXP] safeAddDoc permission denied:', ref.path);
-      return null;
-    }
-    throw error;
+    handlePermissionsError(error, 'safeAddDoc');
+    return null;
   }
 }

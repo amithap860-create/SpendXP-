@@ -8,6 +8,7 @@ import { rateLimiter } from '@/lib/rateLimiter';
 import { getRefreshedToken } from '@/lib/authHelpers';
 import { doc, writeBatch, serverTimestamp, increment } from 'firebase/firestore';
 import { updateLeaderboardEntry } from '@/lib/progressionService';
+import { waitForAuth } from '@/lib/waitForAuth';
 
 export type GameStatus = 'IDLE' | 'COUNTDOWN' | 'PLAYING' | 'PAUSED' | 'GAME_OVER' | 'RESULTS';
 
@@ -128,7 +129,7 @@ function gameReducer(state: GameState, action: Action): GameState {
 }
 
 export function useGameEngine(config: GameConfig) {
-  const { user } = useUser();
+  const { user: hookUser } = useUser();
   const [state, dispatch] = useReducer(gameReducer, config, initialState);
   const comboTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
@@ -196,6 +197,7 @@ export function useGameEngine(config: GameConfig) {
   const nextRound = useCallback(() => dispatch({ type: 'NEXT_ROUND', totalRounds: config.totalRounds, timePerRound: config.timePerRound, xpPerWin: config.xpPerWin }), [config.totalRounds, config.timePerRound, config.xpPerWin]);
 
   const endGame = useCallback(async (finalXpBonus = 0) => {
+    const user = await waitForAuth();
     if (!user || hasEnded.current) return { isHighScore: false };
     hasEnded.current = true;
 
@@ -215,7 +217,6 @@ export function useGameEngine(config: GameConfig) {
 
     dispatch({ type: 'END_GAME' });
 
-    // Mobile-safe confetti logic (Fix 8)
     if (typeof window !== 'undefined') {
       import('https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js' as any).then((module: any) => {
         const isMobile = window.innerWidth < 768;
@@ -226,7 +227,6 @@ export function useGameEngine(config: GameConfig) {
           colors: ['#10b981', '#3b82f6', '#f59e0b']
         });
         
-        // Prevent confetti canvas from stealing touch events on mobile
         setTimeout(() => {
           const canvas = document.querySelector('canvas[style*="position: fixed"]') as HTMLCanvasElement | null;
           if (canvas) canvas.style.pointerEvents = 'none';
@@ -264,7 +264,7 @@ export function useGameEngine(config: GameConfig) {
       console.error('[SpendXP] Failed to submit score:', error);
       return { isHighScore: false };
     }
-  }, [user, config, state.score, state.xpEarned]);
+  }, [config, state.score, state.xpEarned]);
 
   return {
     gameState: state.status,
