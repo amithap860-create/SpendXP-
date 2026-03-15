@@ -7,7 +7,10 @@
 // safeGetDoc, safeOnSnapshot, getRefreshedToken,
 // rateLimiter, validateEmail, validateDisplayName,
 // validateBirthYear, validateScore, validateXP,
-// sanitiseString
+// sanitiseString, checkLockout, recordFailedAttempt,
+// clearAttempts, requiresParentalConsent, hasParentalConsent,
+// captureFingerprint, validateFingerprint, hashGameState,
+// setupDevToolsDetector
 // DO NOT import from @/lib/* directly in components.
 
 export { 
@@ -66,3 +69,7 @@ export * from '@/lib/firestoreSafe';
 export * from '@/lib/authHelpers';
 export * from '@/lib/rateLimiter';
 export * from '@/lib/validation';
+export * from '@/lib/accountLockout';
+export * from '@/lib/privacyGuard';
+export * from '@/lib/sessionGuard';
+export * from '@/lib/antiTamper';
