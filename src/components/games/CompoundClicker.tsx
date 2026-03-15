@@ -43,7 +43,7 @@ export function CompoundClicker({ onExit }: { onExit: () => void }) {
   const { formatValue, completeTask, user } = useUser();
   
   const gameConfig = {
-    gameName: 'moneyMaze' as any, // Reusing existing slot or adding new one
+    gameName: 'compoundClicker' as const,
     totalRounds: 1,
     livesEnabled: false,
     xpPerWin: 250,
@@ -129,10 +129,6 @@ export function CompoundClicker({ onExit }: { onExit: () => void }) {
         }, 0);
         
         if (totalRate === 0) return prev;
-        
-        // annualRate / (compounding periods per year)
-        // Interval is 2s, so 365 days * 24 hours * 30 (intervals per minute)
-        // Prompt says balance += balance * (annualRate / (365/2))
         return prev + (prev * (totalRate / 182.5));
       });
     }, 2000);
@@ -152,7 +148,6 @@ export function CompoundClicker({ onExit }: { onExit: () => void }) {
     targets.forEach(t => {
       if (balance >= t.val && !milestones.includes(t.val)) {
         setMilestones(prev => [...prev, t.val]);
-        // Award logic would go here if using direct user store, but we wrap in endGame
         if (t.val === 10000 && !isCompleted) {
           handleCompletion();
         }
@@ -162,7 +157,7 @@ export function CompoundClicker({ onExit }: { onExit: () => void }) {
 
   const handleCompletion = async () => {
     setIsCompleted(true);
-    await endGame(500); // Massive bonus for 10k
+    await endGame(500); 
     completeTask('game-advisor');
   };
 
@@ -176,7 +171,6 @@ export function CompoundClicker({ onExit }: { onExit: () => void }) {
     }
   };
 
-  // --- MATH HELPERS ---
   const calculateProjection = (start: number, rate: number, years: number) => {
     return start * Math.pow(1 + rate, years);
   };
@@ -190,7 +184,6 @@ export function CompoundClicker({ onExit }: { onExit: () => void }) {
     });
   }, [balance, activeVehicle, ageGroup]);
 
-  // --- RENDERS ---
   if (isCompleted) {
     return (
       <Card className="max-w-2xl mx-auto border-none shadow-2xl bg-white overflow-hidden animate-in zoom-in duration-500">
@@ -228,7 +221,6 @@ export function CompoundClicker({ onExit }: { onExit: () => void }) {
 
   return (
     <div className="max-w-6xl mx-auto grid lg:grid-cols-12 gap-8 relative">
-      {/* Floating Click Text */}
       {floatingTexts.map(t => (
         <div 
           key={t.id} 
@@ -239,7 +231,6 @@ export function CompoundClicker({ onExit }: { onExit: () => void }) {
         </div>
       ))}
 
-      {/* LEFT: Main Clicker Area */}
       <div className="lg:col-span-7 space-y-6">
         <Card className="border-none shadow-xl bg-white overflow-hidden flex flex-col h-[600px]">
           <div className={cn("p-8 text-white transition-colors duration-500", activeVehicle.colour)}>
@@ -261,7 +252,6 @@ export function CompoundClicker({ onExit }: { onExit: () => void }) {
           </div>
 
           <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 relative">
-            {/* The Big Click Button */}
             <button 
               onClick={handleClick}
               className={cn(
@@ -293,7 +283,6 @@ export function CompoundClicker({ onExit }: { onExit: () => void }) {
         </Card>
       </div>
 
-      {/* RIGHT: Upgrades & Stats */}
       <div className="lg:col-span-5 space-y-6">
         <Card className="border-none shadow-xl bg-white h-full flex flex-col">
           <CardHeader className="bg-slate-50 border-b">
@@ -346,7 +335,6 @@ export function CompoundClicker({ onExit }: { onExit: () => void }) {
         </Card>
       </div>
 
-      {/* TIMELAPSE DIALOG */}
       {isLapseOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
           <Card className="max-w-3xl w-full border-none shadow-2xl animate-in fade-in slide-in-from-bottom-8">
@@ -372,15 +360,12 @@ export function CompoundClicker({ onExit }: { onExit: () => void }) {
                 />
               </div>
 
-              {/* Projection Chart */}
               <div className="h-48 w-full bg-slate-50 rounded-2xl p-4 relative">
                 <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible" preserveAspectRatio="none">
-                  {/* Piggy Line (Flat) */}
                   <path 
                     d={`M 0,100 L 100,100`} 
                     fill="none" stroke="#e2e8f0" strokeWidth="2" strokeDasharray="4"
                   />
-                  {/* Growth Line */}
                   <path 
                     d={`M ${chartData.map((d, i) => {
                       const x = (i / (chartData.length - 1)) * 100;
@@ -414,7 +399,6 @@ export function CompoundClicker({ onExit }: { onExit: () => void }) {
         </div>
       )}
 
-      {/* WAIT VS START EARLY DIALOG */}
       {isWaitOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
           <Card className="max-w-2xl w-full border-none shadow-2xl">

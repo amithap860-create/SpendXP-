@@ -1,13 +1,13 @@
 'use client';
 
 import { useReducer, useCallback, useEffect, useRef } from 'react';
-import { doc, setDoc, getDoc, increment, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, increment, writeBatch, serverTimestamp } from 'firebase/firestore';
 import { useFirestore, useUser } from '@/firebase';
 
 export type GameStatus = 'IDLE' | 'COUNTDOWN' | 'PLAYING' | 'PAUSED' | 'GAME_OVER' | 'RESULTS';
 
 export interface GameConfig {
-  gameName: 'budgetBlitz' | 'finIQ' | 'moneyMaze' | 'stockMarketSim' | 'creditScoreBuilder';
+  gameName: 'budgetBlitz' | 'finIQ' | 'moneyMaze' | 'stockMarketSim' | 'creditScoreBuilder' | 'compoundClicker';
   totalRounds: number;
   timePerRound?: number;
   livesEnabled: boolean;
@@ -85,7 +85,6 @@ function gameReducer(state: GameState, action: Action): GameState {
       let comboBonus = 0;
       let comboActive = false;
 
-      // Combo bonus: 3 correct answers within 2.5 seconds
       if (newTimestamps.length === 3 && now - newTimestamps[0] <= 2500) {
         comboBonus = 50;
         comboActive = true;
@@ -148,17 +147,12 @@ function gameReducer(state: GameState, action: Action): GameState {
   }
 }
 
-/**
- * useGameEngine
- * A powerful, reusable hook to power SpendXP financial literacy games.
- */
 export function useGameEngine(config: GameConfig) {
   const db = useFirestore();
   const { user } = useUser();
   const [state, dispatch] = useReducer(gameReducer, config, initialState);
   const comboTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Timer logic for Countdown and Playing states
   useEffect(() => {
     if (state.status !== 'PLAYING' && state.status !== 'COUNTDOWN') return;
 
@@ -173,7 +167,6 @@ export function useGameEngine(config: GameConfig) {
     return () => clearInterval(intervalId);
   }, [state.status, config.timePerRound]);
 
-  // Combo flag reset logic (1.5s duration)
   useEffect(() => {
     if (state.comboActive) {
       if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
@@ -225,36 +218,59 @@ export function useGameEngine(config: GameConfig) {
   const endGame = useCallback(async (finalXpBonus = 0) => {
     if (!user || !db) return;
     
-    // Transition state locally
     dispatch({ type: 'END_GAME' });
 
+    const sessionXp = state.xpEarned + finalXpBonus;
+    const batch = writeBatch(db);
+    
     const gameScoreRef = doc(db, 'users', user.uid, 'gameScores', config.gameName);
-    const userRef = doc(db, 'users', user.uid);
-
-    const totalXp = state.xpEarned + finalXpBonus;
+    const progressionRef = doc(db, 'users', user.uid, 'progression', 'stats');
+    const userRootRef = doc(db, 'users', user.uid);
 
     try {
-      // Fetch existing high score
-      const docSnap = await getDoc(gameScoreRef);
-      const existingData = docSnap.exists() ? docSnap.data() : { highScore: 0 };
-      const newHighScore = Math.max(existingData.highScore || 0, state.score);
+      const gameSnap = await getDoc(gameScoreRef);
+      const existingGameData = gameSnap.exists() ? gameSnap.data() : { highScore: 0 };
+      const newHighScore = Math.max(existingGameData.highScore || 0, state.score);
 
-      // Save game performance
-      await setDoc(gameScoreRef, {
-        gameName: config.gameName,
+      // Path 1: Per-game scores
+      batch.set(gameScoreRef, {
         lastScore: state.score,
         highScore: newHighScore,
-        lastXpEarned: totalXp,
-        totalXpEarnedInGame: increment(totalXp),
-        lastPlayedAt: new Date().toISOString()
+        xpEarned: increment(sessionXp),
+        gamesPlayed: increment(1),
+        lastPlayedAt: serverTimestamp()
       }, { merge: true });
 
-      // Save global XP increment
-      await updateDoc(userRef, {
-        xp: increment(totalXp)
+      // Map config name to requested progression keys
+      const highScoreKeyMap: Record<string, string> = {
+        budgetBlitz: 'budgetBlitz',
+        finIQ: 'finIQQuiz',
+        moneyMaze: 'moneyMaze',
+        stockMarketSim: 'stockMarketSim',
+        creditScoreBuilder: 'creditScoreBuilder',
+        compoundClicker: 'compoundClicker'
+      };
+
+      const highScoresKey = highScoreKeyMap[config.gameName];
+
+      // Path 2: Aggregated progression
+      batch.set(progressionRef, {
+        totalXP: increment(sessionXp),
+        totalGamesPlayed: increment(1),
+        lastActivityAt: serverTimestamp(),
+        gameHighScores: {
+          [highScoresKey]: newHighScore
+        }
+      }, { merge: true });
+
+      // Update root user XP for legacy support/sync
+      batch.update(userRootRef, {
+        xp: increment(sessionXp)
       });
+
+      await batch.commit();
     } catch (error) {
-      console.error('Failed to save game results:', error);
+      console.error('Failed to save game results via batch:', error);
     }
   }, [db, user, config.gameName, state.score, state.xpEarned]);
 
