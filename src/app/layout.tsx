@@ -20,12 +20,20 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
 
   const isAuthPage = ['/login', '/signup', '/verify-email', '/onboarding', '/consent'].includes(pathname);
 
+  const navLinks = [
+    { label: 'Home', href: '/dashboard', icon: 'grid' },
+    { label: 'Quests', href: '/quests', icon: 'flag' },
+    { label: 'Games', href: '/games', icon: 'arcade' },
+    { label: 'Learn', href: '/learn', icon: 'book' },
+    { label: 'Profile', href: '/profile', icon: 'user' }
+  ];
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* TOP NAV (Desktop) */}
       {!loading && user && !isAuthPage && (
         <header className="hidden md:block bg-white border-b border-slate-200 sticky top-0 z-50">
-          <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
             <Link href="/dashboard" className="flex items-center gap-2">
               <div className="w-8 h-8 bg-teal-500 rounded-lg flex items-center justify-center">
                 <div className="w-4 h-5 relative">
@@ -35,12 +43,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
               <span className="font-black text-xl tracking-tighter text-slate-900">SpendXP</span>
             </Link>
             <nav className="flex gap-1">
-              {[
-                { label: 'Dashboard', href: '/dashboard' },
-                { label: 'Games', href: '/games' },
-                { label: 'Learn', href: '/learn' },
-                { label: 'Profile', href: '/profile' }
-              ].map((link) => (
+              {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
@@ -57,37 +60,44 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
         </header>
       )}
 
-      <div className={cn("flex-1", !isAuthPage && user && "pb-20 md:pb-0")}>{children}</div>
+      <div className={cn("flex-1", !isAuthPage && user && "pb-24 md:pb-0")}>{children}</div>
 
       {/* BOTTOM NAV (Mobile) */}
       {!loading && user && !isAuthPage && (
         <nav className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-white border-t border-slate-200 flex items-center justify-around px-2 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
-          <NavLink href="/dashboard" label="Home" active={pathname === '/dashboard'}>
-            <div className="grid grid-cols-2 gap-0.5 p-0.5">
-              {[1,2,3,4].map(i => <div key={i} className="w-2 h-2 bg-current rounded-sm" />)}
-            </div>
-          </NavLink>
-
-          <NavLink href="/games" label="Games" active={pathname === '/games'}>
-            <div className="w-6 h-4 bg-current rounded-sm relative overflow-hidden">
-              <div className="absolute top-1 left-1 w-1 h-1 bg-white rounded-full opacity-50" />
-              <div className="absolute top-1 right-1 w-1 h-1 bg-white rounded-full opacity-50" />
-            </div>
-          </NavLink>
-          
-          <NavLink href="/learn" label="Learn" active={pathname === '/learn'}>
-            <div className="w-5 h-6 bg-current rounded-sm relative">
-              <div className="absolute top-1 left-1 right-1 h-0.5 bg-white opacity-30" />
-              <div className="absolute top-3 left-1 right-1 h-0.5 bg-white opacity-30" />
-            </div>
-          </NavLink>
-
-          <NavLink href="/profile" label="Profile" active={pathname === '/profile'}>
-            <div className="w-5 h-5 rounded-full border-2 border-current flex flex-col items-center justify-center overflow-hidden">
-              <div className="w-2 h-2 rounded-full bg-current mb-0.5" />
-              <div className="w-4 h-2 rounded-full bg-current" />
-            </div>
-          </NavLink>
+          {navLinks.map((link) => (
+            <NavLink key={link.href} href={link.href} label={link.label} active={pathname === link.href}>
+              {link.icon === 'grid' && (
+                <div className="grid grid-cols-2 gap-0.5 p-0.5">
+                  {[1,2,3,4].map(i => <div key={i} className="w-1.5 h-1.5 bg-current rounded-sm" />)}
+                </div>
+              )}
+              {link.icon === 'flag' && (
+                <div className="w-4 h-5 relative">
+                  <div className="absolute top-0 left-0 w-3 h-2.5 bg-current rounded-sm" style={{ clipPath: 'polygon(0 0, 100% 50%, 0 100%)' }} />
+                  <div className="absolute top-0 left-0 w-0.5 h-5 bg-current rounded-full" />
+                </div>
+              )}
+              {link.icon === 'arcade' && (
+                <div className="w-5 h-3.5 bg-current rounded-sm relative overflow-hidden">
+                  <div className="absolute top-1 left-1 w-1 h-1 bg-white rounded-full opacity-50" />
+                  <div className="absolute top-1 right-1 w-1 h-1 bg-white rounded-full opacity-50" />
+                </div>
+              )}
+              {link.icon === 'book' && (
+                <div className="w-4 h-5 bg-current rounded-sm relative">
+                  <div className="absolute top-1 left-1 right-1 h-0.5 bg-white opacity-30" />
+                  <div className="absolute top-2.5 left-1 right-1 h-0.5 bg-white opacity-30" />
+                </div>
+              )}
+              {link.icon === 'user' && (
+                <div className="w-4 h-4 rounded-full border-2 border-current flex flex-col items-center justify-center overflow-hidden">
+                  <div className="w-1.5 h-1.5 rounded-full bg-current mb-0.5" />
+                  <div className="w-3 h-1.5 rounded-full bg-current" />
+                </div>
+              )}
+            </NavLink>
+          ))}
         </nav>
       )}
       <Toaster />
@@ -102,7 +112,7 @@ function NavLink({ href, label, active, children }: { href: string; label: strin
       active ? "text-teal-600 scale-110" : "text-slate-300"
     )}>
       {children}
-      <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
+      <span className="text-[9px] font-black uppercase tracking-widest">{label}</span>
     </Link>
   );
 }

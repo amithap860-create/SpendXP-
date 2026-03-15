@@ -1,6 +1,8 @@
-import { doc, getDoc, setDoc, getDocs, collection, Firestore, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, getDocs, collection, Firestore, serverTimestamp, increment, arrayUnion } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { safeGetDoc, safeSetDoc } from '@/lib/firestoreSafe';
+import { safeGetDoc, safeSetDoc, safeUpdateDoc } from '@/lib/firestoreSafe';
+import { getISTDateKey } from './dateHelpers';
+import { clampHealth } from './financialHealth';
 
 export interface UserProgression {
   totalXP: number;
@@ -9,6 +11,8 @@ export interface UserProgression {
   level: number;
   badges: string[];
   lastActivityAt: any;
+  financialHealth: number;
+  healthHistory: Array<{ date: string; score: number }>;
   gameHighScores: {
     budgetBlitz: number;
     finIQQuiz: number;
@@ -48,6 +52,8 @@ export const DEFAULT_PROGRESSION: UserProgression = {
   level: 1,
   badges: [],
   lastActivityAt: null,
+  financialHealth: 50,
+  healthHistory: [],
   gameHighScores: {
     budgetBlitz: 0,
     finIQQuiz: 0,
@@ -64,7 +70,6 @@ export const DEFAULT_PROGRESSION: UserProgression = {
 export async function updateLeaderboardEntry(uid: string, displayName: string) {
   try {
     const progression = await getProgression(uid);
-    // For prototype, write to top-level leaderboard collection
     const simpleRef = doc(db, 'leaderboard', uid);
     await safeSetDoc(simpleRef, {
       uid,
@@ -102,6 +107,27 @@ export async function getProgression(uid: string): Promise<UserProgression> {
     console.error("Error fetching progression:", error);
     return DEFAULT_PROGRESSION;
   }
+}
+
+/**
+ * Updates the user's Financial Health score and records history.
+ */
+export async function updateFinancialHealth(uid: string, delta: number) {
+  const ref = getProgressionRef(uid);
+  const current = await getProgression(uid);
+  const newScore = clampHealth(current.financialHealth + delta);
+  const dateKey = getISTDateKey();
+
+  // Manage history limit
+  let history = [...(current.healthHistory || [])];
+  if (history.length >= 30) history.shift();
+  history.push({ date: dateKey, score: newScore });
+
+  await safeUpdateDoc(ref, {
+    financialHealth: newScore,
+    healthHistory: history,
+    lastActivityAt: serverTimestamp()
+  });
 }
 
 export async function getAllGameScores(uid: string): Promise<GameScores> {
@@ -151,7 +177,7 @@ export async function getConceptStrengths(uid: string): Promise<ConceptStrengths
   }
 
   completedTasks.forEach(task => {
-    const key = task.category.toLowerCase() as keyof ConceptStrengths;
+    const key = (task.category || 'Academy').toLowerCase() as keyof ConceptStrengths;
     if (strengths[key] !== undefined) strengths[key] += 20;
   });
 
