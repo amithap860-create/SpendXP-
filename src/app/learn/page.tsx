@@ -20,13 +20,24 @@ import {
   Star
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuthContext } from '@/context/AuthContext';
+import { awardBadge } from '@/lib/badgeService';
 
 export default function LearnHub() {
+  const { user } = useAuthContext();
   const { tasks } = useUser();
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
 
+  const availableLessons = lessons.filter(l => l.ageGroups.includes(user?.ageGroup as any || 'junior'));
   const completedCount = lessons.filter(l => tasks.find(t => t.id === `lesson-${l.id}`)?.completed).length;
   const overallProgress = (completedCount / lessons.length) * 100;
+
+  const handleLessonFinish = async (lessonId: string) => {
+    setActiveLesson(null);
+    if (user && completedCount + 1 === lessons.length) {
+      await awardBadge(user.uid, 'scholar');
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -54,7 +65,7 @@ export default function LearnHub() {
                     <Star className="h-4 w-4 fill-current" /> Finance Scholar Badge Earned!
                   </div>
                 ) : (
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Complete all to earn Scholar Badge</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Complete all {lessons.length} to earn Scholar Badge</p>
                 )}
               </div>
             </div>
@@ -64,15 +75,17 @@ export default function LearnHub() {
             {lessons.map((lesson) => {
               const isCompleted = tasks.find(t => t.id === `lesson-${lesson.id}`)?.completed;
               const xpReward = lesson.cards.reduce((acc, c) => acc + c.xpReward, 0);
+              const isAgeAppropriate = availableLessons.find(l => l.id === lesson.id);
               
               return (
                 <Card 
                   key={lesson.id} 
                   className={cn(
                     "group hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden flex flex-col",
-                    isCompleted && "ring-2 ring-emerald-500/20"
+                    isCompleted && "ring-2 ring-emerald-500/20",
+                    !isAgeAppropriate && "opacity-50 grayscale"
                   )}
-                  onClick={() => setActiveLesson(lesson)}
+                  onClick={() => isAgeAppropriate && setActiveLesson(lesson)}
                 >
                   <div className={cn(
                     "h-2",
@@ -91,6 +104,8 @@ export default function LearnHub() {
                         <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none gap-1 font-black">
                           <CheckCircle2 className="h-3 w-3" /> DONE
                         </Badge>
+                      ) : !isAgeAppropriate ? (
+                        <Badge variant="outline" className="text-[10px] uppercase font-black">LOCKED</Badge>
                       ) : (
                         <Badge variant="secondary" className="bg-slate-50 text-slate-500 border-none font-black">
                           +{xpReward} XP
@@ -101,7 +116,7 @@ export default function LearnHub() {
                       {lesson.title}
                     </CardTitle>
                     <CardDescription className="font-medium">
-                      Master the basics of {lesson.topic}.
+                      {!isAgeAppropriate ? `Available for ${lesson.ageGroups.join('/')} level` : `Master the basics of ${lesson.topic}.`}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="mt-auto pt-4 space-y-4">
@@ -109,9 +124,16 @@ export default function LearnHub() {
                       <div className="flex items-center gap-1"><Clock className="h-3 w-3" /> {lesson.estimatedMinutes}m read</div>
                       <div className="flex items-center gap-1"><Trophy className="h-3 w-3" /> Strategy</div>
                     </div>
-                    <Button className="w-full h-12 gap-2 font-black rounded-xl" suppressHydrationWarning>
+                    <button 
+                      className={cn(
+                        "w-full h-12 flex items-center justify-center gap-2 font-black rounded-xl border-2 transition-all",
+                        isCompleted ? "border-slate-200 text-slate-500" : "bg-primary text-white border-primary shadow-lg shadow-primary/20"
+                      )}
+                      disabled={!isAgeAppropriate}
+                      suppressHydrationWarning
+                    >
                       {isCompleted ? 'Review Lesson' : 'Start Learning'} <ArrowRight className="h-4 w-4" />
-                    </Button>
+                    </button>
                   </CardContent>
                 </Card>
               );
@@ -121,7 +143,7 @@ export default function LearnHub() {
           {activeLesson && (
             <LessonViewer 
               lesson={activeLesson} 
-              onClose={() => setActiveLesson(null)} 
+              onClose={() => handleLessonFinish(activeLesson.id)} 
             />
           )}
         </div>

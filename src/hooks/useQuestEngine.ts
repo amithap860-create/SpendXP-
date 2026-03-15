@@ -5,8 +5,9 @@ import { Quest, QuestStep, QuestChoice } from '@/data/quests';
 import { AgeGroup } from '@/lib/ageAdapt';
 import { useAuthContext } from '@/context/AuthContext';
 import { db, safeSetDoc, safeUpdateDoc } from '@/firebase';
-import { doc, serverTimestamp, increment, arrayUnion } from 'firebase/firestore';
+import { doc, serverTimestamp, increment, arrayUnion, collection } from 'firebase/firestore';
 import { updateFinancialHealth, updateLeaderboardEntry } from '@/lib/progressionService';
+import { checkAndAwardQuestBadges } from '@/lib/badgeService';
 
 export type QuestState = {
   status: 'INTRO' | 'IN_PROGRESS' | 'COMPLETE';
@@ -96,7 +97,7 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
     if (choice.nextStepId === 'end' && user) {
       // Finalize and Award
       const xpToAward = Math.max(0, nextState.totalXPEarned + quest.xpReward);
-      const optimalRate = Math.round((nextState.optimalChoiceCount / filteredSteps.length) * 100);
+      const optimalRate = nextState.optimalChoiceCount / filteredSteps.length;
 
       try {
         // 1. Submit Score (Server Action API)
@@ -105,7 +106,7 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             gameName: `quest_${quest.id}`,
-            score: optimalRate,
+            score: Math.round(optimalRate * 100),
             xpEarned: xpToAward
           })
         });
@@ -113,7 +114,7 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
         // 2. Update Financial Health
         await updateFinancialHealth(user.uid, nextState.totalHealthDelta);
 
-        // 3. Record Progress & Badge
+        // 3. Record Progress
         const progressRef = doc(db, 'users', user.uid, 'questProgress', quest.id);
         await safeSetDoc(progressRef, {
           completedAt: serverTimestamp(),
@@ -123,12 +124,8 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
           choiceHistory: newHistory
         });
 
-        if (quest.badgeReward) {
-          const userRef = doc(db, 'users', user.uid);
-          await safeUpdateDoc(userRef, {
-            'progression.badges': arrayUnion(quest.badgeReward)
-          });
-        }
+        // 4. Award Badges
+        await checkAndAwardQuestBadges(user.uid, quest.id, optimalRate);
 
         await updateLeaderboardEntry(user.uid, user.displayName || 'Strategist');
       } catch (err) {

@@ -5,7 +5,9 @@ import {
   getDoc, 
   setDoc, 
   updateDoc, 
+  addDoc,
   DocumentReference, 
+  CollectionReference,
   Query, 
   FirestoreError, 
   Unsubscribe, 
@@ -79,6 +81,21 @@ export async function safeUpdateDoc(
     if (error?.code === 'permission-denied') {
       console.error('[SpendXP] safeUpdateDoc permission denied:', ref.path);
       return false;
+    }
+    throw error;
+  }
+}
+
+export async function safeAddDoc<T extends object>(
+  ref: CollectionReference,
+  data: T
+): Promise<DocumentReference | null> {
+  try {
+    return await addDoc(ref, data);
+  } catch (error: any) {
+    if (error?.code === 'permission-denied') {
+      console.error('[SpendXP] safeAddDoc permission denied:', ref.path);
+      return null;
     }
     throw error;
   }

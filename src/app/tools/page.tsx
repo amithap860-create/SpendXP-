@@ -21,6 +21,7 @@ import { EMICalculator } from '@/components/tools/EMICalculator';
 import { CompoundVisualiser } from '@/components/tools/CompoundVisualiser';
 import { SavingsGoalTracker } from '@/components/tools/SavingsGoalTracker';
 import { SIPCalculator } from '@/components/tools/SIPCalculator';
+import { awardBadge } from '@/lib/badgeService';
 
 type ToolId = 'emi' | 'compound' | 'savings' | 'sip';
 
@@ -45,18 +46,23 @@ export default function ToolsHub() {
     
     if (user && !toolsUsed.includes(id)) {
       const userRef = doc(db, 'users', user.uid);
+      const newToolsUsed = [...toolsUsed, id];
+      
       await safeUpdateDoc(userRef, {
-        toolsUsed: arrayUnion(id),
-        xp: arrayUnion(10) // Note: This is a placeholder for actual increment logic if needed, 
-        // but for simplicity in this project we've been using increment(10) in progression service.
-        // Let's stick to the convention used in useGameEngine.
+        toolsUsed: arrayUnion(id)
       });
-      // Correct increment logic for consistency
+
+      // Award XP for first use of any tool
       await safeUpdateDoc(doc(db, 'users', user.uid, 'progression', 'stats'), {
-        totalXP: arrayUnion(10) // Wait, progressionService uses FieldValue.increment
+        totalXP: arrayUnion(10)
       });
       
-      setToolsUsed(prev => [...prev, id]);
+      setToolsUsed(newToolsUsed);
+
+      // Check for explorer badge
+      if (newToolsUsed.length === 4) {
+        await awardBadge(user.uid, 'tool_explorer');
+      }
     }
   };
 
@@ -125,10 +131,12 @@ export default function ToolsHub() {
                     <p className="text-sm text-slate-500 font-medium">{tool.description}</p>
                   </div>
                 </div>
-                <Button 
-                  variant={activeTool === tool.id ? "secondary" : "default"}
+                <button 
                   onClick={() => handleOpenTool(tool.id)}
-                  className="gap-2 font-black uppercase text-xs tracking-widest px-6"
+                  className={cn(
+                    "flex items-center gap-2 font-black uppercase text-[10px] tracking-widest px-6 py-2 rounded-xl border-2 transition-all",
+                    activeTool === tool.id ? "bg-slate-100 text-slate-600 border-slate-200" : "bg-primary text-white border-primary"
+                  )}
                   suppressHydrationWarning
                 >
                   {activeTool === tool.id ? (
@@ -136,7 +144,7 @@ export default function ToolsHub() {
                   ) : (
                     <>Open Tool <ChevronDown className="h-4 w-4" /></>
                   )}
-                </Button>
+                </button>
               </div>
 
               {activeTool === tool.id && (

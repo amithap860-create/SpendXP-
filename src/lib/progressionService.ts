@@ -3,6 +3,7 @@ import { db } from '@/lib/firebase';
 import { safeGetDoc, safeSetDoc, safeUpdateDoc } from '@/lib/firestoreSafe';
 import { getISTDateKey } from './dateHelpers';
 import { clampHealth } from './financialHealth';
+import { awardBadge } from './badgeService';
 
 export interface UserProgression {
   totalXP: number;
@@ -65,7 +66,7 @@ export const DEFAULT_PROGRESSION: UserProgression = {
 };
 
 /**
- * Logic 3: Client-side leaderboard update workaround
+ * Client-side leaderboard update workaround
  */
 export async function updateLeaderboardEntry(uid: string, displayName: string) {
   try {
@@ -128,6 +129,11 @@ export async function updateFinancialHealth(uid: string, delta: number) {
     healthHistory: history,
     lastActivityAt: serverTimestamp()
   });
+
+  // Check for badges
+  if (newScore >= 75) {
+    await awardBadge(uid, 'financially_stable');
+  }
 }
 
 export async function getAllGameScores(uid: string): Promise<GameScores> {

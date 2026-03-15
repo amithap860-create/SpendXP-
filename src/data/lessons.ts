@@ -132,26 +132,6 @@ export const lessons: Lesson[] = [
           label: 'Growth over 20 years'
         },
         xpReward: 30
-      },
-      {
-        id: 'i2',
-        title: 'Early vs. Late',
-        body: {
-          junior: "The earlier you start, the bigger your tree grows. Time is your best friend in saving!",
-          teen: "Compound interest needs time. Starting at 15 is much more powerful than starting at 25.",
-          senior: "The 'Cost of Delay' is significant. Starting early allows compounding to do the heavy lifting for your wealth."
-        },
-        example: {
-          junior: "Save ₹10 at age 8 and see it grow! If you wait until 18, you have much less time.",
-          teen: "Starting ₹500/month at 15 vs 25 can result in lakhs of difference by the time you're 50.",
-          senior: "A 10-year delay in starting a retirement SIP can halve your final corpus value."
-        },
-        visual: 'comparison',
-        visualData: {
-          left: { label: 'Start at 20', value: 100, color: '#10b981' },
-          right: { label: 'Start at 30', value: 45, color: '#f59e0b' }
-        },
-        xpReward: 30
       }
     ],
     quizCard: {
@@ -159,6 +139,125 @@ export const lessons: Lesson[] = [
       options: ["Nifty 50", "The Big Bazar", "RBI Index", "Cricket Score"],
       correctIndex: 0,
       explanation: "The Nifty 50 tracks the 50 largest companies in India and is a great way to see how the market is doing."
+    }
+  },
+  {
+    id: 'l-etfs',
+    topic: 'investing',
+    relatedGame: 'stockMarketSim',
+    title: 'ETFs & Index Funds',
+    estimatedMinutes: 4,
+    ageGroups: ['teen', 'senior'],
+    cards: [
+      {
+        id: 'e1',
+        title: 'What is an ETF?',
+        body: {
+          junior: "",
+          teen: "An ETF (Exchange Traded Fund) is like a basket of many stocks. When you buy one ETF, you own tiny pieces of many companies at once.",
+          senior: "An ETF tracks an index like the Nifty 50, holding all constituent stocks proportionally. Low expense ratios (typically 0.1–0.5%) make them highly cost-efficient vs active funds."
+        },
+        example: {
+          junior: "",
+          teen: "Nifty 50 ETF = owning a small piece of India's 50 biggest companies for ₹100/unit",
+          senior: "Nifty BeES ETF: expense ratio 0.04% vs average active fund 1.5% — saves ₹14,600 on ₹10L invested over 10 years"
+        },
+        visual: 'comparison',
+        visualData: {
+          left: { label: 'ETF', value: 99, color: '#10b981' },
+          right: { label: 'Active Fund', value: 85, color: '#f59e0b' }
+        },
+        xpReward: 30
+      },
+      {
+        id: 'e2',
+        title: 'Passive vs Active',
+        body: {
+          junior: "",
+          teen: "Active managers try to pick winners. Passive funds (ETFs) just follow the whole market. Statistically, the market wins more often!",
+          senior: "Index funds aim for market returns (beta). Active funds aim to beat the market (alpha). However, 80% of active fund managers underperform their benchmark index over 10+ years."
+        },
+        example: {
+          junior: "",
+          teen: "An active manager might bet all on tech. An index fund owns tech, banking, energy, and more.",
+          senior: "Passive investing removes the human error factor and significantly lowers management fees."
+        },
+        visual: 'bar',
+        visualData: {
+          items: [
+            { label: 'Market Index', value: 100, color: '#10b981' },
+            { label: 'Active Managers', value: 20, color: '#rose-500' }
+          ]
+        },
+        xpReward: 30
+      }
+    ],
+    quizCard: {
+      question: "A Nifty 50 ETF tracks India's top 50 companies. If you invest ₹1,000 in it, you own...",
+      options: ["Only 1 company", "50 companies proportionally", "All BSE companies", "Only tech companies"],
+      correctIndex: 1,
+      explanation: "ETFs give you instant diversification by spreading your money across all companies in the index."
+    }
+  },
+  {
+    id: 'l-crypto',
+    topic: 'investing',
+    relatedGame: 'stockMarketSim',
+    title: 'Crypto & High-Risk Assets',
+    estimatedMinutes: 3,
+    ageGroups: ['senior'],
+    cards: [
+      {
+        id: 'c1',
+        title: 'What is Cryptocurrency?',
+        body: {
+          junior: "",
+          teen: "",
+          senior: "Crypto (Bitcoin, Ethereum etc.) is a digital currency with no government backing. Unlike stocks, crypto has no underlying business earnings to support its value — price is purely based on what someone else will pay for it."
+        },
+        example: {
+          junior: "",
+          teen: "",
+          senior: "Buying a stock is like owning a piece of a pizza shop. Buying crypto is like owning a digital collectible where the price depends on hype."
+        },
+        visual: 'comparison',
+        visualData: {
+          left: { label: 'Stock (Earnings)', value: 80, color: '#2e72db' },
+          right: { label: 'Crypto (Demand)', value: 80, color: '#purple-500' }
+        },
+        xpReward: 25
+      },
+      {
+        id: 'c2',
+        title: 'Serious Risks',
+        body: {
+          junior: "",
+          teen: "",
+          senior: "Crypto is extremely volatile. Crashes of 70–90% are common. There is no regulation in India, meaning no legal recourse if an exchange collapses or your wallet is hacked."
+        },
+        example: {
+          junior: "",
+          teen: "",
+          senior: "Bitcoin lost 83% of its value in 2018 and 77% in 2022. Only invest what you can afford to lose entirely."
+        },
+        visual: 'line',
+        visualData: {
+          points: [
+            { x: 0, y: 200 },
+            { x: 5, y: 800 },
+            { x: 10, y: 150 },
+            { x: 15, y: 400 }
+          ],
+          label: 'Typical Crypto Volatility'
+        },
+        xpReward: 25
+      }
+    ],
+    quizCard: {
+      question: "A friend says a new crypto coin will give 50% monthly returns. What should you do?",
+      options: ["Invest immediately", "Ask for a referral link", "Likely a scam — don't invest", "Invest only ₹1,000"],
+      correctIndex: 2,
+      explanation: "No legitimate investment guarantees 50% monthly returns. This pattern is typical of a Ponzi scheme."
     }
   }
 ];

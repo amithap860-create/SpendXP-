@@ -3,7 +3,7 @@
 // SPENDXP FIREBASE BARREL — single import source
 // for all Firebase and utility exports.
 // Import path for components and hooks: '@/firebase'
-// Exports: app, auth, db, safeSetDoc, safeUpdateDoc,
+// Exports: app, auth, db, safeSetDoc, safeUpdateDoc, safeAddDoc,
 // safeGetDoc, safeOnSnapshot, getRefreshedToken,
 // rateLimiter, validateEmail, validateDisplayName,
 // validateBirthYear, validateScore, validateXP,
