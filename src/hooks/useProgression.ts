@@ -2,23 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { doc, serverTimestamp } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
+import { db, safeOnSnapshot, safeSetDoc } from '@/firebase';
 import { useAuthContext } from '@/context/AuthContext';
 import { getProgressionRef, UserProgression, DEFAULT_PROGRESSION } from '@/lib/progressionService';
-import { safeOnSnapshot, safeSetDoc } from '@/lib/firestoreSafe';
 
-/**
- * Real-time progression hook that listens to the user's stats document.
- * Refactored to prevent assertion crashes during auth transitions.
- */
 export function useProgression() {
-  const db = useFirestore();
   const { user } = useAuthContext();
   const [data, setData] = useState<UserProgression>(DEFAULT_PROGRESSION);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!user || !db) {
+    if (!user) {
       setData(DEFAULT_PROGRESSION);
       setIsLoading(false);
       return;
@@ -31,7 +25,6 @@ export function useProgression() {
       if (snap.exists()) {
         setData(snap.data() as UserProgression);
       } else {
-        // Document doesn't exist yet — initialise with defaults safely
         safeSetDoc(ref, {
           ...DEFAULT_PROGRESSION,
           lastActivityAt: serverTimestamp(),
@@ -45,7 +38,7 @@ export function useProgression() {
     });
 
     return () => unsubscribe();
-  }, [user, db]);
+  }, [user]);
 
   return { data, isLoading };
 }

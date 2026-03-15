@@ -1,19 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth as useFirebaseAuth, useFirestore } from '@/firebase';
+import { useAuth as useFirebaseAuth, db } from '@/firebase';
 import { applyActionCode } from 'firebase/auth';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LoaderCircle, CheckCircle2, AlertCircle, Sparkles, Mail } from 'lucide-react';
+import { LoaderCircle, CheckCircle2, AlertCircle } from 'lucide-react';
 import { doc } from 'firebase/firestore';
-import { safeUpdateDoc } from '@/lib/firestoreSafe';
+import { safeUpdateDoc } from '@/firebase';
 import { useAuthContext } from '@/context/AuthContext';
 
 export default function VerifyEmailPage() {
   const auth = useFirebaseAuth();
-  const db = useFirestore();
   const { user } = useAuthContext();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -31,7 +30,6 @@ export default function VerifyEmailPage() {
       try {
         await applyActionCode(auth, oobCode);
         
-        // If user is currently signed in, sync to Firestore immediately
         if (user) {
           const userRef = doc(db, 'users', user.uid);
           await safeUpdateDoc(userRef, { emailVerified: true });
@@ -39,16 +37,12 @@ export default function VerifyEmailPage() {
         
         setStatus('success');
       } catch (err: any) {
-        if (err.code === 'auth/invalid-action-code') {
-          setStatus('error');
-        } else {
-          setStatus('error');
-        }
+        setStatus('error');
       }
     };
 
     verify();
-  }, [auth, oobCode, user, db]);
+  }, [auth, oobCode, user]);
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
@@ -60,7 +54,7 @@ export default function VerifyEmailPage() {
             <LoaderCircle className="h-16 w-16 animate-spin text-primary mx-auto" />
             <div className="space-y-2">
               <CardTitle className="text-2xl font-black">Verifying your email...</CardTitle>
-              <p className="text-slate-500 font-medium">Just a moment while we secure your account.</p>
+              <p className="text-slate-50 font-medium">Just a moment while we secure your account.</p>
             </div>
           </CardContent>
         )}
@@ -74,7 +68,11 @@ export default function VerifyEmailPage() {
               <CardTitle className="text-3xl font-black text-slate-900">Verified!</CardTitle>
               <p className="text-slate-500 font-medium">Your account is now fully active. Happy learning!</p>
             </div>
-            <Button onClick={() => router.push('/games')} className="w-full h-16 text-xl font-black rounded-2xl shadow-xl shadow-emerald-100">
+            <Button 
+              onClick={() => router.push('/games')} 
+              className="w-full h-16 text-xl font-black rounded-2xl shadow-xl shadow-emerald-100"
+              suppressHydrationWarning
+            >
               Go to SpendXP Arcade →
             </Button>
           </CardContent>
@@ -90,7 +88,12 @@ export default function VerifyEmailPage() {
               <p className="text-slate-500 font-medium">This verification link is invalid or has already been used.</p>
             </div>
             <div className="space-y-3 pt-4">
-              <Button onClick={() => router.push('/login')} variant="outline" className="w-full h-12 font-bold border-2">
+              <Button 
+                onClick={() => router.push('/login')} 
+                variant="outline" 
+                className="w-full h-12 font-bold border-2"
+                suppressHydrationWarning
+              >
                 Back to Sign In
               </Button>
             </div>

@@ -2,20 +2,19 @@
 
 import { useState } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
-import { useFirestore } from '@/firebase';
+import { db } from '@/firebase';
 import { doc, serverTimestamp } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { XPWallet } from '@/components/XPWallet';
 import { getAgeGroup } from '@/lib/ageAdapt';
-import { safeSetDoc } from '@/lib/firestoreSafe';
-import { Sparkles, ChevronRight, User, Calendar, Target, Wallet, ArrowRight } from 'lucide-react';
+import { safeSetDoc } from '@/firebase';
+import { ChevronRight, User, Calendar, Target, Wallet, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function OnboardingPage() {
   const { user } = useAuthContext();
-  const db = useFirestore();
   const router = useRouter();
   
   const [step, setStep] = useState(1);
@@ -46,7 +45,6 @@ export default function OnboardingPage() {
 
   const completeOnboarding = async () => {
     if (!user) {
-      console.error('[SpendXP] completeOnboarding called without auth');
       router.push('/login');
       return;
     }
@@ -102,7 +100,6 @@ export default function OnboardingPage() {
             </div>
             <div className="space-y-2">
               <h2 className="text-4xl font-black text-slate-900 tracking-tight">What should we call you?</h2>
-              <p className="text-slate-500 font-medium">Your strategist name will appear on leaderboards.</p>
             </div>
             <Input 
               value={name} 
@@ -111,7 +108,7 @@ export default function OnboardingPage() {
               placeholder="Your Name"
               suppressHydrationWarning
             />
-            <Button onClick={nextStep} size="lg" className="w-full h-16 text-xl font-black rounded-2xl shadow-xl shadow-primary/20" suppressHydrationWarning>
+            <Button onClick={nextStep} size="lg" className="w-full h-16 text-xl font-black rounded-2xl shadow-xl" suppressHydrationWarning>
               Next <ChevronRight className="ml-2" />
             </Button>
           </div>
@@ -124,28 +121,22 @@ export default function OnboardingPage() {
             </div>
             <div className="space-y-2">
               <h2 className="text-4xl font-black text-slate-900 tracking-tight">When were you born?</h2>
-              <p className="text-slate-500 font-medium">We customize your journey based on your age.</p>
             </div>
             <div className="flex gap-3 overflow-x-auto pb-4 no-scrollbar px-4 -mx-4">
               {years.map(year => (
                 <button
                   key={year}
                   onClick={() => setBirthYear(year)}
+                  suppressHydrationWarning
                   className={cn(
                     "flex-shrink-0 w-20 h-20 rounded-2xl border-2 flex items-center justify-center text-xl font-black transition-all",
                     birthYear === year ? "border-primary bg-primary text-white shadow-lg" : "border-slate-100 hover:border-slate-300"
                   )}
-                  suppressHydrationWarning
                 >
                   {year}
                 </button>
               ))}
             </div>
-            {birthYear && (currentYear - birthYear) < 13 && (
-              <div className="p-4 bg-amber-50 rounded-xl text-amber-800 text-sm font-medium border border-amber-100 animate-in zoom-in duration-300">
-                Ask a parent to help set up your account — we'll send them a link!
-              </div>
-            )}
             <Button 
               disabled={!birthYear} 
               onClick={nextStep} 
@@ -165,18 +156,17 @@ export default function OnboardingPage() {
             </div>
             <div className="space-y-2">
               <h2 className="text-4xl font-black text-slate-900 tracking-tight">Pick what interests you</h2>
-              <p className="text-slate-500 font-medium">We'll show these challenges first.</p>
             </div>
             <div className="flex flex-wrap justify-center gap-3">
               {TOPICS.map(topic => (
                 <button
                   key={topic.id}
                   onClick={() => toggleInterest(topic.id)}
+                  suppressHydrationWarning
                   className={cn(
                     "px-6 py-3 rounded-full border-2 font-bold transition-all",
                     interests.includes(topic.id) ? "bg-primary border-primary text-white shadow-lg" : "bg-white border-slate-100"
                   )}
-                  suppressHydrationWarning
                 >
                   {topic.label}
                 </button>
@@ -195,21 +185,15 @@ export default function OnboardingPage() {
             </div>
             <div className="space-y-4">
               <h2 className="text-4xl font-black text-slate-900 tracking-tight">Meet your wallet</h2>
-              <p className="text-slate-500 font-medium leading-relaxed">
-                Every game you play earns XP. Reach new levels to unlock harder challenges and bigger rewards.
-              </p>
             </div>
             
             <div className="relative p-6 rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200">
-              <div className="absolute -top-4 -right-4 bg-primary text-white p-2 rounded-full animate-bounce">
-                <Sparkles className="h-6 w-6" />
-              </div>
               <div className="opacity-50 pointer-events-none scale-90">
                 <XPWallet />
               </div>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <div className="bg-white/90 backdrop-blur-sm p-4 rounded-2xl shadow-xl text-primary font-black flex items-center gap-2 border">
-                  <ArrowRight className="h-5 w-5 animate-pulse" /> START AT LEVEL 1
+                  START AT LEVEL 1
                 </div>
               </div>
             </div>
