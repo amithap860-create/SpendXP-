@@ -1,3 +1,4 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
 import { UserProvider } from '@/lib/store';
@@ -6,6 +7,10 @@ import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { AgeGroupProvider } from '@/lib/ageAdapt';
 import { AuthProvider } from '@/context/AuthContext';
 import { FirestoreErrorBoundary } from '@/components/FirestoreErrorBoundary';
+import { validateEnv } from '@/lib/envValidation';
+
+// Run security checks
+validateEnv();
 
 export const metadata: Metadata = {
   title: 'SpendXP - Gamified Financial Literacy',

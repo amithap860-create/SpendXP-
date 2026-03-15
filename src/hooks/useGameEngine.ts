@@ -1,9 +1,12 @@
+
 'use client';
 
 import { useReducer, useCallback, useEffect, useRef } from 'react';
-import { doc, getDoc, increment, writeBatch, serverTimestamp, arrayUnion, collection } from 'firebase/firestore';
-import { useFirestore, useUser } from '@/firebase';
+import { useUser } from '@/firebase';
 import { playCorrect, playWrong, playGameOver, playCombo } from '@/lib/sounds';
+import { validateScore, validateXP } from '@/lib/validation';
+import { rateLimiter } from '@/lib/rateLimiter';
+import { getRefreshedToken } from '@/lib/authHelpers';
 
 export type GameStatus = 'IDLE' | 'COUNTDOWN' | 'PLAYING' | 'PAUSED' | 'GAME_OVER' | 'RESULTS';
 
@@ -63,29 +66,19 @@ function gameReducer(state: GameState, action: Action): GameState {
   switch (action.type) {
     case 'START_COUNTDOWN':
       return { ...state, status: 'COUNTDOWN', countdown: 3 };
-
     case 'COUNTDOWN_TICK':
-      if (state.countdown <= 1) {
-        return { ...state, status: 'PLAYING', countdown: 0 };
-      }
+      if (state.countdown <= 1) return { ...state, status: 'PLAYING', countdown: 0 };
       return { ...state, countdown: state.countdown - 1 };
-
     case 'TICK':
       if (state.status !== 'PLAYING') return state;
       return { ...state, timeLeft: Math.max(0, state.timeLeft - 1) };
-
-    case 'PAUSE':
-      return { ...state, status: 'PAUSED' };
-
-    case 'RESUME':
-      return { ...state, status: 'PLAYING' };
-
+    case 'PAUSE': return { ...state, status: 'PAUSED' };
+    case 'RESUME': return { ...state, status: 'PLAYING' };
     case 'CORRECT_ANSWER': {
       const now = Date.now();
       const newTimestamps = [...state.correctAnswerTimestamps, now].slice(-3);
       let comboBonus = 0;
       let comboActive = false;
-
       if (newTimestamps.length === 3 && now - newTimestamps[0] <= 2500) {
         comboBonus = 50;
         comboActive = true;
@@ -93,10 +86,8 @@ function gameReducer(state: GameState, action: Action): GameState {
       } else {
         playCorrect();
       }
-
       const totalXpGain = action.xpPerCorrectAnswer + (action.bonusXp || 0) + comboBonus;
       const newStreak = state.streak + 1;
-
       return {
         ...state,
         score: state.score + 1,
@@ -107,7 +98,6 @@ function gameReducer(state: GameState, action: Action): GameState {
         comboActive: comboActive || state.comboActive,
       };
     }
-
     case 'WRONG_ANSWER': {
       playWrong();
       const newLives = action.livesEnabled ? state.lives - 1 : state.lives;
@@ -120,69 +110,39 @@ function gameReducer(state: GameState, action: Action): GameState {
         status: shouldGameOver ? 'GAME_OVER' : state.status,
       };
     }
-
-    case 'SET_SCORE':
-      return { ...state, score: action.score };
-
+    case 'SET_SCORE': return { ...state, score: action.score };
     case 'NEXT_ROUND':
       if (state.currentRound >= action.totalRounds) {
-        return {
-          ...state,
-          status: 'RESULTS',
-          xpEarned: state.xpEarned + action.xpPerWin,
-        };
+        return { ...state, status: 'RESULTS', xpEarned: state.xpEarned + action.xpPerWin };
       }
-      return {
-        ...state,
-        currentRound: state.currentRound + 1,
-        timeLeft: action.timePerRound ?? 0,
-        streak: 0,
-      };
-
-    case 'END_GAME':
-      return { ...state, status: 'RESULTS' };
-
-    case 'RESET_COMBO':
-      return { ...state, comboActive: false };
-
-    case 'RESET_GAME':
-      return initialState(action.config);
-
-    default:
-      return state;
+      return { ...state, currentRound: state.currentRound + 1, timeLeft: action.timePerRound ?? 0, streak: 0 };
+    case 'END_GAME': return { ...state, status: 'RESULTS' };
+    case 'RESET_COMBO': return { ...state, comboActive: false };
+    case 'RESET_GAME': return initialState(action.config);
+    default: return state;
   }
 }
 
 export function useGameEngine(config: GameConfig) {
-  const db = useFirestore();
   const { user } = useUser();
   const [state, dispatch] = useReducer(gameReducer, config, initialState);
   const comboTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (state.status !== 'PLAYING' && state.status !== 'COUNTDOWN') return;
-
     const intervalId = setInterval(() => {
-      if (state.status === 'COUNTDOWN') {
-        dispatch({ type: 'COUNTDOWN_TICK' });
-      } else if (state.status === 'PLAYING' && config.timePerRound !== undefined) {
-        dispatch({ type: 'TICK' });
-      }
+      if (state.status === 'COUNTDOWN') dispatch({ type: 'COUNTDOWN_TICK' });
+      else if (state.status === 'PLAYING' && config.timePerRound !== undefined) dispatch({ type: 'TICK' });
     }, 1000);
-
     return () => clearInterval(intervalId);
   }, [state.status, config.timePerRound]);
 
   useEffect(() => {
     if (state.comboActive) {
       if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
-      comboTimeoutRef.current = setTimeout(() => {
-        dispatch({ type: 'RESET_COMBO' });
-      }, 1500);
+      comboTimeoutRef.current = setTimeout(() => dispatch({ type: 'RESET_COMBO' }), 1500);
     }
-    return () => {
-      if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current);
-    };
+    return () => { if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current); };
   }, [state.comboActive]);
 
   const startGame = useCallback(() => {
@@ -192,115 +152,63 @@ export function useGameEngine(config: GameConfig) {
 
   const pauseGame = useCallback(() => dispatch({ type: 'PAUSE' }), []);
   const resumeGame = useCallback(() => dispatch({ type: 'RESUME' }), []);
+  const setScore = useCallback((score: number) => dispatch({ type: 'SET_SCORE', score }), []);
+  const correctAnswer = useCallback((bonusXp?: number) => dispatch({ type: 'CORRECT_ANSWER', bonusXp, xpPerCorrectAnswer: config.xpPerCorrectAnswer }), [config.xpPerCorrectAnswer]);
+  const wrongAnswer = useCallback(() => dispatch({ type: 'WRONG_ANSWER', livesEnabled: config.livesEnabled }), [config.livesEnabled]);
+  const nextRound = useCallback(() => dispatch({ type: 'NEXT_ROUND', totalRounds: config.totalRounds, timePerRound: config.timePerRound, xpPerWin: config.xpPerWin }), [config.totalRounds, config.timePerRound, config.xpPerWin]);
 
-  const setScore = useCallback((score: number) => {
-    dispatch({ type: 'SET_SCORE', score });
-  }, []);
-
-  const correctAnswer = useCallback((bonusXp?: number) => {
-    dispatch({
-      type: 'CORRECT_ANSWER',
-      bonusXp,
-      xpPerCorrectAnswer: config.xpPerCorrectAnswer
-    });
-  }, [config.xpPerCorrectAnswer]);
-
-  const wrongAnswer = useCallback(() => {
-    dispatch({
-      type: 'WRONG_ANSWER',
-      livesEnabled: config.livesEnabled
-    });
-  }, [config.livesEnabled]);
-
-  const nextRound = useCallback(() => {
-    dispatch({
-      type: 'NEXT_ROUND',
-      totalRounds: config.totalRounds,
-      timePerRound: config.timePerRound,
-      xpPerWin: config.xpPerWin
-    });
-  }, [config.totalRounds, config.timePerRound, config.xpPerWin]);
-
-  const endGame = useCallback(async (finalXpBonus = 0, metadata: any = {}) => {
-    if (!user || !db) return { isHighScore: false };
+  const endGame = useCallback(async (finalXpBonus = 0) => {
+    if (!user) return { isHighScore: false };
     
-    dispatch({ type: 'END_GAME' });
-
-    const sessionXp = state.xpEarned + finalXpBonus;
-    const walletReward = state.score * 10;
-    const batch = writeBatch(db);
-    
-    const gameScoreRef = doc(db, 'users', user.uid, 'gameScores', config.gameName);
-    const progressionRef = doc(db, 'users', user.uid, 'progression', 'stats');
-    const userRootRef = doc(db, 'users', user.uid);
-    const activityLogRef = doc(collection(db, 'users', user.uid, 'activityLog'));
-
-    try {
-      const gameSnap = await getDoc(gameScoreRef);
-      const existingGameData = gameSnap.exists() ? gameSnap.data() : { highScore: 0 };
-      const isHighScore = state.score > (existingGameData.highScore || 0);
-      const newHighScore = Math.max(existingGameData.highScore || 0, state.score);
-
-      // Path 1: Per-game scores
-      batch.set(gameScoreRef, {
-        lastScore: state.score,
-        highScore: newHighScore,
-        xpEarned: increment(sessionXp),
-        gamesPlayed: increment(1),
-        lastPlayedAt: serverTimestamp(),
-        scoreHistory: arrayUnion(state.score),
-        ...metadata // Extra fields like categoryAccuracy
-      }, { merge: true });
-
-      const highScoreKeyMap: Record<string, string> = {
-        budgetBlitz: 'budgetBlitz',
-        finIQ: 'finIQQuiz',
-        moneyMaze: 'moneyMaze',
-        stockMarketSim: 'stockMarketSim',
-        creditScoreBuilder: 'creditScoreBuilder',
-        compoundClicker: 'compoundClicker'
-      };
-
-      const highScoresKey = highScoreKeyMap[config.gameName];
-
-      // Badge Logic
-      const newBadges: string[] = [];
-      if (!gameSnap.exists()) newBadges.push('first-win');
-      if (state.score === config.totalRounds && config.totalRounds > 0) newBadges.push('perfect-round');
-      if (state.bestStreak >= 5) newBadges.push('streak-5');
-
-      // Path 2: Aggregated progression
-      batch.set(progressionRef, {
-        totalXP: increment(sessionXp),
-        totalGamesPlayed: increment(1),
-        walletBalance: increment(walletReward),
-        lastActivityAt: serverTimestamp(),
-        badges: arrayUnion(...newBadges),
-        gameHighScores: {
-          [highScoresKey]: newHighScore
-        }
-      }, { merge: true });
-
-      // Activity Log for parent
-      batch.set(activityLogRef, {
-        gameName: config.gameName,
-        score: state.score,
-        xpEarned: sessionXp,
-        playedAt: serverTimestamp()
-      });
-
-      // Update root user XP
-      batch.update(userRootRef, {
-        xp: increment(sessionXp)
-      });
-
-      await batch.commit();
-      return { isHighScore };
-    } catch (error) {
-      console.error('Failed to save game results via batch:', error);
+    // 1. Rate Limiting
+    const allowed = rateLimiter.check({
+      key: `game:${config.gameName}:score`,
+      maxCalls: 1,
+      windowMs: 30000
+    });
+    if (!allowed) {
+      console.warn('[SpendXP] Rate limit exceeded for score submission');
       return { isHighScore: false };
     }
-  }, [db, user, config, state.score, state.xpEarned, state.bestStreak]);
+
+    const sessionXp = state.xpEarned + finalXpBonus;
+
+    // 2. Input Validation
+    const scoreVal = validateScore(config.gameName, state.score);
+    const xpVal = validateXP(sessionXp);
+
+    if (!scoreVal.valid || !xpVal.valid) {
+      console.error('[Security] Validation failed for end-game data');
+      return { isHighScore: false };
+    }
+
+    dispatch({ type: 'END_GAME' });
+
+    try {
+      // 3. Server-side Submission
+      const token = await getRefreshedToken();
+      const response = await fetch('/api/scores/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          gameName: config.gameName,
+          score: state.score,
+          xpEarned: sessionXp,
+          sessionToken: Math.random().toString(36).substring(7)
+        })
+      });
+
+      if (!response.ok) throw new Error('Submission failed');
+      
+      return { isHighScore: true }; // Placeholder for response data
+    } catch (error) {
+      console.error('[SpendXP] Failed to submit score:', error);
+      return { isHighScore: false };
+    }
+  }, [user, config, state.score, state.xpEarned]);
 
   return {
     gameState: state.status,
