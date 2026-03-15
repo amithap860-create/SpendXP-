@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useReducer, useCallback, useEffect, useRef } from 'react';
@@ -216,7 +215,7 @@ export function useGameEngine(config: GameConfig) {
 
     dispatch({ type: 'END_GAME' });
 
-    // Mobile-safe confetti logic
+    // Mobile-safe confetti logic (Fix 8)
     if (typeof window !== 'undefined') {
       import('https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js' as any).then((module: any) => {
         const isMobile = window.innerWidth < 768;

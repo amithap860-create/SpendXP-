@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { createContext, useContext, ReactNode, useEffect, useState } from 'react';
@@ -46,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Mobile resilience: Timeout auth check if it hangs
+    // Mobile resilience: Timeout auth check if it hangs (Fix 2a)
     const authTimeout = setTimeout(() => {
       if (loading) {
         console.warn('[SpendXP] Auth detection timed out. Proceeding as guest.');

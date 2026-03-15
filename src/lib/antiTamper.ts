@@ -1,4 +1,3 @@
-
 /**
  * @fileOverview Active threat detection and game state integrity checking.
  */
@@ -17,7 +16,7 @@ export async function hashGameState(state: object): Promise<string> {
 /**
  * Passive detector for Developer Tools presence.
  * Measures execution time of a debugger statement to infer if the console is open.
- * Only active on desktop platforms.
+ * Only active on desktop platforms (Fix 7).
  */
 export function setupDevToolsDetector(onDetected: (isOpen: boolean) => void) {
   if (typeof window === 'undefined') return () => {};

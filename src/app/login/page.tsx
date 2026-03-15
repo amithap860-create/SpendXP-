@@ -111,7 +111,7 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-100 via-blue-50 to-white flex items-center justify-center p-4">
+    <div className="min-h-screen-safe bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-100 via-blue-50 to-white flex items-center justify-center p-4">
       <Card className="max-w-[420px] w-full shadow-2xl border-none overflow-hidden animate-in fade-in zoom-in duration-500">
         {reason === 'reauth_required' && (
           <div className="bg-amber-500 text-white px-4 py-2 text-xs font-bold flex items-center gap-2">
@@ -166,7 +166,7 @@ function LoginContent() {
                     <Input 
                       type="email" 
                       placeholder="Email address" 
-                      className="pl-10 h-12 bg-slate-50/50"
+                      className="pl-10 h-12 bg-slate-50/50 text-base" // Fix 4: text-base for 16px
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -179,7 +179,7 @@ function LoginContent() {
                       <Input 
                         type={isPasswordVisible ? "text" : "password"}
                         placeholder="Password" 
-                        className="pl-10 pr-10 h-12 bg-slate-50/50"
+                        className="pl-10 pr-10 h-12 bg-slate-50/50 text-base"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
@@ -188,7 +188,7 @@ function LoginContent() {
                       <button 
                         type="button"
                         onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                        className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600"
+                        className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600 min-h-[44px] min-w-[44px] flex items-center justify-center"
                         suppressHydrationWarning
                       >
                         {isPasswordVisible ? 'Hide' : 'Show'}
@@ -199,7 +199,7 @@ function LoginContent() {
                         type="button" 
                         onClick={() => setShowReset(true)}
                         suppressHydrationWarning
-                        className="text-xs font-bold text-primary hover:underline"
+                        className="text-xs font-bold text-primary hover:underline py-2"
                       >
                         Forgot password?
                       </button>
@@ -222,7 +222,7 @@ function LoginContent() {
                   </p>
                 )}
 
-                <Button type="submit" disabled={loading || lockout.locked} className="w-full h-14 text-lg font-black rounded-2xl" suppressHydrationWarning>
+                <Button type="submit" disabled={loading || lockout.locked} className="w-full h-14 text-lg font-black rounded-2xl min-h-[44px]" suppressHydrationWarning>
                   {loading ? <RefreshCw className="h-5 w-5 animate-spin" /> : 'Sign In'}
                 </Button>
 
@@ -230,7 +230,7 @@ function LoginContent() {
                   onClick={signInWithGoogle} 
                   variant="outline" 
                   type="button" 
-                  className="w-full h-12 gap-3 font-bold border-2"
+                  className="w-full h-12 gap-3 font-bold border-2 min-h-[44px]"
                   suppressHydrationWarning
                 >
                   Continue with Google
@@ -243,7 +243,7 @@ function LoginContent() {
                 <div className="space-y-3">
                   <Input 
                     placeholder="Display name" 
-                    className="h-12 bg-slate-50/50" 
+                    className="h-12 bg-slate-50/50 text-base" 
                     value={displayName} 
                     onChange={(e) => setDisplayName(e.target.value)} 
                     required 
@@ -252,7 +252,7 @@ function LoginContent() {
                   <Input 
                     type="email" 
                     placeholder="Email address" 
-                    className="h-12 bg-slate-50/50" 
+                    className="h-12 bg-slate-50/50 text-base" 
                     value={email} 
                     onChange={(e) => setEmail(e.target.value)} 
                     required 
@@ -261,7 +261,7 @@ function LoginContent() {
                   <Input 
                     type="password" 
                     placeholder="Password" 
-                    className="h-12 bg-slate-50/50" 
+                    className="h-12 bg-slate-50/50 text-base" 
                     value={password} 
                     onChange={(e) => setPassword(e.target.value)} 
                     required 
@@ -270,7 +270,7 @@ function LoginContent() {
                   <Input 
                     type="password" 
                     placeholder="Confirm Password" 
-                    className="h-12 bg-slate-50/50" 
+                    className="h-12 bg-slate-50/50 text-base" 
                     value={confirmPassword} 
                     onChange={(e) => setConfirmPassword(e.target.value)} 
                     required 
@@ -278,7 +278,7 @@ function LoginContent() {
                   />
                 </div>
                 {confirmError && <p className="text-xs text-destructive font-bold text-center">{confirmError}</p>}
-                <Button type="submit" disabled={loading} className="w-full h-14 text-lg font-black rounded-2xl" suppressHydrationWarning>
+                <Button type="submit" disabled={loading} className="w-full h-14 text-lg font-black rounded-2xl min-h-[44px]" suppressHydrationWarning>
                   {loading ? <RefreshCw className="h-5 w-5 animate-spin" /> : 'Create Account'}
                 </Button>
               </form>
@@ -287,7 +287,7 @@ function LoginContent() {
             {signupSuccess && (
               <div className="py-8 space-y-8 text-center">
                 <h2 className="text-2xl font-black">Check your inbox!</h2>
-                <Button onClick={() => router.push('/onboarding')} className="w-full h-16 text-xl font-black rounded-2xl" suppressHydrationWarning>
+                <Button onClick={() => router.push('/onboarding')} className="w-full h-16 text-xl font-black rounded-2xl min-h-[44px]" suppressHydrationWarning>
                   Continue to setup <ArrowRight className="h-5 w-5 ml-2" />
                 </Button>
               </div>
@@ -301,7 +301,7 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><RefreshCw className="h-8 w-8 animate-spin text-primary" /></div>}>
+    <Suspense fallback={<div className="min-h-screen-safe flex items-center justify-center"><RefreshCw className="h-8 w-8 animate-spin text-primary" /></div>}>
       <LoginContent />
     </Suspense>
   );

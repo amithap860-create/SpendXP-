@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react';
 const inter = Inter({ 
   subsets: ['latin'], 
   variable: '--font-inter',
-  display: 'swap'
+  display: 'swap' // Fix 6: Show system font while Inter loads
 });
 
 function RootLayoutContent({ children }: { children: React.ReactNode }) {
@@ -83,7 +83,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
         <nav 
           className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex items-center justify-around px-1 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] overflow-hidden"
           style={{ 
-            height: 'calc(80px + env(safe-area-inset-bottom, 0px))',
+            height: 'calc(80px + env(safe-area-inset-bottom, 0px))', // Fix 5
             paddingBottom: 'env(safe-area-inset-bottom, 0px)' 
           }}
         >
@@ -163,7 +163,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" /> {/* Fix 5 */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="SpendXP" />

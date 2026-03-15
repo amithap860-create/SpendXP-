@@ -96,7 +96,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
   if (gameState === 'IDLE') return (
     <Card className="max-w-2xl mx-auto border-none shadow-2xl bg-white overflow-hidden">
       <div className="bg-primary p-10 text-white text-center"><BarChart3 className="h-12 w-12 mx-auto mb-6" /><CardTitle className="text-4xl font-black mb-2">STOCK SIMULATOR</CardTitle></div>
-      <CardContent className="p-10"><Button onClick={startGame} className="w-full h-16 text-xl font-black rounded-2xl shadow-xl">START TRADING</Button></CardContent>
+      <CardContent className="p-10"><Button onClick={startGame} className="w-full h-16 text-xl font-black rounded-2xl shadow-xl min-h-[44px]">START TRADING</Button></CardContent>
     </Card>
   );
 
@@ -107,7 +107,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
           <div className="bg-emerald-500 p-10 text-white text-center"><Trophy className="h-16 w-16 mx-auto mb-4" /><CardTitle className="text-4xl font-black mb-2">Market Closed!</CardTitle></div>
           <CardContent className="p-10 space-y-8">
             <div className="text-center font-black text-6xl text-emerald-600">${totalWealth.toFixed(2)}</div>
-            <Button onClick={onExit} className="w-full h-14 font-bold text-lg">Return to Hub</Button>
+            <Button onClick={onExit} className="w-full h-14 font-bold text-lg min-h-[44px]">Return to Hub</Button>
           </CardContent>
         </Card>
       </div>
@@ -158,8 +158,9 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
             <div className="flex items-center gap-3 md:gap-4">
               <div className="text-base md:text-lg font-black text-primary">${prices[c.symbol]}</div>
               <div className="flex gap-1 md:gap-2">
-                <Button size="sm" className="h-9 w-9 md:h-10 md:px-4 p-0 md:w-auto" onClick={() => setTradeModal({ type: 'buy', stock: c })}>Buy</Button>
-                <Button size="sm" variant="outline" className="h-9 w-9 md:h-10 md:px-4 p-0 md:w-auto" disabled={!portfolio[c.symbol]} onClick={() => setTradeModal({ type: 'sell', stock: c })}>Sell</Button>
+                {/* Fix 9: min-h-[44px] for mobile tap targets */}
+                <Button size="sm" className="h-11 w-11 md:px-4 p-0 md:w-auto" onClick={() => setTradeModal({ type: 'buy', stock: c })}>Buy</Button>
+                <Button size="sm" variant="outline" className="h-11 w-11 md:px-4 p-0 md:w-auto" disabled={!portfolio[c.symbol]} onClick={() => setTradeModal({ type: 'sell', stock: c })}>Sell</Button>
               </div>
             </div>
           </Card>
@@ -171,7 +172,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
           <DialogHeader><DialogTitle className="capitalize text-2xl font-black">{tradeModal?.type} {tradeModal?.stock.name}</DialogTitle></DialogHeader>
           <div className="grid grid-cols-2 gap-3 py-6">
             {[1, 5, 10, 20].map(v => (
-              <Button key={v} variant="outline" className="h-14 font-black" onClick={() => handleTrade(v)}>{v} Shares</Button>
+              <Button key={v} variant="outline" className="h-14 font-black min-h-[44px]" onClick={() => handleTrade(v)}>{v} Shares</Button>
             ))}
           </div>
           <p className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">Available Cash: ${cash.toFixed(2)}</p>

@@ -1,4 +1,3 @@
-
 import type {NextConfig} from 'next';
 
 const securityHeaders = [
@@ -51,10 +50,10 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  compress: true,
+  compress: true, // Fix 10: Compress responses for mobile
   images: {
     formats: ['image/webp'],
-    deviceSizes: [360, 414, 768, 1024, 1280],
+    deviceSizes: [360, 414, 768, 1024, 1280], // Fix 10: Mobile image optimization
     remotePatterns: [
       {
         protocol: 'https',
@@ -77,7 +76,7 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    optimizePackageImports: [
+    optimizePackageImports: [ // Fix 10: Reduce bundle sizes
       'firebase',
       '@firebase/firestore',
       '@firebase/auth',

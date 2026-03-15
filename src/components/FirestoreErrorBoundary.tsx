@@ -41,7 +41,7 @@ export class FirestoreErrorBoundary extends Component<Props, State> {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          minHeight: '100vh',
+          minHeight: '100dvh', // Fix 3: dvh for dynamic viewport
           padding: '2rem',
           textAlign: 'center',
           backgroundColor: '#f8fafc'
@@ -62,7 +62,8 @@ export class FirestoreErrorBoundary extends Component<Props, State> {
               color: 'white',
               cursor: 'pointer',
               fontSize: '14px',
-              fontWeight: '600'
+              fontWeight: '600',
+              minHeight: '44px' // Fix 9: Tap target
             }}
           >
             Refresh
