@@ -9,12 +9,13 @@ import {
   safeUpdateDoc,
   db,
   auth,
-  googleProvider
+  recordFailedAttempt
 } from '@/firebase';
 import { 
   doc, 
   serverTimestamp, 
   Timestamp,
+  deleteDoc
 } from 'firebase/firestore';
 import { 
   verifyBeforeUpdateEmail, 
@@ -23,7 +24,8 @@ import {
   EmailAuthProvider,
   linkWithCredential,
   reauthenticateWithPopup,
-  GoogleAuthProvider
+  GoogleAuthProvider,
+  User
 } from 'firebase/auth';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -41,7 +43,10 @@ import {
   Lock,
   Globe,
   ChevronRight,
-  Info
+  Info,
+  Trash2,
+  ArrowRight,
+  X
 } from 'lucide-react';
 import { validateDisplayName, validateEmail, validatePassword } from '@/lib/validation';
 import { rateLimiter } from '@/lib/rateLimiter';
@@ -52,6 +57,8 @@ import { useCurrency } from '@/hooks/useCurrency';
 import { SUPPORTED_CURRENCIES, CurrencyOption } from '@/config/currency';
 import { scaleAmount, formatCurrency } from '@/lib/formatCurrency';
 import { cn } from '@/lib/utils';
+
+type ReauthMethod = 'password' | 'google' | 'both';
 
 export default function ProfilePage() {
   const { user, loading: authLoading } = useAuthContext();
@@ -66,6 +73,16 @@ export default function ProfilePage() {
     return user.providerData.map(p => p.providerId);
   }, [user, providerRefreshKey]);
 
+  const hasPassword = linkedProviders.includes('password');
+  const hasGoogle = linkedProviders.includes('google.com');
+
+  const reauthMethod = useMemo((): ReauthMethod => {
+    if (hasGoogle && !hasPassword) return 'google';
+    if (!hasGoogle && hasPassword) return 'password';
+    if (hasGoogle && hasPassword) return 'both';
+    return 'google';
+  }, [hasGoogle, hasPassword]);
+
   if (authLoading || profileLoading) {
     return <ProfileSkeleton />;
   }
@@ -77,7 +94,7 @@ export default function ProfilePage() {
     : 'Recently';
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-background pb-20">
       <main className="flex-1 p-4 md:p-8 max-w-6xl mx-auto space-y-8">
         {/* IDENTITY CARD */}
         <Card className="border-none shadow-sm overflow-hidden bg-white">
@@ -112,13 +129,19 @@ export default function ProfilePage() {
           <div className="space-y-8">
             <DisplayNameSection profile={profile} uid={user?.uid!} />
             <CurrencySection profile={profile} uid={user?.uid!} />
-            <EmailSection user={user} isGoogleUser={isGoogleUser} profile={profile} />
+            <EmailSection 
+              user={user as User} 
+              profile={profile} 
+              reauthMethod={reauthMethod} 
+              providerRefreshKey={providerRefreshKey}
+            />
             <PasswordSection 
-              user={user} 
+              user={user as User} 
               linkedProviders={linkedProviders} 
               onRefresh={() => setProviderRefreshKey(k => k + 1)} 
             />
             <ParentSection profile={profile} uid={user?.uid!} displayName={profile?.displayName} />
+            <DangerZone user={user as User} reauthMethod={reauthMethod} />
           </div>
 
           <div className="space-y-8">
@@ -296,79 +319,277 @@ function DisplayNameSection({ profile, uid }: { profile: any, uid: string }) {
   );
 }
 
-function EmailSection({ user, isGoogleUser, profile }: { user: any, isGoogleUser: boolean, profile: any }) {
-  const [isEditing, setIsEditing] = useState(false);
+type EmailChangeStep = 'idle' | 'form' | 'reauth' | 'pending' | 'success';
+
+function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { user: User, profile: any, reauthMethod: ReauthMethod, providerRefreshKey: number }) {
+  const [emailChangeStep, setEmailChangeStep] = useState<EmailChangeStep>('idle');
   const [newEmail, setNewEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [sent, setSent] = useState(false);
+  const [reauthPassword, setReauthPassword] = useState('');
+  const [emailChangeError, setEmailChangeError] = useState('');
+  const [emailChangeLoading, setEmailChangeLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
-  const handleUpdate = async () => {
+  // Load check for pending change
+  useEffect(() => {
+    if (profile?.pendingEmail && profile.pendingEmail !== user.email && emailChangeStep === 'idle') {
+      setNewEmail(profile.pendingEmail);
+      setEmailChangeStep('pending');
+    }
+  }, [profile, user.email, emailChangeStep]);
+
+  // Poller for pending step
+  useEffect(() => {
+    if (emailChangeStep !== 'pending') return;
+
+    const interval = setInterval(async () => {
+      await user.reload();
+      if (user.email === newEmail) {
+        setEmailChangeStep('success');
+        clearInterval(interval);
+        await safeUpdateDoc(doc(db, 'users', user.uid), { pendingEmail: null });
+        setTimeout(() => {
+          setEmailChangeStep('idle');
+          setNewEmail('');
+        }, 3000);
+      }
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [emailChangeStep, newEmail, user]);
+
+  // Timer for resend
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (resendCooldown > 0) {
+      timer = setInterval(() => setResendCooldown(c => c - 1), 1000);
+    }
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
+
+  const handleContinue = () => {
     const val = validateEmail(newEmail);
-    if (!val.valid) { setError(val.error!); return; }
-    if (newEmail === user.email) { setError('Email is the same as current.'); return; }
+    if (!val.valid) { setEmailChangeError(val.error!); return; }
+    if (newEmail === user.email) { setEmailChangeError('Please enter a different email address.'); return; }
+    setEmailChangeError('');
+    setEmailChangeStep('reauth');
+  };
 
-    setLoading(true);
-    setError(null);
-
+  const reauthWithGoogle = async (): Promise<boolean> => {
+    setEmailChangeLoading(true);
+    setEmailChangeError('');
     try {
-      const credential = EmailAuthProvider.credential(user.email, password);
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      await reauthenticateWithPopup(user, provider);
+      setEmailChangeLoading(false);
+      return true;
+    } catch (err: any) {
+      setEmailChangeLoading(false);
+      if (err.code === 'auth/popup-closed-by-user') setEmailChangeError('Sign-in window was closed. Please try again.');
+      else if (err.code === 'auth/popup-blocked') setEmailChangeError('Pop-up was blocked. Please allow pop-ups and try again.');
+      else setEmailChangeError('Could not verify your identity.');
+      return false;
+    }
+  };
+
+  const reauthWithPassword = async (password: string): Promise<boolean> => {
+    setEmailChangeLoading(true);
+    setEmailChangeError('');
+    try {
+      const credential = EmailAuthProvider.credential(user.email!, password);
+      const { reauthenticateWithCredential } = await import('firebase/auth');
       await reauthenticateWithCredential(user, credential);
+      setEmailChangeLoading(false);
+      return true;
+    } catch (err: any) {
+      setEmailChangeLoading(false);
+      if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        setEmailChangeError('Incorrect password.');
+        await recordFailedAttempt(db, user.email!);
+      } else setEmailChangeError('Could not verify your identity.');
+      return false;
+    }
+  };
+
+  const proceedWithEmailChange = async () => {
+    setEmailChangeLoading(true);
+    setEmailChangeError('');
+    try {
       await verifyBeforeUpdateEmail(user, newEmail);
-      
       await safeUpdateDoc(doc(db, 'users', user.uid), {
         pendingEmail: newEmail,
         updatedAt: serverTimestamp()
       });
-      
-      setSent(true);
+      setEmailChangeStep('pending');
     } catch (err: any) {
-      if (err.code === 'auth/wrong-password') setError('Incorrect current password.');
-      else setError('Something went wrong. Please try again.');
+      if (err.code === 'auth/email-already-in-use') setEmailChangeError('An account with this email already exists.');
+      else setEmailChangeError('Could not send verification email. Please try again.');
     } finally {
-      setLoading(false);
+      setEmailChangeLoading(false);
     }
+  };
+
+  const handleResend = async () => {
+    if (resendCooldown > 0) return;
+    if (!rateLimiter.check({ key: 'email:change:resend', maxCalls: 1, windowMs: 60000 })) return;
+    try {
+      await verifyBeforeUpdateEmail(user, newEmail);
+      setResendCooldown(60);
+    } catch (err) {
+      setEmailChangeError('Failed to resend email.');
+    }
+  };
+
+  const cancelEmailChange = async () => {
+    await safeUpdateDoc(doc(db, 'users', user.uid), { pendingEmail: null });
+    setEmailChangeStep('idle');
+    setNewEmail('');
+    setReauthPassword('');
+    setEmailChangeError('');
   };
 
   return (
     <Card className="border-none shadow-sm bg-white p-6">
       <h3 className="text-[15px] font-medium text-primary border-b border-slate-100 pb-3 mb-4">Email address</h3>
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-bold text-slate-700">{user?.email}</span>
-        {isGoogleUser ? (
-          <Badge variant="outline" className="bg-slate-50 text-slate-400 border-slate-200">Google account</Badge>
-        ) : !isEditing ? (
-          <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary font-bold" suppressHydrationWarning>Change</Button>
-        ) : null}
-      </div>
-
-      {isEditing && !sent && (
-        <div className="mt-4 space-y-4 animate-in slide-in-from-top-2">
-          <Input type="email" placeholder="New Email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} className="h-12" suppressHydrationWarning />
-          <Input type="password" placeholder="Confirm with Password" value={password} onChange={(e) => setPassword(e.target.value)} className="h-12" suppressHydrationWarning />
-          {error && <p className="text-xs text-rose-500 font-bold">{error}</p>}
-          <div className="flex gap-2">
-            <Button onClick={handleUpdate} disabled={loading} size="sm" className="font-bold" suppressHydrationWarning>
-              {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Update Email'}
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-slate-400" suppressHydrationWarning>Cancel</Button>
+      
+      {emailChangeStep === 'idle' && (
+        <div className="space-y-4 animate-in fade-in duration-300">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-slate-700">{user.email}</span>
+              {reauthMethod === 'google' && <Badge variant="secondary" className="bg-slate-50 text-slate-400 text-[10px] border-none uppercase">Google account</Badge>}
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => setEmailChangeStep('form')} className="text-primary font-bold">Change</Button>
           </div>
+          <p className="text-xs text-slate-400 italic">
+            You'll confirm this change with {reauthMethod === 'google' ? 'Google Sign-In' : 'your password'}.
+          </p>
+        </div>
+      )}
+
+      {emailChangeStep === 'form' && (
+        <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
+          <Label className="text-xs font-black uppercase text-slate-400 tracking-widest">Enter your new email address</Label>
+          <Input 
+            type="email" 
+            value={newEmail} 
+            onChange={(e) => setNewEmail(e.target.value)} 
+            placeholder="new-email@example.com"
+            className="h-12 text-base"
+            suppressHydrationWarning
+          />
+          <p className="text-xs text-slate-500 leading-relaxed font-medium">
+            We'll send a verification link to this address. Your email won't change until you click it.
+          </p>
+          {emailChangeError && <p className="text-xs text-rose-500 font-bold">{emailChangeError}</p>}
+          <div className="flex gap-2">
+            <Button onClick={handleContinue} size="sm" className="font-bold">Continue <ArrowRight className="h-4 w-4 ml-1" /></Button>
+            <Button variant="ghost" size="sm" onClick={() => setEmailChangeStep('idle')} className="text-slate-400">Cancel</Button>
+          </div>
+        </div>
+      )}
+
+      {emailChangeStep === 'reauth' && (
+        <div className="space-y-6 animate-in slide-in-from-top-2 duration-300">
+          <div className="space-y-1">
+            <h4 className="font-bold text-slate-900">Confirm it's you</h4>
+            <p className="text-xs text-slate-500">We need to verify your identity before changing your email.</p>
+          </div>
+
+          {(reauthMethod === 'password' || reauthMethod === 'both') && (
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black uppercase text-slate-400">Enter current password</Label>
+              <Input 
+                type="password" 
+                value={reauthPassword} 
+                onChange={(e) => setReauthPassword(e.target.value)}
+                className="h-12 text-base"
+                suppressHydrationWarning
+              />
+              <Button 
+                onClick={async () => {
+                  const ok = await reauthWithPassword(reauthPassword);
+                  if (ok) await proceedWithEmailChange();
+                }} 
+                disabled={emailChangeLoading || !reauthPassword} 
+                className="w-full font-black"
+              >
+                {emailChangeLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Confirm with Password'}
+              </Button>
+            </div>
+          )}
+
+          {reauthMethod === 'both' && (
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
+              <div className="relative flex justify-center text-[10px] uppercase"><span className="bg-white px-2 text-slate-400 font-bold">or</span></div>
+            </div>
+          )}
+
+          {(reauthMethod === 'google' || reauthMethod === 'both') && (
+            <Button 
+              variant="outline" 
+              onClick={async () => {
+                const ok = await reauthWithGoogle();
+                if (ok) await proceedWithEmailChange();
+              }}
+              disabled={emailChangeLoading}
+              className="w-full h-12 gap-3 border-2 font-bold bg-white"
+            >
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="h-5 w-5" alt="" />
+              {emailChangeLoading ? 'Verifying...' : 'Confirm with Google'}
+            </Button>
+          )}
+
+          {emailChangeError && <p className="text-xs text-rose-500 font-bold text-center">{emailChangeError}</p>}
+          
+          <div className="text-center">
+            <button onClick={() => setEmailChangeStep('form')} className="text-xs font-bold text-slate-400 hover:underline">Back</button>
+          </div>
+        </div>
+      )}
+
+      {emailChangeStep === 'pending' && (
+        <div className="space-y-4 animate-in fade-in duration-300">
+          <div className="p-4 bg-teal-50 border-2 border-teal-100 rounded-2xl space-y-3">
+            <div className="flex items-center gap-2 text-teal-700 font-bold text-sm">
+              <Mail className="h-4 w-4" /> Verification email sent
+            </div>
+            <p className="text-xs text-teal-800 leading-relaxed font-medium">
+              We sent a link to <span className="font-black underline">{newEmail}</span>. Click it to confirm the change. Your current email stays active until you verify the new one.
+            </p>
+            <div className="flex gap-4 pt-1">
+              <button 
+                onClick={handleResend} 
+                disabled={resendCooldown > 0} 
+                className={cn("text-[10px] font-black uppercase tracking-widest transition-opacity", resendCooldown > 0 ? "opacity-50 cursor-not-allowed" : "hover:underline")}
+              >
+                {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend link'}
+              </button>
+              <button onClick={cancelEmailChange} className="text-[10px] font-black uppercase tracking-widest text-rose-600 hover:underline">Cancel change</button>
+            </div>
+          </div>
+          <div className="flex items-center justify-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse">
+            <RefreshCw className="h-3 w-3 animate-spin" /> Waiting for verification...
+          </div>
+        </div>
+      )}
+
+      {emailChangeStep === 'success' && (
+        <div className="p-4 bg-emerald-50 border-2 border-emerald-100 rounded-2xl flex items-center gap-3 animate-in zoom-in duration-500">
+          <div className="h-8 w-8 rounded-full bg-emerald-500 flex items-center justify-center text-white shrink-0">
+            <CheckCircle2 className="h-5 w-5" />
+          </div>
+          <div className="font-bold text-emerald-900">Email updated to {newEmail}!</div>
         </div>
       )}
     </Card>
   );
 }
 
-function PasswordSection({ 
-  user, 
-  linkedProviders, 
-  onRefresh 
-}: { 
-  user: any, 
-  linkedProviders: string[], 
-  onRefresh: () => void 
-}) {
+type PasswordSectionState = 'loading' | 'google_only' | 'email_only' | 'google_and_password' | 'no_provider';
+
+function PasswordSection({ user, linkedProviders, onRefresh }: { user: User, linkedProviders: string[], onRefresh: () => void }) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [currentPass, setCurrentPass] = useState('');
@@ -380,8 +601,6 @@ function PasswordSection({
 
   const hasPassword = linkedProviders.includes('password');
   const hasGoogle = linkedProviders.includes('google.com');
-
-  type PasswordSectionState = 'loading' | 'google_only' | 'email_only' | 'google_and_password' | 'no_provider';
 
   const passwordState: PasswordSectionState = useMemo(() => {
     if (!user) return 'loading';
@@ -412,28 +631,20 @@ function PasswordSection({
       setSuccess('Password set! You can now sign in with either Google or email.');
       setIsEditing(false);
     } catch (err: any) {
-      if (err.code === 'auth/email-already-in-use') {
-        setError('This email already has a password account.');
-      } else if (err.code === 'auth/requires-recent-login') {
+      if (err.code === 'auth/email-already-in-use') setError('This email already has a password account.');
+      else if (err.code === 'auth/requires-recent-login') {
         try {
           const provider = new GoogleAuthProvider();
           await reauthenticateWithPopup(user, provider);
-          // Retry
           const credential = EmailAuthProvider.credential(user.email!, newPass);
           await linkWithCredential(user, credential);
           await user.reload();
           onRefresh();
           setSuccess('Password set successfully!');
           setIsEditing(false);
-        } catch (reAuthErr) {
-          setError('Please sign out and back in to add a password.');
-        }
-      } else {
-        setError('Failed to add password.');
-      }
-    } finally {
-      setLoading(false);
-    }
+        } catch (reAuthErr) { setError('Please sign out and back in to add a password.'); }
+      } else setError('Failed to add password.');
+    } finally { setLoading(false); }
   };
 
   const handleUpdatePassword = async () => {
@@ -453,14 +664,9 @@ function PasswordSection({
       if (err.code === 'auth/requires-recent-login') {
         await auth.signOut();
         router.push('/login?reason=reauth_required');
-      } else if (err.code === 'auth/wrong-password') {
-        setError('Current password is incorrect.');
-      } else {
-        setError('Update failed. Please try again.');
-      }
-    } finally {
-      setLoading(false);
-    }
+      } else if (err.code === 'auth/wrong-password') setError('Current password is incorrect.');
+      else setError('Update failed. Please try again.');
+    } finally { setLoading(false); }
   };
 
   const handleGoogleReauth = async () => {
@@ -471,11 +677,8 @@ function PasswordSection({
       await updatePassword(user, newPass);
       setSuccess('Password updated with Google confirmation!');
       setIsEditing(false);
-    } catch (err: any) {
-      setError('Google re-authentication failed.');
-    } finally {
-      setLoading(false);
-    }
+    } catch (err: any) { setError('Google re-authentication failed.'); }
+    finally { setLoading(false); }
   };
 
   if (passwordState === 'loading') {
@@ -503,9 +706,7 @@ function PasswordSection({
         <div className="space-y-4">
           <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-start gap-3">
             <Info className="h-5 w-5 text-slate-400 shrink-0 mt-0.5" />
-            <p className="text-sm text-slate-600 leading-tight">
-              You signed in with Google. You haven't set a password yet.
-            </p>
+            <p className="text-sm text-slate-600 leading-tight">You signed in with Google. You haven't set a password yet.</p>
           </div>
           {!isEditing ? (
             <Button onClick={() => setIsEditing(true)} variant="outline" className="gap-2 font-bold" suppressHydrationWarning>
@@ -526,10 +727,8 @@ function PasswordSection({
               </div>
               {error && <p className="text-xs text-rose-500 font-bold">{error}</p>}
               <div className="flex gap-2">
-                <Button onClick={handleAddPassword} disabled={loading} size="sm" className="font-bold" suppressHydrationWarning>
-                  {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Set Password'}
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-slate-400" suppressHydrationWarning>Cancel</Button>
+                <Button onClick={handleAddPassword} disabled={loading} size="sm" className="font-bold">Set Password</Button>
+                <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-slate-400">Cancel</Button>
               </div>
             </div>
           )}
@@ -547,7 +746,7 @@ function PasswordSection({
           {!isEditing ? (
             <div className="flex items-center justify-between">
               <span className="text-sm font-bold text-slate-700">••••••••••••</span>
-              <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary font-bold" suppressHydrationWarning>Change</Button>
+              <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary font-bold">Change</Button>
             </div>
           ) : (
             <div className="space-y-4 animate-in slide-in-from-top-2">
@@ -555,7 +754,7 @@ function PasswordSection({
                 <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Confirm identity</p>
                 <Input type="password" placeholder="Current Password" value={currentPass} onChange={(e) => setCurrentPass(e.target.value)} className="h-12 bg-white" suppressHydrationWarning />
                 {passwordState === 'google_and_password' && (
-                  <Button variant="outline" onClick={handleGoogleReauth} className="w-full gap-2 font-bold h-12 bg-white border-2" suppressHydrationWarning>
+                  <Button variant="outline" onClick={handleGoogleReauth} className="w-full gap-2 font-bold h-12 bg-white border-2">
                     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="h-4 w-4" alt="" />
                     Or: Confirm with Google
                   </Button>
@@ -567,8 +766,8 @@ function PasswordSection({
               </div>
               {error && <p className="text-xs text-rose-500 font-bold">{error}</p>}
               <div className="flex gap-2">
-                <Button onClick={handleUpdatePassword} disabled={loading} size="sm" className="font-bold" suppressHydrationWarning>Update Password</Button>
-                <Button variant="ghost" size="sm" onClick={() => { setIsEditing(false); setError(null); }} className="text-slate-400" suppressHydrationWarning>Cancel</Button>
+                <Button onClick={handleUpdatePassword} disabled={loading} size="sm" className="font-bold">Update Password</Button>
+                <Button variant="ghost" size="sm" onClick={() => { setIsEditing(false); setError(null); }} className="text-slate-400">Cancel</Button>
               </div>
             </div>
           )}
@@ -592,11 +791,8 @@ function ParentSection({ profile, uid, displayName }: { profile: any, uid: strin
     try {
       await safeUpdateDoc(doc(db, 'users', uid), { pendingParentEmail: parentEmail.toLowerCase() });
       setMessage(`Invite sent to ${parentEmail}!`);
-    } catch (err) {
-      setError('Failed to send invite.');
-    } finally {
-      setLoading(false);
-    }
+    } catch (err) { setError('Failed to send invite.'); }
+    finally { setLoading(false); }
   };
 
   return (
@@ -606,11 +802,105 @@ function ParentSection({ profile, uid, displayName }: { profile: any, uid: strin
         <p className="text-sm text-slate-500 leading-relaxed">Invite a parent to monitor your learning progress and unlock badges.</p>
         <div className="flex gap-2">
           <Input type="email" placeholder="Parent's email" value={parentEmail} onChange={(e) => setParentEmail(e.target.value)} className="h-12" suppressHydrationWarning />
-          <Button onClick={handleInvite} disabled={loading} className="font-bold" suppressHydrationWarning>Invite</Button>
+          <Button onClick={handleInvite} disabled={loading} className="font-bold">Invite</Button>
         </div>
         {error && <p className="text-xs text-rose-500 font-bold">{error}</p>}
         {message && <p className="text-xs text-emerald-600 font-bold">{message}</p>}
       </div>
+    </Card>
+  );
+}
+
+function DangerZone({ user, reauthMethod }: { user: User, reauthMethod: ReauthMethod }) {
+  const [step, setStep] = useState(1);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleDelete = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      let success = false;
+      if (reauthMethod === 'google') {
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+        await reauthenticateWithPopup(user, provider);
+        success = true;
+      } else {
+        const credential = EmailAuthProvider.credential(user.email!, password);
+        await reauthenticateWithCredential(user, credential);
+        success = true;
+      }
+
+      if (success) {
+        await deleteDoc(doc(db, 'users', user.uid));
+        await user.delete();
+        window.location.href = '/login?reason=account_deleted';
+      }
+    } catch (err: any) {
+      if (err.code === 'auth/wrong-password') setError('Incorrect password.');
+      else if (err.code === 'auth/requires-recent-login') setError('Please sign out and sign back in to delete your account.');
+      else setError('Failed to delete account. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Card className="border-none shadow-sm bg-rose-50/50 p-6 border-rose-100 border">
+      <h3 className="text-[15px] font-bold text-rose-600 border-b border-rose-100 pb-3 mb-4">Danger Zone</h3>
+      
+      {step === 1 ? (
+        <div className="space-y-4">
+          <p className="text-xs text-rose-700 font-medium leading-relaxed">
+            Deleting your account is permanent. You will lose all your XP, badges, and progress.
+          </p>
+          <Button 
+            variant="outline" 
+            onClick={() => setStep(2)} 
+            className="w-full h-12 border-rose-200 text-rose-600 hover:bg-rose-100 hover:text-rose-700 font-bold gap-2"
+          >
+            <Trash2 className="h-4 w-4" /> Delete My Account
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-black text-rose-900">Final Confirmation</h4>
+            <button onClick={() => { setStep(1); setError(''); }} className="text-rose-400 hover:text-rose-600"><X className="h-4 w-4" /></button>
+          </div>
+          
+          {reauthMethod === 'password' ? (
+            <div className="space-y-3">
+              <Label className="text-[10px] font-black uppercase text-rose-400">Enter your password to proceed</Label>
+              <Input 
+                type="password" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)}
+                className="h-12 bg-white border-rose-200"
+                placeholder="Password"
+                suppressHydrationWarning
+              />
+            </div>
+          ) : (
+            <p className="text-xs text-rose-700 font-bold bg-rose-100/50 p-3 rounded-lg">
+              Confirm your identity with Google to permanently delete your data.
+            </p>
+          )}
+
+          {error && <p className="text-xs text-rose-600 font-bold">{error}</p>}
+
+          <Button 
+            onClick={handleDelete} 
+            disabled={loading || (reauthMethod === 'password' && !password)} 
+            className="w-full h-12 bg-rose-600 hover:bg-rose-700 text-white font-black uppercase tracking-widest gap-2 shadow-lg shadow-rose-200"
+          >
+            {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+            Confirm Permanent Deletion
+          </Button>
+        </div>
+      )}
     </Card>
   );
 }
