@@ -1,7 +1,7 @@
 'use client';
 
 import { useReducer, useCallback, useEffect, useRef } from 'react';
-import { doc, getDoc, increment, writeBatch, serverTimestamp, arrayUnion } from 'firebase/firestore';
+import { doc, getDoc, increment, writeBatch, serverTimestamp, arrayUnion, collection, addDoc } from 'firebase/firestore';
 import { useFirestore, useUser } from '@/firebase';
 import { playCorrect, playWrong, playGameOver, playCombo } from '@/lib/sounds';
 
@@ -233,6 +233,7 @@ export function useGameEngine(config: GameConfig) {
     const gameScoreRef = doc(db, 'users', user.uid, 'gameScores', config.gameName);
     const progressionRef = doc(db, 'users', user.uid, 'progression', 'stats');
     const userRootRef = doc(db, 'users', user.uid);
+    const activityLogRef = doc(collection(db, 'users', user.uid, 'activityLog'));
 
     try {
       const gameSnap = await getDoc(gameScoreRef);
@@ -246,7 +247,9 @@ export function useGameEngine(config: GameConfig) {
         highScore: newHighScore,
         xpEarned: increment(sessionXp),
         gamesPlayed: increment(1),
-        lastPlayedAt: serverTimestamp()
+        lastPlayedAt: serverTimestamp(),
+        // Store recent trend
+        scoreHistory: arrayUnion(state.score)
       }, { merge: true });
 
       const highScoreKeyMap: Record<string, string> = {
@@ -277,6 +280,14 @@ export function useGameEngine(config: GameConfig) {
           [highScoresKey]: newHighScore
         }
       }, { merge: true });
+
+      // Activity Log for parent
+      batch.set(activityLogRef, {
+        gameName: config.gameName,
+        score: state.score,
+        xpEarned: sessionXp,
+        playedAt: serverTimestamp()
+      });
 
       // Update root user XP for legacy support/sync
       batch.update(userRootRef, {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuthContext } from '@/context/AuthContext';
 import { useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
@@ -14,6 +14,7 @@ interface AuthGuardProps {
 export function AuthGuard({ children }: AuthGuardProps) {
   const { user, loading } = useAuthContext();
   const router = useRouter();
+  const pathname = usePathname();
   const db = useFirestore();
 
   const profileRef = useMemoFirebase(() => {
@@ -26,11 +27,21 @@ export function AuthGuard({ children }: AuthGuardProps) {
     if (!loading && !user) {
       router.push('/login');
     } else if (!loading && user && !isProfileLoading) {
-      if (profile && !profile.onboardingComplete) {
-        router.push('/onboarding');
+      if (profile) {
+        // Redirect to setup/onboarding if not done
+        if (profile.isParent && !profile.setupComplete && pathname !== '/parent/setup') {
+          router.push('/parent/setup');
+        } else if (!profile.isParent && !profile.onboardingComplete && pathname !== '/onboarding') {
+          router.push('/onboarding');
+        }
+
+        // Parent specific protection
+        if (pathname.startsWith('/parent') && !profile.isParent) {
+          router.push('/games');
+        }
       }
     }
-  }, [user, loading, isProfileLoading, profile, router]);
+  }, [user, loading, isProfileLoading, profile, router, pathname]);
 
   if (loading || isProfileLoading) {
     return (
@@ -40,7 +51,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
     );
   }
 
-  if (!user || (profile && !profile.onboardingComplete)) {
+  if (!user) {
     return null;
   }
 

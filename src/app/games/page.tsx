@@ -37,14 +37,16 @@ import {
   Volume2,
   VolumeX,
   Sparkles,
-  ChevronRight
+  ChevronRight,
+  ShieldCheck,
+  X
 } from 'lucide-react';
-import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { collection, query, orderBy, limit, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { cn } from '@/lib/utils';
 
 export default function GamesHub() {
-  const { name, formatValue } = useUser();
+  const { name, formatValue, user } = useUser();
   const { data: progression, isLoading: isProgLoading } = useProgression();
   const { ageGroup, difficultyConfig } = useAgeAdapt();
   const db = useFirestore();
@@ -53,6 +55,7 @@ export default function GamesHub() {
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [challengeStats, setChallengeStats] = useState({ players: 0, timeRemaining: '' });
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [linkRequest, setLinkRequest] = useState<any>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -60,9 +63,47 @@ export default function GamesHub() {
     }
   }, []);
 
+  // Listen for Link Requests
+  useEffect(() => {
+    if (!user || !db) return;
+    const q = query(collection(db, 'users', user.uid, 'linkRequests'), where('status', '==', 'pending'), limit(1));
+    const unsubscribe = onSnapshot(q, (snap) => {
+      if (!snap.empty) {
+        setLinkRequest({ id: snap.docs[0].id, ...snap.docs[0].data() });
+      } else {
+        setLinkRequest(null);
+      }
+    });
+    return () => unsubscribe();
+  }, [user, db]);
+
   const handleToggleSound = () => {
     const newState = toggleSound();
     setSoundEnabled(newState);
+  };
+
+  const handleAcceptLink = async () => {
+    if (!user || !db || !linkRequest) return;
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      const reqRef = doc(db, 'users', user.uid, 'linkRequests', linkRequest.id);
+      await updateDoc(userRef, { parentUid: linkRequest.parentUid });
+      await updateDoc(reqRef, { status: 'accepted' });
+      setLinkRequest(null);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeclineLink = async () => {
+    if (!user || !db || !linkRequest) return;
+    try {
+      const reqRef = doc(db, 'users', user.uid, 'linkRequests', linkRequest.id);
+      await updateDoc(reqRef, { status: 'declined' });
+      setLinkRequest(null);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   // Leaderboard Subscription
@@ -92,30 +133,6 @@ export default function GamesHub() {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
-
-  const FINANCE_TIPS = {
-    junior: [
-      "Find a shiny coin? Put it in your piggy bank! Small savings add up to big toys.",
-      "Needs are things like food and school shoes. Wants are toys and treats!",
-      "Ask an adult about how a savings account works. It's like a safe for your money."
-    ],
-    teen: [
-      "The 50/30/20 rule: 50% for needs, 30% for wants, and 20% for your future self.",
-      "Starting to save at 15 is much easier than starting at 25. Let time do the work!",
-      "A credit score is your financial reputation. Pay your phone bill on time to build it."
-    ],
-    senior: [
-      "Compound interest is the 8th wonder of the world. He who understands it, earns it.",
-      "Diversification isn't just a buzzword; it's your primary defense against market crashes.",
-      "Understand your tax brackets. It's not about how much you make, but how much you keep."
-    ]
-  };
-
-  const currentTip = useMemo(() => {
-    const tips = FINANCE_TIPS[ageGroup as keyof typeof FINANCE_TIPS] || FINANCE_TIPS.teen;
-    const day = new Date().getDate();
-    return tips[day % tips.length];
-  }, [ageGroup]);
 
   const games = [
     {
@@ -206,9 +223,26 @@ export default function GamesHub() {
     <AuthGuard>
       <div className="flex min-h-screen bg-background">
         <MainNav />
-        <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8 max-w-7xl mx-auto">
+        <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8 max-w-7xl mx-auto space-y-8">
+          {/* Link Request Banner */}
+          {linkRequest && (
+            <div className="p-4 bg-primary text-white rounded-2xl shadow-xl flex items-center justify-between animate-in slide-in-from-top-4 duration-500">
+              <div className="flex items-center gap-4">
+                <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center"><ShieldCheck className="h-6 w-6" /></div>
+                <div>
+                  <p className="font-bold">Connect Account?</p>
+                  <p className="text-xs opacity-80">Your parent {linkRequest.parentName} wants to link to your SpendXP.</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={handleAcceptLink} size="sm" className="bg-white text-primary hover:bg-white/90 font-bold">Accept</Button>
+                <Button onClick={handleDeclineLink} size="sm" variant="ghost" className="text-white hover:bg-white/10"><X className="h-4 w-4" /></Button>
+              </div>
+            </div>
+          )}
+
           {/* Top Header */}
-          <header className="mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="flex items-center gap-4">
               <div className="h-16 w-16 rounded-2xl bg-white shadow-xl flex items-center justify-center border-2 border-primary/5">
                 <Gamepad2 className="h-10 w-10 text-primary" />
@@ -216,23 +250,14 @@ export default function GamesHub() {
               <div>
                 <div className="flex items-center gap-3">
                   <h2 className="text-3xl font-black text-primary tracking-tight">Financial Arcade</h2>
-                  <button 
-                    onClick={handleToggleSound}
-                    className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors"
-                  >
-                    {soundEnabled ? (
-                      <Volume2 className="h-4 w-4 text-slate-600" />
-                    ) : (
-                      <VolumeX className="h-4 w-4 text-slate-400" />
-                    )}
+                  <button onClick={handleToggleSound} className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors">
+                    {soundEnabled ? <Volume2 className="h-4 w-4 text-slate-600" /> : <VolumeX className="h-4 w-4 text-slate-400" />}
                   </button>
                 </div>
                 <div className="flex items-center gap-2 mt-1">
                   <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                   <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Welcome back, {name}</span>
-                  <Badge variant="outline" className="text-[10px] gap-1 ml-2">
-                    <Flame className="h-3 w-3 text-orange-500 fill-current" /> 3 DAY STREAK
-                  </Badge>
+                  <Badge variant="outline" className="text-[10px] gap-1 ml-2"><Flame className="h-3 w-3 text-orange-500 fill-current" /> 3 DAY STREAK</Badge>
                 </div>
               </div>
             </div>
@@ -245,31 +270,18 @@ export default function GamesHub() {
             <div className="lg:col-span-8 space-y-8">
               {/* Daily Challenge Banner */}
               <Card className="relative overflow-hidden border-none shadow-2xl bg-gradient-to-r from-primary to-accent text-white">
-                <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
-                  <Zap className="h-48 w-48" />
-                </div>
+                <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none"><Zap className="h-48 w-48" /></div>
                 <CardContent className="p-8">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="space-y-2">
-                      <Badge className="bg-white/20 hover:bg-white/30 text-white border-none gap-1.5 px-3 py-1">
-                        <Users className="h-3 w-3" /> 1,420 PLAYERS TODAY
-                      </Badge>
+                      <Badge className="bg-white/20 hover:bg-white/30 text-white border-none gap-1.5 px-3 py-1"><Users className="h-3 w-3" /> 1,420 PLAYERS TODAY</Badge>
                       <h3 className="text-3xl font-black tracking-tight">FinIQ Daily Challenge</h3>
-                      <p className="text-primary-foreground/80 max-w-md">
-                        Everyone gets the same 10 scenarios today. Can you reach the top of the global leaderboard?
-                      </p>
+                      <p className="text-primary-foreground/80 max-w-md">Everyone gets the same 10 scenarios today. Can you reach the top of the global leaderboard?</p>
                       <div className="flex items-center gap-4 pt-2">
-                        <div className="flex items-center gap-2 text-xs font-bold bg-black/10 px-3 py-1.5 rounded-lg">
-                          <Timer className="h-4 w-4" /> RESET IN {challengeStats.timeRemaining}
-                        </div>
+                        <div className="flex items-center gap-2 text-xs font-bold bg-black/10 px-3 py-1.5 rounded-lg"><Timer className="h-4 w-4" /> RESET IN {challengeStats.timeRemaining}</div>
                       </div>
                     </div>
-                    <Button 
-                      onClick={() => setActiveGame('daily')}
-                      className="bg-white text-primary hover:bg-white/90 h-16 px-8 rounded-2xl text-xl font-black shadow-xl"
-                    >
-                      PLAY CHALLENGE
-                    </Button>
+                    <Button onClick={() => setActiveGame('daily')} className="bg-white text-primary hover:bg-white/90 h-16 px-8 rounded-2xl text-xl font-black shadow-xl">PLAY CHALLENGE</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -282,36 +294,19 @@ export default function GamesHub() {
                   games.map((game) => {
                     const isLocked = progression.totalXP < game.minXP;
                     return (
-                      <Card 
-                        key={game.id} 
-                        className={cn(
-                          "group hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden relative",
-                          isLocked && "grayscale opacity-75 cursor-not-allowed"
-                        )}
-                        onClick={() => !isLocked && setActiveGame(game.id)}
-                      >
+                      <Card key={game.id} className={cn("group hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden relative", isLocked && "grayscale opacity-75 cursor-not-allowed")} onClick={() => !isLocked && setActiveGame(game.id)}>
                         <div className={cn("h-3", game.color)} />
                         <CardHeader>
                           <div className="flex justify-between items-start">
-                            <div className={cn("h-12 w-12 rounded-xl flex items-center justify-center text-white mb-2 shadow-lg", game.color)}>
-                              <game.icon className="h-6 w-6" />
-                            </div>
-                            <Badge variant="secondary" className="bg-slate-50 text-slate-500 border-none font-bold">
-                              {game.badge}
-                            </Badge>
+                            <div className={cn("h-12 w-12 rounded-xl flex items-center justify-center text-white mb-2 shadow-lg", game.color)}><game.icon className="h-6 w-6" /></div>
+                            <Badge variant="secondary" className="bg-slate-50 text-slate-500 border-none font-bold">{game.badge}</Badge>
                           </div>
-                          <CardTitle className="text-2xl font-black text-slate-900 group-hover:text-primary transition-colors">
-                            {game.title}
-                          </CardTitle>
-                          <CardDescription className="text-slate-500 font-medium leading-snug">
-                            {game.desc}
-                          </CardDescription>
+                          <CardTitle className="text-2xl font-black text-slate-900 group-hover:text-primary transition-colors">{game.title}</CardTitle>
+                          <CardDescription className="text-slate-500 font-medium leading-snug">{game.desc}</CardDescription>
                         </CardHeader>
                         <CardContent>
                           <div className="flex items-center justify-between mt-2">
-                            <div className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
-                              Best: <span className="text-slate-900">{game.highScore}</span>
-                            </div>
+                            <div className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Best: <span className="text-slate-900">{game.highScore}</span></div>
                             <div className="flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                               <span className="text-xs font-bold text-primary">Play Now</span>
                               <ChevronRight className="h-3 w-3 text-primary" />
@@ -320,9 +315,7 @@ export default function GamesHub() {
                         </CardContent>
                         {isLocked && (
                           <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex flex-col items-center justify-center text-center p-6">
-                            <div className="h-14 w-14 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-2 border-2 border-dashed border-slate-300">
-                              <Lock className="h-6 w-6" />
-                            </div>
+                            <div className="h-14 w-14 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-2 border-2 border-dashed border-slate-300"><Lock className="h-6 w-6" /></div>
                             <h4 className="font-black text-slate-900">Rank Locked</h4>
                             <p className="text-xs font-bold text-slate-500">Unlocks at {game.minXP} XP</p>
                           </div>
@@ -332,66 +325,34 @@ export default function GamesHub() {
                   })
                 )}
               </div>
-
-              {/* Tip of the Day */}
-              <Card className="border-none bg-emerald-50 border-2 border-emerald-100/50 shadow-sm overflow-hidden">
-                <CardContent className="p-6 flex items-start gap-4">
-                  <div className="h-12 w-12 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
-                    <Lightbulb className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <div className="text-[10px] font-black uppercase text-emerald-600 tracking-widest mb-1">Tip of the Day ({ageGroup})</div>
-                    <p className="text-emerald-900 font-bold leading-relaxed">
-                      "{currentTip}"
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
 
-            {/* Sidebar: Leaderboard */}
-            <div className="lg:col-span-4 space-y-6">
+            {/* Leaderboard */}
+            <div className="lg:col-span-4">
               <Card className="border-none shadow-xl bg-white h-full flex flex-col">
                 <CardHeader className="border-b bg-slate-50/50">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2 text-xl font-black">
-                      <Trophy className="h-5 w-5 text-amber-500" />
-                      Top Strategists
-                    </CardTitle>
+                    <CardTitle className="flex items-center gap-2 text-xl font-black"><Trophy className="h-5 w-5 text-amber-500" /> Top Strategists</CardTitle>
                     <Badge className="bg-primary/10 text-primary border-none">Global</Badge>
                   </div>
                 </CardHeader>
                 <CardContent className="p-0 flex-1">
                   {isProgLoading ? (
-                    <div className="p-6 space-y-4">
-                      {Array(8).fill(0).map((_, i) => (
-                        <Skeleton key={i} className="h-12 w-full" />
-                      ))}
-                    </div>
+                    <div className="p-6 space-y-4">{Array(8).fill(0).map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
                   ) : (
                     <div className="divide-y">
-                      {leaderboard.map((user, idx) => (
-                        <div 
-                          key={user.id} 
-                          className={cn(
-                            "flex items-center justify-between p-4 transition-colors hover:bg-slate-50",
-                            user.id === progression.id && "border-l-4 border-primary bg-primary/5"
-                          )}
-                        >
+                      {leaderboard.map((userEntry, idx) => (
+                        <div key={userEntry.id} className={cn("flex items-center justify-between p-4 transition-colors hover:bg-slate-50", userEntry.id === progression.id && "border-l-4 border-primary bg-primary/5")}>
                           <div className="flex items-center gap-4">
-                            <div className="w-6 text-center text-sm font-black text-slate-400">
-                              {idx + 1}
-                            </div>
-                            <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600 border-2 border-white shadow-sm">
-                              {user.displayName?.[0]?.toUpperCase() || '?'}
-                            </div>
+                            <div className="w-6 text-center text-sm font-black text-slate-400">{idx + 1}</div>
+                            <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600 border-2 border-white shadow-sm">{userEntry.displayName?.[0]?.toUpperCase() || '?'}</div>
                             <div>
-                              <div className="font-bold text-slate-900 text-sm">{user.displayName || 'Anonymous'}</div>
-                              <div className="text-[10px] font-black uppercase text-slate-400">LVL {Math.floor((user.xp || 0) / 500) + 1}</div>
+                              <div className="font-bold text-slate-900 text-sm">{userEntry.displayName || 'Anonymous'}</div>
+                              <div className="text-[10px] font-black uppercase text-slate-400">LVL {Math.floor((userEntry.xp || 0) / 500) + 1}</div>
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="font-black text-primary text-sm">{user.xp?.toLocaleString() || 0}</div>
+                            <div className="font-black text-primary text-sm">{userEntry.xp?.toLocaleString() || 0}</div>
                             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">TOTAL XP</div>
                           </div>
                         </div>
@@ -399,11 +360,6 @@ export default function GamesHub() {
                     </div>
                   )}
                 </CardContent>
-                <div className="p-4 border-t bg-slate-50/50">
-                  <Button variant="outline" className="w-full h-10 font-bold text-xs" disabled>
-                    SEE FULL LEADERBOARD
-                  </Button>
-                </div>
               </Card>
             </div>
           </div>
