@@ -1,23 +1,8 @@
-
 'use client';
 
 // SPENDXP FIREBASE BARREL — single import source
 // for all Firebase and utility exports.
 // Import path for components and hooks: '@/firebase'
-// Exports: app, auth, db, safeSetDoc, safeUpdateDoc, safeAddDoc,
-// safeGetDoc, safeOnSnapshot, getRefreshedToken,
-// rateLimiter, validateEmail, validateDisplayName,
-// validateBirthYear, validateScore, validateXP,
-// sanitiseString, checkLockout, recordFailedAttempt,
-// clearAttempts, requiresParentalConsent, hasParentalConsent,
-// captureFingerprint, validateFingerprint, hashGameState,
-// setupDevToolsDetector
-// DO NOT import from @/lib/* directly in components.
-
-// IMPORT RULE:
-// Components, hooks, pages → import from '@/firebase'
-// Service files in src/lib/ → import from '@/lib/firebase'
-// Never mix these two patterns.
 
 export { 
   app, 
@@ -45,7 +30,6 @@ export function initializeFirebase() {
     }
     
     // Initialize App Check asynchronously without blocking the return of core services
-    // This prevents the initialization from being 'async' which breaks synchronous provider props.
     import('firebase/app-check').then(({ initializeAppCheck, ReCaptchaV3Provider }) => {
       try {
         initializeAppCheck(app, {
@@ -71,9 +55,19 @@ export function initializeFirebase() {
   };
 }
 
-// Re-export Provider and Hooks
-export * from './provider';
-export * from './client-provider';
+// Re-export Provider and Hooks from source of truth
+export {
+  FirebaseProvider,
+  FirebaseClientProvider,
+  useFirebase,
+  useFirebaseApp,
+  useFirestore,
+  useAuth,
+  useUser,
+  FirebaseContext,
+  useMemoFirebase
+} from './provider';
+
 export * from './firestore/use-collection';
 export * from './firestore/use-doc';
 export * from './non-blocking-updates';

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { useFirestore, useDoc, useMemoFirebase, FirebaseContext } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
 /**
@@ -90,8 +90,13 @@ const AgeGroupContext = createContext<AgeGroupContextValue | undefined>(undefine
  * Provider that synchronizes age group settings with user profile in Firestore.
  */
 export const AgeGroupProvider = ({ children }: { children: ReactNode }) => {
-  const { user, isUserLoading } = useUser();
   const db = useFirestore();
+  
+  // Safe access to context to avoid "services not available" error during SSR
+  const firebaseContext = useContext(FirebaseContext);
+  const user = firebaseContext?.areServicesAvailable ? firebaseContext.user : null;
+  const isUserLoading = firebaseContext?.isUserLoading ?? true;
+
   const [ageGroup, setAgeGroup] = useState<AgeGroup>('junior');
   const [config, setConfig] = useState<DifficultyConfig>(getDifficultyConfig('junior'));
 

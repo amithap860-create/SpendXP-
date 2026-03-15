@@ -2,7 +2,7 @@
 
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { AuthProvider, useAuthContext } from '@/context/AuthContext';
+import { AuthProvider } from '@/context/AuthContext';
 import { FirestoreErrorBoundary } from '@/components/FirestoreErrorBoundary';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { AgeGroupProvider } from '@/lib/ageAdapt';
@@ -16,13 +16,12 @@ import { useEffect, useState } from 'react';
 const inter = Inter({ 
   subsets: ['latin'], 
   variable: '--font-inter',
-  display: 'swap' // Fix 6: Show system font while Inter loads
+  display: 'swap'
 });
 
 function RootLayoutContent({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuthContext();
-  const pathname = usePathname();
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const checkSize = () => setIsSmallScreen(window.innerWidth < 360);
@@ -31,6 +30,8 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('resize', checkSize);
   }, []);
 
+  // Use a simplified auth check for layout visibility
+  // The actual protection happens in AuthGuard or pages
   const isAuthPage = ['/login', '/signup', '/verify-email', '/onboarding', '/consent'].includes(pathname);
 
   const navLinks = [
@@ -45,7 +46,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col min-h-screen-safe">
       {/* TOP NAV (Desktop) */}
-      {!loading && user && !isAuthPage && (
+      {!isAuthPage && (
         <header className="hidden md:block bg-white border-b border-slate-200 sticky top-0 z-50">
           <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
             <Link href="/dashboard" className="flex items-center gap-2">
@@ -74,16 +75,16 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
         </header>
       )}
 
-      <div className={cn("flex-1", !isAuthPage && user && "pb-[calc(80px+env(safe-area-inset-bottom,0px))] md:pb-0")}>
+      <div className={cn("flex-1", !isAuthPage && "pb-[calc(80px+env(safe-area-inset-bottom,0px))] md:pb-0")}>
         {children}
       </div>
 
       {/* BOTTOM NAV (Mobile) */}
-      {!loading && user && !isAuthPage && (
+      {!isAuthPage && (
         <nav 
           className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex items-center justify-around px-1 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] overflow-hidden"
           style={{ 
-            height: 'calc(80px + env(safe-area-inset-bottom, 0px))', // Fix 5
+            height: 'calc(80px + env(safe-area-inset-bottom, 0px))',
             paddingBottom: 'env(safe-area-inset-bottom, 0px)' 
           }}
         >
@@ -163,7 +164,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" /> {/* Fix 5 */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="SpendXP" />
