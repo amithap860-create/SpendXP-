@@ -35,14 +35,19 @@ import {
   AlertCircle,
   Plus,
   ShieldCheck,
-  Lock
+  Lock,
+  Globe,
+  ChevronRight
 } from 'lucide-react';
 import { validateDisplayName, validateEmail } from '@/lib/validation';
 import { rateLimiter } from '@/lib/rateLimiter';
-import { getRefreshedToken } from '@/lib/authHelpers';
 import { useUser } from '@/lib/store';
 import { XPWallet } from '@/components/XPWallet';
 import { useRouter } from 'next/navigation';
+import { useCurrency } from '@/hooks/useCurrency';
+import { SUPPORTED_CURRENCIES, CurrencyOption } from '@/config/currency';
+import { scaleAmount, formatCurrency } from '@/lib/formatCurrency';
+import { cn } from '@/lib/utils';
 
 export default function ProfilePage() {
   const { user, loading: authLoading, linkedProviders } = useAuthContext();
@@ -56,7 +61,6 @@ export default function ProfilePage() {
   }
 
   const isGoogleUser = linkedProviders.includes('google.com');
-  const hasPassword = linkedProviders.includes('password');
   
   const memberSince = profile?.createdAt 
     ? new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format((profile.createdAt as Timestamp).toDate())
@@ -97,6 +101,7 @@ export default function ProfilePage() {
         <div className="grid md:grid-cols-2 gap-8">
           <div className="space-y-8">
             <DisplayNameSection profile={profile} uid={user?.uid!} />
+            <CurrencySection profile={profile} uid={user?.uid!} />
             <EmailSection user={user} isGoogleUser={isGoogleUser} profile={profile} />
             <PasswordSection user={user} linkedProviders={linkedProviders} />
             <ParentSection profile={profile} uid={user?.uid!} displayName={profile?.displayName} />
@@ -113,6 +118,99 @@ export default function ProfilePage() {
         </div>
       </main>
     </div>
+  );
+}
+
+function CurrencySection({ profile, uid }: { profile: any, uid: string }) {
+  const { activeCurrency } = useCurrency();
+  const [isEditing, setIsEditing] = useState(false);
+  const [hoveredCode, setHoveredCode] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const handleSelect = async (option: CurrencyOption) => {
+    if (option.code === profile.currencyCode) return;
+
+    // Optimistic Update handled by profile listener usually, 
+    // but we can set UI immediately if needed.
+    const success = await safeUpdateDoc(doc(db, 'users', uid), {
+      currencyCode: option.code,
+      updatedAt: serverTimestamp()
+    });
+
+    if (success) {
+      setToast(`Currency updated to ${option.symbol} ${option.code}`);
+      setTimeout(() => setToast(null), 2500);
+      setIsEditing(false);
+    }
+  };
+
+  const previewAmount = hoveredCode || profile.currencyCode || 'INR';
+  const previewFormatted = formatCurrency(scaleAmount(25000, previewAmount), SUPPORTED_CURRENCIES.find(c => c.code === previewAmount)!);
+
+  return (
+    <Card className="border-none shadow-sm bg-white p-6 relative">
+      {toast && (
+        <div className="absolute top-0 left-0 right-0 p-2 bg-emerald-500 text-white text-xs font-black text-center animate-out fade-out duration-1000 slide-out-to-top transition-all">
+          {toast}
+        </div>
+      )}
+      <h3 className="text-[15px] font-medium text-primary border-b border-slate-100 pb-3 mb-4">Currency preference</h3>
+      {!isEditing ? (
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Globe className="h-4 w-4 text-slate-400" />
+            <span className="font-bold text-slate-700">
+              {activeCurrency.symbol} {activeCurrency.code} — {activeCurrency.name}
+            </span>
+          </div>
+          <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary font-bold" suppressHydrationWarning>Change</Button>
+        </div>
+      ) : (
+        <div className="space-y-6 animate-in fade-in slide-in-from-top-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {SUPPORTED_CURRENCIES.map(c => (
+              <button
+                key={c.code}
+                onMouseEnter={() => setHoveredCode(c.code)}
+                onMouseLeave={() => setHoveredCode(null)}
+                onClick={() => handleSelect(c)}
+                suppressHydrationWarning
+                className={cn(
+                  "p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-1",
+                  profile.currencyCode === c.code 
+                    ? "border-primary bg-primary/5 ring-4 ring-primary/5" 
+                    : "border-slate-100 hover:border-slate-200"
+                )}
+              >
+                <span className={cn("text-2xl font-black", profile.currencyCode === c.code ? "text-primary" : "text-slate-400")}>{c.symbol}</span>
+                <span className="text-[10px] font-black uppercase tracking-widest">{c.code}</span>
+                <span className="text-[8px] text-slate-400 font-bold text-center line-clamp-1">{c.name}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="p-4 bg-slate-50 rounded-2xl space-y-2">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Live Preview</p>
+            <p className="text-sm font-medium text-slate-600">
+              A ₹25,000 monthly salary would show as <span className="font-black text-primary">{previewFormatted}</span>
+            </p>
+            <p className="text-[9px] text-slate-400 italic">
+              Exchange rates are approximate and for learning purposes only.
+            </p>
+          </div>
+
+          <div className="flex justify-end">
+            <button 
+              onClick={() => setIsEditing(false)}
+              className="text-xs font-bold text-slate-400 hover:text-slate-600 uppercase tracking-widest"
+              suppressHydrationWarning
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+    </Card>
   );
 }
 

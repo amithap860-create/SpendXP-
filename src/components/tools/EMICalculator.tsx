@@ -14,11 +14,11 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Info, AlertCircle } from 'lucide-react';
+import { Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function EMICalculator() {
-  const { formatINR } = useCurrency();
+  const { formatValue } = useCurrency();
   const [principal, setPrincipal] = useState(500000);
   const [rate, setRate] = useState(12);
   const [tenure, setTenure] = useState(60);
@@ -76,7 +76,7 @@ export function EMICalculator() {
           <div className="space-y-4">
             <div className="flex justify-between items-end">
               <Label className="text-xs font-black uppercase text-slate-400">Loan Amount</Label>
-              <span className="text-lg font-black text-primary">{formatINR(principal)}</span>
+              <span className="text-lg font-black text-primary">{formatValue(principal)}</span>
             </div>
             <Slider 
               value={[principal]} 
@@ -127,17 +127,17 @@ export function EMICalculator() {
         <div className="bg-slate-50 rounded-3xl p-8 space-y-8 flex flex-col justify-center">
           <div className="text-center space-y-1">
             <div className="text-xs font-black uppercase text-slate-400 tracking-widest">Monthly EMI</div>
-            <div className="text-5xl font-black text-teal-600">{formatINR(stats.emi)}</div>
+            <div className="text-5xl font-black text-teal-600">{formatValue(stats.emi)}</div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
               <div className="text-[10px] font-black uppercase text-slate-400 mb-1">Total Interest</div>
-              <div className="text-lg font-black text-rose-500">{formatINR(stats.totalInterest)}</div>
+              <div className="text-lg font-black text-rose-500">{formatValue(stats.totalInterest)}</div>
             </div>
             <div className="p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
               <div className="text-[10px] font-black uppercase text-slate-400 mb-1">Total Payable</div>
-              <div className="text-lg font-black text-slate-900">{formatINR(stats.totalPayable)}</div>
+              <div className="text-lg font-black text-slate-900">{formatValue(stats.totalPayable)}</div>
             </div>
           </div>
 
@@ -175,7 +175,7 @@ export function EMICalculator() {
           ) : rate <= 18 ? (
             "This is a moderate rate — typical for personal loans. Try to prepay when possible to save on interest."
           ) : (
-            `Warning: This is a high interest rate. You are paying ${formatINR(stats.totalInterest)} in extra payments — consider if this purchase is truly necessary.`
+            `Warning: This is a high interest rate. You are paying ${formatValue(stats.totalInterest)} in extra payments — consider if this purchase is truly necessary.`
           )}
         </p>
       </div>
@@ -205,9 +205,9 @@ export function EMICalculator() {
                 {yearlyBreakdown.map((row) => (
                   <TableRow key={row.year}>
                     <TableCell className="font-bold">Year {row.year}</TableCell>
-                    <TableCell className="text-teal-600 font-medium">{formatINR(row.principal)}</TableCell>
-                    <TableCell className="text-rose-500 font-medium">{formatINR(row.interest)}</TableCell>
-                    <TableCell className="font-black">{formatINR(row.balance)}</TableCell>
+                    <TableCell className="text-teal-600 font-medium">{formatValue(row.principal)}</TableCell>
+                    <TableCell className="text-rose-500 font-medium">{formatValue(row.interest)}</TableCell>
+                    <TableCell className="font-black">{formatValue(row.balance)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

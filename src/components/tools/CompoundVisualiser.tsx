@@ -1,16 +1,15 @@
 'use client';
 
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useCurrency } from '@/hooks/useCurrency';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Info, TrendingUp, Wallet, Zap } from 'lucide-react';
-import { formatCompact } from '@/lib/dateHelpers';
+import { Zap } from 'lucide-react';
 
 export function CompoundVisualiser() {
-  const { formatINR } = useCurrency();
+  const { formatValue, formatCompact } = useCurrency();
   const [initial, setInitial] = useState(10000);
   const [sip, setSip] = useState(1000);
   const [rate, setRate] = useState(12);
@@ -25,13 +24,11 @@ export function CompoundVisualiser() {
     const PMT = sip;
 
     // Compound Interest with Monthly SIP Formula
-    // A = P(1 + r/n)^(nt) + PMT * [((1 + r/n)^(nt) - 1) / (r/n)]
     const futureValue = P * Math.pow(1 + r / n, n * t) + 
                        PMT * ((Math.pow(1 + r / n, n * t) - 1) / (r / n));
     
     const totalInvested = P + (PMT * 12 * t);
     const totalReturns = futureValue - totalInvested;
-    const multiplier = futureValue / totalInvested;
 
     // Data points for chart
     const points = [];
@@ -47,7 +44,6 @@ export function CompoundVisualiser() {
       futureValue,
       totalInvested,
       totalReturns,
-      multiplier,
       points,
       savingsPoints
     };
@@ -98,13 +94,13 @@ export function CompoundVisualiser() {
           <div className="space-y-4">
             <Label className="text-xs font-black uppercase text-slate-400">Initial Investment</Label>
             <Slider value={[initial]} max={1000000} step={1000} onValueChange={([v]) => setInitial(v)} />
-            <div className="text-xl font-black text-primary">{formatINR(initial)}</div>
+            <div className="text-xl font-black text-primary">{formatValue(initial)}</div>
           </div>
 
           <div className="space-y-4">
-            <Label className="text-xs font-black uppercase text-slate-400">Monthly SIP</Label>
+            <Label className="text-xs font-black uppercase text-slate-400">Monthly Contribution</Label>
             <Slider value={[sip]} max={100000} step={500} onValueChange={([v]) => setSip(v)} />
-            <div className="text-xl font-black text-primary">{formatINR(sip)}</div>
+            <div className="text-xl font-black text-primary">{formatValue(sip)}</div>
           </div>
 
           <div className="grid grid-cols-2 gap-6">
@@ -154,10 +150,8 @@ export function CompoundVisualiser() {
 
           <div className="relative bg-white rounded-3xl border p-4 overflow-hidden">
             <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} className="w-full h-auto overflow-visible">
-              {/* Area */}
               <path d={getAreaPath()} fill="rgba(20, 184, 166, 0.1)" />
               
-              {/* Grid Lines */}
               {[0, 0.25, 0.5, 0.75, 1].map(v => (
                 <line 
                   key={v}
@@ -167,11 +161,9 @@ export function CompoundVisualiser() {
                 />
               ))}
 
-              {/* Lines */}
               <path d={getPath(stats.savingsPoints)} fill="none" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="4 4" />
               <path d={getPath(stats.points)} fill="none" stroke="#14b8a6" strokeWidth="4" strokeLinecap="round" className="animate-draw" />
 
-              {/* Axis Labels */}
               {Array.from({ length: 5 }).map((_, i) => {
                 const year = Math.round((years / 4) * i);
                 const x = padding + year * xScale;
@@ -198,15 +190,15 @@ export function CompoundVisualiser() {
       <div className="grid md:grid-cols-3 gap-4 pt-4 border-t">
         <Button variant="ghost" onClick={() => setPreset(0, 500, 12, 20)} className="h-auto p-4 border rounded-2xl flex-col items-start gap-1" suppressHydrationWarning>
           <span className="text-[10px] font-black text-slate-400 uppercase">Tiny Start</span>
-          <span className="font-bold">₹500/mo for 20 yrs</span>
+          <span className="font-bold">{formatValue(500)}/mo for 20 yrs</span>
         </Button>
         <Button variant="ghost" onClick={() => setPreset(100000, 0, 15, 15)} className="h-auto p-4 border rounded-2xl flex-col items-start gap-1" suppressHydrationWarning>
           <span className="text-[10px] font-black text-slate-400 uppercase">Lump Sum</span>
-          <span className="font-bold">₹1L once for 15 yrs</span>
+          <span className="font-bold">{formatValue(100000)} once for 15 yrs</span>
         </Button>
         <Button variant="ghost" onClick={() => setPreset(0, 2000, 12, 40)} className="h-auto p-4 border rounded-2xl flex-col items-start gap-1" suppressHydrationWarning>
           <span className="text-[10px] font-black text-slate-400 uppercase">Legacy Path</span>
-          <span className="font-bold">₹2K/mo for 40 yrs</span>
+          <span className="font-bold">{formatValue(2000)}/mo for 40 yrs</span>
         </Button>
       </div>
 

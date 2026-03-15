@@ -16,8 +16,6 @@ import {
   orderBy, 
   limit, 
   getDocs, 
-  where,
-  Timestamp
 } from 'firebase/firestore';
 import { 
   getProgression, 
@@ -31,7 +29,6 @@ import { useCurrency } from '@/hooks/useCurrency';
 import { 
   getISTDateKey, 
   getNextISTMidnight, 
-  formatCompact, 
   formatRelativeTime 
 } from '@/lib/dateHelpers';
 import { RadarChart } from '@/components/charts/RadarChart';
@@ -42,7 +39,7 @@ import { cn } from '@/lib/utils';
 
 export default function DashboardPage() {
   const { user } = useAuthContext();
-  const { formatINR } = useCurrency();
+  const { formatValue, formatCompact } = useCurrency();
   const [loading, setLoading] = useState(true);
   
   // Data State
@@ -163,7 +160,6 @@ export default function DashboardPage() {
       return "Welcome to SpendXP! Start your first game to earn XP.";
     if (!dailyRank) 
       return "Daily challenge available — play now to keep your streak!";
-    // Add other contextual sub-titles here as needed
     return `You've earned ${progression.totalXP?.toLocaleString()} XP so far. Keep going!`;
   }, [progression, dailyRank]);
 
@@ -263,13 +259,13 @@ export default function DashboardPage() {
 
           <div className="bg-white p-5 rounded-2xl border-[0.5px] border-slate-200 shadow-sm text-center space-y-1">
             <span className="text-xl font-black text-slate-900 truncate block">
-              {formatINR(progression?.walletBalance || 0)}
+              {formatValue(progression?.walletBalance || 0)}
             </span>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Saved Virtually</p>
           </div>
 
           <div className="bg-white p-5 rounded-2xl border-[0.5px] border-slate-200 shadow-sm text-center space-y-1">
-            <span className="text-2xl font-black text-slate-900">{completedLessonsCount} / 6</span>
+            <span className="text-2xl font-black text-slate-900">{completedLessonsCount} / 8</span>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Lessons Done</p>
           </div>
         </section>
@@ -351,7 +347,7 @@ export default function DashboardPage() {
                 <>
                   <div className="space-y-1">
                     <h3 className="text-xl font-black text-slate-900">FinIQ Daily Blitz</h3>
-                    <p className="text-sm text-slate-500 font-medium leading-tight">Same questions for everyone — see how you rank against 50,000+ users.</p>
+                    <p className="text-sm text-slate-500 font-medium leading-tight">Same questions for everyone — see how you rank against other users.</p>
                   </div>
                   <div className="flex items-center justify-between text-xs font-bold text-slate-400">
                     <span>🔥 {dailyParticipantCount} players today</span>

@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { db, useCollection, useMemoFirebase, safeSetDoc, safeUpdateDoc } from '@/firebase';
-import { collection, query, orderBy, serverTimestamp, doc, increment, deleteDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, orderBy, serverTimestamp, doc, increment, deleteDoc } from 'firebase/firestore';
 import { useCurrency } from '@/hooks/useCurrency';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, CheckCircle2, AlertTriangle, PartyPopper } from 'lucide-react';
+import { Plus, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { validateDisplayName } from '@/firebase';
 import { cn } from '@/lib/utils';
 
@@ -39,7 +39,7 @@ const PRESET_SHAPES: { shape: GoalShape; color: string; label: string }[] = [
 
 export function SavingsGoalTracker() {
   const { user } = useAuthContext();
-  const { formatINR } = useCurrency();
+  const { formatValue } = useCurrency();
   
   const [isAdding, setIsAdding] = useState(false);
   const [newName, setNewName] = useState('');
@@ -54,11 +54,11 @@ export function SavingsGoalTracker() {
   const goalsQuery = useMemoFirebase(() => {
     return user ? query(collection(db, 'users', user.uid, 'savingsGoals'), orderBy('createdAt', 'desc')) : null;
   }, [user]);
-  const { data: goals, isLoading } = useCollection<SavingsGoal>(goalsQuery);
+  const { data: goals } = useCollection<SavingsGoal>(goalsQuery);
 
   const handleAddGoal = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || goals!.length >= 5) return;
+    if (!user || (goals && goals.length >= 5)) return;
 
     const val = validateDisplayName(newName);
     if (!val.valid) return;
@@ -106,9 +106,6 @@ export function SavingsGoalTracker() {
     <div className={cn("shrink-0", color, className, {
       "rounded-full": shape === 'circle',
       "rounded-lg": shape === 'square',
-      "clip-path-triangle": shape === 'triangle',
-      "clip-path-diamond": shape === 'diamond',
-      "clip-path-hexagon": shape === 'hexagon',
     })} style={{
       clipPath: shape === 'triangle' ? 'polygon(50% 0%, 0% 100%, 100% 100%)' :
                 shape === 'diamond' ? 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' :
@@ -137,7 +134,7 @@ export function SavingsGoalTracker() {
                 <Input value={newName} onChange={e => setNewName(e.target.value)} placeholder="New Laptop" required suppressHydrationWarning />
               </div>
               <div className="space-y-2">
-                <Label>Target Amount (₹)</Label>
+                <Label>Target Amount</Label>
                 <Input type="number" value={newTarget} onChange={e => setNewTarget(e.target.value)} placeholder="50000" required suppressHydrationWarning />
               </div>
               <div className="space-y-2">
@@ -197,7 +194,7 @@ export function SavingsGoalTracker() {
 
               <div className="space-y-4">
                 <div className="flex justify-between items-end">
-                  <div className="text-2xl font-black text-primary">{formatINR(goal.savedAmount)} <span className="text-sm font-medium text-slate-400">/ {formatINR(goal.targetAmount)}</span></div>
+                  <div className="text-2xl font-black text-primary">{formatValue(goal.savedAmount)} <span className="text-sm font-medium text-slate-400">/ {formatValue(goal.targetAmount)}</span></div>
                   <div className={cn("text-lg font-black", isReached ? "text-emerald-500" : "text-primary")}>{progress}%</div>
                 </div>
                 <Progress value={progress} className="h-2" />
@@ -208,7 +205,7 @@ export function SavingsGoalTracker() {
                   ) : isLate ? (
                     <div className="flex items-center gap-2 text-amber-600 bg-amber-50 px-3 py-1 rounded-full"><AlertTriangle className="h-3 w-3" /> Past target date</div>
                   ) : (
-                    <div className="text-slate-500">Need {formatINR(goal.monthlyContribution)} / month</div>
+                    <div className="text-slate-50">Need {formatValue(goal.monthlyContribution)} / month</div>
                   )}
                   
                   {!isReached && (
@@ -220,7 +217,7 @@ export function SavingsGoalTracker() {
               {addingFundsTo === goal.id && (
                 <div className="mt-6 pt-6 border-t animate-in slide-in-from-top-2 duration-300">
                   <div className="flex gap-2">
-                    <Input type="number" value={fundAmount} onChange={e => setFundAmount(e.target.value)} placeholder="₹ Amount" className="h-12" suppressHydrationWarning />
+                    <Input type="number" value={fundAmount} onChange={e => setFundAmount(e.target.value)} placeholder="Amount" className="h-12" suppressHydrationWarning />
                     <Button onClick={() => handleAddFunds(goal.id)} className="h-12 font-black px-8" suppressHydrationWarning>Save</Button>
                     <Button variant="ghost" onClick={() => setAddingFundsTo(null)} className="h-12" suppressHydrationWarning>Cancel</Button>
                   </div>
@@ -229,16 +226,6 @@ export function SavingsGoalTracker() {
             </Card>
           );
         })}
-
-        {goals?.length === 0 && !isAdding && (
-          <div className="py-20 text-center space-y-4">
-            <Target className="h-16 w-16 text-slate-200 mx-auto" />
-            <div>
-              <p className="text-lg font-black text-slate-400 uppercase tracking-widest">No Active Missions</p>
-              <p className="text-sm text-slate-400">Add a goal like a "New Phone" or "Bike" to start tracking.</p>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

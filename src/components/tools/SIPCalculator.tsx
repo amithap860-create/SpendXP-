@@ -5,12 +5,11 @@ import { useCurrency } from '@/hooks/useCurrency';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { formatCompact } from '@/lib/dateHelpers';
-import { TrendingUp, Coins, Zap } from 'lucide-react';
+import { Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function SIPCalculator() {
-  const { formatINR } = useCurrency();
+  const { formatValue, formatCompact } = useCurrency();
   const [sip, setSip] = useState(5000);
   const [rate, setRate] = useState(12);
   const [years, setYears] = useState(15);
@@ -28,12 +27,8 @@ export function SIPCalculator() {
       totalCorpus = amount * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * (1 + monthlyRate);
       totalInvested = amount * months;
     } else {
-      // Step-up logic: Increase SIP amount every 12 months
       for (let year = 1; year <= t; year++) {
-        const remainingMonths = (t - year + 1) * 12;
-        // This is a simplified step-up calculation
         const yearMonths = 12;
-        const yearGrowthFactor = Math.pow(1 + monthlyRate, months - (year - 1) * 12);
         const yearContribution = currentSip * ((Math.pow(1 + monthlyRate, yearMonths) - 1) / monthlyRate) * (1 + monthlyRate) * Math.pow(1 + monthlyRate, (t - year) * 12);
         totalCorpus += yearContribution;
         totalInvested += currentSip * 12;
@@ -64,7 +59,7 @@ export function SIPCalculator() {
           <div className="space-y-4">
             <div className="flex justify-between items-end">
               <Label className="text-xs font-black uppercase text-slate-400">Monthly SIP</Label>
-              <span className="text-lg font-black text-primary">{formatINR(sip)}</span>
+              <span className="text-lg font-black text-primary">{formatValue(sip)}</span>
             </div>
             <Slider value={[sip]} min={100} max={100000} step={500} onValueChange={([v]) => setSip(v)} />
           </div>
@@ -126,7 +121,7 @@ export function SIPCalculator() {
 
           <div className="p-6 bg-indigo-600 rounded-2xl text-white text-center">
             <p className="text-xs font-bold uppercase tracking-widest opacity-70">Wealth Multiplier</p>
-            <div className="text-2xl font-black">Every ₹1 invested became ₹{(results.corpus / results.invested).toFixed(1)}</div>
+            <div className="text-2xl font-black">Every unit invested became {(results.corpus / results.invested).toFixed(1)} units</div>
           </div>
 
           {isStepUp && (
@@ -140,44 +135,9 @@ export function SIPCalculator() {
         </div>
       </div>
 
-      <div className="space-y-6">
-        <h4 className="text-lg font-black flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-primary" /> Potential Outcomes Matrix
-        </h4>
-        <div className="overflow-x-auto rounded-2xl border">
-          <Table>
-            <TableHeader className="bg-slate-50">
-              <TableRow>
-                <TableHead className="font-black text-xs uppercase text-slate-400">Return Rate</TableHead>
-                <TableHead className="font-black text-xs uppercase">10 Years</TableHead>
-                <TableHead className="font-black text-xs uppercase">20 Years</TableHead>
-                <TableHead className="font-black text-xs uppercase">30 Years</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {[8, 12, 15].map(r => (
-                <TableRow key={r}>
-                  <TableCell className={cn("font-black", r === rate ? "text-primary" : "text-slate-400")}>
-                    {r === 8 ? 'Conservative (8%)' : r === 12 ? 'Moderate (12%)' : 'Aggressive (15%)'}
-                  </TableCell>
-                  {[10, 20, 30].map(y => {
-                    const c = calculateSIP(sip, r, y, isStepUp ? stepUpRate : 0).corpus;
-                    return (
-                      <TableCell key={y} className={cn("font-bold text-lg", r === rate && y === years && "bg-primary/10 text-primary")}>
-                        {formatCompact(c)}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
-
       <footer className="pt-6 border-t text-[10px] text-slate-400 font-medium italic text-center">
         Past performance is not a guarantee of future returns. These calculations are for educational purposes only. 
-        Consult a SEBI-registered financial advisor before investing real money.
+        Consult a qualified financial advisor before investing real money.
       </footer>
     </div>
   );

@@ -31,6 +31,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useCurrency } from '@/hooks/useCurrency';
 
 const LEVELS = [
   { level: 1, title: 'Starter', minXP: 0, icon: User },
@@ -51,7 +52,6 @@ const BADGE_MAP = [
   { id: 'daily-challenger', title: 'Daily Challenger', icon: Calendar, color: 'text-purple-500' },
   { id: 'speed-demon', title: 'Speed Demon', icon: Zap, color: 'text-yellow-500' },
   { id: 'perfect-round', title: 'Perfect Round', icon: Star, color: 'text-cyan-500' },
-  // New Badges
   { id: 'emergency_fund_builder', title: 'Safety First', icon: ShieldCheck, color: 'text-emerald-600' },
   { id: 'debt_destroyer', title: 'Debt Destroyer', icon: Zap, color: 'text-rose-500' },
   { id: 'smart_investor', title: 'Smart Investor', icon: TrendingUp, color: 'text-blue-500' },
@@ -66,10 +66,10 @@ const BADGE_MAP = [
 
 export function XPWallet() {
   const { data, isLoading } = useProgression();
+  const { formatValue, activeCurrency } = useCurrency();
   const [unlockedBadge, setUnlockedBadge] = useState<(typeof BADGE_MAP)[0] | null>(null);
   const [prevBadges, setPrevBadges] = useState<string[]>([]);
 
-  // Watch for new badges
   useEffect(() => {
     if (data.badges.length > prevBadges.length) {
       const newlyAdded = data.badges.find(b => !prevBadges.includes(b));
@@ -90,10 +90,11 @@ export function XPWallet() {
   }, [data.totalXP]);
 
   const walletMilestone = useMemo(() => {
-    if (data.walletBalance >= 1000) return "That's a month's rent for many people!";
-    if (data.walletBalance >= 500) return "You've got an emergency fund!";
-    if (data.walletBalance >= 100) return "You could buy groceries for a week!";
-    return "Starting your journey to ₹1,000!";
+    // These thresholds are relative to base currency unit, they scale well enough visually
+    if (data.walletBalance >= 1000) return "That's a major milestone for your piggy bank!";
+    if (data.walletBalance >= 500) return "You've got a solid safety net forming!";
+    if (data.walletBalance >= 100) return "You're building real momentum!";
+    return "Starting your journey to mastery!";
   }, [data.walletBalance]);
 
   if (isLoading) return null;
@@ -138,7 +139,7 @@ export function XPWallet() {
               </div>
               <span className="font-black text-slate-900 tracking-tight text-lg">XP Game Wallet</span>
             </div>
-            <div className="text-2xl font-black text-accent">₹{data.walletBalance.toLocaleString()} saved</div>
+            <div className="text-2xl font-black text-accent">{formatValue(data.walletBalance)} saved</div>
           </div>
           <div className="p-4 rounded-xl bg-slate-50 border-2 border-dashed border-slate-200 flex items-start gap-3">
             <ArrowUpRight className="h-5 w-5 text-accent mt-0.5 shrink-0" />

@@ -15,6 +15,7 @@ interface AuthContextType {
   loading: boolean;
   emailVerified: boolean;
   currentAgeGroup: AgeGroup;
+  currencyCode: string;
   linkedProviders: string[];
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>;
@@ -34,6 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [fingerprint, setFingerprint] = useState<any>(null);
   const [emailVerified, setEmailVerified] = useState(false);
   const [currentAgeGroup, setCurrentAgeGroup] = useState<AgeGroup>('junior');
+  const [currencyCode, setCurrencyCode] = useState<string>('INR');
 
   useEffect(() => {
     if (!firebaseAuth) return;
@@ -45,7 +47,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         const userRef = doc(db, 'users', firebaseUser.uid);
         
-        // Logic 10: Heal race condition - ensure profile exists
         let snap = await getDoc(userRef);
         if (!snap.exists()) {
           await safeSetDoc(userRef, {
@@ -55,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             emailVerified: isVerified,
             createdAt: serverTimestamp(),
             balance: 10000,
+            currencyCode: 'INR',
             xp: 0,
             level: 1,
             onboardingComplete: false
@@ -64,12 +66,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         const profileData = snap.data();
         
-        // Logic 1: Live Age Group Recalculation
+        // Age group calc
         const freshAgeGroup = profileData?.birthYear 
           ? getAgeGroup(profileData.birthYear) 
           : 'junior';
         
         setCurrentAgeGroup(freshAgeGroup);
+        setCurrencyCode(profileData?.currencyCode || 'INR');
 
         if (freshAgeGroup !== profileData?.ageGroup) {
           safeUpdateDoc(userRef, { ageGroup: freshAgeGroup });
@@ -96,7 +99,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (fingerprint && !validateFingerprint(fingerprint)) {
-      console.warn('[SpendXP Security] Session hijack suspected. Terminating session.');
       auth.signOut();
       router.push('/login?reason=session_invalid');
     }
@@ -106,6 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ...auth,
     emailVerified,
     currentAgeGroup,
+    currencyCode,
   };
 
   return (
