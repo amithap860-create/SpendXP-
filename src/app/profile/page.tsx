@@ -11,51 +11,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { User, Mail, Globe, Banknote, Calendar, RefreshCcw, LoaderCircle, ShieldCheck, Sparkles } from 'lucide-react';
-import { 
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-
-const COUNTRIES = [
-  "United States", "United Kingdom", "Canada", "Australia", "Germany", 
-  "France", "Japan", "India", "Brazil", "South Africa"
-];
-
-const CURRENCIES = [
-  "USD", "EUR", "GBP", "CAD", "AUD", "JPY", "INR", "BRL", "ZAR"
-];
+import { User, LogOut, ShieldCheck, Sparkles, RefreshCw, Trophy, Gamepad2, Zap } from 'lucide-react';
+import { doc, updateDoc } from 'firebase/firestore';
 
 export default function Profile() {
-  const { name, email, age, country, currency, updateProfile, resetAccount, tasks } = useUser();
-  const { user } = useAuthContext();
+  const { name, xp, level, tasks, portfolio } = useUser();
+  const { user, signOut } = useAuthContext();
   const db = useFirestore();
   const { toast } = useToast();
   
-  const [isResetting, setIsResetting] = useState(false);
   const [strengths, setStrengths] = useState<ConceptStrengths | null>(null);
-  const [formData, setFormData] = useState({
-    name: name,
-    email: email,
-    age: age,
-    country: country,
-    currency: currency
-  });
+  const [newName, setNewName] = useState(name);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     if (user && db) {
@@ -63,129 +31,93 @@ export default function Profile() {
     }
   }, [user, db, tasks]);
 
-  const handleSave = () => {
-    if (!formData.name || !formData.email || !formData.age) {
-      toast({ title: "Missing Information", description: "Please fill out all required fields.", variant: "destructive" });
-      return;
-    }
-    updateProfile({
-      name: formData.name,
-      email: formData.email,
-      age: parseInt(formData.age.toString()),
-      country: formData.country,
-      currency: formData.currency
-    });
-    toast({ title: "Profile Updated", description: "Your settings have been saved successfully." });
-  };
-
-  const handleReset = async () => {
-    setIsResetting(true);
+  const handleUpdateName = async () => {
+    if (!user || !newName || newName === name) return;
+    setIsUpdating(true);
     try {
-      await resetAccount();
-      toast({ title: "Account Reset", description: "Your balance has been restored to $1,000 and progress cleared." });
-    } catch (error) {
-      toast({ title: "Error", description: "Could not reset account.", variant: "destructive" });
+      await updateDoc(doc(db, 'users', user.uid), { displayName: newName });
+      toast({ title: "Name Updated", description: "Your strategist name has been changed." });
+    } catch (e) {
+      toast({ title: "Error", description: "Failed to update name.", variant: "destructive" });
     } finally {
-      setIsResetting(false);
+      setIsUpdating(false);
     }
   };
 
   return (
     <div className="flex min-h-screen bg-background">
       <MainNav />
-      <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8">
-        <header className="mb-8 text-center md:text-left">
-          <h2 className="text-3xl font-bold text-primary">Your Strategist Profile</h2>
-          <p className="text-muted-foreground">Master your identity and track your growth.</p>
+      <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8 max-w-6xl mx-auto space-y-8">
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="flex items-center gap-6">
+            <div className="h-24 w-24 rounded-3xl bg-primary/10 flex items-center justify-center text-primary border-4 border-white shadow-xl">
+              <User className="h-12 w-12" />
+            </div>
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <h2 className="text-4xl font-black text-slate-900 tracking-tight">{name}</h2>
+                <Badge className="bg-primary px-3 py-1 font-black">LVL {level}</Badge>
+              </div>
+              <p className="text-slate-500 font-medium text-lg italic">Master Strategist in Training</p>
+            </div>
+          </div>
+          <Button variant="outline" onClick={signOut} className="h-14 px-8 gap-2 border-2 text-rose-600 hover:bg-rose-50 hover:text-rose-700 font-black rounded-2xl">
+            <LogOut className="h-5 w-5" /> Sign Out
+          </Button>
         </header>
 
-        <div className="grid gap-8 lg:grid-cols-12 max-w-6xl mx-auto">
-          {/* Settings Form */}
-          <div className="lg:col-span-7 space-y-6">
-            <Card className="border-none shadow-xl bg-white">
+        <div className="grid gap-8 lg:grid-cols-12">
+          <div className="lg:col-span-7 space-y-8">
+            <Card className="border-none shadow-xl bg-white overflow-hidden">
               <CardHeader className="bg-slate-50 border-b">
-                <div className="flex items-center gap-4">
-                  <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center text-primary border-4 border-white shadow-sm">
-                    <User className="h-8 w-8" />
-                  </div>
-                  <div>
-                    <CardTitle>{name || 'User Name'}</CardTitle>
-                    <CardDescription>{email}</CardDescription>
-                  </div>
-                </div>
+                <CardTitle className="text-xl font-black">Identity Settings</CardTitle>
               </CardHeader>
-              <CardContent className="p-6 space-y-6">
-                <div className="grid gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="flex items-center gap-2"><User className="h-4 w-4 text-muted-foreground" />Full Name</Label>
-                    <Input id="name" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="h-11" suppressHydrationWarning />
+              <CardContent className="p-8 space-y-6">
+                <div className="space-y-4">
+                  <Label className="text-xs font-black uppercase text-slate-400 tracking-widest">Strategist Name</Label>
+                  <div className="flex gap-3">
+                    <Input 
+                      value={newName} 
+                      onChange={(e) => setNewName(e.target.value)}
+                      className="h-14 text-lg font-bold rounded-xl"
+                    />
+                    <Button onClick={handleUpdateName} disabled={isUpdating} className="h-14 px-8 rounded-xl font-black">
+                      {isUpdating ? <RefreshCw className="animate-spin h-5 w-5" /> : "Update"}
+                    </Button>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="flex items-center gap-2"><Mail className="h-4 w-4 text-muted-foreground" />Email Address</Label>
-                    <Input id="email" type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="h-11" suppressHydrationWarning />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="age" className="flex items-center gap-2"><Calendar className="h-4 w-4 text-muted-foreground" />Age</Label>
-                      <Input id="age" type="number" value={formData.age} onChange={(e) => setFormData({...formData, age: e.target.value})} min="8" max="20" className="h-11" suppressHydrationWarning />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="flex items-center gap-2"><Banknote className="h-4 w-4 text-muted-foreground" />Currency</Label>
-                      <Select value={formData.currency} onValueChange={(value) => setFormData({...formData, currency: value})}>
-                        <SelectTrigger className="h-11"><SelectValue placeholder="Select currency" /></SelectTrigger>
-                        <SelectContent>{CURRENCIES.map(curr => (<SelectItem key={curr} value={curr}>{curr}</SelectItem>))}</SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </div>
-                <div className="pt-6 border-t">
-                  <Button onClick={handleSave} className="w-full h-12 text-lg font-bold shadow-lg shadow-primary/20">Save Changes</Button>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-none shadow-sm bg-rose-50 border-rose-100 overflow-hidden">
-              <CardHeader className="bg-rose-100/50 pb-3"><CardTitle className="text-sm font-bold text-rose-900 uppercase tracking-wider flex items-center gap-2">Danger Zone</CardTitle></CardHeader>
-              <CardContent className="p-6">
-                <p className="text-sm text-rose-800 mb-6">Resetting will restore balance to <strong>$1,000</strong> and clear all XP/mission progress.</p>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="outline" className="border-rose-200 text-rose-600 hover:bg-rose-100 font-bold gap-2">
-                      {isResetting ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <RefreshCcw className="h-4 w-4" />}
-                      Reset My Journey
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                      <AlertDialogDescription>This wipes all XP, levels, and completed missions. Your balance returns to $1,000.</AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleReset} className="bg-rose-600 hover:bg-rose-700">Reset Everything</AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </CardContent>
-            </Card>
+            <div className="grid grid-cols-2 gap-6">
+              <Card className="p-6 border-none shadow-md bg-white flex flex-col items-center text-center">
+                <div className="h-12 w-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 mb-4"><Zap className="h-6 w-6" /></div>
+                <div className="text-3xl font-black text-slate-900">{xp.toLocaleString()}</div>
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total XP Earned</div>
+              </Card>
+              <Card className="p-6 border-none shadow-md bg-white flex flex-col items-center text-center">
+                <div className="h-12 w-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 mb-4"><Gamepad2 className="h-6 w-6" /></div>
+                <div className="text-3xl font-black text-slate-900">{portfolio.length}</div>
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Investments</div>
+              </Card>
+            </div>
           </div>
 
-          {/* Strengths Sidebar */}
-          <div className="lg:col-span-5 space-y-6">
-            <Card className="border-none shadow-xl bg-white overflow-hidden">
-              <div className="bg-primary p-6 text-white">
-                <CardTitle className="flex items-center gap-2">
-                  <ShieldCheck className="h-6 w-6" />
-                  Your Strengths
+          <div className="lg:col-span-5">
+            <Card className="border-none shadow-xl bg-white overflow-hidden sticky top-8">
+              <div className="bg-primary p-8 text-white">
+                <CardTitle className="flex items-center gap-2 text-2xl font-black">
+                  <ShieldCheck className="h-6 w-6 text-accent" />
+                  Skill Mastery
                 </CardTitle>
-                <CardDescription className="text-primary-foreground/70">Based on game performance and academy progress.</CardDescription>
+                <CardDescription className="text-primary-foreground/70">Knowledge profile updated in real-time.</CardDescription>
               </div>
-              <CardContent className="p-6 space-y-6">
+              <CardContent className="p-8 space-y-6">
                 {strengths ? (
                   Object.entries(strengths).map(([key, val]) => (
                     <div key={key} className="space-y-2">
                       <div className="flex justify-between items-end">
-                        <span className="text-xs font-bold uppercase text-slate-500 tracking-wider capitalize">{key}</span>
+                        <span className="text-xs font-black uppercase text-slate-500 tracking-wider capitalize">{key}</span>
                         <span className="text-sm font-black text-primary">{val}%</span>
                       </div>
                       <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
@@ -197,16 +129,13 @@ export default function Profile() {
                     </div>
                   ))
                 ) : (
-                  <div className="flex flex-col items-center justify-center py-12 text-slate-400 italic">
-                    <LoaderCircle className="h-8 w-8 animate-spin mb-4 text-primary" />
-                    Calculating your mastery...
-                  </div>
+                  <div className="py-12 text-center text-slate-400 italic">Calculating strengths...</div>
                 )}
 
-                <div className="mt-8 p-4 rounded-xl bg-secondary/50 border border-primary/10 flex items-start gap-3">
-                  <Sparkles className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                  <p className="text-xs font-medium text-slate-600 leading-relaxed">
-                    <strong>Boost your score:</strong> Complete academy lessons or finish games with higher scores to increase your concept proficiency!
+                <div className="mt-8 p-6 rounded-2xl bg-accent/5 border-2 border-accent/10 flex items-start gap-4">
+                  <Sparkles className="h-6 w-6 text-accent shrink-0" />
+                  <p className="text-sm font-medium text-slate-600 leading-relaxed">
+                    <strong>Pro Tip:</strong> Complete Academy lessons to instantly boost your mastery scores by 20 points!
                   </p>
                 </div>
               </CardContent>
@@ -216,4 +145,8 @@ export default function Profile() {
       </main>
     </div>
   );
+}
+
+function Badge({ children, className }: { children: React.ReactNode, className?: string }) {
+  return <span className={cn("px-2 py-0.5 rounded-full text-white text-[10px] font-bold", className)}>{children}</span>;
 }
