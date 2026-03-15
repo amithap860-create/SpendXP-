@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -20,7 +19,6 @@ import {
 import { 
   verifyBeforeUpdateEmail, 
   updatePassword,
-  reauthenticateWithCredential,
   EmailAuthProvider,
   linkWithCredential,
   reauthenticateWithPopup,
@@ -37,12 +35,9 @@ import {
   Mail, 
   RefreshCw,
   CheckCircle2, 
-  AlertCircle,
   Plus,
   ShieldCheck,
-  Lock,
   Globe,
-  ChevronRight,
   Info,
   Trash2,
   ArrowRight,
@@ -54,9 +49,10 @@ import { useUser } from '@/lib/store';
 import { XPWallet } from '@/components/XPWallet';
 import { useRouter } from 'next/navigation';
 import { useCurrency } from '@/hooks/useCurrency';
-import { SUPPORTED_CURRENCIES, CurrencyOption } from '@/config/currency';
+import { SUPPORTED_CURRENCIES, CurrencyOption, DEFAULT_CURRENCY } from '@/config/currency';
 import { scaleAmount, formatCurrency } from '@/lib/formatCurrency';
 import { cn } from '@/lib/utils';
+import { SectionErrorBoundary } from '@/components/profile/SectionErrorBoundary';
 
 type ReauthMethod = 'password' | 'google' | 'both';
 
@@ -87,10 +83,8 @@ export default function ProfilePage() {
     return <ProfileSkeleton />;
   }
 
-  const isGoogleUser = linkedProviders.includes('google.com');
-  
   const memberSince = profile?.createdAt 
-    ? new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format((profile.createdAt as Timestamp).toDate())
+    ? new Intl.DateTimeFormat('en-IN', { month: 'long', year: 'numeric' }).format((profile.createdAt as Timestamp).toDate())
     : 'Recently';
 
   return (
@@ -127,21 +121,38 @@ export default function ProfilePage() {
 
         <div className="grid md:grid-cols-2 gap-8">
           <div className="space-y-8">
-            <DisplayNameSection profile={profile} uid={user?.uid!} />
-            <CurrencySection profile={profile} uid={user?.uid!} />
-            <EmailSection 
-              user={user as User} 
-              profile={profile} 
-              reauthMethod={reauthMethod} 
-              providerRefreshKey={providerRefreshKey}
-            />
-            <PasswordSection 
-              user={user as User} 
-              linkedProviders={linkedProviders} 
-              onRefresh={() => setProviderRefreshKey(k => k + 1)} 
-            />
-            <ParentSection profile={profile} uid={user?.uid!} displayName={profile?.displayName} />
-            <DangerZone user={user as User} reauthMethod={reauthMethod} />
+            <SectionErrorBoundary sectionName="Display name">
+              <DisplayNameSection profile={profile} uid={user?.uid!} />
+            </SectionErrorBoundary>
+
+            <SectionErrorBoundary sectionName="Currency">
+              <CurrencySection profile={profile} uid={user?.uid!} />
+            </SectionErrorBoundary>
+
+            <SectionErrorBoundary sectionName="Email address">
+              <EmailSection 
+                user={user as User} 
+                profile={profile} 
+                reauthMethod={reauthMethod} 
+                providerRefreshKey={providerRefreshKey}
+              />
+            </SectionErrorBoundary>
+
+            <SectionErrorBoundary sectionName="Account password">
+              <PasswordSection 
+                user={user as User} 
+                linkedProviders={linkedProviders} 
+                onRefresh={() => setProviderRefreshKey(k => k + 1)} 
+              />
+            </SectionErrorBoundary>
+
+            <SectionErrorBoundary sectionName="Parent connection">
+              <ParentSection profile={profile} uid={user?.uid!} />
+            </SectionErrorBoundary>
+
+            <SectionErrorBoundary sectionName="Danger zone">
+              <DangerZone user={user as User} reauthMethod={reauthMethod} />
+            </SectionErrorBoundary>
           </div>
 
           <div className="space-y-8">
@@ -160,12 +171,15 @@ export default function ProfilePage() {
 
 function CurrencySection({ profile, uid }: { profile: any, uid: string }) {
   const { activeCurrency } = useCurrency();
+  const [mounted, setMounted] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [hoveredCode, setHoveredCode] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
+  useEffect(() => { setMounted(true); }, []);
+
   const handleSelect = async (option: CurrencyOption) => {
-    if (option.code === profile.currencyCode) return;
+    if (!mounted || option.code === profile.currencyCode) return;
 
     const success = await safeUpdateDoc(doc(db, 'users', uid), {
       currencyCode: option.code,
@@ -179,13 +193,18 @@ function CurrencySection({ profile, uid }: { profile: any, uid: string }) {
     }
   };
 
-  const previewAmount = hoveredCode || profile.currencyCode || 'INR';
-  const previewFormatted = formatCurrency(scaleAmount(25000, previewAmount), SUPPORTED_CURRENCIES.find(c => c.code === previewAmount)!);
+  if (!mounted) {
+    return <Skeleton className="h-32 w-full rounded-2xl" />;
+  }
+
+  const previewCode = hoveredCode || profile.currencyCode || 'INR';
+  const previewOption = SUPPORTED_CURRENCIES.find(c => c.code === previewCode) || DEFAULT_CURRENCY;
+  const previewFormatted = formatCurrency(scaleAmount(25000, previewCode), previewOption);
 
   return (
-    <Card className="border-none shadow-sm bg-white p-6 relative">
+    <Card className="border-none shadow-sm bg-white p-6 relative overflow-hidden">
       {toast && (
-        <div className="absolute top-0 left-0 right-0 p-2 bg-emerald-500 text-white text-xs font-black text-center animate-out fade-out duration-1000 slide-out-to-top transition-all">
+        <div className="absolute top-0 left-0 right-0 p-2 bg-emerald-500 text-white text-[10px] font-black text-center z-10 animate-in slide-in-from-top duration-300">
           {toast}
         </div>
       )}
@@ -198,7 +217,7 @@ function CurrencySection({ profile, uid }: { profile: any, uid: string }) {
               {activeCurrency.symbol} {activeCurrency.code} — {activeCurrency.name}
             </span>
           </div>
-          <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary font-bold" suppressHydrationWarning>Change</Button>
+          <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary font-bold">Change</Button>
         </div>
       ) : (
         <div className="space-y-6 animate-in fade-in slide-in-from-top-2">
@@ -206,12 +225,13 @@ function CurrencySection({ profile, uid }: { profile: any, uid: string }) {
             {SUPPORTED_CURRENCIES.map(c => (
               <button
                 key={c.code}
-                onMouseEnter={() => setHoveredCode(c.code)}
-                onMouseLeave={() => setHoveredCode(null)}
-                onClick={() => handleSelect(c)}
+                onClick={() => {
+                  setHoveredCode(c.code);
+                  handleSelect(c);
+                }}
                 suppressHydrationWarning
                 className={cn(
-                  "p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-1",
+                  "p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-1 active:scale-95",
                   profile.currencyCode === c.code 
                     ? "border-primary bg-primary/5 ring-4 ring-primary/5" 
                     : "border-slate-100 hover:border-slate-200"
@@ -236,9 +256,11 @@ function CurrencySection({ profile, uid }: { profile: any, uid: string }) {
 
           <div className="flex justify-end">
             <button 
-              onClick={() => setIsEditing(false)}
+              onClick={() => {
+                setIsEditing(false);
+                setHoveredCode(null);
+              }}
               className="text-xs font-bold text-slate-400 hover:text-slate-600 uppercase tracking-widest"
-              suppressHydrationWarning
             >
               Cancel
             </button>
@@ -294,7 +316,7 @@ function DisplayNameSection({ profile, uid }: { profile: any, uid: string }) {
       {!isEditing ? (
         <div className="flex items-center justify-between">
           <span className="font-bold text-slate-700">{profile?.displayName}</span>
-          <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary font-bold" suppressHydrationWarning>Edit</Button>
+          <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary font-bold">Edit</Button>
         </div>
       ) : (
         <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -302,16 +324,16 @@ function DisplayNameSection({ profile, uid }: { profile: any, uid: string }) {
             value={newName} 
             onChange={(e) => setNewName(e.target.value)} 
             placeholder="New display name"
-            className="h-12"
+            className="h-12 text-base"
             suppressHydrationWarning
           />
           {error && <p className="text-xs text-rose-500 font-bold">{error}</p>}
           {success && <p className="text-xs text-emerald-500 font-bold">Name updated!</p>}
           <div className="flex gap-2">
-            <Button onClick={handleSave} disabled={loading || success} size="sm" className="font-bold" suppressHydrationWarning>
+            <Button onClick={handleSave} disabled={loading || success} size="sm" className="font-bold">
               {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Save'}
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-slate-400" suppressHydrationWarning>Cancel</Button>
+            <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-slate-400">Cancel</Button>
           </div>
         </div>
       )}
@@ -329,7 +351,6 @@ function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { use
   const [emailChangeLoading, setEmailChangeLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
 
-  // Load check for pending change
   useEffect(() => {
     if (profile?.pendingEmail && profile.pendingEmail !== user.email && emailChangeStep === 'idle') {
       setNewEmail(profile.pendingEmail);
@@ -337,7 +358,6 @@ function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { use
     }
   }, [profile, user.email, emailChangeStep]);
 
-  // Poller for pending step
   useEffect(() => {
     if (emailChangeStep !== 'pending') return;
 
@@ -356,15 +376,6 @@ function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { use
 
     return () => clearInterval(interval);
   }, [emailChangeStep, newEmail, user]);
-
-  // Timer for resend
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (resendCooldown > 0) {
-      timer = setInterval(() => setResendCooldown(c => c - 1), 1000);
-    }
-    return () => clearInterval(timer);
-  }, [resendCooldown]);
 
   const handleContinue = () => {
     const val = validateEmail(newEmail);
@@ -385,9 +396,7 @@ function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { use
       return true;
     } catch (err: any) {
       setEmailChangeLoading(false);
-      if (err.code === 'auth/popup-closed-by-user') setEmailChangeError('Sign-in window was closed. Please try again.');
-      else if (err.code === 'auth/popup-blocked') setEmailChangeError('Pop-up was blocked. Please allow pop-ups and try again.');
-      else setEmailChangeError('Could not verify your identity.');
+      setEmailChangeError('Could not verify your identity.');
       return false;
     }
   };
@@ -429,25 +438,6 @@ function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { use
     }
   };
 
-  const handleResend = async () => {
-    if (resendCooldown > 0) return;
-    if (!rateLimiter.check({ key: 'email:change:resend', maxCalls: 1, windowMs: 60000 })) return;
-    try {
-      await verifyBeforeUpdateEmail(user, newEmail);
-      setResendCooldown(60);
-    } catch (err) {
-      setEmailChangeError('Failed to resend email.');
-    }
-  };
-
-  const cancelEmailChange = async () => {
-    await safeUpdateDoc(doc(db, 'users', user.uid), { pendingEmail: null });
-    setEmailChangeStep('idle');
-    setNewEmail('');
-    setReauthPassword('');
-    setEmailChangeError('');
-  };
-
   return (
     <Card className="border-none shadow-sm bg-white p-6">
       <h3 className="text-[15px] font-medium text-primary border-b border-slate-100 pb-3 mb-4">Email address</h3>
@@ -461,15 +451,12 @@ function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { use
             </div>
             <Button variant="ghost" size="sm" onClick={() => setEmailChangeStep('form')} className="text-primary font-bold">Change</Button>
           </div>
-          <p className="text-xs text-slate-400 italic">
-            You'll confirm this change with {reauthMethod === 'google' ? 'Google Sign-In' : 'your password'}.
-          </p>
         </div>
       )}
 
       {emailChangeStep === 'form' && (
         <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
-          <Label className="text-xs font-black uppercase text-slate-400 tracking-widest">Enter your new email address</Label>
+          <Label className="text-xs font-black uppercase text-slate-400 tracking-widest">New email address</Label>
           <Input 
             type="email" 
             value={newEmail} 
@@ -478,12 +465,9 @@ function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { use
             className="h-12 text-base"
             suppressHydrationWarning
           />
-          <p className="text-xs text-slate-500 leading-relaxed font-medium">
-            We'll send a verification link to this address. Your email won't change until you click it.
-          </p>
           {emailChangeError && <p className="text-xs text-rose-500 font-bold">{emailChangeError}</p>}
           <div className="flex gap-2">
-            <Button onClick={handleContinue} size="sm" className="font-bold">Continue <ArrowRight className="h-4 w-4 ml-1" /></Button>
+            <Button onClick={handleContinue} size="sm" className="font-bold">Continue</Button>
             <Button variant="ghost" size="sm" onClick={() => setEmailChangeStep('idle')} className="text-slate-400">Cancel</Button>
           </div>
         </div>
@@ -492,17 +476,17 @@ function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { use
       {emailChangeStep === 'reauth' && (
         <div className="space-y-6 animate-in slide-in-from-top-2 duration-300">
           <div className="space-y-1">
-            <h4 className="font-bold text-slate-900">Confirm it's you</h4>
+            <h4 className="font-bold text-slate-900 text-sm">Confirm it's you</h4>
             <p className="text-xs text-slate-500">We need to verify your identity before changing your email.</p>
           </div>
 
           {(reauthMethod === 'password' || reauthMethod === 'both') && (
             <div className="space-y-3">
-              <Label className="text-[10px] font-black uppercase text-slate-400">Enter current password</Label>
               <Input 
                 type="password" 
                 value={reauthPassword} 
                 onChange={(e) => setReauthPassword(e.target.value)}
+                placeholder="Current Password"
                 className="h-12 text-base"
                 suppressHydrationWarning
               />
@@ -512,19 +496,14 @@ function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { use
                   if (ok) await proceedWithEmailChange();
                 }} 
                 disabled={emailChangeLoading || !reauthPassword} 
-                className="w-full font-black"
+                className="w-full font-black text-sm"
               >
                 {emailChangeLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Confirm with Password'}
               </Button>
             </div>
           )}
 
-          {reauthMethod === 'both' && (
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
-              <div className="relative flex justify-center text-[10px] uppercase"><span className="bg-white px-2 text-slate-400 font-bold">or</span></div>
-            </div>
-          )}
+          {reauthMethod === 'both' && <div className="text-center text-[10px] uppercase font-bold text-slate-400">or</div>}
 
           {(reauthMethod === 'google' || reauthMethod === 'both') && (
             <Button 
@@ -534,10 +513,9 @@ function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { use
                 if (ok) await proceedWithEmailChange();
               }}
               disabled={emailChangeLoading}
-              className="w-full h-12 gap-3 border-2 font-bold bg-white"
+              className="w-full h-12 gap-3 border-2 font-bold bg-white text-sm"
             >
-              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="h-5 w-5" alt="" />
-              {emailChangeLoading ? 'Verifying...' : 'Confirm with Google'}
+              Confirm with Google
             </Button>
           )}
 
@@ -550,28 +528,13 @@ function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { use
       )}
 
       {emailChangeStep === 'pending' && (
-        <div className="space-y-4 animate-in fade-in duration-300">
-          <div className="p-4 bg-teal-50 border-2 border-teal-100 rounded-2xl space-y-3">
-            <div className="flex items-center gap-2 text-teal-700 font-bold text-sm">
-              <Mail className="h-4 w-4" /> Verification email sent
-            </div>
-            <p className="text-xs text-teal-800 leading-relaxed font-medium">
-              We sent a link to <span className="font-black underline">{newEmail}</span>. Click it to confirm the change. Your current email stays active until you verify the new one.
-            </p>
-            <div className="flex gap-4 pt-1">
-              <button 
-                onClick={handleResend} 
-                disabled={resendCooldown > 0} 
-                className={cn("text-[10px] font-black uppercase tracking-widest transition-opacity", resendCooldown > 0 ? "opacity-50 cursor-not-allowed" : "hover:underline")}
-              >
-                {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend link'}
-              </button>
-              <button onClick={cancelEmailChange} className="text-[10px] font-black uppercase tracking-widest text-rose-600 hover:underline">Cancel change</button>
-            </div>
+        <div className="p-4 bg-teal-50 border-2 border-teal-100 rounded-2xl space-y-3">
+          <div className="flex items-center gap-2 text-teal-700 font-bold text-sm">
+            <Mail className="h-4 w-4" /> Verification sent
           </div>
-          <div className="flex items-center justify-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse">
-            <RefreshCw className="h-3 w-3 animate-spin" /> Waiting for verification...
-          </div>
+          <p className="text-xs text-teal-800 leading-relaxed font-medium">
+            Verify <span className="font-black underline">{newEmail}</span> to complete the change.
+          </p>
         </div>
       )}
 
@@ -580,14 +543,12 @@ function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { use
           <div className="h-8 w-8 rounded-full bg-emerald-500 flex items-center justify-center text-white shrink-0">
             <CheckCircle2 className="h-5 w-5" />
           </div>
-          <div className="font-bold text-emerald-900">Email updated to {newEmail}!</div>
+          <div className="font-bold text-emerald-900 text-sm">Email updated!</div>
         </div>
       )}
     </Card>
   );
 }
-
-type PasswordSectionState = 'loading' | 'google_only' | 'email_only' | 'google_and_password' | 'no_provider';
 
 function PasswordSection({ user, linkedProviders, onRefresh }: { user: User, linkedProviders: string[], onRefresh: () => void }) {
   const router = useRouter();
@@ -602,53 +563,8 @@ function PasswordSection({ user, linkedProviders, onRefresh }: { user: User, lin
   const hasPassword = linkedProviders.includes('password');
   const hasGoogle = linkedProviders.includes('google.com');
 
-  const passwordState: PasswordSectionState = useMemo(() => {
-    if (!user) return 'loading';
-    if (hasGoogle && !hasPassword) return 'google_only';
-    if (!hasGoogle && hasPassword) return 'email_only';
-    if (hasGoogle && hasPassword) return 'google_and_password';
-    return 'no_provider';
-  }, [user, hasGoogle, hasPassword]);
-
-  const passwordValidation = useMemo(() => validatePassword(newPass), [newPass]);
-
-  const handleAddPassword = async () => {
-    if (newPass !== confirmPass) { setError("Passwords don't match."); return; }
-    const validation = validatePassword(newPass);
-    if (!validation.valid) { setError(validation.error); return; }
-
-    setLoading(true);
-    setError(null);
-    try {
-      const credential = EmailAuthProvider.credential(user.email!, newPass);
-      await linkWithCredential(user, credential);
-      await safeUpdateDoc(doc(db, 'users', user.uid), {
-        provider: 'google+email',
-        updatedAt: serverTimestamp()
-      });
-      await user.reload();
-      onRefresh();
-      setSuccess('Password set! You can now sign in with either Google or email.');
-      setIsEditing(false);
-    } catch (err: any) {
-      if (err.code === 'auth/email-already-in-use') setError('This email already has a password account.');
-      else if (err.code === 'auth/requires-recent-login') {
-        try {
-          const provider = new GoogleAuthProvider();
-          await reauthenticateWithPopup(user, provider);
-          const credential = EmailAuthProvider.credential(user.email!, newPass);
-          await linkWithCredential(user, credential);
-          await user.reload();
-          onRefresh();
-          setSuccess('Password set successfully!');
-          setIsEditing(false);
-        } catch (reAuthErr) { setError('Please sign out and back in to add a password.'); }
-      } else setError('Failed to add password.');
-    } finally { setLoading(false); }
-  };
-
   const handleUpdatePassword = async () => {
-    if (newPass !== confirmPass) { setError("New passwords don't match."); return; }
+    if (newPass !== confirmPass) { setError("Passwords don't match."); return; }
     const validation = validatePassword(newPass);
     if (!validation.valid) { setError(validation.error); return; }
 
@@ -658,126 +574,42 @@ function PasswordSection({ user, linkedProviders, onRefresh }: { user: User, lin
       const credential = EmailAuthProvider.credential(user.email!, currentPass);
       await reauthenticateWithCredential(user, credential);
       await updatePassword(user, newPass);
-      setSuccess('Password updated successfully!');
+      setSuccess('Password updated!');
       setIsEditing(false);
     } catch (err: any) {
       if (err.code === 'auth/requires-recent-login') {
         await auth.signOut();
         router.push('/login?reason=reauth_required');
-      } else if (err.code === 'auth/wrong-password') setError('Current password is incorrect.');
-      else setError('Update failed. Please try again.');
+      } else setError('Incorrect current password.');
     } finally { setLoading(false); }
   };
-
-  const handleGoogleReauth = async () => {
-    setLoading(true);
-    try {
-      const provider = new GoogleAuthProvider();
-      await reauthenticateWithPopup(user, provider);
-      await updatePassword(user, newPass);
-      setSuccess('Password updated with Google confirmation!');
-      setIsEditing(false);
-    } catch (err: any) { setError('Google re-authentication failed.'); }
-    finally { setLoading(false); }
-  };
-
-  if (passwordState === 'loading') {
-    return (
-      <Card className="border-none shadow-sm bg-white p-6 space-y-4">
-        <Skeleton className="h-4 w-32" />
-        <Skeleton className="h-10 w-full" />
-      </Card>
-    );
-  }
-
-  if (passwordState === 'no_provider') return null;
 
   return (
     <Card className="border-none shadow-sm bg-white p-6">
       <h3 className="text-[15px] font-medium text-primary border-b border-slate-100 pb-3 mb-4">Account password</h3>
+      {success && <p className="mb-4 text-xs text-emerald-600 font-bold">{success}</p>}
       
-      {success && (
-        <div className="mb-4 p-3 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-100 flex items-center gap-2">
-          <CheckCircle2 className="h-4 w-4" /> {success}
+      {!isEditing ? (
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-bold text-slate-700">••••••••••••</span>
+          <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary font-bold">Change</Button>
         </div>
-      )}
-
-      {passwordState === 'google_only' && (
-        <div className="space-y-4">
-          <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-start gap-3">
-            <Info className="h-5 w-5 text-slate-400 shrink-0 mt-0.5" />
-            <p className="text-sm text-slate-600 leading-tight">You signed in with Google. You haven't set a password yet.</p>
+      ) : (
+        <div className="space-y-4 animate-in slide-in-from-top-2">
+          <Input type="password" placeholder="Current Password" value={currentPass} onChange={(e) => setCurrentPass(e.target.value)} className="h-12 text-base" />
+          <Input type="password" placeholder="New Password" value={newPass} onChange={(e) => setNewPass(e.target.value)} className="h-12 text-base" />
+          {error && <p className="text-xs text-rose-500 font-bold">{error}</p>}
+          <div className="flex gap-2">
+            <Button onClick={handleUpdatePassword} disabled={loading} size="sm" className="font-bold">Update</Button>
+            <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-slate-400">Cancel</Button>
           </div>
-          {!isEditing ? (
-            <Button onClick={() => setIsEditing(true)} variant="outline" className="gap-2 font-bold" suppressHydrationWarning>
-              <Plus className="h-4 w-4" /> Add a password
-            </Button>
-          ) : (
-            <div className="space-y-4 animate-in slide-in-from-top-2">
-              <div className="space-y-3">
-                <Input type="password" placeholder="New Password" value={newPass} onChange={(e) => setNewPass(e.target.value)} className="h-12" suppressHydrationWarning />
-                {newPass && (
-                  <div className="flex gap-1 h-1 px-1">
-                    <div className={cn("flex-1 rounded-full", passwordValidation.strength === 'weak' ? "bg-rose-500" : "bg-emerald-500")} />
-                    <div className={cn("flex-1 rounded-full", ['fair', 'strong'].includes(passwordValidation.strength) ? "bg-emerald-500" : "bg-slate-100")} />
-                    <div className={cn("flex-1 rounded-full", passwordValidation.strength === 'strong' ? "bg-emerald-500" : "bg-slate-100")} />
-                  </div>
-                )}
-                <Input type="password" placeholder="Confirm Password" value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} className="h-12" suppressHydrationWarning />
-              </div>
-              {error && <p className="text-xs text-rose-500 font-bold">{error}</p>}
-              <div className="flex gap-2">
-                <Button onClick={handleAddPassword} disabled={loading} size="sm" className="font-bold">Set Password</Button>
-                <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-slate-400">Cancel</Button>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {(passwordState === 'email_only' || passwordState === 'google_and_password') && (
-        <div className="space-y-4">
-          {passwordState === 'google_and_password' && (
-            <Badge variant="secondary" className="bg-teal-50 text-teal-700 border-teal-100 gap-1 font-bold">
-              <ShieldCheck className="h-3 w-3" /> Google + Password linked
-            </Badge>
-          )}
-          
-          {!isEditing ? (
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-bold text-slate-700">••••••••••••</span>
-              <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary font-bold">Change</Button>
-            </div>
-          ) : (
-            <div className="space-y-4 animate-in slide-in-from-top-2">
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-4">
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Confirm identity</p>
-                <Input type="password" placeholder="Current Password" value={currentPass} onChange={(e) => setCurrentPass(e.target.value)} className="h-12 bg-white" suppressHydrationWarning />
-                {passwordState === 'google_and_password' && (
-                  <Button variant="outline" onClick={handleGoogleReauth} className="w-full gap-2 font-bold h-12 bg-white border-2">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="h-4 w-4" alt="" />
-                    Or: Confirm with Google
-                  </Button>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Input type="password" placeholder="New Password" value={newPass} onChange={(e) => setNewPass(e.target.value)} className="h-12" suppressHydrationWarning />
-                <Input type="password" placeholder="Confirm New Password" value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} className="h-12" suppressHydrationWarning />
-              </div>
-              {error && <p className="text-xs text-rose-500 font-bold">{error}</p>}
-              <div className="flex gap-2">
-                <Button onClick={handleUpdatePassword} disabled={loading} size="sm" className="font-bold">Update Password</Button>
-                <Button variant="ghost" size="sm" onClick={() => { setIsEditing(false); setError(null); }} className="text-slate-400">Cancel</Button>
-              </div>
-            </div>
-          )}
         </div>
       )}
     </Card>
   );
 }
 
-function ParentSection({ profile, uid, displayName }: { profile: any, uid: string, displayName: string }) {
+function ParentSection({ profile, uid }: { profile: any, uid: string }) {
   const [parentEmail, setParentEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -787,10 +619,9 @@ function ParentSection({ profile, uid, displayName }: { profile: any, uid: strin
     const val = validateEmail(parentEmail);
     if (!val.valid) { setError(val.error!); return; }
     setLoading(true);
-    setError(null);
     try {
       await safeUpdateDoc(doc(db, 'users', uid), { pendingParentEmail: parentEmail.toLowerCase() });
-      setMessage(`Invite sent to ${parentEmail}!`);
+      setMessage(`Invite sent!`);
     } catch (err) { setError('Failed to send invite.'); }
     finally { setLoading(false); }
   };
@@ -799,12 +630,11 @@ function ParentSection({ profile, uid, displayName }: { profile: any, uid: strin
     <Card className="border-none shadow-sm bg-white p-6">
       <h3 className="text-[15px] font-medium text-primary border-b border-slate-100 pb-3 mb-4">Parent connection</h3>
       <div className="space-y-4">
-        <p className="text-sm text-slate-500 leading-relaxed">Invite a parent to monitor your learning progress and unlock badges.</p>
+        <p className="text-xs text-slate-500 leading-relaxed">Invite a parent to monitor your learning journey.</p>
         <div className="flex gap-2">
-          <Input type="email" placeholder="Parent's email" value={parentEmail} onChange={(e) => setParentEmail(e.target.value)} className="h-12" suppressHydrationWarning />
+          <Input type="email" placeholder="Parent's email" value={parentEmail} onChange={(e) => setParentEmail(e.target.value)} className="h-12 text-base" />
           <Button onClick={handleInvite} disabled={loading} className="font-bold">Invite</Button>
         </div>
-        {error && <p className="text-xs text-rose-500 font-bold">{error}</p>}
         {message && <p className="text-xs text-emerald-600 font-bold">{message}</p>}
       </div>
     </Card>
@@ -819,29 +649,20 @@ function DangerZone({ user, reauthMethod }: { user: User, reauthMethod: ReauthMe
 
   const handleDelete = async () => {
     setLoading(true);
-    setError('');
     try {
-      let success = false;
       if (reauthMethod === 'google') {
         const provider = new GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: 'select_account' });
         await reauthenticateWithPopup(user, provider);
-        success = true;
       } else {
         const credential = EmailAuthProvider.credential(user.email!, password);
+        const { reauthenticateWithCredential } = await import('firebase/auth');
         await reauthenticateWithCredential(user, credential);
-        success = true;
       }
-
-      if (success) {
-        await deleteDoc(doc(db, 'users', user.uid));
-        await user.delete();
-        window.location.href = '/login?reason=account_deleted';
-      }
+      await deleteDoc(doc(db, 'users', user.uid));
+      await user.delete();
+      window.location.href = '/login?reason=account_deleted';
     } catch (err: any) {
-      if (err.code === 'auth/wrong-password') setError('Incorrect password.');
-      else if (err.code === 'auth/requires-recent-login') setError('Please sign out and sign back in to delete your account.');
-      else setError('Failed to delete account. Please try again later.');
+      setError('Failed to delete account. Try again later.');
     } finally {
       setLoading(false);
     }
@@ -852,53 +673,20 @@ function DangerZone({ user, reauthMethod }: { user: User, reauthMethod: ReauthMe
       <h3 className="text-[15px] font-bold text-rose-600 border-b border-rose-100 pb-3 mb-4">Danger Zone</h3>
       
       {step === 1 ? (
-        <div className="space-y-4">
-          <p className="text-xs text-rose-700 font-medium leading-relaxed">
-            Deleting your account is permanent. You will lose all your XP, badges, and progress.
-          </p>
-          <Button 
-            variant="outline" 
-            onClick={() => setStep(2)} 
-            className="w-full h-12 border-rose-200 text-rose-600 hover:bg-rose-100 hover:text-rose-700 font-bold gap-2"
-          >
-            <Trash2 className="h-4 w-4" /> Delete My Account
-          </Button>
-        </div>
+        <Button 
+          variant="outline" 
+          onClick={() => setStep(2)} 
+          className="w-full h-12 border-rose-200 text-rose-600 hover:bg-rose-100 font-bold gap-2 text-sm"
+        >
+          <Trash2 className="h-4 w-4" /> Delete Account
+        </Button>
       ) : (
-        <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
-          <div className="flex items-center justify-between">
-            <h4 className="text-sm font-black text-rose-900">Final Confirmation</h4>
-            <button onClick={() => { setStep(1); setError(''); }} className="text-rose-400 hover:text-rose-600"><X className="h-4 w-4" /></button>
-          </div>
-          
-          {reauthMethod === 'password' ? (
-            <div className="space-y-3">
-              <Label className="text-[10px] font-black uppercase text-rose-400">Enter your password to proceed</Label>
-              <Input 
-                type="password" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)}
-                className="h-12 bg-white border-rose-200"
-                placeholder="Password"
-                suppressHydrationWarning
-              />
-            </div>
-          ) : (
-            <p className="text-xs text-rose-700 font-bold bg-rose-100/50 p-3 rounded-lg">
-              Confirm your identity with Google to permanently delete your data.
-            </p>
-          )}
-
+        <div className="space-y-4 animate-in slide-in-from-top-2">
+          <p className="text-xs text-rose-700 font-bold">This is permanent. Confirm to proceed.</p>
+          {reauthMethod === 'password' && <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="h-12 bg-white text-base" placeholder="Password" />}
           {error && <p className="text-xs text-rose-600 font-bold">{error}</p>}
-
-          <Button 
-            onClick={handleDelete} 
-            disabled={loading || (reauthMethod === 'password' && !password)} 
-            className="w-full h-12 bg-rose-600 hover:bg-rose-700 text-white font-black uppercase tracking-widest gap-2 shadow-lg shadow-rose-200"
-          >
-            {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-            Confirm Permanent Deletion
-          </Button>
+          <Button onClick={handleDelete} disabled={loading} className="w-full h-12 bg-rose-600 hover:bg-rose-700 text-white font-black uppercase text-xs">Confirm Deletion</Button>
+          <Button variant="ghost" onClick={() => setStep(1)} className="w-full text-xs">Cancel</Button>
         </div>
       )}
     </Card>

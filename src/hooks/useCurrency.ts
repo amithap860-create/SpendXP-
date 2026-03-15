@@ -10,7 +10,8 @@ import { SUPPORTED_CURRENCIES, DEFAULT_CURRENCY, CurrencyOption } from '@/config
 import { formatCurrency, formatCompact as libFormatCompact, scaleAmount } from '@/lib/formatCurrency';
 
 export function useCurrency() {
-  const { currencyCode } = useAuthContext();
+  const authContext = useAuthContext();
+  const currencyCode = authContext?.currencyCode || 'INR';
 
   const activeCurrency: CurrencyOption = useMemo(() => {
     return SUPPORTED_CURRENCIES.find(c => c.code === currencyCode) || DEFAULT_CURRENCY;
