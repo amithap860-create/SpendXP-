@@ -1,7 +1,7 @@
 'use client';
 
 import { useReducer, useCallback, useEffect, useRef } from 'react';
-import { doc, getDoc, increment, writeBatch, serverTimestamp, arrayUnion, collection, addDoc } from 'firebase/firestore';
+import { doc, getDoc, increment, writeBatch, serverTimestamp, arrayUnion, collection } from 'firebase/firestore';
 import { useFirestore, useUser } from '@/firebase';
 import { playCorrect, playWrong, playGameOver, playCombo } from '@/lib/sounds';
 
@@ -221,7 +221,7 @@ export function useGameEngine(config: GameConfig) {
     });
   }, [config.totalRounds, config.timePerRound, config.xpPerWin]);
 
-  const endGame = useCallback(async (finalXpBonus = 0) => {
+  const endGame = useCallback(async (finalXpBonus = 0, metadata: any = {}) => {
     if (!user || !db) return { isHighScore: false };
     
     dispatch({ type: 'END_GAME' });
@@ -248,8 +248,8 @@ export function useGameEngine(config: GameConfig) {
         xpEarned: increment(sessionXp),
         gamesPlayed: increment(1),
         lastPlayedAt: serverTimestamp(),
-        // Store recent trend
-        scoreHistory: arrayUnion(state.score)
+        scoreHistory: arrayUnion(state.score),
+        ...metadata // Extra fields like categoryAccuracy
       }, { merge: true });
 
       const highScoreKeyMap: Record<string, string> = {
@@ -265,7 +265,7 @@ export function useGameEngine(config: GameConfig) {
 
       // Badge Logic
       const newBadges: string[] = [];
-      if (gameSnap.exists() === false) newBadges.push('first-win');
+      if (!gameSnap.exists()) newBadges.push('first-win');
       if (state.score === config.totalRounds && config.totalRounds > 0) newBadges.push('perfect-round');
       if (state.bestStreak >= 5) newBadges.push('streak-5');
 
@@ -289,7 +289,7 @@ export function useGameEngine(config: GameConfig) {
         playedAt: serverTimestamp()
       });
 
-      // Update root user XP for legacy support/sync
+      // Update root user XP
       batch.update(userRootRef, {
         xp: increment(sessionXp)
       });

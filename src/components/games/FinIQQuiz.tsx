@@ -108,7 +108,7 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
     setSelectedOption(null);
     setShowExplanation(false);
     if (currentRound < 10) nextRound();
-    else endGame();
+    else endGame(0, { categoryAccuracy: categoryStats });
   };
 
   useEffect(() => {

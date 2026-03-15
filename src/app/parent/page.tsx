@@ -3,39 +3,34 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, where, orderBy, limit, doc, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { MainNav } from '@/components/layout/main-nav';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { WeeklyReport } from '@/components/parent/WeeklyReport';
-import { useCurrency } from '@/hooks/useCurrency';
+import { getConceptStrengths, ConceptStrengths } from '@/lib/progressionService';
 import { 
-  TrendingUp, 
   Zap, 
   Gamepad2, 
   Trophy, 
   Clock, 
-  AlertCircle,
-  FileText,
-  BarChart3,
-  ChevronRight,
+  FileText, 
   ShieldCheck,
   Activity,
-  ArrowUpRight,
-  ArrowDownRight
+  Users,
+  UserPlus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function ParentDashboard() {
   const { user } = useAuthContext();
   const db = useFirestore();
-  const { formatINR } = useCurrency();
   
   const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
   const [showReport, setShowReport] = useState(false);
+  const [strengths, setStrengths] = useState<ConceptStrengths | null>(null);
 
   // Fetch linked children
   const childrenQuery = useMemoFirebase(() => {
@@ -71,6 +66,12 @@ export default function ParentDashboard() {
     return () => unsubscribe();
   }, [db, selectedChildId]);
 
+  // Fetch Live Strengths
+  useEffect(() => {
+    if (!selectedChildId || !db) return;
+    getConceptStrengths(db, selectedChildId).then(setStrengths);
+  }, [selectedChildId, db, activityLog]);
+
   if (isChildrenLoading) return <div className="flex h-screen items-center justify-center"><Activity className="animate-spin text-primary" /></div>;
 
   if (!children || children.length === 0) {
@@ -90,17 +91,17 @@ export default function ParentDashboard() {
     );
   }
 
-  // Radar Chart Data Calculation
-  const radarData = [
-    { label: 'Budgeting', score: 85 },
-    { label: 'Saving', score: 70 },
-    { label: 'Investing', score: 45 },
-    { label: 'Credit', score: 30 },
-    { label: 'Taxes', score: 60 },
-    { label: 'Spending', score: 90 },
-  ];
+  // Radar Chart Calculation
+  const radarItems = strengths ? [
+    { label: 'Budgeting', score: strengths.budgeting },
+    { label: 'Saving', score: strengths.saving },
+    { label: 'Investing', score: strengths.investing },
+    { label: 'Credit', score: strengths.credit },
+    { label: 'Taxes', score: strengths.taxes },
+    { label: 'Spending', score: strengths.spending },
+  ] : [];
 
-  const getRadarPoints = (data: typeof radarData, size: number) => {
+  const getRadarPoints = (data: any[], size: number) => {
     const center = size / 2;
     const radius = size * 0.4;
     return data.map((d, i) => {
@@ -166,7 +167,6 @@ export default function ParentDashboard() {
 
         {selectedChild && (
           <div className="grid gap-8 lg:grid-cols-12">
-            {/* Overview Section */}
             <div className="lg:col-span-12 grid gap-6 md:grid-cols-3">
               <Card className="border-none shadow-md bg-white">
                 <CardContent className="p-6 flex items-center gap-4">
@@ -183,12 +183,11 @@ export default function ParentDashboard() {
               <Card className="border-none shadow-md bg-white">
                 <CardContent className="p-6 flex items-center gap-4">
                   <div className="h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600"><Gamepad2 className="h-6 w-6" /></div>
-                  <div><div className="text-[10px] font-bold text-slate-400 uppercase">Sessions This Week</div><div className="text-2xl font-black">12</div></div>
+                  <div><div className="text-[10px] font-bold text-slate-400 uppercase">Latest Session</div><div className="text-2xl font-black">{activityLog?.[0]?.gameName || 'None'}</div></div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Main Content Grid */}
             <div className="lg:col-span-8 space-y-8">
               {/* Concept Radar */}
               <Card className="border-none shadow-xl bg-white overflow-hidden">
@@ -196,35 +195,38 @@ export default function ParentDashboard() {
                   <CardTitle className="text-xl font-black flex items-center gap-2">
                     <ShieldCheck className="h-5 w-5 text-primary" /> Concept Proficiency
                   </CardTitle>
-                  <CardDescription>Visualizing strengths and knowledge gaps.</CardDescription>
+                  <CardDescription>Knowledge profile updated in real-time.</CardDescription>
                 </CardHeader>
                 <CardContent className="p-8 flex flex-col md:flex-row items-center justify-around gap-8">
-                  <div className="relative">
-                    <svg viewBox="0 0 100 100" className="w-64 h-64">
-                      {/* Background Hex */}
-                      <polygon points={getBackgroundHex(100)} fill="#f1f5f9" stroke="#e2e8f0" strokeWidth="0.5" />
-                      <circle cx="50" cy="50" r="20" fill="none" stroke="#e2e8f0" strokeWidth="0.5" strokeDasharray="2 2" />
-                      <circle cx="50" cy="50" r="40" fill="none" stroke="#e2e8f0" strokeWidth="0.5" />
-                      {/* Data Polygon */}
-                      <polygon points={getRadarPoints(radarData, 100)} fill="rgba(45, 114, 219, 0.2)" stroke="#2e72db" strokeWidth="2" />
-                      {/* Points */}
-                      {radarData.map((d, i) => {
-                        const angle = (Math.PI * 2 * i) / radarData.length - Math.PI / 2;
-                        const x = 50 + 40 * (d.score / 100) * Math.cos(angle);
-                        const y = 50 + 40 * (d.score / 100) * Math.sin(angle);
-                        return <circle key={i} cx={x} cy={y} r="2" fill="#2e72db" />;
-                      })}
-                    </svg>
-                  </div>
-                  <div className="grid grid-cols-2 gap-x-8 gap-y-4">
-                    {radarData.map((d, i) => (
-                      <div key={i} className="flex items-center gap-2">
-                        <div className="h-2 w-2 rounded-full bg-primary" />
-                        <span className="text-xs font-bold text-slate-600 uppercase">{d.label}</span>
-                        <span className="text-xs font-black ml-auto">{d.score}%</span>
+                  {strengths ? (
+                    <>
+                      <div className="relative">
+                        <svg viewBox="0 0 100 100" className="w-64 h-64">
+                          <polygon points={getBackgroundHex(100)} fill="#f1f5f9" stroke="#e2e8f0" strokeWidth="0.5" />
+                          <circle cx="50" cy="50" r="20" fill="none" stroke="#e2e8f0" strokeWidth="0.5" strokeDasharray="2 2" />
+                          <circle cx="50" cy="50" r="40" fill="none" stroke="#e2e8f0" strokeWidth="0.5" />
+                          <polygon points={getRadarPoints(radarItems, 100)} fill="rgba(45, 114, 219, 0.2)" stroke="#2e72db" strokeWidth="2" />
+                          {radarItems.map((d, i) => {
+                            const angle = (Math.PI * 2 * i) / radarItems.length - Math.PI / 2;
+                            const x = 50 + 40 * (d.score / 100) * Math.cos(angle);
+                            const y = 50 + 40 * (d.score / 100) * Math.sin(angle);
+                            return <circle key={i} cx={x} cy={y} r="2" fill="#2e72db" />;
+                          })}
+                        </svg>
                       </div>
-                    ))}
-                  </div>
+                      <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                        {radarItems.map((d, i) => (
+                          <div key={i} className="flex items-center gap-2">
+                            <div className="h-2 w-2 rounded-full bg-primary" />
+                            <span className="text-xs font-bold text-slate-600 uppercase">{d.label}</span>
+                            <span className="text-xs font-black ml-auto">{d.score}%</span>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="h-64 flex items-center justify-center w-full text-muted-foreground italic">Calculating strengths...</div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -246,7 +248,7 @@ export default function ParentDashboard() {
                       </div>
                       <div className="flex items-end gap-1 h-8">
                         {(game.scoreHistory || [0,0,0,0,0]).slice(-5).map((s: number, i: number) => {
-                          const max = Math.max(...game.scoreHistory, 1);
+                          const max = Math.max(...(game.scoreHistory || [1]), 1);
                           const h = (s / max) * 100;
                           return (
                             <div key={i} className="flex-1 bg-slate-100 rounded-t-sm relative group overflow-hidden" style={{ height: `${Math.max(h, 10)}%` }}>
@@ -261,34 +263,20 @@ export default function ParentDashboard() {
               </div>
             </div>
 
-            {/* Sidebar Section */}
             <div className="lg:col-span-4 space-y-8">
-              {/* Screen Time Today */}
               <Card className="border-none shadow-xl bg-white">
-                <CardHeader>
-                  <CardTitle className="text-xl font-black flex items-center gap-2">
-                    <Clock className="h-5 w-5 text-accent" /> Play Usage
-                  </CardTitle>
-                </CardHeader>
+                <CardHeader><CardTitle className="text-xl font-black flex items-center gap-2"><Clock className="h-5 w-5 text-accent" /> Play Usage</CardTitle></CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
-                    <div className="flex justify-between items-end">
-                      <span className="text-xs font-bold uppercase text-slate-400">Minutes Used Today</span>
-                      <span className="text-lg font-black text-slate-900">22 / 60</span>
-                    </div>
+                    <div className="flex justify-between items-end"><span className="text-xs font-bold uppercase text-slate-400">Minutes Used Today</span><span className="text-lg font-black text-slate-900">22 / 60</span></div>
                     <Progress value={36} className="h-2" />
                   </div>
                   <Button variant="outline" className="w-full font-bold border-2">Edit Limits</Button>
                 </CardContent>
               </Card>
 
-              {/* Recent Activity */}
               <Card className="border-none shadow-xl bg-white overflow-hidden">
-                <CardHeader className="bg-slate-50 border-b">
-                  <CardTitle className="text-xl font-black flex items-center gap-2">
-                    <Activity className="h-5 w-5 text-emerald-500" /> Recent Activity
-                  </CardTitle>
-                </CardHeader>
+                <CardHeader className="bg-slate-50 border-b"><CardTitle className="text-xl font-black flex items-center gap-2"><Activity className="h-5 w-5 text-emerald-500" /> Recent Activity</CardTitle></CardHeader>
                 <div className="divide-y">
                   {activityLog?.map((act) => (
                     <div key={act.id} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
@@ -299,27 +287,16 @@ export default function ParentDashboard() {
                           <div className="text-[10px] font-bold text-slate-400 uppercase">{act.playedAt?.toDate().toLocaleDateString()}</div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-xs font-black text-primary">+{act.xpEarned} XP</div>
-                        <div className="text-[10px] font-bold text-slate-400">SCORE {act.score}</div>
-                      </div>
+                      <div className="text-right"><div className="text-xs font-black text-primary">+{act.xpEarned} XP</div><div className="text-[10px] font-bold text-slate-400">SCORE {act.score}</div></div>
                     </div>
                   ))}
-                  {(!activityLog || activityLog.length === 0) && (
-                    <div className="p-8 text-center text-slate-400 italic text-sm">No recent activity recorded.</div>
-                  )}
                 </div>
               </Card>
             </div>
           </div>
         )}
 
-        {showReport && selectedChild && (
-          <WeeklyReport 
-            child={selectedChild} 
-            onClose={() => setShowReport(false)} 
-          />
-        )}
+        {showReport && selectedChild && <WeeklyReport child={selectedChild} onClose={() => setShowReport(false)} />}
       </main>
     </div>
   );

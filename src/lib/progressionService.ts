@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc, Firestore } from 'firebase/firestore';
+import { doc, getDoc, setDoc, getDocs, collection, Firestore } from 'firebase/firestore';
 
 export interface UserProgression {
   totalXP: number;
@@ -23,9 +23,21 @@ export interface GameScoreData {
   xpEarned: number;
   gamesPlayed: number;
   lastPlayedAt: any;
+  categoryAccuracy?: Record<string, { correct: number; total: number }>;
+  totalProfit?: number;
+  completed?: boolean;
 }
 
 export type GameScores = Record<string, GameScoreData | null>;
+
+export type ConceptStrengths = {
+  budgeting: number;
+  saving: number;
+  investing: number;
+  credit: number;
+  taxes: number;
+  spending: number;
+};
 
 export const DEFAULT_PROGRESSION: UserProgression = {
   totalXP: 0,
@@ -53,7 +65,6 @@ export function getProgressionRef(db: Firestore, uid: string) {
 
 /**
  * Fetches the user's aggregated progression document.
- * If it doesn't exist, it creates a default one.
  */
 export async function getProgression(db: Firestore, uid: string): Promise<UserProgression> {
   const progressionRef = getProgressionRef(db, uid);
@@ -111,4 +122,68 @@ export async function getAllGameScores(db: Firestore, uid: string): Promise<Game
     console.error("Error fetching all game scores:", error);
     return scores;
   }
+}
+
+/**
+ * Calculates financial concept strengths based on game performance and lesson completion.
+ */
+export async function getConceptStrengths(db: Firestore, uid: string): Promise<ConceptStrengths> {
+  const scores = await getAllGameScores(db, uid);
+  const tasksSnap = await getDocs(collection(db, 'users', uid, 'lessonProgress'));
+  const completedTasks = tasksSnap.docs.map(d => d.data()).filter(t => t.completed);
+
+  const strengths: ConceptStrengths = {
+    budgeting: 0,
+    saving: 0,
+    investing: 0,
+    credit: 0,
+    taxes: 0,
+    spending: 0,
+  };
+
+  // 1. Base Accuracy from FinIQ Quiz
+  const finIQ = scores.finIQQuiz;
+  if (finIQ?.categoryAccuracy) {
+    Object.entries(finIQ.categoryAccuracy).forEach(([cat, stat]) => {
+      const key = cat.toLowerCase() as keyof ConceptStrengths;
+      if (strengths[key] !== undefined && stat.total > 0) {
+        strengths[key] = Math.round((stat.correct / stat.total) * 100);
+      }
+    });
+  }
+
+  // 2. Bonus from Lesson Completion (+20 per lesson)
+  completedTasks.forEach(task => {
+    const key = task.category.toLowerCase() as keyof ConceptStrengths;
+    if (strengths[key] !== undefined) {
+      strengths[key] += 20;
+    }
+  });
+
+  // 3. Game-specific Milestone Bonuses
+  if ((scores.budgetBlitz?.highScore || 0) > 500) {
+    strengths.budgeting += 10;
+    strengths.spending += 10;
+  }
+  
+  if ((scores.creditScoreBuilder?.highScore || 0) > 700) {
+    strengths.credit += 15;
+  }
+
+  if ((scores.stockMarketSim?.totalProfit || 0) > 0) {
+    strengths.investing += 10;
+  }
+
+  if (scores.compoundClicker?.completed) {
+    strengths.saving += 15;
+    strengths.investing += 15;
+  }
+
+  // Cap all at 100
+  Object.keys(strengths).forEach((key) => {
+    const k = key as keyof ConceptStrengths;
+    strengths[k] = Math.min(100, strengths[k]);
+  });
+
+  return strengths;
 }
