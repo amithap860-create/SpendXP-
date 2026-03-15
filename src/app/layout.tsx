@@ -57,11 +57,11 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
         </header>
       )}
 
-      <div className="flex-1">{children}</div>
+      <div className={cn("flex-1", !isAuthPage && user && "pb-20 md:pb-0")}>{children}</div>
 
       {/* BOTTOM NAV (Mobile) */}
       {!loading && user && !isAuthPage && (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-white border-t border-slate-200 flex items-center justify-around px-2 z-50">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-white border-t border-slate-200 flex items-center justify-around px-2 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
           <NavLink href="/dashboard" label="Home" active={pathname === '/dashboard'}>
             <div className="grid grid-cols-2 gap-0.5 p-0.5">
               {[1,2,3,4].map(i => <div key={i} className="w-2 h-2 bg-current rounded-sm" />)}

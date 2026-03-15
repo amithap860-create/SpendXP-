@@ -1,8 +1,6 @@
-
 "use client"
 
 import { useState } from 'react';
-import { MainNav } from '@/components/layout/main-nav';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -38,7 +36,7 @@ interface BudgetItem {
 }
 
 export default function Academy() {
-  const { formatValue, convertFromCurrent, completeTask, tasks } = useUser();
+  const { formatValue, completeTask, tasks } = useUser();
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([
     { id: '1', name: 'Weekly Allowance', type: 'income', amountUsd: 20 },
     { id: '2', name: 'Streaming Subscription', type: 'expense', amountUsd: 15 },
@@ -51,7 +49,8 @@ export default function Academy() {
     const currentAmount = parseFloat(newItemAmount);
     if (!newItemName || isNaN(currentAmount)) return;
 
-    const amountUsd = convertFromCurrent(currentAmount);
+    // Use raw numeric amount for simplicity in this prototype
+    const amountUsd = currentAmount;
 
     const newItem: BudgetItem = {
       id: Math.random().toString(36).substr(2, 9),
@@ -84,8 +83,7 @@ export default function Academy() {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <MainNav />
-      <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8">
+      <main className="flex-1 p-4 md:p-8">
         <header className="mb-8 flex justify-between items-start">
           <div>
             <h2 className="text-3xl font-bold text-primary">Financial Academy</h2>
@@ -141,6 +139,7 @@ export default function Academy() {
                       className="w-full mt-4" 
                       onClick={() => completeTask('academy-income')}
                       disabled={isTaskCompleted('academy-income')}
+                      suppressHydrationWarning
                     >
                       {isTaskCompleted('academy-income') ? 'Concept Learned' : 'I Understand Income (+50 XP)'}
                     </Button>
@@ -180,6 +179,7 @@ export default function Academy() {
                       className="w-full mt-4 bg-rose-600 hover:bg-rose-700" 
                       onClick={() => completeTask('academy-outcome')}
                       disabled={isTaskCompleted('academy-outcome')}
+                      suppressHydrationWarning
                     >
                       {isTaskCompleted('academy-outcome') ? 'Concept Learned' : 'I Understand Expenses (+50 XP)'}
                     </Button>
@@ -288,7 +288,7 @@ export default function Academy() {
                       />
                     </div>
                     <div className="col-span-2">
-                      <Button onClick={addItem} className="w-full h-10 p-0">
+                      <Button onClick={addItem} className="w-full h-10 p-0" suppressHydrationWarning>
                         <Plus className="h-4 w-4" />
                       </Button>
                     </div>
@@ -300,6 +300,7 @@ export default function Academy() {
                         checked={newItemType === 'income'} 
                         onChange={() => setNewItemType('income')}
                         className="text-primary"
+                        suppressHydrationWarning
                       />
                       Income
                     </label>
@@ -308,6 +309,7 @@ export default function Academy() {
                         type="radio" 
                         checked={newItemType === 'expense'} 
                         onChange={() => setNewItemType('expense')}
+                        suppressHydrationWarning
                       />
                       Expense
                     </label>
@@ -341,6 +343,7 @@ export default function Academy() {
                               size="icon" 
                               className="h-8 w-8 text-muted-foreground hover:text-destructive"
                               onClick={() => removeItem(item.id)}
+                              suppressHydrationWarning
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>

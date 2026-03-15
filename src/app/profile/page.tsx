@@ -7,7 +7,8 @@ import {
   useDoc, 
   useMemoFirebase,
   safeUpdateDoc,
-  safeSetDoc
+  safeSetDoc,
+  db
 } from '@/firebase';
 import { 
   doc, 
@@ -17,40 +18,29 @@ import {
   where, 
   getDocs, 
   limit,
-  deleteDoc,
   writeBatch,
   Timestamp,
   onSnapshot
 } from 'firebase/firestore';
 import { 
   updateProfile, 
-  updateEmail, 
   verifyBeforeUpdateEmail, 
   updatePassword,
   reauthenticateWithCredential,
   EmailAuthProvider,
   deleteUser
 } from 'firebase/auth';
-import { MainNav } from '@/components/layout/main-nav';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { 
-  User, 
   Mail, 
-  Lock, 
-  ShieldCheck, 
-  Trash2, 
-  ChevronRight, 
-  CheckCircle2, 
-  AlertCircle,
   RefreshCw,
-  X,
-  ExternalLink,
-  Smartphone
+  CheckCircle2, 
+  AlertCircle
 } from 'lucide-react';
 import { validateDisplayName, validateEmail } from '@/lib/validation';
 import { rateLimiter } from '@/lib/rateLimiter';
@@ -61,10 +51,9 @@ import { XPWallet } from '@/components/XPWallet';
 
 export default function ProfilePage() {
   const { user, loading: authLoading, signOut } = useAuthContext();
-  const { xp, level, formatValue } = useUser();
-  const db = useFirestore();
+  const { level } = useUser();
 
-  const profileRef = useMemoFirebase(() => user ? doc(db, 'users', user.uid) : null, [db, user]);
+  const profileRef = useMemoFirebase(() => user ? doc(db, 'users', user.uid) : null, [user]);
   const { data: profile, isLoading: profileLoading } = useDoc(profileRef);
 
   if (authLoading || profileLoading) {
@@ -78,8 +67,7 @@ export default function ProfilePage() {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <MainNav />
-      <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8 max-w-6xl mx-auto space-y-8">
+      <main className="flex-1 p-4 md:p-8 max-w-6xl mx-auto space-y-8">
         {/* IDENTITY CARD */}
         <Card className="border-none shadow-sm overflow-hidden bg-white">
           <CardContent className="p-6 md:p-8 flex flex-col md:flex-row items-center gap-6">
@@ -140,7 +128,6 @@ function DisplayNameSection({ profile, uid }: { profile: any, uid: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const db = useFirestore();
 
   const handleSave = async () => {
     const val = validateDisplayName(newName);
@@ -213,7 +200,6 @@ function EmailSection({ user, isGoogleUser, profile }: { user: any, isGoogleUser
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
-  const db = useFirestore();
 
   const handleUpdate = async () => {
     const val = validateEmail(newEmail);
@@ -324,7 +310,6 @@ function PasswordSection({ user }: { user: any }) {
       await updatePassword(user, newPass);
       await getRefreshedToken();
       setSuccess(true);
-      // Firebase automatically sends a security email notification upon password update.
     } catch (err: any) {
       if (err.code === 'auth/wrong-password') setError('Current password is incorrect.');
       else if (err.code === 'auth/requires-recent-login') setError('Please sign out and back in to change password.');
@@ -379,17 +364,16 @@ function ParentSection({ profile, uid, displayName }: { profile: any, uid: strin
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const db = useFirestore();
 
   // Watch for request acceptance
   useEffect(() => {
     if (!uid) return;
     const q = query(collection(db, 'linkRequests'), where('childUid', '==', uid), where('status', '==', 'pending'), limit(1));
     const unsub = onSnapshot(q, (snap) => {
-      // Logic handled via firestore trigger or user profile update
+      // Logic handled via profile document listener usually
     });
     return () => unsub();
-  }, [uid, db]);
+  }, [uid]);
 
   const handleInvite = async () => {
     const val = validateEmail(parentEmail);
@@ -444,7 +428,6 @@ function ParentSection({ profile, uid, displayName }: { profile: any, uid: strin
 
   const handleDisconnect = async () => {
     if (!confirm('Are you sure you want to disconnect your parent?')) return;
-    const parentUid = profile.parentUid;
     const batch = writeBatch(db);
     batch.update(doc(db, 'users', uid), { 
       parentLinked: false, 
@@ -452,10 +435,6 @@ function ParentSection({ profile, uid, displayName }: { profile: any, uid: strin
       parentUid: null, 
       pendingParentEmail: null 
     });
-    if (parentUid) {
-      // Note: removing from array requires user object ref which might be restricted
-      // In this prototype we assume parent doc is updated via trigger or shared permission
-    }
     await batch.commit();
   };
 
@@ -522,7 +501,6 @@ function DangerZoneSection({ user }: { user: any }) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const db = useFirestore();
 
   const handleNext = () => setStep(prev => prev + 1);
 
@@ -538,7 +516,6 @@ function DangerZoneSection({ user }: { user: any }) {
       }
       
       const batch = writeBatch(db);
-      // Batched delete implementation
       const collections = ['gameScores', 'progression', 'lessonProgress', 'activityLog', 'parentControls'];
       for (const coll of collections) {
         const q = await getDocs(collection(db, 'users', user.uid, coll));
@@ -620,7 +597,6 @@ function DangerZoneSection({ user }: { user: any }) {
 function ProfileSkeleton() {
   return (
     <div className="flex min-h-screen bg-background">
-      <MainNav />
       <main className="flex-1 p-4 md:p-8 max-w-6xl mx-auto space-y-8">
         <Card className="p-8"><div className="flex items-center gap-6"><Skeleton className="h-24 w-24 rounded-full" /><div className="space-y-2"><Skeleton className="h-8 w-48" /><Skeleton className="h-4 w-32" /></div></div></Card>
         <div className="grid md:grid-cols-2 gap-8">

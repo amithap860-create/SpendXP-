@@ -1,8 +1,6 @@
-
 "use client"
 
 import { useState, useEffect } from 'react';
-import { MainNav } from '@/components/layout/main-nav';
 import { useUser, Stock } from '@/lib/store';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -101,19 +99,18 @@ export default function MarketSimulation() {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <MainNav />
-      <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8">
+      <main className="flex-1 p-4 md:p-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h2 className="text-3xl font-bold text-primary">Market Simulator</h2>
             <p className="text-muted-foreground">Learn how the world invests by trading fictional companies. Prices auto-adjust to {currency}.</p>
           </div>
           <div className="flex gap-2">
-            <Button onClick={() => setShowGuide(true)} variant="secondary" className="gap-2 bg-white border">
+            <Button onClick={() => setShowGuide(true)} variant="secondary" className="gap-2 bg-white border" suppressHydrationWarning>
               <HelpCircle className="h-4 w-4 text-primary" />
               Investor's Guide
             </Button>
-            <Button onClick={fetchNews} disabled={isLoadingNews} variant="outline" className="gap-2">
+            <Button onClick={fetchNews} disabled={isLoadingNews} variant="outline" className="gap-2" suppressHydrationWarning>
               {isLoadingNews ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Newspaper className="h-4 w-4" />}
               Refresh News
             </Button>
@@ -170,6 +167,7 @@ export default function MarketSimulation() {
                     onClick={() => setShowExplanation(true)}
                     variant="link" 
                     className="p-0 h-auto font-bold flex items-center gap-1 text-accent"
+                    suppressHydrationWarning
                   >
                     <Info className="h-4 w-4" />
                     Why is this happening?
@@ -214,8 +212,8 @@ export default function MarketSimulation() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 pt-2">
-                      <Button onClick={handleBuy} className="bg-white text-primary hover:bg-white/90 font-bold">Buy</Button>
-                      <Button onClick={handleSell} variant="outline" className="border-white text-white hover:bg-white/10 font-bold">Sell</Button>
+                      <Button onClick={handleBuy} className="bg-white text-primary hover:bg-white/90 font-bold" suppressHydrationWarning>Buy</Button>
+                      <Button onClick={handleSell} variant="outline" className="border-white text-white hover:bg-white/10 font-bold" suppressHydrationWarning>Sell</Button>
                     </div>
 
                     <div className="pt-4 border-t border-white/10">
@@ -262,7 +260,7 @@ export default function MarketSimulation() {
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={() => setShowExplanation(false)} className="w-full h-12 text-lg">I Got It! +10 XP</Button>
+              <Button onClick={() => setShowExplanation(false)} className="w-full h-12 text-lg" suppressHydrationWarning>I Got It! +10 XP</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -348,7 +346,7 @@ export default function MarketSimulation() {
             </Accordion>
             
             <DialogFooter className="mt-6">
-              <Button onClick={() => setShowGuide(false)} className="w-full">Start Trading Like a Pro</Button>
+              <Button onClick={() => setShowGuide(false)} className="w-full" suppressHydrationWarning>Start Trading Like a Pro</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

@@ -1,11 +1,9 @@
-
 "use client"
 
 import { useState, useEffect } from 'react';
-import { MainNav } from '@/components/layout/main-nav';
 import { useUser } from '@/lib/store';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { generatePersonalizedFlashcards } from '@/ai/flows/generate-personalized-flashcards';
 import { LoaderCircle, RefreshCw, ChevronLeft, ChevronRight, Zap } from 'lucide-react';
 
@@ -53,8 +51,7 @@ export default function Flashcards() {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <MainNav />
-      <main className="flex-1 p-4 md:p-8 flex flex-col items-center justify-center max-w-4xl mx-auto pb-24 md:pb-8">
+      <main className="flex-1 p-4 md:p-8 flex flex-col items-center justify-center max-w-4xl mx-auto">
         <div className="text-center mb-12 w-full">
           <div className="inline-flex items-center gap-2 bg-white px-3 py-1 rounded-full border mb-4 text-xs font-bold text-accent">
             <Zap className="h-3 w-3" />
@@ -97,6 +94,7 @@ export default function Flashcards() {
                 variant="outline" 
                 size="lg"
                 className="rounded-full h-12 w-12 p-0"
+                suppressHydrationWarning
               >
                 <ChevronLeft className="h-6 w-6" />
               </Button>
@@ -109,13 +107,14 @@ export default function Flashcards() {
                 variant="outline" 
                 size="lg"
                 className="rounded-full h-12 w-12 p-0"
+                suppressHydrationWarning
               >
                 <ChevronRight className="h-6 w-6" />
               </Button>
             </div>
 
             <div className="flex justify-center pt-8">
-              <Button onClick={fetchFlashcards} variant="ghost" className="gap-2 text-muted-foreground hover:text-primary">
+              <Button onClick={fetchFlashcards} variant="ghost" className="gap-2 text-muted-foreground hover:text-primary" suppressHydrationWarning>
                 <RefreshCw className="h-4 w-4" />
                 Generate New Cards
               </Button>
@@ -124,7 +123,7 @@ export default function Flashcards() {
         ) : (
           <div className="text-center py-20">
             <p>No flashcards found. Try refreshing.</p>
-            <Button onClick={fetchFlashcards} className="mt-4">Retry</Button>
+            <Button onClick={fetchFlashcards} className="mt-4" suppressHydrationWarning>Retry</Button>
           </div>
         )}
       </main>

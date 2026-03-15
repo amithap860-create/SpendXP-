@@ -4,10 +4,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, where, orderBy, limit } from 'firebase/firestore';
-import { MainNav } from '@/components/layout/main-nav';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { WeeklyReport } from '@/components/parent/WeeklyReport';
 import { getConceptStrengths, ConceptStrengths } from '@/lib/progressionService';
 import { safeOnSnapshot } from '@/lib/firestoreSafe';
@@ -15,13 +13,11 @@ import {
   Zap, 
   Gamepad2, 
   Trophy, 
-  Clock, 
-  FileText, 
-  ShieldCheck,
   Activity,
   Users,
   UserPlus,
-  HelpCircle
+  HelpCircle,
+  ShieldCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -89,7 +85,6 @@ export default function ParentDashboard() {
     );
   }
 
-  // Logic 6: Minimum score floor for rendering
   const radarItems = strengths ? [
     { label: 'Budgeting', score: Math.max(5, strengths.budgeting) },
     { label: 'Saving', score: Math.max(5, strengths.saving) },
@@ -114,8 +109,7 @@ export default function ParentDashboard() {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <MainNav />
-      <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8 max-w-7xl mx-auto">
+      <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto">
         <header className="mb-8 space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-3xl font-black text-slate-900 tracking-tight">Parent Portal</h2>
@@ -176,8 +170,7 @@ export default function ParentDashboard() {
                   <div className="h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600"><Gamepad2 className="h-6 w-6" /></div>
                   <div><div className="text-[10px] font-bold text-slate-400 uppercase">Latest Session</div><div className="text-2xl font-black">{activityLog?.[0]?.gameName || 'None'}</div></div>
                 </CardContent>
-              </Card>
-            </div>
+              </div>
 
             <div className="lg:col-span-8 space-y-8">
               <Card className="border-none shadow-xl bg-white overflow-hidden">
