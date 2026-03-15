@@ -1,8 +1,11 @@
-import { doc, getDoc, setDoc, collection, getDocs, Firestore } from 'firebase/firestore';
+import { doc, getDoc, setDoc, Firestore } from 'firebase/firestore';
 
 export interface UserProgression {
   totalXP: number;
   totalGamesPlayed: number;
+  walletBalance: number;
+  level: number;
+  badges: string[];
   lastActivityAt: any;
   gameHighScores: {
     budgetBlitz: number;
@@ -24,9 +27,12 @@ export interface GameScoreData {
 
 export type GameScores = Record<string, GameScoreData | null>;
 
-const DEFAULT_PROGRESSION: UserProgression = {
+export const DEFAULT_PROGRESSION: UserProgression = {
   totalXP: 0,
   totalGamesPlayed: 0,
+  walletBalance: 0,
+  level: 1,
+  badges: [],
   lastActivityAt: null,
   gameHighScores: {
     budgetBlitz: 0,
@@ -39,11 +45,18 @@ const DEFAULT_PROGRESSION: UserProgression = {
 };
 
 /**
+ * Returns the Firestore document reference for a user's progression stats.
+ */
+export function getProgressionRef(db: Firestore, uid: string) {
+  return doc(db, 'users', uid, 'progression', 'stats');
+}
+
+/**
  * Fetches the user's aggregated progression document.
  * If it doesn't exist, it creates a default one.
  */
 export async function getProgression(db: Firestore, uid: string): Promise<UserProgression> {
-  const progressionRef = doc(db, 'users', uid, 'progression', 'stats');
+  const progressionRef = getProgressionRef(db, uid);
   
   try {
     const snap = await getDoc(progressionRef);
@@ -58,7 +71,6 @@ export async function getProgression(db: Firestore, uid: string): Promise<UserPr
         }
       } as UserProgression;
     } else {
-      // Initialize if missing
       await setDoc(progressionRef, DEFAULT_PROGRESSION);
       return DEFAULT_PROGRESSION;
     }
@@ -90,8 +102,6 @@ export async function getAllGameScores(db: Firestore, uid: string): Promise<Game
 
     results.forEach((snap, index) => {
       const gameKey = games[index];
-      // Normalize internal key 'finIQ' to 'finIQQuiz' for the wallet if needed,
-      // but here we return as saved in gameScores.
       const displayKey = gameKey === 'finIQ' ? 'finIQQuiz' : gameKey;
       scores[displayKey] = snap.exists() ? (snap.data() as GameScoreData) : null;
     });

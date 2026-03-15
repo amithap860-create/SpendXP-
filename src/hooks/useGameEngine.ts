@@ -1,7 +1,7 @@
 'use client';
 
 import { useReducer, useCallback, useEffect, useRef } from 'react';
-import { doc, setDoc, getDoc, increment, writeBatch, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, increment, writeBatch, serverTimestamp, arrayUnion } from 'firebase/firestore';
 import { useFirestore, useUser } from '@/firebase';
 
 export type GameStatus = 'IDLE' | 'COUNTDOWN' | 'PLAYING' | 'PAUSED' | 'GAME_OVER' | 'RESULTS';
@@ -221,6 +221,7 @@ export function useGameEngine(config: GameConfig) {
     dispatch({ type: 'END_GAME' });
 
     const sessionXp = state.xpEarned + finalXpBonus;
+    const walletReward = state.score * 10;
     const batch = writeBatch(db);
     
     const gameScoreRef = doc(db, 'users', user.uid, 'gameScores', config.gameName);
@@ -241,7 +242,6 @@ export function useGameEngine(config: GameConfig) {
         lastPlayedAt: serverTimestamp()
       }, { merge: true });
 
-      // Map config name to requested progression keys
       const highScoreKeyMap: Record<string, string> = {
         budgetBlitz: 'budgetBlitz',
         finIQ: 'finIQQuiz',
@@ -253,11 +253,19 @@ export function useGameEngine(config: GameConfig) {
 
       const highScoresKey = highScoreKeyMap[config.gameName];
 
+      // Badge Logic
+      const newBadges: string[] = [];
+      if (gameSnap.exists() === false) newBadges.push('first-win');
+      if (state.score === config.totalRounds && config.totalRounds > 0) newBadges.push('perfect-round');
+      if (state.bestStreak >= 5) newBadges.push('streak-5');
+
       // Path 2: Aggregated progression
       batch.set(progressionRef, {
         totalXP: increment(sessionXp),
         totalGamesPlayed: increment(1),
+        walletBalance: increment(walletReward),
         lastActivityAt: serverTimestamp(),
+        badges: arrayUnion(...newBadges),
         gameHighScores: {
           [highScoresKey]: newHighScore
         }
@@ -272,7 +280,7 @@ export function useGameEngine(config: GameConfig) {
     } catch (error) {
       console.error('Failed to save game results via batch:', error);
     }
-  }, [db, user, config.gameName, state.score, state.xpEarned]);
+  }, [db, user, config, state.score, state.xpEarned, state.bestStreak]);
 
   return {
     gameState: state.status,
