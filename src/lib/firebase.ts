@@ -1,10 +1,15 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, EmailAuthProvider, Auth } from 'firebase/auth';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import { 
+  getFirestore, 
+  Firestore, 
+  initializeFirestore, 
+  persistentLocalCache, 
+  persistentMultipleTabManager 
+} from 'firebase/firestore';
 import { firebaseConfig } from '@/firebase/config';
 
 // Initialize Firebase singleton instances with safety guards
-// Singleton guard prevents double-initialization on mobile (Fix 1a)
 let app: FirebaseApp;
 let auth: Auth;
 let db: Firestore;
@@ -12,9 +17,22 @@ let db: Firestore;
 try {
   app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
   auth = getAuth(app);
-  db = getFirestore(app);
+  
+  // Use persistentLocalCache for offline support in Firebase 12+
+  // This is critical for mobile connectivity resilience in India
+  try {
+    db = initializeFirestore(app, {
+      localCache: persistentLocalCache({
+        tabManager: persistentMultipleTabManager()
+      }),
+      experimentalAutoDetectLongPolling: true,
+    });
+  } catch (cacheError) {
+    // Fallback to default in-memory cache if IndexedDB is blocked (e.g., incognito mode)
+    console.warn('[SpendXP] Firestore persistent cache failed to initialize, using memory cache:', cacheError);
+    db = getFirestore(app);
+  }
 } catch (error) {
-  // Module-level throws white-screen on mobile; log instead (Fix 1c)
   console.error('[SpendXP] Core Firebase initialization error:', error);
 }
 
@@ -23,7 +41,7 @@ const googleProvider = new GoogleAuthProvider();
 const emailProvider = new EmailAuthProvider();
 
 /**
- * Checks if the core Firebase services are initialized and ready for use (Fix 1d).
+ * Checks if the core Firebase services are initialized and ready for use.
  */
 export function isFirebaseReady(): boolean {
   return !!(app && auth && db);

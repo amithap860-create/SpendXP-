@@ -12,6 +12,7 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { useEffect, useState } from 'react';
+import { OfflineBanner } from '@/components/OfflineBanner';
 
 const inter = Inter({ 
   subsets: ['latin'], 
@@ -30,8 +31,6 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('resize', checkSize);
   }, []);
 
-  // Use a simplified auth check for layout visibility
-  // The actual protection happens in AuthGuard or pages
   const isAuthPage = ['/login', '/signup', '/verify-email', '/onboarding', '/consent'].includes(pathname);
 
   const navLinks = [
@@ -45,6 +44,8 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex flex-col min-h-screen-safe">
+      <OfflineBanner />
+      
       {/* TOP NAV (Desktop) */}
       {!isAuthPage && (
         <header className="hidden md:block bg-white border-b border-slate-200 sticky top-0 z-50">
