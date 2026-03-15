@@ -3,8 +3,8 @@
 import React, { createContext, useContext, ReactNode, useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { User, setPersistence, browserLocalPersistence, browserSessionPersistence, onIdTokenChanged } from 'firebase/auth';
-import { useAgeAdapt, getAgeGroup, AgeGroup } from '@/lib/ageAdapt';
-import { useAuth as useFirebaseAuth, useFirestore } from '@/firebase';
+import { getAgeGroup, AgeGroup } from '@/lib/ageAdapt';
+import { auth as firebaseAuth, db } from '@/firebase';
 import { validateFingerprint, captureFingerprint } from '@/lib/sessionGuard';
 import { useRouter } from 'next/navigation';
 import { doc, getDoc, serverTimestamp } from 'firebase/firestore';
@@ -15,6 +15,7 @@ interface AuthContextType {
   loading: boolean;
   emailVerified: boolean;
   currentAgeGroup: AgeGroup;
+  linkedProviders: string[];
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>;
   signUpWithEmail: (email: string, pass: string, name: string, isParent?: boolean) => Promise<{ success: boolean; error?: string }>;
@@ -28,8 +29,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const auth = useAuth();
-  const firebaseAuth = useFirebaseAuth();
-  const db = useFirestore();
   const router = useRouter();
   
   const [fingerprint, setFingerprint] = useState<any>(null);
@@ -93,7 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => unsubscribe();
-  }, [firebaseAuth, db]);
+  }, [fingerprint]);
 
   useEffect(() => {
     if (fingerprint && !validateFingerprint(fingerprint)) {

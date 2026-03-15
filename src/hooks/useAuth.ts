@@ -123,7 +123,6 @@ export function useAuth() {
     try {
       await signInWithEmailAndPassword(auth, email, pass);
       await clearAttempts(db, email);
-      router.push('/dashboard');
       return { success: true };
     } catch (err: any) {
       await recordFailedAttempt(db, email);
@@ -166,6 +165,9 @@ export function useAuth() {
     router.push('/login');
   };
 
+  const linkedProviders: string[] =
+    auth.currentUser?.providerData.map(p => p.providerId) ?? [];
+
   return { 
     user, 
     loading, 
@@ -175,6 +177,7 @@ export function useAuth() {
     sendPasswordReset,
     resendVerificationEmail,
     signOut, 
-    error 
+    error,
+    linkedProviders
   };
 }

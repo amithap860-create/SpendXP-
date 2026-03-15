@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardDescription } from '@/components/ui/card';
-import { Mail, Lock, ShieldAlert, Sparkles, RefreshCw, ArrowRight } from 'lucide-react';
+import { Mail, Lock, ShieldAlert, Sparkles, RefreshCw, ArrowRight, Info } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { checkLockout } from '@/firebase';
 import { db } from '@/firebase';
@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 
 type Tab = 'signin' | 'signup';
 
-export default function LoginPage() {
+function LoginContent() {
   const { 
     signInWithGoogle, 
     signInWithEmail, 
@@ -25,6 +25,7 @@ export default function LoginPage() {
   
   const router = useRouter();
   const searchParams = useSearchParams();
+  const reason = searchParams.get('reason');
   
   const [activeTab, setActiveTab] = useState<Tab>('signin');
   const [showReset, setShowReset] = useState(false);
@@ -74,7 +75,13 @@ export default function LoginPage() {
       return;
     }
     const res = await signInWithEmail(email, password);
-    if (!res.success) {
+    if (res.success) {
+      if (reason === 'reauth_required') {
+        router.push('/profile');
+      } else {
+        router.push('/dashboard');
+      }
+    } else {
       const newStatus = await checkLockout(db, email);
       if (newStatus.locked) setLockout({ locked: true, mins: newStatus.minutesLeft });
     }
@@ -103,22 +110,15 @@ export default function LoginPage() {
     setLoading(false);
   };
 
-  const handleResend = async () => {
-    if (resendCooldown > 0) return;
-    const res = await resendVerificationEmail();
-    if (res.success) setResendCooldown(60);
-  };
-
-  const passwordStrength = {
-    length: password.length >= 8,
-    number: /\d/.test(password),
-    special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
-  };
-  const strengthScore = Object.values(passwordStrength).filter(Boolean).length;
-
   return (
     <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-100 via-blue-50 to-white flex items-center justify-center p-4">
       <Card className="max-w-[420px] w-full shadow-2xl border-none overflow-hidden animate-in fade-in zoom-in duration-500">
+        {reason === 'reauth_required' && (
+          <div className="bg-amber-500 text-white px-4 py-2 text-xs font-bold flex items-center gap-2">
+            <Info className="h-3 w-3" />
+            For security, please sign in again to change your password.
+          </div>
+        )}
         <CardHeader className="text-center pb-2">
           <div className="flex items-center justify-center gap-2 mb-2">
             <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-lg">
@@ -277,6 +277,7 @@ export default function LoginPage() {
                     suppressHydrationWarning 
                   />
                 </div>
+                {confirmError && <p className="text-xs text-destructive font-bold text-center">{confirmError}</p>}
                 <Button type="submit" disabled={loading} className="w-full h-14 text-lg font-black rounded-2xl" suppressHydrationWarning>
                   {loading ? <RefreshCw className="h-5 w-5 animate-spin" /> : 'Create Account'}
                 </Button>
@@ -295,5 +296,13 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><RefreshCw className="h-8 w-8 animate-spin text-primary" /></div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
