@@ -1,4 +1,3 @@
-
 "use client"
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
@@ -23,7 +22,6 @@ import { setDocumentNonBlocking, updateDocumentNonBlocking, deleteDocumentNonBlo
 
 export type AgeGroup = '8-11' | '11-15' | '16-20';
 
-// Current approximate exchange rates (USD base)
 export const EXCHANGE_RATES: Record<string, number> = {
   USD: 1.0,
   EUR: 0.94,
@@ -93,7 +91,7 @@ const DEFAULT_TASKS: AppTask[] = [
   { id: 'academy-budget', title: 'Master the Budget', category: 'Academy', xpReward: 50, completed: false },
   { id: 'game-advisor', title: 'Complete Wealth Architect', category: 'Games', xpReward: 100, completed: false },
   { id: 'game-loan-sim', title: 'Loan Specialist', category: 'Games', xpReward: 100, completed: false },
-  { id: 'game-pro-sim', title: 'Adulting Master', category: 'Games', xpReward: 200, completed: false },
+  { id: 'game-credit-sim', title: 'Credit Specialist', category: 'Games', xpReward: 200, completed: false },
   { id: 'market-trade', title: 'Make your first trade', category: 'Market', xpReward: 100, completed: false },
   { id: 'flashcards-set', title: 'Complete a Flashcard set', category: 'Study', xpReward: 75, completed: false },
 ];
@@ -144,20 +142,17 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   const [stocks, setStocks] = useState<Stock[]>(INITIAL_STOCKS);
 
-  // Firestore Sync: Profile
   const profileRef = useMemoFirebase(() => {
     return user ? doc(db, 'users', user.uid) : null;
   }, [db, user]);
   const { data: profile, isLoading: isProfileLoading } = useDoc<UserProfile>(profileRef);
 
-  // Firestore Sync: Portfolio
   const portfolioQuery = useMemoFirebase(() => {
     return user ? collection(db, 'users', user.uid, 'virtualInvestments') : null;
   }, [db, user]);
   const { data: portfolioData, isLoading: isPortfolioLoading } = useCollection<PortfolioItem>(portfolioQuery);
   const portfolio = useMemo(() => Array.isArray(portfolioData) ? portfolioData : [], [portfolioData]);
 
-  // Firestore Sync: Tasks/Progress
   const tasksQuery = useMemoFirebase(() => {
     return user ? collection(db, 'users', user.uid, 'lessonProgress') : null;
   }, [db, user]);
@@ -166,7 +161,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const isInitialLoading = isUserLoading || isProfileLoading || isPortfolioLoading || isTasksLoading;
 
-  // Auto-initialize balance if it's a new or empty profile
   useEffect(() => {
     if (!isInitialLoading && user && profile && (profile.balance === undefined || profile.balance === null)) {
       const birthYear = profile.birthYear || (new Date().getFullYear() - (profile.age || 10));
@@ -227,7 +221,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const resetAccount = async () => {
     if (!user || !profileRef) return;
     
-    // Reset core profile with $1000
     updateDocumentNonBlocking(profileRef, {
       balance: 1000,
       savingsCurrent: 0,
@@ -237,13 +230,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       savingsGoal: 500
     });
 
-    // Reset tasks
     remoteTasks.forEach(task => {
       const taskRef = doc(db, 'users', user.uid, 'lessonProgress', task.id);
       updateDocumentNonBlocking(taskRef, { completed: false, status: 'not_started' });
     });
 
-    // Clear portfolio
     portfolio.forEach(item => {
       const invRef = doc(db, 'users', user.uid, 'virtualInvestments', item.id);
       deleteDocumentNonBlocking(invRef);

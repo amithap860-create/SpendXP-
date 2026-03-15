@@ -10,6 +10,7 @@ import { Slider } from '@/components/ui/slider';
 import { BudgetBlitz } from '@/components/games/BudgetBlitz';
 import { FinIQQuiz } from '@/components/games/FinIQQuiz';
 import { MoneyMaze } from '@/components/games/MoneyMaze';
+import { CreditScoreBuilder } from '@/components/games/CreditScoreBuilder';
 import { 
   Gamepad2, 
   Zap, 
@@ -29,7 +30,8 @@ import {
   ShoppingBag,
   Brain,
   Trophy,
-  Puzzle
+  Puzzle,
+  CreditCard
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -73,63 +75,6 @@ const ADVISOR_SCENARIOS: Scenario[] = [
         projection: "This $800 asset could grow to $2,500 by the time you're ready for college."
       }
     ]
-  },
-  {
-    title: "Side Hustle Opportunity",
-    description: "You have a chance to start a small pet-sitting business. It requires $100 for supplies, but could earn $50/week.",
-    options: [
-      {
-        label: "Invest in the business",
-        impact: { balance: -100, income: 50 },
-        advice: "This is a high-return investment in yourself.",
-        projection: "At $50/week, you'll break even in 2 weeks. By next year, you'll have earned over $2,400."
-      },
-      {
-        label: "Keep the cash safe",
-        impact: { balance: 0 },
-        advice: "Playing it safe is fine, but you're missing out on 'Opportunity Cost'.",
-        projection: "Your $100 stays $100. Inflation might actually make it worth less over time."
-      }
-    ]
-  }
-];
-
-const PRO_SCENARIOS: Scenario[] = [
-  {
-    title: "Tax Season Survival",
-    description: "You just landed your first internship paying $1,000/month. You notice your paycheck is actually only $850.",
-    options: [
-      {
-        label: "Research Tax Brackets",
-        impact: { balance: 0 },
-        advice: "Understanding taxes helps you calculate your 'Take-Home Pay' correctly before spending.",
-        projection: "You'll never be surprised by a tax bill again."
-      },
-      {
-        label: "Ignore & Complain",
-        impact: { balance: -50 },
-        advice: "Ignorance can lead to fines later if you don't file your taxes properly.",
-        projection: "Late fees could cost you hundreds in the future."
-      }
-    ]
-  },
-  {
-    title: "The Insurance Choice",
-    description: "You're renting your first apartment. Renter's insurance is $15/month. You're on a tight budget.",
-    options: [
-      {
-        label: "Buy Insurance",
-        impact: { balance: -15 },
-        advice: "Insurance is paying a small amount now to avoid a catastrophic loss later.",
-        projection: "If a pipe bursts, your $2,000 laptop is covered."
-      },
-      {
-        label: "Risk it",
-        impact: { balance: 0 },
-        advice: "This is a gamble. One accident could wipe out all your savings.",
-        projection: "A single break-in could put you in major debt."
-      }
-    ]
   }
 ];
 
@@ -159,7 +104,7 @@ export default function GamesHub() {
   const totalInterest = totalPaid - loanPrincipal;
 
   const handleAdvisorChoice = (optionIdx: number) => {
-    const scenarioList = activeGame === 'pro' ? PRO_SCENARIOS : ADVISOR_SCENARIOS;
+    const scenarioList = ADVISOR_SCENARIOS;
     const scenario = scenarioList[currentScenarioIdx];
     const option = scenario.options[optionIdx];
     
@@ -174,23 +119,10 @@ export default function GamesHub() {
       setCurrentScenarioIdx(prev => prev + 1);
     } else {
       setShowAdvisorResult(true);
-      if (activeGame === 'pro') completeTask('game-pro-sim');
-      else completeTask('game-advisor');
+      completeTask('game-advisor');
     }
     
     toast({ title: "Choice Recorded" });
-  };
-
-  const getLoanContextTitle = () => {
-    if (ageGroup === '8-11') return "Borrowing for a Bike";
-    if (ageGroup === '11-15') return "Game Console Installments";
-    return "Car Loan & Credit Simulator";
-  };
-
-  const getLoanContextDesc = () => {
-    if (ageGroup === '8-11') return "Learn how 'Interest' makes a $500 bike cost more if you pay slowly.";
-    if (ageGroup === '11-15') return "See how long it takes to pay off a $1,000 PC with different interest rates.";
-    return "Master APR, principal, and terms. See the true cost of credit cards and auto loans.";
   };
 
   return (
@@ -219,6 +151,18 @@ export default function GamesHub() {
 
         {!activeGame ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <Card className="hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/5" onClick={() => setActiveGame('credit')}>
+              <div className="h-3 bg-blue-600" />
+              <CardHeader>
+                <CreditCard className="h-10 w-10 text-blue-600 mb-2 group-hover:scale-110 transition-transform" />
+                <CardTitle className="text-2xl">Credit Builder</CardTitle>
+                <CardDescription className="text-sm">FICO strategy sim. Can you reach a 750 score in 12 months?</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Badge className="bg-blue-50 text-blue-700">Strategy Engine</Badge>
+              </CardContent>
+            </Card>
+
             <Card className="hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/5" onClick={() => setActiveGame('blitz')}>
               <div className="h-3 bg-emerald-500" />
               <CardHeader>
@@ -255,61 +199,27 @@ export default function GamesHub() {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/5" onClick={() => setActiveGame('advisor')}>
-              <div className="h-3 bg-primary" />
-              <CardHeader>
-                <ShieldCheck className="h-10 w-10 text-primary mb-2 group-hover:scale-110 transition-transform" />
-                <CardTitle className="text-2xl">Wealth Architect</CardTitle>
-                <CardDescription className="text-sm">Financial advisor simulator. See how lifestyle choices shape your net worth.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Badge className="bg-primary/10 text-primary">Strategic Sim</Badge>
-              </CardContent>
-            </Card>
-
             <Card className="hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/5" onClick={() => setActiveGame('loan')}>
               <div className="h-3 bg-accent" />
               <CardHeader>
                 <Landmark className="h-10 w-10 text-accent mb-2 group-hover:scale-110 transition-transform" />
                 <CardTitle className="text-2xl">The Loan Lab</CardTitle>
-                <CardDescription className="text-sm">{getLoanContextDesc()}</CardDescription>
+                <CardDescription className="text-sm">Simulate borrowing costs based on interest rates and terms.</CardDescription>
               </CardHeader>
               <CardContent>
                 <Badge className="bg-accent/10 text-accent">Interest Sim</Badge>
               </CardContent>
             </Card>
-
-            {ageGroup === '16-20' ? (
-              <Card className="hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/5" onClick={() => setActiveGame('pro')}>
-                <div className="h-3 bg-indigo-500" />
-                <CardHeader>
-                  <GraduationCap className="h-10 w-10 text-indigo-500 mb-2 group-hover:scale-110 transition-transform" />
-                  <CardTitle className="text-2xl">Life Path: Pro</CardTitle>
-                  <CardDescription className="text-sm">Advanced simulation covering taxes, insurance, and student debt.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Badge className="bg-indigo-50 text-indigo-600 border-indigo-100">Teen Special</Badge>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card className="opacity-60 grayscale border-none bg-white overflow-hidden cursor-not-allowed border-2 border-slate-100">
-                <div className="h-3 bg-slate-300" />
-                <CardHeader>
-                  <Lock className="h-10 w-10 text-slate-400 mb-2" />
-                  <CardTitle className="text-2xl">Life Path: Pro</CardTitle>
-                  <CardDescription className="text-sm">Unlocks at age 16. Covers taxes and adulting essentials.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Badge variant="outline">Age Restricted</Badge>
-                </CardContent>
-              </Card>
-            )}
           </div>
         ) : (
           <div className="max-w-4xl mx-auto">
             <Button variant="ghost" className="mb-6 gap-2 text-muted-foreground hover:text-primary" onClick={() => { setActiveGame(null); setShowAdvisorResult(false); setSimulationHistory([]); setCurrentScenarioIdx(0); }}>
               <ArrowRight className="h-4 w-4 rotate-180" /> Exit to Games Hub
             </Button>
+
+            {activeGame === 'credit' && (
+              <CreditScoreBuilder onExit={() => setActiveGame(null)} />
+            )}
 
             {activeGame === 'blitz' && (
               <BudgetBlitz onExit={() => setActiveGame(null)} />
@@ -336,13 +246,13 @@ export default function GamesHub() {
                         <BadgePercent className="h-5 w-5 text-white/80" />
                         <span className="text-xs font-bold uppercase tracking-wider">Loan Configurator</span>
                       </div>
-                      <CardTitle className="text-2xl font-black">{getLoanContextTitle()}</CardTitle>
+                      <CardTitle className="text-2xl font-black">Interactive Loan Lab</CardTitle>
                     </div>
                     <CardContent className="p-8 space-y-8">
                       <div className="space-y-6">
                         <div className="space-y-3">
                           <div className="flex justify-between text-sm font-bold">
-                            <span>{ageGroup === '8-11' ? 'Price of Item' : 'Loan Principal'}</span>
+                            <span>Loan Principal</span>
                             <span className="text-accent">{formatValue(loanPrincipal)}</span>
                           </div>
                           <Slider 
@@ -427,128 +337,6 @@ export default function GamesHub() {
                     </CardContent>
                   </Card>
                 </div>
-              </div>
-            )}
-
-            {(activeGame === 'advisor' || activeGame === 'pro') && !showAdvisorResult && (
-              <div className="grid gap-8 lg:grid-cols-12">
-                <div className="lg:col-span-8 space-y-6">
-                  <Card className="border-none shadow-xl bg-white overflow-hidden">
-                    <div className={`${activeGame === 'pro' ? 'bg-indigo-600' : 'bg-primary'} p-6 text-white`}>
-                      <div className="flex items-center gap-2 mb-2">
-                        <Sparkles className="h-5 w-5 text-accent" />
-                        <span className="text-xs font-bold uppercase tracking-wider">
-                          Scenario {currentScenarioIdx + 1} / {activeGame === 'pro' ? PRO_SCENARIOS.length : ADVISOR_SCENARIOS.length}
-                        </span>
-                      </div>
-                      <CardTitle className="text-2xl font-black">
-                        {(activeGame === 'pro' ? PRO_SCENARIOS : ADVISOR_SCENARIOS)[currentScenarioIdx].title}
-                      </CardTitle>
-                    </div>
-                    <CardContent className="p-8 space-y-8">
-                      <p className="text-lg text-slate-700 leading-relaxed font-medium">
-                        {(activeGame === 'pro' ? PRO_SCENARIOS : ADVISOR_SCENARIOS)[currentScenarioIdx].description}
-                      </p>
-
-                      <div className="grid gap-4">
-                        {(activeGame === 'pro' ? PRO_SCENARIOS : ADVISOR_SCENARIOS)[currentScenarioIdx].options.map((opt, i) => (
-                          <Button 
-                            key={i}
-                            variant="outline"
-                            className={`h-auto p-6 flex flex-col items-start gap-1 text-left border-2 hover:border-${activeGame === 'pro' ? 'indigo-500' : 'primary'} hover:bg-${activeGame === 'pro' ? 'indigo-50' : 'primary/5'} transition-all group`}
-                            onClick={() => handleAdvisorChoice(i)}
-                          >
-                            <span className={`font-bold text-lg group-hover:text-${activeGame === 'pro' ? 'indigo-600' : 'primary'}`}>{opt.label}</span>
-                            <span className="text-xs text-muted-foreground">Select this path</span>
-                          </Button>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                <div className="lg:col-span-4 space-y-6">
-                  <Card className="border-none shadow-sm bg-slate-900 text-white">
-                    <CardHeader className="pb-2 border-b border-white/10">
-                      <CardTitle className="text-sm font-bold uppercase tracking-widest text-slate-400">Scenario Context</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6 space-y-6">
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                           {activeGame === 'pro' ? <FileText className="h-5 w-5 text-indigo-400" /> : <Calculator className="h-5 w-5 text-primary" />}
-                           <div>
-                              <div className="text-[10px] font-bold text-slate-500 uppercase">Topic</div>
-                              <div className="text-sm font-bold">{activeGame === 'pro' ? 'Real World Readiness' : 'Wealth Strategy'}</div>
-                           </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                           <HeartPulse className="h-5 w-5 text-rose-400" />
-                           <div>
-                              <div className="text-[10px] font-bold text-slate-500 uppercase">Impact Level</div>
-                              <div className="text-sm font-bold">High (Mission Critical)</div>
-                           </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            )}
-
-            {(activeGame === 'advisor' || activeGame === 'pro') && showAdvisorResult && (
-              <div className="space-y-8">
-                <Card className="border-none shadow-2xl bg-white overflow-hidden">
-                  <div className="bg-emerald-500 p-8 text-white text-center">
-                    <div className="h-16 w-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <ShieldCheck className="h-10 w-10" />
-                    </div>
-                    <CardTitle className="text-4xl font-black mb-2">Simulation Complete</CardTitle>
-                    <CardDescription className="text-emerald-100 text-lg">Your choices have been analyzed by the SpendXP Advisor.</CardDescription>
-                  </div>
-                  <CardContent className="p-0">
-                    <div className="divide-y">
-                      {simulationHistory.map((item, i) => (
-                        <div key={i} className="p-8 grid md:grid-cols-2 gap-8 items-start hover:bg-slate-50 transition-colors">
-                          <div className="space-y-4">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-primary/10 text-primary">Stage {i+1}</Badge>
-                              <h4 className="font-black text-xl text-slate-900">{item.scenario}</h4>
-                            </div>
-                            <div className="p-4 rounded-xl bg-white border-2 border-slate-100">
-                              <span className="text-xs font-bold text-muted-foreground uppercase block mb-1">Your Choice</span>
-                              <p className="font-bold text-slate-800">{item.choice}</p>
-                            </div>
-                          </div>
-                          <div className="space-y-6">
-                            <div className="flex gap-4">
-                              <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-                                <ShieldCheck className="h-5 w-5 text-amber-600" />
-                              </div>
-                              <div>
-                                <h5 className="font-bold text-slate-900 mb-1">Advisor Guidance</h5>
-                                <p className="text-sm text-slate-600 leading-relaxed">{item.advice}</p>
-                              </div>
-                            </div>
-                            <div className="flex gap-4">
-                              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                                <Calendar className="h-5 w-5 text-blue-600" />
-                              </div>
-                              <div>
-                                <h5 className="font-bold text-slate-900 mb-1">Future Projection</h5>
-                                <p className="text-sm text-slate-600 leading-relaxed italic">"{item.projection}"</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="p-12 bg-slate-50 text-center">
-                       <Button size="lg" className="h-16 px-12 text-xl font-black rounded-2xl shadow-xl shadow-primary/20" onClick={() => { setActiveGame(null); setShowAdvisorResult(false); }}>
-                          Finish Simulation
-                       </Button>
-                    </div>
-                  </CardContent>
-                </Card>
               </div>
             )}
           </div>
