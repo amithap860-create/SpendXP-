@@ -13,6 +13,11 @@
 // setupDevToolsDetector
 // DO NOT import from @/lib/* directly in components.
 
+// IMPORT RULE:
+// Components, hooks, pages → import from '@/firebase'
+// Service files in src/lib/ → import from '@/lib/firebase'
+// Never mix these two patterns.
+
 export { 
   app, 
   auth, 

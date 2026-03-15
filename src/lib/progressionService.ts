@@ -1,5 +1,6 @@
 import { doc, getDoc, setDoc, getDocs, collection, Firestore, serverTimestamp } from 'firebase/firestore';
-import { safeGetDoc, safeSetDoc } from '@/firebase';
+import { db } from '@/lib/firebase';
+import { safeGetDoc, safeSetDoc } from '@/lib/firestoreSafe';
 
 export interface UserProgression {
   totalXP: number;
@@ -63,7 +64,6 @@ export const DEFAULT_PROGRESSION: UserProgression = {
 export async function updateLeaderboardEntry(uid: string, displayName: string) {
   try {
     const progression = await getProgression(uid);
-    const leaderboardRef = doc(collection(doc(collection(db, 'leaderboard'), uid), 'entry'), 'data'); // Adjusted path for better indexing
     // For prototype, write to top-level leaderboard collection
     const simpleRef = doc(db, 'leaderboard', uid);
     await safeSetDoc(simpleRef, {
@@ -77,12 +77,12 @@ export async function updateLeaderboardEntry(uid: string, displayName: string) {
   }
 }
 
-export function getProgressionRef(db: Firestore, uid: string) {
+export function getProgressionRef(uid: string) {
   return doc(db, 'users', uid, 'progression', 'stats');
 }
 
 export async function getProgression(uid: string): Promise<UserProgression> {
-  const progressionRef = getProgressionRef(db, uid);
+  const progressionRef = getProgressionRef(uid);
   
   try {
     const snap = await safeGetDoc(progressionRef);
@@ -104,7 +104,7 @@ export async function getProgression(uid: string): Promise<UserProgression> {
   }
 }
 
-export async function getAllGameScores(db: Firestore, uid: string): Promise<GameScores> {
+export async function getAllGameScores(uid: string): Promise<GameScores> {
   const games = ['budgetBlitz', 'finIQ', 'moneyMaze', 'stockMarketSim', 'creditScoreBuilder', 'compoundClicker'];
   const scores: GameScores = {};
 
@@ -126,8 +126,8 @@ export async function getAllGameScores(db: Firestore, uid: string): Promise<Game
   }
 }
 
-export async function getConceptStrengths(db: Firestore, uid: string): Promise<ConceptStrengths> {
-  const scores = await getAllGameScores(db, uid);
+export async function getConceptStrengths(uid: string): Promise<ConceptStrengths> {
+  const scores = await getAllGameScores(uid);
   const tasksSnap = await getDocs(collection(db, 'users', uid, 'lessonProgress'));
   const completedTasks = tasksSnap.docs.map(d => d.data()).filter(t => t.completed);
 

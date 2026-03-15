@@ -67,7 +67,7 @@ export default function ParentDashboard() {
 
   useEffect(() => {
     if (!selectedChildId || !db || !user) return;
-    getConceptStrengths(db, selectedChildId).then(setStrengths);
+    getConceptStrengths(selectedChildId).then(setStrengths);
   }, [selectedChildId, db, activityLog, user]);
 
   if (isChildrenLoading) return <div className="flex h-screen items-center justify-center"><Activity className="animate-spin text-primary" /></div>;

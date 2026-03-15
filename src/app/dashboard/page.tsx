@@ -91,8 +91,8 @@ export default function DashboardPage() {
         ] = await Promise.all([
           safeGetDoc(doc(db, 'users', user.uid)),
           getProgression(user.uid),
-          getAllGameScores(db, user.uid),
-          getConceptStrengths(db, user.uid),
+          getAllGameScores(user.uid),
+          getConceptStrengths(user.uid),
           getDocs(collection(db, 'users', user.uid, 'lessonProgress')),
           safeGetDoc(doc(db, 'dailyChallenges', istDateKey))
         ]);

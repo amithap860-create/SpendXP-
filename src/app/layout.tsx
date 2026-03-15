@@ -19,7 +19,10 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
   const isAuthPage = ['/login', '/signup', '/verify-email', '/onboarding', '/consent'].includes(pathname);
 
   return (
-    <body className={cn(inter.variable, "font-sans antialiased bg-slate-50 text-slate-900")}>
+    <body 
+      className={cn(inter.variable, "font-sans antialiased bg-slate-50 text-slate-900")}
+      suppressHydrationWarning
+    >
       <div className="flex flex-col min-h-screen">
         {/* TOP NAV (Desktop) */}
         {!loading && user && !isAuthPage && (
@@ -108,7 +111,7 @@ function NavLink({ href, label, active, children }: { href: string; label: strin
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <FirebaseClientProvider>
         <AgeGroupProvider>
           <AuthProvider>

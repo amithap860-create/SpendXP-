@@ -19,7 +19,7 @@ export function useProgression() {
     }
 
     setIsLoading(true);
-    const ref = getProgressionRef(db, user.uid);
+    const ref = getProgressionRef(user.uid);
 
     const unsubscribe = safeOnSnapshot(ref, (snap) => {
       if (snap.exists()) {
