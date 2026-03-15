@@ -1,4 +1,5 @@
-import { doc, getDoc, setDoc, getDocs, collection, Firestore } from 'firebase/firestore';
+import { doc, getDoc, setDoc, getDocs, collection, Firestore, serverTimestamp } from 'firebase/firestore';
+import { safeGetDoc, safeSetDoc } from '@/firebase';
 
 export interface UserProgression {
   totalXP: number;
@@ -57,32 +58,44 @@ export const DEFAULT_PROGRESSION: UserProgression = {
 };
 
 /**
- * Returns the Firestore document reference for a user's progression stats.
+ * Logic 3: Client-side leaderboard update workaround
  */
+export async function updateLeaderboardEntry(uid: string, displayName: string) {
+  try {
+    const progression = await getProgression(uid);
+    const leaderboardRef = doc(collection(doc(collection(db, 'leaderboard'), uid), 'entry'), 'data'); // Adjusted path for better indexing
+    // For prototype, write to top-level leaderboard collection
+    const simpleRef = doc(db, 'leaderboard', uid);
+    await safeSetDoc(simpleRef, {
+      uid,
+      displayName,
+      totalXP: progression.totalXP,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+  } catch (error) {
+    console.error("Leaderboard update failed:", error);
+  }
+}
+
 export function getProgressionRef(db: Firestore, uid: string) {
   return doc(db, 'users', uid, 'progression', 'stats');
 }
 
-/**
- * Fetches the user's aggregated progression document.
- */
-export async function getProgression(db: Firestore, uid: string): Promise<UserProgression> {
+export async function getProgression(uid: string): Promise<UserProgression> {
   const progressionRef = getProgressionRef(db, uid);
   
   try {
-    const snap = await getDoc(progressionRef);
-    if (snap.exists()) {
-      const data = snap.data();
+    const snap = await safeGetDoc(progressionRef);
+    if (snap) {
       return {
         ...DEFAULT_PROGRESSION,
-        ...data,
+        ...snap,
         gameHighScores: {
           ...DEFAULT_PROGRESSION.gameHighScores,
-          ...(data.gameHighScores || {})
+          ...(snap.gameHighScores || {})
         }
       } as UserProgression;
     } else {
-      await setDoc(progressionRef, DEFAULT_PROGRESSION);
       return DEFAULT_PROGRESSION;
     }
   } catch (error) {
@@ -91,19 +104,8 @@ export async function getProgression(db: Firestore, uid: string): Promise<UserPr
   }
 }
 
-/**
- * Reads all game score documents for a user.
- */
 export async function getAllGameScores(db: Firestore, uid: string): Promise<GameScores> {
-  const games = [
-    'budgetBlitz', 
-    'finIQ', 
-    'moneyMaze', 
-    'stockMarketSim', 
-    'creditScoreBuilder', 
-    'compoundClicker'
-  ];
-
+  const games = ['budgetBlitz', 'finIQ', 'moneyMaze', 'stockMarketSim', 'creditScoreBuilder', 'compoundClicker'];
   const scores: GameScores = {};
 
   try {
@@ -124,9 +126,6 @@ export async function getAllGameScores(db: Firestore, uid: string): Promise<Game
   }
 }
 
-/**
- * Calculates financial concept strengths based on game performance and lesson completion.
- */
 export async function getConceptStrengths(db: Firestore, uid: string): Promise<ConceptStrengths> {
   const scores = await getAllGameScores(db, uid);
   const tasksSnap = await getDocs(collection(db, 'users', uid, 'lessonProgress'));
@@ -141,7 +140,6 @@ export async function getConceptStrengths(db: Firestore, uid: string): Promise<C
     spending: 0,
   };
 
-  // 1. Base Accuracy from FinIQ Quiz
   const finIQ = scores.finIQQuiz;
   if (finIQ?.categoryAccuracy) {
     Object.entries(finIQ.categoryAccuracy).forEach(([cat, stat]) => {
@@ -152,34 +150,23 @@ export async function getConceptStrengths(db: Firestore, uid: string): Promise<C
     });
   }
 
-  // 2. Bonus from Lesson Completion (+20 per lesson)
   completedTasks.forEach(task => {
     const key = task.category.toLowerCase() as keyof ConceptStrengths;
-    if (strengths[key] !== undefined) {
-      strengths[key] += 20;
-    }
+    if (strengths[key] !== undefined) strengths[key] += 20;
   });
 
-  // 3. Game-specific Milestone Bonuses
   if ((scores.budgetBlitz?.highScore || 0) > 500) {
     strengths.budgeting += 10;
     strengths.spending += 10;
   }
   
-  if ((scores.creditScoreBuilder?.highScore || 0) > 700) {
-    strengths.credit += 15;
-  }
-
-  if ((scores.stockMarketSim?.totalProfit || 0) > 0) {
-    strengths.investing += 10;
-  }
-
+  if ((scores.creditScoreBuilder?.highScore || 0) > 700) strengths.credit += 15;
+  if ((scores.stockMarketSim?.totalProfit || 0) > 0) strengths.investing += 10;
   if (scores.compoundClicker?.completed) {
     strengths.saving += 15;
     strengths.investing += 15;
   }
 
-  // Cap all at 100
   Object.keys(strengths).forEach((key) => {
     const k = key as keyof ConceptStrengths;
     strengths[k] = Math.min(100, strengths[k]);

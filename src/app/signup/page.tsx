@@ -1,23 +1,39 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { User, Mail, Lock, ShieldCheck } from 'lucide-react';
+import { User, Mail, Lock, ShieldCheck, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { collection, query, where, getDocs, doc, serverTimestamp, writeBatch, FieldValue, arrayUnion } from 'firebase/firestore';
+import { db, safeSetDoc, safeUpdateDoc } from '@/firebase';
 
 export default function SignupPage() {
-  const { signUpWithEmail, signInWithGoogle, error } = useAuthContext();
+  const { signUpWithEmail, signInWithGoogle, error: authError } = useAuthContext();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [isParent, setIsParent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [inviteCode, setInviteCode] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const code = searchParams.get('inviteCode');
+    if (code) {
+      setInviteCode(code);
+      setIsParent(true);
+    }
+  }, [searchParams]);
 
   const passwordStrength = useMemo(() => {
     let strength = 0;
@@ -30,7 +46,67 @@ export default function SignupPage() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await signUpWithEmail(email, password, isParent);
+    setError(null);
+
+    const res = await signUpWithEmail(email, password, displayName, isParent);
+    
+    if (res.success && inviteCode) {
+      try {
+        // Logic 7: Check invite code expiry
+        const q = query(collection(db, 'pendingParentInvites'), where('inviteCode', '==', inviteCode));
+        const snap = await getDocs(q);
+        const inviteDoc = snap.docs[0];
+        
+        if (!inviteDoc || inviteDoc.data().expiresAt.toDate() < new Date()) {
+          setError("This invite link has expired. Ask your child to send a new one.");
+          setLoading(false);
+          return;
+        }
+
+        const inviteData = inviteDoc.data();
+        const batch = writeBatch(db);
+        const newParentUid = res.userId; // Assume hook returns userId
+
+        // Create Accepted Link
+        const linkRef = doc(db, 'linkRequests', `${inviteData.childUid}_${newParentUid}`);
+        batch.set(linkRef, {
+          parentUid: newParentUid,
+          childUid: inviteData.childUid,
+          status: 'accepted',
+          createdAt: serverTimestamp()
+        });
+
+        // Update Child
+        batch.update(doc(db, 'users', inviteData.childUid), {
+          parentLinked: true,
+          parentUid: newParentUid,
+          parentEmail: email.toLowerCase(),
+          pendingParentEmail: null
+        });
+
+        // Update Parent
+        batch.update(doc(db, 'users', newParentUid), {
+          linkedChildren: arrayUnion(inviteData.childUid),
+          isParent: true,
+          setupComplete: true
+        });
+
+        // Clean up
+        batch.delete(inviteDoc.ref);
+        await batch.commit();
+        
+        router.push('/parent');
+        return;
+      } catch (err) {
+        console.error("Invite processing error:", err);
+      }
+    }
+
+    if (res.success) {
+      router.push(isParent ? '/parent/setup' : '/onboarding');
+    } else {
+      setError(res.error || authError);
+    }
     setLoading(false);
   };
 
@@ -38,6 +114,14 @@ export default function SignupPage() {
     <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-100 via-blue-50 to-white flex items-center justify-center p-4">
       <Card className="max-w-md w-full shadow-2xl border-none">
         <CardHeader className="text-center">
+          {inviteCode && (
+            <div className="mb-6 p-4 bg-primary/10 rounded-xl border-2 border-primary/20 flex items-start gap-3 text-left">
+              <ShieldCheck className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+              <p className="text-xs font-bold text-primary leading-tight">
+                You've been invited to connect with a SpendXP user! Create your account to see their progress.
+              </p>
+            </div>
+          )}
           <h1 className="text-4xl font-black text-primary mb-2">SpendXP</h1>
           <CardDescription className="text-lg">Create your account to start earning.</CardDescription>
         </CardHeader>
@@ -109,6 +193,7 @@ export default function SignupPage() {
               <Checkbox 
                 id="isParent" 
                 checked={isParent} 
+                disabled={!!inviteCode}
                 onCheckedChange={(val) => setIsParent(!!val)} 
                 suppressHydrationWarning
               />
@@ -118,8 +203,8 @@ export default function SignupPage() {
             </div>
 
             {error && (
-              <p className="text-sm text-destructive font-bold bg-destructive/10 p-3 rounded-lg">
-                {error}
+              <p className="text-sm text-destructive font-bold bg-destructive/10 p-3 rounded-lg flex items-center gap-2">
+                <AlertCircle className="h-4 w-4" /> {error}
               </p>
             )}
 

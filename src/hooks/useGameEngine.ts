@@ -1,12 +1,13 @@
-
 'use client';
 
 import { useReducer, useCallback, useEffect, useRef } from 'react';
-import { useUser } from '@/firebase';
+import { useUser, db, safeGetDoc, safeSetDoc } from '@/firebase';
 import { playCorrect, playWrong, playGameOver, playCombo } from '@/lib/sounds';
 import { validateScore, validateXP } from '@/lib/validation';
 import { rateLimiter } from '@/lib/rateLimiter';
 import { getRefreshedToken } from '@/lib/authHelpers';
+import { doc, writeBatch, serverTimestamp, increment } from 'firebase/firestore';
+import { updateLeaderboardEntry } from '@/lib/progressionService';
 
 export type GameStatus = 'IDLE' | 'COUNTDOWN' | 'PLAYING' | 'PAUSED' | 'GAME_OVER' | 'RESULTS';
 
@@ -37,6 +38,8 @@ type Action =
   | { type: 'START_COUNTDOWN' }
   | { type: 'START_PLAYING'; timePerRound?: number }
   | { type: 'TICK' }
+  | { type: 'SET_TIME'; payload: number }
+  | { type: 'TIMER_EXPIRED' }
   | { type: 'COUNTDOWN_TICK' }
   | { type: 'PAUSE' }
   | { type: 'RESUME' }
@@ -69,9 +72,10 @@ function gameReducer(state: GameState, action: Action): GameState {
     case 'COUNTDOWN_TICK':
       if (state.countdown <= 1) return { ...state, status: 'PLAYING', countdown: 0 };
       return { ...state, countdown: state.countdown - 1 };
-    case 'TICK':
-      if (state.status !== 'PLAYING') return state;
-      return { ...state, timeLeft: Math.max(0, state.timeLeft - 1) };
+    case 'SET_TIME':
+      return { ...state, timeLeft: action.payload };
+    case 'TIMER_EXPIRED':
+      return { ...state, timeLeft: 0 };
     case 'PAUSE': return { ...state, status: 'PAUSED' };
     case 'RESUME': return { ...state, status: 'PLAYING' };
     case 'CORRECT_ANSWER': {
@@ -127,15 +131,50 @@ export function useGameEngine(config: GameConfig) {
   const { user } = useUser();
   const [state, dispatch] = useReducer(gameReducer, config, initialState);
   const comboTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Logic 2: XP Guard
+  const hasEnded = useRef(false);
+  
+  // Logic 5: Timestamp anchored timer
+  const timerStartRef = useRef<number>(0);
+  const timerDurationRef = useRef<number>(0);
+
+  const startTimer = useCallback((durationSeconds: number) => {
+    timerStartRef.current = Date.now();
+    timerDurationRef.current = durationSeconds * 1000;
+  }, []);
 
   useEffect(() => {
-    if (state.status !== 'PLAYING' && state.status !== 'COUNTDOWN') return;
-    const intervalId = setInterval(() => {
-      if (state.status === 'COUNTDOWN') dispatch({ type: 'COUNTDOWN_TICK' });
-      else if (state.status === 'PLAYING' && config.timePerRound !== undefined) dispatch({ type: 'TICK' });
-    }, 1000);
-    return () => clearInterval(intervalId);
-  }, [state.status, config.timePerRound]);
+    if (state.status === 'PLAYING' && config.timePerRound !== undefined) {
+      startTimer(state.timeLeft);
+    }
+  }, [state.status, config.timePerRound, state.currentRound]);
+
+  useEffect(() => {
+    if (state.status !== 'PLAYING') return;
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - timerStartRef.current;
+      const remaining = Math.max(0, timerDurationRef.current - elapsed);
+      const remainingSeconds = Math.ceil(remaining / 1000);
+      
+      dispatch({ type: 'SET_TIME', payload: remainingSeconds });
+      
+      if (remaining <= 0) {
+        clearInterval(interval);
+        dispatch({ type: 'TIMER_EXPIRED' });
+      }
+    }, 100);
+    return () => clearInterval(interval);
+  }, [state.status]);
+
+  useEffect(() => {
+    if (state.status === 'COUNTDOWN') {
+      const interval = setInterval(() => {
+        dispatch({ type: 'COUNTDOWN_TICK' });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [state.status]);
 
   useEffect(() => {
     if (state.comboActive) {
@@ -146,6 +185,7 @@ export function useGameEngine(config: GameConfig) {
   }, [state.comboActive]);
 
   const startGame = useCallback(() => {
+    hasEnded.current = false; // Logic 2: Reset guard
     dispatch({ type: 'RESET_GAME', config });
     dispatch({ type: 'START_COUNTDOWN' });
   }, [config]);
@@ -158,52 +198,55 @@ export function useGameEngine(config: GameConfig) {
   const nextRound = useCallback(() => dispatch({ type: 'NEXT_ROUND', totalRounds: config.totalRounds, timePerRound: config.timePerRound, xpPerWin: config.xpPerWin }), [config.totalRounds, config.timePerRound, config.xpPerWin]);
 
   const endGame = useCallback(async (finalXpBonus = 0) => {
-    if (!user) return { isHighScore: false };
-    
-    // 1. Rate Limiting
+    // Logic 2 & 8: Guards and Clamping
+    if (!user || hasEnded.current) return { isHighScore: false };
+    hasEnded.current = true;
+
+    const safeScore = Math.max(0, state.score);
+    const safeXP = Math.max(0, state.xpEarned + finalXpBonus);
+
     const allowed = rateLimiter.check({
       key: `game:${config.gameName}:score`,
       maxCalls: 1,
       windowMs: 30000
     });
-    if (!allowed) {
-      console.warn('[SpendXP] Rate limit exceeded for score submission');
-      return { isHighScore: false };
-    }
+    if (!allowed) return { isHighScore: false };
 
-    const sessionXp = state.xpEarned + finalXpBonus;
-
-    // 2. Input Validation
-    const scoreVal = validateScore(config.gameName, state.score);
-    const xpVal = validateXP(sessionXp);
-
-    if (!scoreVal.valid || !xpVal.valid) {
-      console.error('[Security] Validation failed for end-game data');
-      return { isHighScore: false };
-    }
+    const scoreVal = validateScore(config.gameName, safeScore);
+    const xpVal = validateXP(safeXP);
+    if (!scoreVal.valid || !xpVal.valid) return { isHighScore: false };
 
     dispatch({ type: 'END_GAME' });
 
     try {
-      // 3. Server-side Submission
-      const token = await getRefreshedToken();
-      const response = await fetch('/api/scores/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          gameName: config.gameName,
-          score: state.score,
-          xpEarned: sessionXp,
-          sessionToken: Math.random().toString(36).substring(7)
-        })
-      });
+      // Logic 2: Idempotent Increment
+      const gameScoreRef = doc(db, 'users', user.uid, 'gameScores', config.gameName);
+      const prevDoc = await safeGetDoc(gameScoreRef);
+      const prevXP = prevDoc?.xpEarned ?? 0;
+      const xpDelta = Math.max(0, safeXP - prevXP);
 
-      if (!response.ok) throw new Error('Submission failed');
+      const batch = writeBatch(db);
+      const progressionRef = doc(db, 'users', user.uid, 'progression', 'stats');
       
-      return { isHighScore: true }; // Placeholder for response data
+      batch.set(gameScoreRef, {
+        gameName: config.gameName,
+        lastScore: safeScore,
+        highScore: increment(0), // Placeholder for server-side logic or client comparison
+        xpEarned: safeXP,
+        lastPlayedAt: serverTimestamp(),
+      }, { merge: true });
+
+      batch.set(progressionRef, {
+        totalXP: increment(xpDelta),
+        lastActivityAt: serverTimestamp(),
+      }, { merge: true });
+
+      await batch.commit();
+
+      // Logic 3: Update Leaderboard
+      await updateLeaderboardEntry(user.uid, user.displayName || 'Strategist');
+      
+      return { isHighScore: true };
     } catch (error) {
       console.error('[SpendXP] Failed to submit score:', error);
       return { isHighScore: false };

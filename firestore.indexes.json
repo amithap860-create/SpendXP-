@@ -4,20 +4,22 @@
       "collectionGroup": "activityLog",
       "queryScope": "COLLECTION",
       "fields": [
-        {
-          "fieldPath": "playedAt",
-          "order": "DESCENDING"
-        }
+        { "fieldPath": "playedAt", "order": "DESCENDING" }
       ]
     },
     {
       "collectionGroup": "gameScores",
       "queryScope": "COLLECTION",
       "fields": [
-        {
-          "fieldPath": "lastPlayedAt",
-          "order": "DESCENDING"
-        }
+        { "fieldPath": "lastPlayedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "pendingParentInvites",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "inviteCode", "order": "ASCENDING" },
+        { "fieldPath": "expiresAt", "order": "ASCENDING" }
       ]
     }
   ],

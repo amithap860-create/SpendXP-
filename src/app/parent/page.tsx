@@ -20,7 +20,8 @@ import {
   ShieldCheck,
   Activity,
   Users,
-  UserPlus
+  UserPlus,
+  HelpCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -33,7 +34,6 @@ export default function ParentDashboard() {
   const [strengths, setStrengths] = useState<ConceptStrengths | null>(null);
   const [gameScores, setGameScores] = useState<any[]>([]);
 
-  // Fetch linked children
   const childrenQuery = useMemoFirebase(() => {
     return user ? query(collection(db, 'users'), where('parentUid', '==', user.uid)) : null;
   }, [db, user]);
@@ -47,7 +47,6 @@ export default function ParentDashboard() {
 
   const selectedChild = useMemo(() => children?.find(c => c.id === selectedChildId), [children, selectedChildId]);
 
-  // Fetch Activity Log
   const activityQuery = useMemoFirebase(() => {
     return selectedChildId ? query(
       collection(db, 'users', selectedChildId, 'activityLog'), 
@@ -57,7 +56,6 @@ export default function ParentDashboard() {
   }, [db, selectedChildId]);
   const { data: activityLog } = useCollection(activityQuery);
 
-  // Fetch Game Scores for Trend - Protected
   useEffect(() => {
     if (!selectedChildId || !user) return;
     const ref = collection(db, 'users', selectedChildId, 'gameScores');
@@ -67,7 +65,6 @@ export default function ParentDashboard() {
     return () => unsubscribe();
   }, [db, selectedChildId, user]);
 
-  // Fetch Live Strengths
   useEffect(() => {
     if (!selectedChildId || !db || !user) return;
     getConceptStrengths(db, selectedChildId).then(setStrengths);
@@ -84,7 +81,7 @@ export default function ParentDashboard() {
           </div>
           <CardTitle className="text-2xl font-black mb-2">No Linked Accounts</CardTitle>
           <p className="text-slate-500 mb-8">You haven't added any children to your dashboard yet.</p>
-          <Button onClick={() => window.location.href = '/parent/setup'} className="w-full h-14 text-lg font-black">
+          <Button onClick={() => window.location.href = '/parent/setup'} className="w-full h-14 text-lg font-black" suppressHydrationWarning>
             Add a Child
           </Button>
         </Card>
@@ -92,14 +89,17 @@ export default function ParentDashboard() {
     );
   }
 
+  // Logic 6: Minimum score floor for rendering
   const radarItems = strengths ? [
-    { label: 'Budgeting', score: strengths.budgeting },
-    { label: 'Saving', score: strengths.saving },
-    { label: 'Investing', score: strengths.investing },
-    { label: 'Credit', score: strengths.credit },
-    { label: 'Taxes', score: strengths.taxes },
-    { label: 'Spending', score: strengths.spending },
+    { label: 'Budgeting', score: Math.max(5, strengths.budgeting) },
+    { label: 'Saving', score: Math.max(5, strengths.saving) },
+    { label: 'Investing', score: Math.max(5, strengths.investing) },
+    { label: 'Credit', score: Math.max(5, strengths.credit) },
+    { label: 'Taxes', score: Math.max(5, strengths.taxes) },
+    { label: 'Spending', score: Math.max(5, strengths.spending) },
   ] : [];
+
+  const isRadarEmpty = strengths ? Object.values(strengths).every(v => v === 0) : true;
 
   const getRadarPoints = (data: any[], size: number) => {
     const center = size / 2;
@@ -112,17 +112,6 @@ export default function ParentDashboard() {
     }).join(' ');
   };
 
-  const getBackgroundHex = (size: number) => {
-    const center = size / 2;
-    const radius = size * 0.4;
-    return Array.from({ length: 6 }).map((_, i) => {
-      const angle = (Math.PI * 2 * i) / 6 - Math.PI / 2;
-      const x = center + radius * Math.cos(angle);
-      const y = center + radius * Math.sin(angle);
-      return `${x},${y}`;
-    }).join(' ');
-  };
-
   return (
     <div className="flex min-h-screen bg-background">
       <MainNav />
@@ -130,7 +119,7 @@ export default function ParentDashboard() {
         <header className="mb-8 space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-3xl font-black text-slate-900 tracking-tight">Parent Portal</h2>
-            <Button variant="outline" onClick={() => setShowReport(true)} className="gap-2 font-bold border-2">
+            <Button variant="outline" onClick={() => setShowReport(true)} className="gap-2 font-bold border-2" suppressHydrationWarning>
               <FileText className="h-4 w-4" /> Weekly Report
             </Button>
           </div>
@@ -140,6 +129,7 @@ export default function ParentDashboard() {
               <button
                 key={child.id}
                 onClick={() => setSelectedChildId(child.id)}
+                suppressHydrationWarning
                 className={cn(
                   "flex items-center gap-3 px-6 py-3 rounded-2xl border-2 transition-all shrink-0",
                   selectedChildId === child.id 
@@ -158,7 +148,8 @@ export default function ParentDashboard() {
             ))}
             <button 
               onClick={() => window.location.href = '/parent/setup'}
-              className="px-6 py-3 rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 hover:border-slate-300 hover:text-slate-500 transition-all flex items-center gap-2"
+              suppressHydrationWarning
+              className="px-6 py-3 rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 hover:border-primary/40 hover:text-primary transition-all flex items-center gap-2"
             >
               <UserPlus className="h-4 w-4" /> Add Child
             </button>
@@ -189,7 +180,6 @@ export default function ParentDashboard() {
             </div>
 
             <div className="lg:col-span-8 space-y-8">
-              {/* Concept Radar */}
               <Card className="border-none shadow-xl bg-white overflow-hidden">
                 <CardHeader className="bg-slate-50 border-b">
                   <CardTitle className="text-xl font-black flex items-center gap-2">
@@ -197,29 +187,36 @@ export default function ParentDashboard() {
                   </CardTitle>
                   <CardDescription>Knowledge profile updated in real-time.</CardDescription>
                 </CardHeader>
-                <CardContent className="p-8 flex flex-col md:flex-row items-center justify-around gap-8">
+                <CardContent className="p-8 flex flex-col md:flex-row items-center justify-around gap-8 min-h-[300px]">
                   {strengths ? (
                     <>
-                      <div className="relative">
-                        <svg viewBox="0 0 100 100" className="w-64 h-64">
-                          <polygon points={getBackgroundHex(100)} fill="#f1f5f9" stroke="#e2e8f0" strokeWidth="0.5" />
-                          <circle cx="50" cy="50" r="20" fill="none" stroke="#e2e8f0" strokeWidth="0.5" strokeDasharray="2 2" />
-                          <circle cx="50" cy="50" r="40" fill="none" stroke="#e2e8f0" strokeWidth="0.5" />
-                          <polygon points={getRadarPoints(radarItems, 100)} fill="rgba(45, 114, 219, 0.2)" stroke="#2e72db" strokeWidth="2" />
-                          {radarItems.map((d, i) => {
-                            const angle = (Math.PI * 2 * i) / radarItems.length - Math.PI / 2;
-                            const x = 50 + 40 * (d.score / 100) * Math.cos(angle);
-                            const y = 50 + 40 * (d.score / 100) * Math.sin(angle);
-                            return <circle key={i} cx={x} cy={y} r="2" fill="#2e72db" />;
-                          })}
-                        </svg>
-                      </div>
+                      {isRadarEmpty ? (
+                        <div className="flex flex-col items-center justify-center text-center space-y-4 max-w-sm">
+                          <HelpCircle className="h-12 w-12 text-slate-300" />
+                          <p className="text-sm font-medium text-slate-500">No game data yet. {selectedChild.displayName} hasn't explored any topics. Share a game with them!</p>
+                        </div>
+                      ) : (
+                        <div className="relative">
+                          <svg viewBox="0 0 100 100" className="w-64 h-64">
+                            <polygon points="50,10 84.6,30 84.6,70 50,90 15.4,70 15.4,30" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="0.5" />
+                            <circle cx="50" cy="50" r="20" fill="none" stroke="#e2e8f0" strokeWidth="0.5" strokeDasharray="2 2" />
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="#e2e8f0" strokeWidth="0.5" />
+                            <polygon points={getRadarPoints(radarItems, 100)} fill="rgba(45, 114, 219, 0.2)" stroke="#2e72db" strokeWidth="2" />
+                            {radarItems.map((d, i) => {
+                              const angle = (Math.PI * 2 * i) / radarItems.length - Math.PI / 2;
+                              const x = 50 + 40 * (d.score / 100) * Math.cos(angle);
+                              const y = 50 + 40 * (d.score / 100) * Math.sin(angle);
+                              return <circle key={i} cx={x} cy={y} r="2" fill="#2e72db" />;
+                            })}
+                          </svg>
+                        </div>
+                      )}
                       <div className="grid grid-cols-2 gap-x-8 gap-y-4">
                         {radarItems.map((d, i) => (
                           <div key={i} className="flex items-center gap-2">
                             <div className="h-2 w-2 rounded-full bg-primary" />
                             <span className="text-xs font-bold text-slate-600 uppercase">{d.label}</span>
-                            <span className="text-xs font-black ml-auto">{d.score}%</span>
+                            <span className="text-xs font-black ml-auto">{strengths[d.label.toLowerCase() as keyof ConceptStrengths]}%</span>
                           </div>
                         ))}
                       </div>
@@ -230,7 +227,6 @@ export default function ParentDashboard() {
                 </CardContent>
               </Card>
 
-              {/* Game Scores */}
               <div className="grid gap-6 md:grid-cols-2">
                 {gameScores.map((game) => (
                   <Card key={game.id} className="border-none shadow-md hover:shadow-lg transition-shadow bg-white overflow-hidden">

@@ -33,7 +33,8 @@ import {
   Volume2,
   VolumeX,
   ChevronRight,
-  GraduationCap
+  GraduationCap,
+  Timer
 } from 'lucide-react';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
@@ -41,6 +42,7 @@ import { cn } from '@/lib/utils';
 import { lessons } from '@/data/lessons';
 import { LessonViewer } from '@/components/learn/LessonViewer';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { getISTDateKey, getNextISTMidnight } from '@/lib/dateHelpers';
 
 export default function GamesHub() {
   const { name, tasks } = useUser();
@@ -53,6 +55,26 @@ export default function GamesHub() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [gatedGame, setGatedGame] = useState<{ id: string, lessonId: string } | null>(null);
   const [showLessonViewer, setShowLessonViewer] = useState(false);
+  const [timeToReset, setTimeToReset] = useState('');
+
+  // Logic 4: Sync Daily Challenge to IST
+  const dateKey = getISTDateKey();
+
+  useEffect(() => {
+    const updateCountdown = () => {
+      const now = new Date();
+      const nextMidnight = getNextISTMidnight();
+      const diff = nextMidnight.getTime() - now.getTime();
+      
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const mins = Math.floor((diff / (1000 * 60)) % 60);
+      setTimeToReset(`${hours}h ${mins}m`);
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -60,7 +82,6 @@ export default function GamesHub() {
     }
   }, []);
 
-  // Leaderboard Subscription - Protected by safeOnSnapshot and user check
   useEffect(() => {
     if (!db || !user) return;
     const q = query(collection(db, 'users'), orderBy('xp', 'desc'), limit(10));
@@ -100,7 +121,7 @@ export default function GamesHub() {
               <ChevronRight className="h-4 w-4 rotate-180" /> Back to Arcade
             </Button>
             {activeGame === 'blitz' && <BudgetBlitz onExit={() => setActiveGame(null)} />}
-            {activeGame === 'finIQ' && <FinIQQuiz onExit={() => setActiveGame(null)} />}
+            {activeGame === 'finIQ' && <FinIQQuiz onExit={() => setActiveGame(null)} isDailyChallenge={true} />}
             {activeGame === 'compound' && <CompoundClicker onExit={() => setActiveGame(null)} />}
             {activeGame === 'stock' && <StockMarketSim onExit={() => setActiveGame(null)} />}
             {activeGame === 'maze' && <MoneyMaze onExit={() => setActiveGame(null)} />}
@@ -127,7 +148,7 @@ export default function GamesHub() {
                 <div>
                   <div className="flex items-center gap-3">
                     <h2 className="text-3xl font-black text-slate-900 tracking-tighter">The Arcade</h2>
-                    <button onClick={() => setSoundEnabled(toggleSound())} className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors">
+                    <button onClick={() => setSoundEnabled(toggleSound())} className="h-10 w-10 rounded-xl bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors" suppressHydrationWarning>
                       {soundEnabled ? <Volume2 className="h-5 w-5 text-slate-600" /> : <VolumeX className="h-5 w-5 text-slate-400" />}
                     </button>
                   </div>
@@ -149,11 +170,14 @@ export default function GamesHub() {
                   <CardContent className="p-8">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                       <div className="space-y-2">
-                        <Badge className="bg-white/20 text-white border-none gap-1.5 px-3 py-1 font-black">DAILY CHALLENGE</Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge className="bg-white/20 text-white border-none gap-1.5 px-3 py-1 font-black">DAILY CHALLENGE</Badge>
+                          <span className="text-[10px] font-black flex items-center gap-1 uppercase opacity-80"><Timer className="h-3 w-3" /> Resets in {timeToReset}</span>
+                        </div>
                         <h3 className="text-3xl font-black tracking-tight leading-tight">FinIQ Daily Blitz</h3>
-                        <p className="text-primary-foreground/80 max-w-md font-medium">Compare your financial IQ with players across India. New scenarios every 24 hours.</p>
+                        <p className="text-primary-foreground/80 max-w-md font-medium">Compare your financial IQ with players across India. Anchored to IST midnight.</p>
                       </div>
-                      <Button onClick={() => handleGameSelect('finIQ')} className="bg-white text-primary hover:bg-white/90 h-16 px-10 rounded-2xl text-xl font-black shadow-xl">PLAY NOW</Button>
+                      <Button onClick={() => handleGameSelect('finIQ')} className="bg-white text-primary hover:bg-white/90 h-16 px-10 rounded-2xl text-xl font-black shadow-xl" suppressHydrationWarning>PLAY NOW</Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -206,6 +230,11 @@ export default function GamesHub() {
                     </CardTitle>
                   </CardHeader>
                   <div className="divide-y flex-1">
+                    {leaderboard.length < 3 && (
+                      <div className="p-12 text-center text-slate-400 italic font-medium">
+                        Be one of the first on the leaderboard!
+                      </div>
+                    )}
                     {leaderboard.map((u, i) => (
                       <div key={u.id} className={cn("p-4 flex items-center justify-between", u.id === user?.uid && "bg-primary/5 border-l-4 border-primary")}>
                         <div className="flex items-center gap-4">
@@ -241,8 +270,8 @@ export default function GamesHub() {
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="flex flex-col gap-3 sm:flex-col">
-              <Button onClick={() => setShowLessonViewer(true)} className="w-full h-14 text-xl font-black rounded-xl">Learn Now (+80 XP)</Button>
-              <Button variant="ghost" onClick={() => { setActiveGame(gatedGame?.id || null); setGatedGame(null); }} className="w-full h-12 text-slate-400 font-bold">I'll play anyway</Button>
+              <Button onClick={() => setShowLessonViewer(true)} className="w-full h-14 text-xl font-black rounded-xl" suppressHydrationWarning>Learn Now (+80 XP)</Button>
+              <Button variant="ghost" onClick={() => { setActiveGame(gatedGame?.id || null); setGatedGame(null); }} className="w-full h-12 text-slate-400 font-bold" suppressHydrationWarning>I'll play anyway</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

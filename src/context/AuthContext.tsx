@@ -3,17 +3,18 @@
 import React, { createContext, useContext, ReactNode, useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { User, setPersistence, browserLocalPersistence, browserSessionPersistence, onIdTokenChanged } from 'firebase/auth';
-import { useAgeAdapt } from '@/lib/ageAdapt';
+import { useAgeAdapt, getAgeGroup, AgeGroup } from '@/lib/ageAdapt';
 import { useAuth as useFirebaseAuth, useFirestore } from '@/firebase';
 import { validateFingerprint, captureFingerprint } from '@/lib/sessionGuard';
 import { useRouter } from 'next/navigation';
-import { doc } from 'firebase/firestore';
-import { safeUpdateDoc } from '@/lib/firestoreSafe';
+import { doc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { safeUpdateDoc, safeSetDoc } from '@/lib/firestoreSafe';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   emailVerified: boolean;
+  currentAgeGroup: AgeGroup;
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>;
   signUpWithEmail: (email: string, pass: string, name: string, isParent?: boolean) => Promise<{ success: boolean; error?: string }>;
@@ -29,11 +30,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const auth = useAuth();
   const firebaseAuth = useFirebaseAuth();
   const db = useFirestore();
-  const { ageGroup } = useAgeAdapt();
   const router = useRouter();
   
   const [fingerprint, setFingerprint] = useState<any>(null);
   const [emailVerified, setEmailVerified] = useState(false);
+  const [currentAgeGroup, setCurrentAgeGroup] = useState<AgeGroup>('junior');
 
   useEffect(() => {
     if (!firebaseAuth) return;
@@ -43,19 +44,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const isVerified = firebaseUser.emailVerified;
         setEmailVerified(isVerified);
         
-        // Sync verification status to Firestore if it just changed
-        if (isVerified) {
-          const userRef = doc(db, 'users', firebaseUser.uid);
+        const userRef = doc(db, 'users', firebaseUser.uid);
+        
+        // Logic 10: Heal race condition - ensure profile exists
+        let snap = await getDoc(userRef);
+        if (!snap.exists()) {
+          await safeSetDoc(userRef, {
+            id: firebaseUser.uid,
+            displayName: firebaseUser.displayName || 'Strategist',
+            email: firebaseUser.email?.toLowerCase(),
+            emailVerified: isVerified,
+            createdAt: serverTimestamp(),
+            balance: 10000,
+            xp: 0,
+            level: 1,
+            onboardingComplete: false
+          }, { merge: true });
+          snap = await getDoc(userRef);
+        }
+
+        const profileData = snap.data();
+        
+        // Logic 1: Live Age Group Recalculation
+        const freshAgeGroup = profileData?.birthYear 
+          ? getAgeGroup(profileData.birthYear) 
+          : 'junior';
+        
+        setCurrentAgeGroup(freshAgeGroup);
+
+        if (freshAgeGroup !== profileData?.ageGroup) {
+          safeUpdateDoc(userRef, { ageGroup: freshAgeGroup });
+        }
+
+        if (isVerified && !profileData?.emailVerified) {
           safeUpdateDoc(userRef, { emailVerified: true });
         }
 
-        // Fingerprint capturing on login
         if (!fingerprint) {
           setFingerprint(captureFingerprint());
         }
 
-        // Dynamic persistence based on age
-        const mode = ageGroup === 'junior' ? browserSessionPersistence : browserLocalPersistence;
+        const mode = freshAgeGroup === 'junior' ? browserSessionPersistence : browserLocalPersistence;
         setPersistence(firebaseAuth, mode).catch(console.error);
       } else {
         setEmailVerified(false);
@@ -64,9 +93,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => unsubscribe();
-  }, [firebaseAuth, ageGroup, db]);
+  }, [firebaseAuth, db]);
 
-  // Session Guard: Validate fingerprint
   useEffect(() => {
     if (fingerprint && !validateFingerprint(fingerprint)) {
       console.warn('[SpendXP Security] Session hijack suspected. Terminating session.');
@@ -78,6 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = {
     ...auth,
     emailVerified,
+    currentAgeGroup,
   };
 
   return (
@@ -90,7 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuthContext() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuthContext must be used within an AgeGroupProvider (reordered layout)');
+    throw new Error('useAuthContext must be used within an AuthProvider');
   }
   return context;
 }
