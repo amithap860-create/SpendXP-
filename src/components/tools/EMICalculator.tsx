@@ -69,14 +69,14 @@ export function EMICalculator() {
   }, [principal, rate, tenure, stats.emi]);
 
   return (
-    <div className="p-6 md:p-10 space-y-10">
-      <div className="grid gap-10 lg:grid-cols-2">
+    <div className="p-4 md:p-10 space-y-8 md:space-y-10">
+      <div className="grid gap-8 lg:grid-cols-2">
         {/* INPUTS */}
-        <div className="space-y-8">
+        <div className="space-y-6 md:space-y-8">
           <div className="space-y-4">
             <div className="flex justify-between items-end">
-              <Label className="text-xs font-black uppercase text-slate-400">Loan Amount</Label>
-              <span className="text-lg font-black text-primary">{formatValue(principal)}</span>
+              <Label className="text-[10px] md:text-xs font-black uppercase text-slate-400">Loan Amount</Label>
+              <span className="text-base md:text-lg font-black text-primary">{formatValue(principal)}</span>
             </div>
             <Slider 
               value={[principal]} 
@@ -84,20 +84,21 @@ export function EMICalculator() {
               max={5000000} 
               step={10000} 
               onValueChange={([v]) => setPrincipal(v)} 
+              className="py-4 touch-pan-x"
             />
             <Input 
               type="number" 
               value={principal} 
               onChange={(e) => setPrincipal(Number(e.target.value))}
-              className="h-12 text-lg font-bold"
+              className="h-12 text-base md:text-lg font-bold bg-slate-50 border-none"
               suppressHydrationWarning
             />
           </div>
 
           <div className="space-y-4">
             <div className="flex justify-between items-end">
-              <Label className="text-xs font-black uppercase text-slate-400">Interest Rate (% p.a.)</Label>
-              <span className="text-lg font-black text-primary">{rate}%</span>
+              <Label className="text-[10px] md:text-xs font-black uppercase text-slate-400">Rate (% p.a.)</Label>
+              <span className="text-base md:text-lg font-black text-primary">{rate}%</span>
             </div>
             <Slider 
               value={[rate]} 
@@ -105,13 +106,14 @@ export function EMICalculator() {
               max={36} 
               step={0.5} 
               onValueChange={([v]) => setRate(v)} 
+              className="py-4 touch-pan-x"
             />
           </div>
 
           <div className="space-y-4">
             <div className="flex justify-between items-end">
-              <Label className="text-xs font-black uppercase text-slate-400">Tenure (Months)</Label>
-              <span className="text-lg font-black text-primary">{tenure} <span className="text-xs text-slate-400">({Math.round(tenure/12)} yrs)</span></span>
+              <Label className="text-[10px] md:text-xs font-black uppercase text-slate-400">Tenure (Months)</Label>
+              <span className="text-base md:text-lg font-black text-primary">{tenure} <span className="text-xs text-slate-400">({Math.round(tenure/12)}y)</span></span>
             </div>
             <Slider 
               value={[tenure]} 
@@ -119,63 +121,64 @@ export function EMICalculator() {
               max={360} 
               step={3} 
               onValueChange={([v]) => setTenure(v)} 
+              className="py-4 touch-pan-x"
             />
           </div>
         </div>
 
         {/* OUTPUTS */}
-        <div className="bg-slate-50 rounded-3xl p-8 space-y-8 flex flex-col justify-center">
+        <div className="bg-slate-50 rounded-3xl p-6 md:p-8 space-y-6 md:space-y-8 flex flex-col justify-center">
           <div className="text-center space-y-1">
-            <div className="text-xs font-black uppercase text-slate-400 tracking-widest">Monthly EMI</div>
-            <div className="text-5xl font-black text-teal-600">{formatValue(stats.emi)}</div>
+            <div className="text-[10px] md:text-xs font-black uppercase text-slate-400 tracking-widest">Monthly EMI</div>
+            <div className="text-4xl md:text-5xl font-black text-teal-600">{formatValue(stats.emi)}</div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
-              <div className="text-[10px] font-black uppercase text-slate-400 mb-1">Total Interest</div>
-              <div className="text-lg font-black text-rose-500">{formatValue(stats.totalInterest)}</div>
+          <div className="grid grid-cols-2 gap-3 md:gap-4">
+            <div className="p-4 bg-white rounded-2xl shadow-sm border border-slate-100 text-center">
+              <div className="text-[8px] md:text-[10px] font-black uppercase text-slate-400 mb-1">Total Interest</div>
+              <div className="text-base md:text-lg font-black text-rose-500">{formatValue(stats.totalInterest)}</div>
             </div>
-            <div className="p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
-              <div className="text-[10px] font-black uppercase text-slate-400 mb-1">Total Payable</div>
-              <div className="text-lg font-black text-slate-900">{formatValue(stats.totalPayable)}</div>
+            <div className="p-4 bg-white rounded-2xl shadow-sm border border-slate-100 text-center">
+              <div className="text-[8px] md:text-[10px] font-black uppercase text-slate-400 mb-1">Total Payable</div>
+              <div className="text-base md:text-lg font-black text-slate-900">{formatValue(stats.totalPayable)}</div>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <div className="flex justify-between text-[10px] font-black uppercase text-slate-400">
+          <div className="space-y-3">
+            <div className="flex justify-between text-[9px] md:text-[10px] font-black uppercase text-slate-400">
               <span>Principal ({Math.round(100 - stats.interestPercent)}%)</span>
               <span>Interest ({Math.round(stats.interestPercent)}%)</span>
             </div>
-            <div className="h-6 w-full bg-slate-200 rounded-lg overflow-hidden flex">
+            <div className="h-8 md:h-10 w-full bg-slate-200 rounded-xl overflow-hidden flex">
               <div 
-                className="h-full bg-teal-500 transition-all duration-500 flex items-center justify-center text-[10px] font-black text-white" 
+                className="h-full bg-teal-500 transition-all duration-500 flex items-center justify-center text-[9px] md:text-[10px] font-black text-white" 
                 style={{ width: `${100 - stats.interestPercent}%` }}
               >
-                {100 - stats.interestPercent > 20 && 'PRINCIPAL'}
+                {100 - stats.interestPercent > 25 && 'PRINCIPAL'}
               </div>
               <div 
-                className="h-full bg-rose-500 transition-all duration-500 flex items-center justify-center text-[10px] font-black text-white" 
+                className="h-full bg-rose-500 transition-all duration-500 flex items-center justify-center text-[9px] md:text-[10px] font-black text-white" 
                 style={{ width: `${stats.interestPercent}%` }}
               >
-                {stats.interestPercent > 20 && 'INTEREST'}
+                {stats.interestPercent > 25 && 'INTEREST'}
               </div>
             </div>
-            <p className="text-[10px] text-center text-rose-600 font-bold">
+            <p className="text-[10px] md:text-xs text-center text-rose-600 font-bold">
               You pay {Math.round(stats.interestPercent)}% EXTRA on top of your loan!
             </p>
           </div>
         </div>
       </div>
 
-      <div className="p-6 rounded-2xl bg-primary/5 border-2 border-primary/10 flex items-start gap-4">
-        <Info className="h-6 w-6 text-primary mt-1 shrink-0" />
-        <p className="text-sm font-medium text-slate-600 leading-relaxed">
+      <div className="p-5 md:p-6 rounded-3xl bg-primary/5 border-2 border-primary/10 flex items-start gap-4">
+        <Info className="h-5 w-5 md:h-6 md:w-6 text-primary mt-1 shrink-0" />
+        <p className="text-xs md:text-sm font-medium text-slate-600 leading-relaxed">
           {rate < 10 ? (
             "This is a relatively low interest rate — likely a home loan or secured loan."
           ) : rate <= 18 ? (
             "This is a moderate rate — typical for personal loans. Try to prepay when possible to save on interest."
           ) : (
-            `Warning: This is a high interest rate. You are paying ${formatValue(stats.totalInterest)} in extra payments — consider if this purchase is truly necessary.`
+            `Warning: This is a high interest rate. You are paying ${formatValue(stats.totalInterest)} in extra interest — consider if this is truly worth it.`
           )}
         </p>
       </div>
@@ -184,34 +187,36 @@ export function EMICalculator() {
         <Button 
           variant="outline" 
           onClick={() => setShowBreakdown(!showBreakdown)}
-          className="w-full h-12 font-bold"
+          className="w-full h-12 md:h-14 font-black uppercase text-[10px] tracking-widest border-2"
           suppressHydrationWarning
         >
-          {showBreakdown ? 'Hide Yearly Breakdown' : 'Show Yearly Breakdown'}
+          {showBreakdown ? 'Hide Breakdown' : 'Show Breakdown'}
         </Button>
 
         {showBreakdown && (
-          <div className="max-h-96 overflow-auto rounded-xl border border-slate-200 bg-white animate-in fade-in duration-300">
-            <Table>
-              <TableHeader className="bg-slate-50 sticky top-0">
-                <TableRow>
-                  <TableHead className="font-black text-xs uppercase">Year</TableHead>
-                  <TableHead className="font-black text-xs uppercase">Principal Paid</TableHead>
-                  <TableHead className="font-black text-xs uppercase">Interest Paid</TableHead>
-                  <TableHead className="font-black text-xs uppercase">Remaining</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {yearlyBreakdown.map((row) => (
-                  <TableRow key={row.year}>
-                    <TableCell className="font-bold">Year {row.year}</TableCell>
-                    <TableCell className="text-teal-600 font-medium">{formatValue(row.principal)}</TableCell>
-                    <TableCell className="text-rose-500 font-medium">{formatValue(row.interest)}</TableCell>
-                    <TableCell className="font-black">{formatValue(row.balance)}</TableCell>
+          <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white animate-in fade-in duration-300">
+            <div className="min-w-[400px]">
+              <Table>
+                <TableHeader className="bg-slate-50">
+                  <TableRow>
+                    <TableHead className="font-black text-[9px] uppercase">Year</TableHead>
+                    <TableHead className="font-black text-[9px] uppercase">Principal</TableHead>
+                    <TableHead className="font-black text-[9px] uppercase">Interest</TableHead>
+                    <TableHead className="font-black text-[9px] uppercase">Remaining</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {yearlyBreakdown.map((row) => (
+                    <TableRow key={row.year}>
+                      <TableCell className="font-bold text-xs md:text-sm">Year {row.year}</TableCell>
+                      <TableCell className="text-teal-600 font-bold text-xs md:text-sm">{formatValue(row.principal)}</TableCell>
+                      <TableCell className="text-rose-500 font-bold text-xs md:text-sm">{formatValue(row.interest)}</TableCell>
+                      <TableCell className="font-black text-xs md:text-sm">{formatValue(row.balance)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         )}
       </div>

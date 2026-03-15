@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Inter } from 'next/font/google';
@@ -12,6 +11,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
+import { useEffect, useState } from 'react';
 
 const inter = Inter({ 
   subsets: ['latin'], 
@@ -22,6 +22,14 @@ const inter = Inter({
 function RootLayoutContent({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthContext();
   const pathname = usePathname();
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  useEffect(() => {
+    const checkSize = () => setIsSmallScreen(window.innerWidth < 360);
+    checkSize();
+    window.addEventListener('resize', checkSize);
+    return () => window.removeEventListener('resize', checkSize);
+  }, []);
 
   const isAuthPage = ['/login', '/signup', '/verify-email', '/onboarding', '/consent'].includes(pathname);
 
@@ -73,14 +81,20 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
       {/* BOTTOM NAV (Mobile) */}
       {!loading && user && !isAuthPage && (
         <nav 
-          className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex items-center justify-around px-2 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]"
+          className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex items-center justify-around px-1 z-50 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] overflow-hidden"
           style={{ 
             height: 'calc(80px + env(safe-area-inset-bottom, 0px))',
             paddingBottom: 'env(safe-area-inset-bottom, 0px)' 
           }}
         >
           {navLinks.map((link) => (
-            <NavLink key={link.href} href={link.href} label={link.label} active={pathname === link.href}>
+            <NavLink 
+              key={link.href} 
+              href={link.href} 
+              label={link.label} 
+              active={pathname === link.href}
+              isSmallScreen={isSmallScreen}
+            >
               {link.icon === 'grid' && (
                 <div className="grid grid-cols-2 gap-0.5 p-0.5">
                   {[1,2,3,4].map(i => <div key={i} className="w-1.5 h-1.5 bg-current rounded-sm" />)}
@@ -124,14 +138,23 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
   );
 }
 
-function NavLink({ href, label, active, children }: { href: string; label: string; active: boolean; children: React.ReactNode }) {
+function NavLink({ href, label, active, children, isSmallScreen }: { href: string; label: string; active: boolean; children: React.ReactNode; isSmallScreen: boolean }) {
   return (
     <Link href={href} className={cn(
-      "flex flex-col items-center gap-1 transition-all duration-300",
-      active ? "text-teal-600 scale-110" : "text-slate-300"
+      "flex flex-col items-center gap-1 transition-all duration-300 flex-1 min-w-0",
+      active ? "text-teal-600 scale-105" : "text-slate-300"
     )}>
-      {children}
-      <span className="text-[9px] font-black uppercase tracking-widest">{label}</span>
+      <div className="flex items-center justify-center" style={{ width: isSmallScreen ? '18px' : '20px', height: isSmallScreen ? '18px' : '20px' }}>
+        {children}
+      </div>
+      {!isSmallScreen && (
+        <span className={cn(
+          "font-black uppercase tracking-widest truncate w-full text-center px-1",
+          isSmallScreen ? "text-[8px]" : "text-[10px]"
+        )}>
+          {label}
+        </span>
+      )}
     </Link>
   );
 }
@@ -141,6 +164,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="SpendXP" />
+        <meta name="theme-color" content="#0F6E56" />
+        <link rel="manifest" href="/manifest.json" />
       </head>
       <body 
         className={cn(inter.variable, "font-sans antialiased bg-slate-50 text-slate-900")}

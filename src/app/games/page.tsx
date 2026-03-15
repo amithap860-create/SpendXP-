@@ -2,14 +2,35 @@
 
 import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { BudgetBlitz } from '@/components/games/BudgetBlitz';
-import { FinIQQuiz } from '@/components/games/FinIQQuiz';
-import { MoneyMaze } from '@/components/games/MoneyMaze';
-import { StockMarketSim } from '@/components/games/StockMarketSim';
-import { CreditScoreBuilder } from '@/components/games/CreditScoreBuilder';
-import { CompoundClicker } from '@/components/games/CompoundClicker';
+import dynamic from 'next/dynamic';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import { cn } from '@/lib/utils';
+import { GameLoadingSkeleton } from '@/components/games/GameLoadingSkeleton';
+
+const BudgetBlitz = dynamic(() => import('@/components/games/BudgetBlitz').then(mod => mod.BudgetBlitz), {
+  loading: () => <GameLoadingSkeleton />,
+  ssr: false
+});
+const FinIQQuiz = dynamic(() => import('@/components/games/FinIQQuiz').then(mod => mod.FinIQQuiz), {
+  loading: () => <GameLoadingSkeleton />,
+  ssr: false
+});
+const MoneyMaze = dynamic(() => import('@/components/games/MoneyMaze').then(mod => mod.MoneyMaze), {
+  loading: () => <GameLoadingSkeleton />,
+  ssr: false
+});
+const StockMarketSim = dynamic(() => import('@/components/games/StockMarketSim').then(mod => mod.StockMarketSim), {
+  loading: () => <GameLoadingSkeleton />,
+  ssr: false
+});
+const CreditScoreBuilder = dynamic(() => import('@/components/games/CreditScoreBuilder').then(mod => mod.CreditScoreBuilder), {
+  loading: () => <GameLoadingSkeleton />,
+  ssr: false
+});
+const CompoundClicker = dynamic(() => import('@/components/games/CompoundClicker').then(mod => mod.CompoundClicker), {
+  loading: () => <GameLoadingSkeleton />,
+  ssr: false
+});
 
 type GameID = 'budgetBlitz' | 'finIQQuiz' | 'moneyMaze' | 'stockMarketSim' | 'creditScoreBuilder' | 'compoundClicker';
 
@@ -41,29 +62,21 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
 
       if (validGames.includes(gameParam)) {
         if (gameParam === 'finIQQuiz' && modeParam === 'daily') {
-          // Special case: Direct open for daily challenge
           setActiveGame('finIQQuiz');
           setIsDaily(true);
         } else {
-          // Normal case: Highlight and scroll
           setHighlightedGame(gameParam);
-          
-          // Use a small timeout to ensure DOM is ready for scrolling
           setTimeout(() => {
             const element = document.getElementById(`game-card-${gameParam}`);
             if (element) {
               element.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
           }, 100);
-
-          // Remove highlight after 2 seconds
           setTimeout(() => {
             setHighlightedGame(null);
           }, 2000);
         }
       }
-      
-      // Clear params from URL
       router.replace('/games');
     }
   }, [resolvedParams, router]);
@@ -71,7 +84,7 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
   const renderGame = () => {
     switch (activeGame) {
       case 'budgetBlitz': return <BudgetBlitz onExit={() => setActiveGame(null)} />;
-      case 'finIQQuiz': return <FinIQQuiz onExit={() => setActiveGame(null)} isDailyChallenge={isDaily} dailyMode={isDaily} />;
+      case 'finIQQuiz': return <FinIQQuiz onExit={() => setActiveGame(null)} isDailyChallenge={isDaily} />;
       case 'moneyMaze': return <MoneyMaze onExit={() => setActiveGame(null)} />;
       case 'stockMarketSim': return <StockMarketSim onExit={() => setActiveGame(null)} />;
       case 'creditScoreBuilder': return <CreditScoreBuilder onExit={() => setActiveGame(null)} />;
@@ -81,17 +94,17 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen-safe bg-slate-50 flex flex-col">
       <EmailVerificationBanner />
       
       {!activeGame ? (
         <main className="max-w-5xl mx-auto px-4 py-8 w-full space-y-8">
           <header>
-            <h1 className="text-4xl font-black text-slate-900 tracking-tight">Arcade</h1>
+            <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Arcade</h1>
             <p className="text-slate-500 font-medium">Learn by playing. Earn XP to level up.</p>
           </header>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             <GameCard 
               id="budgetBlitz"
               name="Budget Blitz" 
@@ -150,7 +163,7 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
                 setActiveGame(null);
                 setIsDaily(false);
               }}
-              className="mb-4 text-xs font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest"
+              className="mb-4 text-xs font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest flex items-center gap-2 h-11 px-4 rounded-xl hover:bg-slate-100 transition-colors"
             >
               ← Back to Arcade
             </button>
@@ -182,16 +195,19 @@ function GameCard({
       id={`game-card-${id}`}
       onClick={onClick}
       className={cn(
-        "bg-white rounded-3xl border-[0.5px] border-slate-200 p-8 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all text-left group overflow-hidden relative",
+        "bg-white rounded-3xl border-[0.5px] border-slate-200 p-6 md:p-8 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all text-left group overflow-hidden relative",
         "ring-offset-2",
-        isHighlighted ? "ring-2 ring-teal-500" : "ring-0 transition-all duration-1000"
+        isHighlighted ? "ring-2 ring-teal-500" : "ring-0 transition-all duration-1000",
+        "min-h-[160px] flex flex-col justify-between"
       )}
     >
       <div className={cn("absolute top-0 left-0 w-2 h-full", color)} />
-      <h3 className="text-xl font-black text-slate-900 mb-2 group-hover:text-teal-600 transition-colors">{name}</h3>
-      <p className="text-sm text-slate-500 font-medium leading-snug">{desc}</p>
-      <div className="mt-6 flex justify-end">
-        <span className="text-xs font-black text-slate-300 group-hover:text-teal-600 transition-colors">PLAY NOW →</span>
+      <div>
+        <h3 className="text-xl font-black text-slate-900 mb-2 group-hover:text-teal-600 transition-colors">{name}</h3>
+        <p className="text-sm text-slate-500 font-medium leading-snug">{desc}</p>
+      </div>
+      <div className="flex justify-end pt-4">
+        <span className="text-[10px] font-black text-slate-300 group-hover:text-teal-600 transition-colors uppercase tracking-widest">PLAY NOW →</span>
       </div>
     </button>
   );

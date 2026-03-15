@@ -28,40 +28,46 @@ export {
   isFirebaseReady
 } from '@/lib/firebase';
 
-import { app } from '@/lib/firebase';
+import { app, auth, db } from '@/lib/firebase';
 
 /**
  * Initializes secondary Firebase services like App Check.
  * This is called by the FirebaseClientProvider.
  * Made fault-tolerant for mobile browsers/ad-blockers.
+ * 
+ * Returns core services synchronously to avoid Promise-related 
+ * hydration issues in Next.js 15.
  */
-export async function initializeFirebase() {
+export function initializeFirebase() {
   if (typeof window !== 'undefined') {
     if (process.env.NODE_ENV !== 'production') {
       (self as any).FIREBASE_APPCHECK_DEBUG_TOKEN = true;
     }
     
-    try {
-      const { initializeAppCheck, ReCaptchaV3Provider } = await import('firebase/app-check');
-      initializeAppCheck(app, {
-        provider: new ReCaptchaV3Provider(
-          process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
-        ),
-        isTokenAutoRefreshEnabled: true
-      });
-    } catch (err) {
-      console.warn('[SpendXP] App Check initialization skipped or blocked by browser:', err);
-    }
+    // Initialize App Check asynchronously without blocking the return of core services
+    // This prevents the initialization from being 'async' which breaks synchronous provider props.
+    import('firebase/app-check').then(({ initializeAppCheck, ReCaptchaV3Provider }) => {
+      try {
+        initializeAppCheck(app, {
+          provider: new ReCaptchaV3Provider(
+            process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
+          ),
+          isTokenAutoRefreshEnabled: true
+        });
+      } catch (err) {
+        console.warn('[SpendXP] App Check initialization skipped or blocked by browser:', err);
+      }
+    }).catch(err => {
+      console.warn('[SpendXP] App Check module load failed:', err);
+    });
   }
 
-  // Use dynamic imports for services to ensure app is initialized first
-  const { auth: authInstance, db: dbInstance } = await import('@/lib/firebase');
-
+  // Return instances directly from lib/firebase which are initialized in module scope
   return {
     firebaseApp: app,
-    auth: authInstance,
-    firestore: dbInstance,
-    db: dbInstance
+    auth: auth,
+    firestore: db,
+    db: db
   };
 }
 

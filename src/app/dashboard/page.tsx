@@ -6,8 +6,6 @@ import {
   db, 
   safeGetDoc, 
   safeOnSnapshot, 
-  useFirestore, 
-  useMemoFirebase 
 } from '@/firebase';
 import { 
   doc, 
@@ -31,16 +29,22 @@ import {
   getNextISTMidnight, 
   formatRelativeTime 
 } from '@/lib/dateHelpers';
-import { RadarChart } from '@/components/charts/RadarChart';
 import { lessons } from '@/data/lessons';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import dynamic from 'next/dynamic';
+
+const RadarChart = dynamic(() => import('@/components/charts/RadarChart').then(mod => mod.RadarChart), {
+  ssr: false,
+  loading: () => <div className="h-[220px] w-[220px] rounded-full bg-slate-100 animate-pulse" />
+});
 
 export default function DashboardPage() {
   const { user } = useAuthContext();
   const { formatValue, formatCompact } = useCurrency();
   const [loading, setLoading] = useState(true);
+  const [radarSize, setRadarSize] = useState(220);
   
   // Data State
   const [profile, setProfile] = useState<any>(null);
@@ -72,6 +76,15 @@ export default function DashboardPage() {
   }, [progression]);
 
   useEffect(() => {
+    const handleResize = () => {
+      setRadarSize(Math.min(window.innerWidth - 48, 280));
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
     if (!user) return;
 
     const loadData = async () => {
@@ -101,7 +114,6 @@ export default function DashboardPage() {
         setCompletedLessonsCount(tasksSnap.docs.filter(d => d.data().completed).length);
         setDailyParticipantCount(dailyDoc?.participantCount || 0);
 
-        // Fetch rank for daily challenge
         const rankSnap = await getDocs(query(
           collection(db, 'dailyChallenges', istDateKey, 'scores'),
           orderBy('score', 'desc')
@@ -122,7 +134,6 @@ export default function DashboardPage() {
 
     loadData();
 
-    // Listen to activity log in real time
     const activityQuery = query(
       collection(db, 'users', user.uid, 'activityLog'),
       orderBy('playedAt', 'desc'),
@@ -132,7 +143,6 @@ export default function DashboardPage() {
       setActivityLog(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     });
 
-    // Timer for daily challenge reset
     const timer = setInterval(() => {
       const next = getNextISTMidnight();
       const diff = next.getTime() - Date.now();
@@ -188,51 +198,51 @@ export default function DashboardPage() {
   if (loading) return <DashboardSkeleton />;
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-24 md:pb-8">
+    <div className="min-h-screen-safe bg-slate-50 pb-24 md:pb-8">
       <main className="max-w-5xl mx-auto px-4 py-6 space-y-8 animate-in fade-in duration-700">
         
         {/* HERO HEADER */}
-        <section className="bg-white rounded-3xl border-[0.5px] border-slate-200 p-8 shadow-sm grid md:grid-cols-2 gap-8 items-center overflow-hidden relative">
-          <div className="space-y-4">
+        <section className="bg-white rounded-3xl border-[0.5px] border-slate-200 p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center gap-8 overflow-hidden relative">
+          <div className="space-y-4 text-center md:text-left flex-1">
             <div>
-              <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+              <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
                 {greeting}, {profile?.displayName?.split(' ')[0]}!
               </h1>
-              <p className="text-slate-500 font-medium mt-1">{subtitle}</p>
+              <p className="text-slate-500 font-medium mt-1 text-sm md:text-base">{subtitle}</p>
             </div>
-            <div className="flex gap-2">
-              <span className="px-3 py-1 bg-teal-500 text-white rounded-full text-xs font-black uppercase tracking-widest">
+            <div className="flex justify-center md:justify-start gap-2">
+              <span className="px-3 py-1 bg-teal-500 text-white rounded-full text-[10px] font-black uppercase tracking-widest">
                 {progression?.level === 1 ? 'Starter' : progression?.level === 2 ? 'Saver' : 'Investor'}
               </span>
-              <span className="px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-xs font-black uppercase tracking-widest">
+              <span className="px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-[10px] font-black uppercase tracking-widest">
                 {profile?.ageGroup} • {profile?.birthYear ? (new Date().getFullYear() - profile.birthYear) : '8-20'}
               </span>
             </div>
           </div>
 
-          <div className="flex flex-col items-center justify-center">
-            <div className="relative h-32 w-32">
-              <svg className="h-32 w-32 -rotate-90">
+          <div className="flex flex-col items-center justify-center shrink-0">
+            <div className="relative h-28 w-28 md:h-32 md:w-32">
+              <svg className="h-full w-full -rotate-90">
                 <circle
-                  cx="64" cy="64" r="54"
+                  cx="50%" cy="50%" r="44%"
                   fill="none" stroke="#f1f5f9" strokeWidth="8"
                 />
                 <circle
-                  cx="64" cy="64" r="54"
+                  cx="50%" cy="50%" r="44%"
                   fill="none" stroke="#14b8a6" strokeWidth="8"
-                  strokeDasharray={2 * Math.PI * 54}
-                  strokeDashoffset={(2 * Math.PI * 54) * (1 - (levelProgress / 100))}
+                  strokeDasharray="276%"
+                  strokeDashoffset={2.76 * (1 - (levelProgress / 100)) * 100 + '%'}
                   strokeLinecap="round"
                   className="transition-all duration-1000 ease-out"
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-2xl font-black text-slate-900">{formatCompact(progression?.totalXP || 0)}</span>
-                <span className="text-[10px] font-bold text-slate-400 uppercase">XP</span>
+                <span className="text-xl md:text-2xl font-black text-slate-900">{formatCompact(progression?.totalXP || 0)}</span>
+                <span className="text-[9px] font-bold text-slate-400 uppercase">XP</span>
               </div>
             </div>
             <div className="mt-2 text-center">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
                 / {formatCompact(nextLevelXP)} XP to Next Rank
               </p>
             </div>
@@ -240,85 +250,77 @@ export default function DashboardPage() {
         </section>
 
         {/* STREAKS & STATS */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white p-5 rounded-2xl border-[0.5px] border-slate-200 shadow-sm text-center space-y-1">
-            <div className="flex items-center justify-center gap-2">
-              <span className="text-2xl font-black text-slate-900">3</span>
-              <div className="w-4 h-5 relative">
-                <div className="absolute bottom-0 left-0 w-full h-full bg-orange-500 rounded-t-full rounded-br-full -rotate-45" />
-                <div className="absolute bottom-1 left-1 w-1/2 h-1/2 bg-yellow-400 rounded-t-full rounded-br-full -rotate-45" />
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          {[
+            { label: 'Day Streak', val: '3', icon: true },
+            { label: 'Games Played', val: progression?.totalGamesPlayed || 0 },
+            { label: 'Saved Virtually', val: formatValue(progression?.walletBalance || 0), smallVal: true },
+            { label: 'Lessons Done', val: `${completedLessonsCount} / 8` },
+          ].map((stat, i) => (
+            <div key={i} className="bg-white p-3 md:p-5 rounded-2xl border-[0.5px] border-slate-200 shadow-sm text-center space-y-1">
+              <div className="flex items-center justify-center gap-2">
+                <span className={cn("font-black text-slate-900", stat.smallVal ? "text-lg md:text-xl" : "text-xl md:text-2xl")}>{stat.val}</span>
+                {stat.icon && (
+                  <div className="w-3 h-4 md:w-4 md:h-5 relative">
+                    <div className="absolute bottom-0 left-0 w-full h-full bg-orange-500 rounded-t-full rounded-br-full -rotate-45" />
+                    <div className="absolute bottom-1 left-1 w-1/2 h-1/2 bg-yellow-400 rounded-t-full rounded-br-full -rotate-45" />
+                  </div>
+                )}
               </div>
+              <p className="text-[8px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
             </div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Day Streak</p>
-          </div>
-
-          <div className="bg-white p-5 rounded-2xl border-[0.5px] border-slate-200 shadow-sm text-center space-y-1">
-            <span className="text-2xl font-black text-slate-900">{progression?.totalGamesPlayed || 0}</span>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Games Played</p>
-          </div>
-
-          <div className="bg-white p-5 rounded-2xl border-[0.5px] border-slate-200 shadow-sm text-center space-y-1">
-            <span className="text-xl font-black text-slate-900 truncate block">
-              {formatValue(progression?.walletBalance || 0)}
-            </span>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Saved Virtually</p>
-          </div>
-
-          <div className="bg-white p-5 rounded-2xl border-[0.5px] border-slate-200 shadow-sm text-center space-y-1">
-            <span className="text-2xl font-black text-slate-900">{completedLessonsCount} / 8</span>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Lessons Done</p>
-          </div>
+          ))}
         </section>
 
         {/* CONTINUE PLAYING */}
         <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">Continue playing</h2>
+            <h2 className="text-base md:text-lg font-black text-slate-900 uppercase tracking-tight">Continue playing</h2>
             <Link href="/games" className="text-xs font-bold text-teal-600 hover:underline">View all</Link>
           </div>
-          <div className="flex overflow-x-auto pb-4 gap-4 no-scrollbar md:grid md:grid-cols-3 md:overflow-visible">
+          <div className="flex overflow-x-auto pb-4 gap-4 no-scrollbar snap-x snap-mandatory md:grid md:grid-cols-3 md:overflow-visible">
             {recommendedGames.slice(0, 6).map((game) => (
               <Link 
                 key={game.id} 
                 href={`/games?game=${game.id}`}
-                className="flex-shrink-0 w-[200px] h-[140px] md:w-full bg-white rounded-2xl border-[0.5px] border-slate-200 p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
+                className="flex-shrink-0 w-[160px] h-[120px] md:w-full md:h-[140px] bg-white rounded-2xl border-[0.5px] border-slate-200 p-4 md:p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group snap-start"
               >
                 <div>
-                  <h3 className="font-bold text-slate-900 text-sm group-hover:text-teal-600 transition-colors">{game.name}</h3>
-                  <p className="text-[10px] text-slate-400 font-medium">
+                  <h3 className="font-bold text-slate-900 text-xs md:text-sm group-hover:text-teal-600 transition-colors line-clamp-1">{game.name}</h3>
+                  <p className="text-[9px] md:text-[10px] text-slate-400 font-medium">
                     Best: {gameScores?.[game.id as keyof GameScores]?.highScore || 'Not played'}
                   </p>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex gap-1">
-                    <div className="w-2 h-2 rounded-full bg-teal-500" />
-                    <div className="w-2 h-2 rounded-full bg-teal-500" />
-                    <div className="w-2 h-2 rounded-full bg-slate-200" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-teal-500" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-teal-500" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-slate-200" />
                   </div>
-                  <span className="text-xs font-black text-teal-600 group-hover:translate-x-1 transition-transform">Play →</span>
+                  <span className="text-[10px] font-black text-teal-600 group-hover:translate-x-1 transition-transform">Play →</span>
                 </div>
               </Link>
             ))}
           </div>
         </section>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-6 md:gap-8">
           {/* KNOWLEDGE RADAR */}
-          <section className="bg-white rounded-3xl border-[0.5px] border-slate-200 p-8 shadow-sm flex flex-col items-center">
-            <h2 className="w-full text-sm font-black text-slate-900 uppercase tracking-tight mb-8">Financial knowledge</h2>
+          <section className="bg-white rounded-3xl border-[0.5px] border-slate-200 p-6 md:p-8 shadow-sm flex flex-col items-center">
+            <h2 className="w-full text-xs md:text-sm font-black text-slate-900 uppercase tracking-tight mb-6 md:mb-8">Financial knowledge</h2>
             {strengths ? (
               <>
-                <RadarChart scores={strengths} size={220} />
-                <div className="w-full mt-8 grid grid-cols-2 gap-4">
+                <RadarChart scores={strengths} size={radarSize} />
+                <div className="w-full mt-6 md:mt-8 grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <p className="text-[9px] font-black text-slate-400 uppercase">Strongest</p>
-                    <span className="px-2 py-1 bg-teal-50 text-teal-600 rounded-lg text-[10px] font-black uppercase">
+                    <p className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase">Strongest</p>
+                    <span className="px-2 py-1 bg-teal-50 text-teal-600 rounded-lg text-[9px] md:text-[10px] font-black uppercase">
                       {Object.entries(strengths).sort((a,b) => b[1]-a[1])[0][0]}
                     </span>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[9px] font-black text-slate-400 uppercase">Focus next</p>
-                    <span className="px-2 py-1 bg-rose-50 text-rose-600 rounded-lg text-[10px] font-black uppercase">
+                    <p className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase">Focus next</p>
+                    <span className="px-2 py-1 bg-rose-50 text-rose-600 rounded-lg text-[9px] md:text-[10px] font-black uppercase">
                       {Object.entries(strengths).sort((a,b) => a[1]-b[1])[0][0]}
                     </span>
                   </div>
@@ -331,30 +333,30 @@ export default function DashboardPage() {
 
           {/* DAILY CHALLENGE */}
           <section className="space-y-4">
-            <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Today's challenge</h2>
-            <div className="bg-white rounded-3xl border-[0.5px] border-l-4 border-l-teal-500 border-slate-200 p-8 shadow-sm space-y-6">
+            <h2 className="text-xs md:text-sm font-black text-slate-900 uppercase tracking-tight">Today's challenge</h2>
+            <div className="bg-white rounded-3xl border-[0.5px] border-l-4 border-l-teal-500 border-slate-200 p-6 md:p-8 shadow-sm space-y-6">
               {dailyRank ? (
                 <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 bg-teal-100 rounded-2xl flex items-center justify-center text-teal-600">
-                    <div className="w-6 h-6 border-4 border-teal-600 rounded-full border-t-transparent -rotate-45" />
+                  <div className="h-10 w-10 md:h-12 md:w-12 bg-teal-100 rounded-2xl flex items-center justify-center text-teal-600">
+                    <div className="w-5 h-5 md:w-6 md:h-6 border-4 border-teal-600 rounded-full border-t-transparent -rotate-45" />
                   </div>
                   <div>
-                    <h3 className="font-black text-slate-900">Completed today!</h3>
-                    <p className="text-xs text-slate-500 font-medium">You scored {dailyRank.score} · Rank #{dailyRank.rank}</p>
+                    <h3 className="font-black text-slate-900 text-sm md:text-base">Completed today!</h3>
+                    <p className="text-[10px] md:text-xs text-slate-500 font-medium">You scored {dailyRank.score} · Rank #{dailyRank.rank}</p>
                   </div>
                 </div>
               ) : (
                 <>
                   <div className="space-y-1">
-                    <h3 className="text-xl font-black text-slate-900">FinIQ Daily Blitz</h3>
-                    <p className="text-sm text-slate-500 font-medium leading-tight">Same questions for everyone — see how you rank against other users.</p>
+                    <h3 className="text-lg md:text-xl font-black text-slate-900">FinIQ Daily Blitz</h3>
+                    <p className="text-xs md:text-sm text-slate-500 font-medium leading-tight">Same questions for everyone — see how you rank against other users.</p>
                   </div>
-                  <div className="flex items-center justify-between text-xs font-bold text-slate-400">
+                  <div className="flex items-center justify-between text-[10px] md:text-xs font-bold text-slate-400">
                     <span>🔥 {dailyParticipantCount} players today</span>
-                    <span>⏳ Resets in {timeLeft}</span>
+                    <span>⏳ {timeLeft} left</span>
                   </div>
                   <Link href="/games?game=finIQQuiz&mode=daily">
-                    <button className="w-full h-12 bg-slate-900 text-white rounded-xl font-black uppercase tracking-widest hover:bg-slate-800 transition-colors">
+                    <button className="w-full h-12 bg-slate-900 text-white rounded-xl font-black uppercase text-xs md:text-sm tracking-widest hover:bg-slate-800 transition-colors">
                       Play Now
                     </button>
                   </Link>
@@ -363,110 +365,6 @@ export default function DashboardPage() {
             </div>
           </section>
         </div>
-
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* LEARNING PATH */}
-          <section className="space-y-4">
-            <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Learning path</h2>
-            <div className="bg-white rounded-3xl border-[0.5px] border-slate-200 p-8 shadow-sm space-y-8">
-              <div className="flex justify-between items-center relative">
-                <div className="absolute top-1/2 left-0 w-full h-[2px] bg-slate-100 -translate-y-1/2" />
-                {lessons.map((lesson, i) => (
-                  <div key={lesson.id} className="relative z-10 flex flex-col items-center gap-2">
-                    <div className={cn(
-                      "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-500",
-                      i < completedLessonsCount 
-                        ? "bg-teal-500 border-teal-500" 
-                        : i === completedLessonsCount 
-                          ? "bg-white border-teal-500 animate-pulse scale-110 shadow-lg shadow-teal-500/20" 
-                          : "bg-white border-slate-200"
-                    )}>
-                      {i < completedLessonsCount && <div className="w-2 h-3 border-r-2 border-b-2 border-white rotate-45 mb-0.5" />}
-                    </div>
-                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">{lesson.topic}</span>
-                  </div>
-                ))}
-              </div>
-
-              {completedLessonsCount < lessons.length ? (
-                <div className="p-6 bg-slate-50 rounded-2xl space-y-4">
-                  <div>
-                    <h4 className="font-black text-slate-900 text-sm">Next: {lessons[completedLessonsCount].title}</h4>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">~3 min read · +80 XP</p>
-                  </div>
-                  <Link href={`/learn?lesson=${lessons[completedLessonsCount].id}`}>
-                    <button className="w-full h-10 bg-teal-500 text-white rounded-lg font-black uppercase text-xs tracking-widest shadow-lg shadow-teal-500/20">
-                      Start Lesson
-                    </button>
-                  </Link>
-                </div>
-              ) : (
-                <div className="p-6 bg-teal-50 rounded-2xl text-center">
-                  <p className="text-teal-600 font-black text-sm uppercase">Scholar Badge Earned!</p>
-                </div>
-              )}
-            </div>
-          </section>
-
-          {/* RECENT ACTIVITY */}
-          <section className="space-y-4">
-            <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight">Recent activity</h2>
-            <div className="bg-white rounded-3xl border-[0.5px] border-slate-200 p-6 shadow-sm space-y-4">
-              {activityLog.length > 0 ? (
-                <div className="space-y-4">
-                  {activityLog.map((activity) => (
-                    <div key={activity.id} className="flex items-center justify-between group">
-                      <div className="flex items-center gap-3">
-                        <div className={cn(
-                          "w-2 h-2 rounded-full",
-                          activity.type === 'game' ? 'bg-rose-400' : 'bg-teal-400'
-                        )} />
-                        <div>
-                          <p className="text-xs font-bold text-slate-700">
-                            {activity.gameName || 'Academy Lesson'}
-                          </p>
-                          <p className="text-[10px] text-slate-400 font-bold uppercase">
-                            +{activity.xpEarned} XP
-                          </p>
-                        </div>
-                      </div>
-                      <span className="text-[10px] font-bold text-slate-300">
-                        {formatRelativeTime(activity.playedAt)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="py-8 text-center">
-                  <p className="text-slate-400 text-xs font-medium">No activity yet. Play a game to start!</p>
-                </div>
-              )}
-            </div>
-          </section>
-        </div>
-
-        {/* PARENT NUDGE */}
-        {profile && !profile.parentLinked && (profile.ageGroup === 'junior' || profile.ageGroup === 'teen') && !nudgeDismissed && (
-          <section className="bg-amber-50 rounded-3xl border-[0.5px] border-l-4 border-l-amber-500 border-amber-100 p-8 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="space-y-1 text-center md:text-left">
-              <h3 className="font-black text-slate-900 uppercase tracking-tight">Connect your parent</h3>
-              <p className="text-sm text-slate-600 font-medium">Share your progress and earn the Family Linked badge (+50 XP).</p>
-            </div>
-            <div className="flex gap-3 w-full md:w-auto">
-              <button 
-                onClick={() => setNudgeDismissed(true)}
-                className="flex-1 px-6 h-12 bg-white text-slate-400 rounded-xl font-bold text-sm border-[0.5px] border-slate-200"
-              >
-                Maybe later
-              </button>
-              <Link href="/profile#parent-connection" className="flex-1">
-                <button className="w-full px-6 h-12 bg-amber-500 text-white rounded-xl font-black uppercase text-sm tracking-widest shadow-lg shadow-amber-500/20">
-                  Connect
-                </button>
-              </Link>
-            </div>
-          </section>
-        )}
       </main>
     </div>
   );
@@ -475,19 +373,15 @@ export default function DashboardPage() {
 function DashboardSkeleton() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 space-y-8 animate-pulse">
-      <div className="h-48 bg-white rounded-3xl border border-slate-100" />
-      <div className="grid grid-cols-4 gap-4">
-        {[1,2,3,4].map(i => <div key={i} className="h-24 bg-white rounded-2xl border border-slate-100" />)}
+      <div className="h-40 md:h-48 bg-white rounded-3xl border border-slate-100" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[1,2,3,4].map(i => <div key={i} className="h-20 md:h-24 bg-white rounded-2xl border border-slate-100" />)}
       </div>
       <div className="space-y-4">
         <div className="h-4 w-32 bg-slate-200 rounded" />
         <div className="flex gap-4 overflow-hidden">
-          {[1,2,3].map(i => <div key={i} className="min-w-[200px] h-[140px] bg-white rounded-2xl border border-slate-100" />)}
+          {[1,2,3].map(i => <div key={i} className="min-w-[160px] h-[120px] md:min-w-[200px] md:h-[140px] bg-white rounded-2xl border border-slate-100" />)}
         </div>
-      </div>
-      <div className="grid md:grid-cols-2 gap-8">
-        <div className="h-64 bg-white rounded-3xl border border-slate-100" />
-        <div className="h-64 bg-white rounded-3xl border border-slate-100" />
       </div>
     </div>
   );
