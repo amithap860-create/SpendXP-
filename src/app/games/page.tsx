@@ -7,8 +7,8 @@ import { useUser } from '@/lib/store';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
+import { BudgetBlitz } from '@/components/games/BudgetBlitz';
 import { 
   Gamepad2, 
   Zap, 
@@ -24,7 +24,8 @@ import {
   BadgePercent,
   TrendingUp,
   FileText,
-  HeartPulse
+  HeartPulse,
+  ShoppingBag
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -176,9 +177,6 @@ export default function GamesHub() {
     toast({ title: "Choice Recorded" });
   };
 
-  const totalAssets = balance + getPortfolioValue();
-  const netWorth = totalAssets - liabilities;
-
   const getLoanContextTitle = () => {
     if (ageGroup === '8-11') return "Borrowing for a Bike";
     if (ageGroup === '11-15') return "Game Console Installments";
@@ -206,16 +204,28 @@ export default function GamesHub() {
         </header>
 
         {!activeGame ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <Card className="hover:shadow-lg transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/20" onClick={() => setActiveGame('blitz')}>
+              <div className="h-2 bg-primary" />
+              <CardHeader>
+                <ShoppingBag className="h-8 w-8 text-primary mb-2 group-hover:scale-110 transition-transform" />
+                <CardTitle>Budget Blitz</CardTitle>
+                <CardDescription>Arcade reflex game. Sort needs, wants, and savings at lightning speed!</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Badge className="bg-emerald-100 text-emerald-700">Arcade Action</Badge>
+              </CardContent>
+            </Card>
+
             <Card className="hover:shadow-lg transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-primary/20" onClick={() => setActiveGame('advisor')}>
               <div className="h-2 bg-primary" />
               <CardHeader>
                 <ShieldCheck className="h-8 w-8 text-primary mb-2 group-hover:scale-110 transition-transform" />
                 <CardTitle>Wealth Architect</CardTitle>
-                <CardDescription>A financial advisor simulator. See how lifestyle choices shape your assets and liabilities.</CardDescription>
+                <CardDescription>A financial advisor simulator. See how lifestyle choices shape your assets.</CardDescription>
               </CardHeader>
               <CardContent>
-                <Badge className="bg-primary/10 text-primary hover:bg-primary/10">Strategic Sim</Badge>
+                <Badge className="bg-primary/10 text-primary">Strategic Sim</Badge>
               </CardContent>
             </Card>
 
@@ -227,7 +237,7 @@ export default function GamesHub() {
                 <CardDescription>{getLoanContextDesc()}</CardDescription>
               </CardHeader>
               <CardContent>
-                <Badge className="bg-accent/10 text-accent hover:bg-accent/10">Interest Sim</Badge>
+                <Badge className="bg-accent/10 text-accent">Interest Sim</Badge>
               </CardContent>
             </Card>
 
@@ -237,7 +247,7 @@ export default function GamesHub() {
                 <CardHeader>
                   <GraduationCap className="h-8 w-8 text-indigo-500 mb-2 group-hover:scale-110 transition-transform" />
                   <CardTitle>Life Path: Pro</CardTitle>
-                  <CardDescription>Advanced simulation covering taxes, insurance, and student debt for the real world.</CardDescription>
+                  <CardDescription>Advanced simulation covering taxes, insurance, and student debt.</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Badge className="bg-indigo-50 text-indigo-600 border-indigo-100">Teen Special</Badge>
@@ -249,7 +259,7 @@ export default function GamesHub() {
                 <CardHeader>
                   <Lock className="h-8 w-8 text-slate-400 mb-2" />
                   <CardTitle>Life Path: Pro</CardTitle>
-                  <CardDescription>Unlocks at age 16. Covers taxes, insurance, and college planning.</CardDescription>
+                  <CardDescription>Unlocks at age 16. Covers taxes and college planning.</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Badge variant="outline">Age Restricted</Badge>
@@ -262,6 +272,10 @@ export default function GamesHub() {
             <Button variant="ghost" className="mb-4" onClick={() => { setActiveGame(null); setShowAdvisorResult(false); setSimulationHistory([]); setCurrentScenarioIdx(0); }}>
               ← Exit Simulation
             </Button>
+
+            {activeGame === 'blitz' && (
+              <BudgetBlitz onExit={() => setActiveGame(null)} />
+            )}
 
             {activeGame === 'loan' && (
               <div className="grid gap-8 lg:grid-cols-12">
