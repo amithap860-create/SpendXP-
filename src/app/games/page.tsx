@@ -7,13 +7,24 @@ import { useUser } from '@/lib/store';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Slider } from '@/components/ui/slider';
 import { 
   Gamepad2, 
   Zap, 
   GraduationCap, 
   ShieldCheck,
   Calendar,
-  Sparkles
+  Sparkles,
+  Calculator,
+  Info,
+  Lock,
+  ArrowRight,
+  Landmark,
+  BadgePercent,
+  TrendingUp,
+  FileText,
+  HeartPulse
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -27,7 +38,6 @@ interface Scenario {
       portfolio?: number;
       liabilities?: number;
       income?: number;
-      happiness?: number;
     };
     advice: string;
     projection: string;
@@ -79,8 +89,47 @@ const ADVISOR_SCENARIOS: Scenario[] = [
   }
 ];
 
+const PRO_SCENARIOS: Scenario[] = [
+  {
+    title: "Tax Season Survival",
+    description: "You just landed your first internship paying $1,000/month. You notice your paycheck is actually only $850.",
+    options: [
+      {
+        label: "Research Tax Brackets",
+        impact: { balance: 0 },
+        advice: "Understanding taxes helps you calculate your 'Take-Home Pay' correctly before spending.",
+        projection: "You'll never be surprised by a tax bill again."
+      },
+      {
+        label: "Ignore & Complain",
+        impact: { balance: -50 },
+        advice: "Ignorance can lead to fines later if you don't file your taxes properly.",
+        projection: "Late fees could cost you hundreds in the future."
+      }
+    ]
+  },
+  {
+    title: "The Insurance Choice",
+    description: "You're renting your first apartment. Renter's insurance is $15/month. You're on a tight budget.",
+    options: [
+      {
+        label: "Buy Insurance",
+        impact: { balance: -15 },
+        advice: "Insurance is paying a small amount now to avoid a catastrophic loss later.",
+        projection: "If a pipe bursts, your $2,000 laptop is covered."
+      },
+      {
+        label: "Risk it",
+        impact: { balance: 0 },
+        advice: "This is a gamble. One accident could wipe out all your savings.",
+        projection: "A single break-in could put you in major debt."
+      }
+    ]
+  }
+];
+
 export default function GamesHub() {
-  const { balance, getPortfolioValue, liabilities, formatValue, completeTask } = useUser();
+  const { ageGroup, balance, getPortfolioValue, liabilities, formatValue, completeTask } = useUser();
   const { toast } = useToast();
   const [activeGame, setActiveGame] = useState<string | null>(null);
 
@@ -89,8 +138,24 @@ export default function GamesHub() {
   const [simulationHistory, setSimulationHistory] = useState<any[]>([]);
   const [showAdvisorResult, setShowAdvisorResult] = useState(false);
 
+  // Loan Sim State
+  const [loanPrincipal, setLoanPrincipal] = useState(1000);
+  const [loanRate, setLoanRate] = useState(5);
+  const [loanTerm, setLoanTerm] = useState(12);
+
+  const calculateMonthlyPayment = () => {
+    const monthlyRate = loanRate / 100 / 12;
+    if (monthlyRate === 0) return loanPrincipal / loanTerm;
+    return (loanPrincipal * monthlyRate * Math.pow(1 + monthlyRate, loanTerm)) / (Math.pow(1 + monthlyRate, loanTerm) - 1);
+  };
+
+  const monthlyPayment = calculateMonthlyPayment();
+  const totalPaid = monthlyPayment * loanTerm;
+  const totalInterest = totalPaid - loanPrincipal;
+
   const handleAdvisorChoice = (optionIdx: number) => {
-    const scenario = ADVISOR_SCENARIOS[currentScenarioIdx];
+    const scenarioList = activeGame === 'pro' ? PRO_SCENARIOS : ADVISOR_SCENARIOS;
+    const scenario = scenarioList[currentScenarioIdx];
     const option = scenario.options[optionIdx];
     
     setSimulationHistory([...simulationHistory, {
@@ -100,11 +165,12 @@ export default function GamesHub() {
       projection: option.projection
     }]);
 
-    if (currentScenarioIdx < ADVISOR_SCENARIOS.length - 1) {
+    if (currentScenarioIdx < scenarioList.length - 1) {
       setCurrentScenarioIdx(prev => prev + 1);
     } else {
       setShowAdvisorResult(true);
-      completeTask('game-advisor');
+      if (activeGame === 'pro') completeTask('game-pro-sim');
+      else completeTask('game-advisor');
     }
     
     toast({ title: "Choice Recorded" });
@@ -112,6 +178,18 @@ export default function GamesHub() {
 
   const totalAssets = balance + getPortfolioValue();
   const netWorth = totalAssets - liabilities;
+
+  const getLoanContextTitle = () => {
+    if (ageGroup === '8-11') return "Borrowing for a Bike";
+    if (ageGroup === '11-15') return "Game Console Installments";
+    return "Car Loan & Credit Simulator";
+  };
+
+  const getLoanContextDesc = () => {
+    if (ageGroup === '8-11') return "Learn how 'Interest' makes a $500 bike cost more if you pay slowly.";
+    if (ageGroup === '11-15') return "See how long it takes to pay off a $1,000 PC with different interest rates.";
+    return "Master APR, principal, and terms. See the true cost of credit cards and auto loans.";
+  };
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -137,21 +215,47 @@ export default function GamesHub() {
                 <CardDescription>A financial advisor simulator. See how lifestyle choices shape your assets and liabilities.</CardDescription>
               </CardHeader>
               <CardContent>
-                <Badge className="bg-primary/10 text-primary hover:bg-primary/10">Advisor Guide</Badge>
+                <Badge className="bg-primary/10 text-primary hover:bg-primary/10">Strategic Sim</Badge>
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-all cursor-pointer border-none bg-white overflow-hidden group opacity-60 grayscale" onClick={() => toast({ title: "Coming Soon!" })}>
-              <div className="h-2 bg-indigo-400" />
+            <Card className="hover:shadow-lg transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-accent/20" onClick={() => setActiveGame('loan')}>
+              <div className="h-2 bg-accent" />
               <CardHeader>
-                <GraduationCap className="h-8 w-8 text-indigo-500 mb-2" />
-                <CardTitle>Uni-Survival</CardTitle>
-                <CardDescription>Manage student loans, rent, and groceries. Unlocks at Level 5.</CardDescription>
+                <Landmark className="h-8 w-8 text-accent mb-2 group-hover:scale-110 transition-transform" />
+                <CardTitle>The Loan Lab</CardTitle>
+                <CardDescription>{getLoanContextDesc()}</CardDescription>
               </CardHeader>
               <CardContent>
-                <Badge variant="outline">Locked</Badge>
+                <Badge className="bg-accent/10 text-accent hover:bg-accent/10">Interest Sim</Badge>
               </CardContent>
             </Card>
+
+            {ageGroup === '16-20' ? (
+              <Card className="hover:shadow-lg transition-all cursor-pointer border-none bg-white overflow-hidden group border-2 border-indigo-400/20" onClick={() => setActiveGame('pro')}>
+                <div className="h-2 bg-indigo-400" />
+                <CardHeader>
+                  <GraduationCap className="h-8 w-8 text-indigo-500 mb-2 group-hover:scale-110 transition-transform" />
+                  <CardTitle>Life Path: Pro</CardTitle>
+                  <CardDescription>Advanced simulation covering taxes, insurance, and student debt for the real world.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Badge className="bg-indigo-50 text-indigo-600 border-indigo-100">Teen Special</Badge>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card className="opacity-60 grayscale border-none bg-white overflow-hidden cursor-not-allowed">
+                <div className="h-2 bg-slate-300" />
+                <CardHeader>
+                  <Lock className="h-8 w-8 text-slate-400 mb-2" />
+                  <CardTitle>Life Path: Pro</CardTitle>
+                  <CardDescription>Unlocks at age 16. Covers taxes, insurance, and college planning.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Badge variant="outline">Age Restricted</Badge>
+                </CardContent>
+              </Card>
+            )}
           </div>
         ) : (
           <div className="max-w-4xl mx-auto">
@@ -159,32 +263,139 @@ export default function GamesHub() {
               ← Exit Simulation
             </Button>
 
-            {activeGame === 'advisor' && !showAdvisorResult && (
+            {activeGame === 'loan' && (
+              <div className="grid gap-8 lg:grid-cols-12">
+                <div className="lg:col-span-7 space-y-6">
+                  <Card className="border-none shadow-xl bg-white overflow-hidden">
+                    <div className="bg-accent p-6 text-white">
+                      <div className="flex items-center gap-2 mb-2">
+                        <BadgePercent className="h-5 w-5 text-white/80" />
+                        <span className="text-xs font-bold uppercase tracking-wider">Loan Configurator</span>
+                      </div>
+                      <CardTitle className="text-2xl font-black">{getLoanContextTitle()}</CardTitle>
+                    </div>
+                    <CardContent className="p-8 space-y-8">
+                      <div className="space-y-6">
+                        <div className="space-y-3">
+                          <div className="flex justify-between text-sm font-bold">
+                            <span>{ageGroup === '8-11' ? 'Price of Item' : 'Loan Principal'}</span>
+                            <span className="text-accent">{formatValue(loanPrincipal)}</span>
+                          </div>
+                          <Slider 
+                            value={[loanPrincipal]} 
+                            min={100} 
+                            max={20000} 
+                            step={100} 
+                            onValueChange={([val]) => setLoanPrincipal(val)} 
+                          />
+                        </div>
+
+                        <div className="space-y-3">
+                          <div className="flex justify-between text-sm font-bold">
+                            <span>Interest Rate (APR)</span>
+                            <span className="text-accent">{loanRate}%</span>
+                          </div>
+                          <Slider 
+                            value={[loanRate]} 
+                            min={0} 
+                            max={30} 
+                            step={0.5} 
+                            onValueChange={([val]) => setLoanRate(val)} 
+                          />
+                        </div>
+
+                        <div className="space-y-3">
+                          <div className="flex justify-between text-sm font-bold">
+                            <span>Payback Term (Months)</span>
+                            <span className="text-accent">{loanTerm} mo.</span>
+                          </div>
+                          <Slider 
+                            value={[loanTerm]} 
+                            min={1} 
+                            max={60} 
+                            step={1} 
+                            onValueChange={([val]) => setLoanTerm(val)} 
+                          />
+                        </div>
+                      </div>
+
+                      <div className="p-6 rounded-2xl bg-slate-50 border-2 border-dashed border-slate-200">
+                         <div className="flex items-start gap-3">
+                            <Info className="h-5 w-5 text-accent mt-1" />
+                            <p className="text-sm text-slate-600 leading-relaxed">
+                               <strong>Advisor Note:</strong> A {loanTerm} month loan at {loanRate}% means you pay <strong>{formatValue(totalInterest)}</strong> extra just for the privilege of borrowing!
+                            </p>
+                         </div>
+                      </div>
+
+                      <Button className="w-full h-14 text-lg bg-accent hover:bg-accent/90" onClick={() => { completeTask('game-loan-sim'); toast({ title: "Analysis Complete!" }) }}>
+                        Complete Analysis & Earn XP
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="lg:col-span-5 space-y-6">
+                  <Card className="border-none shadow-xl bg-slate-900 text-white overflow-hidden">
+                    <CardHeader className="bg-slate-800 border-b border-white/5">
+                      <CardTitle className="text-xs font-bold uppercase tracking-widest text-slate-400">Monthly Projection</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-8 space-y-8">
+                       <div className="text-center">
+                          <div className="text-5xl font-black text-white mb-1">{formatValue(monthlyPayment)}</div>
+                          <div className="text-xs font-bold text-slate-500 uppercase">Monthly Payment</div>
+                       </div>
+                       
+                       <div className="space-y-4 pt-4 border-t border-white/10">
+                          <div className="flex justify-between items-center">
+                             <span className="text-sm text-slate-400">Base Price</span>
+                             <span className="font-bold">{formatValue(loanPrincipal)}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                             <span className="text-sm text-rose-400 font-bold">Total Interest</span>
+                             <span className="font-bold text-rose-400">+{formatValue(totalInterest)}</span>
+                          </div>
+                          <div className="flex justify-between items-center pt-4 border-t border-white/10">
+                             <span className="text-lg font-bold">Total Cost</span>
+                             <span className="text-lg font-black text-accent">{formatValue(totalPaid)}</span>
+                          </div>
+                       </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            )}
+
+            {(activeGame === 'advisor' || activeGame === 'pro') && !showAdvisorResult && (
               <div className="grid gap-8 lg:grid-cols-12">
                 <div className="lg:col-span-8 space-y-6">
                   <Card className="border-none shadow-xl bg-white overflow-hidden">
-                    <div className="bg-primary p-6 text-white">
+                    <div className={`${activeGame === 'pro' ? 'bg-indigo-600' : 'bg-primary'} p-6 text-white`}>
                       <div className="flex items-center gap-2 mb-2">
                         <Sparkles className="h-5 w-5 text-accent" />
-                        <span className="text-xs font-bold uppercase tracking-wider">Active Scenario {currentScenarioIdx + 1} / {ADVISOR_SCENARIOS.length}</span>
+                        <span className="text-xs font-bold uppercase tracking-wider">
+                          Scenario {currentScenarioIdx + 1} / {activeGame === 'pro' ? PRO_SCENARIOS.length : ADVISOR_SCENARIOS.length}
+                        </span>
                       </div>
-                      <CardTitle className="text-2xl font-black">{ADVISOR_SCENARIOS[currentScenarioIdx].title}</CardTitle>
+                      <CardTitle className="text-2xl font-black">
+                        {(activeGame === 'pro' ? PRO_SCENARIOS : ADVISOR_SCENARIOS)[currentScenarioIdx].title}
+                      </CardTitle>
                     </div>
                     <CardContent className="p-8 space-y-8">
                       <p className="text-lg text-slate-700 leading-relaxed font-medium">
-                        {ADVISOR_SCENARIOS[currentScenarioIdx].description}
+                        {(activeGame === 'pro' ? PRO_SCENARIOS : ADVISOR_SCENARIOS)[currentScenarioIdx].description}
                       </p>
 
                       <div className="grid gap-4">
-                        {ADVISOR_SCENARIOS[currentScenarioIdx].options.map((opt, i) => (
+                        {(activeGame === 'pro' ? PRO_SCENARIOS : ADVISOR_SCENARIOS)[currentScenarioIdx].options.map((opt, i) => (
                           <Button 
                             key={i}
                             variant="outline"
-                            className="h-auto p-6 flex flex-col items-start gap-1 text-left border-2 hover:border-primary hover:bg-primary/5 transition-all group"
+                            className={`h-auto p-6 flex flex-col items-start gap-1 text-left border-2 hover:border-${activeGame === 'pro' ? 'indigo-500' : 'primary'} hover:bg-${activeGame === 'pro' ? 'indigo-50' : 'primary/5'} transition-all group`}
                             onClick={() => handleAdvisorChoice(i)}
                           >
-                            <span className="font-bold text-lg group-hover:text-primary">{opt.label}</span>
-                            <span className="text-xs text-muted-foreground">Select to see advisor guidance</span>
+                            <span className={`font-bold text-lg group-hover:text-${activeGame === 'pro' ? 'indigo-600' : 'primary'}`}>{opt.label}</span>
+                            <span className="text-xs text-muted-foreground">Select this path</span>
                           </Button>
                         ))}
                       </div>
@@ -195,22 +406,24 @@ export default function GamesHub() {
                 <div className="lg:col-span-4 space-y-6">
                   <Card className="border-none shadow-sm bg-slate-900 text-white">
                     <CardHeader className="pb-2 border-b border-white/10">
-                      <CardTitle className="text-sm font-bold uppercase tracking-widest text-slate-400">Live Balance Sheet</CardTitle>
+                      <CardTitle className="text-sm font-bold uppercase tracking-widest text-slate-400">Scenario Context</CardTitle>
                     </CardHeader>
                     <CardContent className="p-6 space-y-6">
                       <div className="space-y-4">
-                        <div>
-                          <div className="text-[10px] font-bold text-emerald-400 uppercase mb-1">Total Assets</div>
-                          <div className="text-2xl font-black">{formatValue(totalAssets)}</div>
+                        <div className="flex items-center gap-3">
+                           {activeGame === 'pro' ? <FileText className="h-5 w-5 text-indigo-400" /> : <Calculator className="h-5 w-5 text-primary" />}
+                           <div>
+                              <div className="text-[10px] font-bold text-slate-500 uppercase">Topic</div>
+                              <div className="text-sm font-bold">{activeGame === 'pro' ? 'Real World Readiness' : 'Wealth Strategy'}</div>
+                           </div>
                         </div>
-                        <div>
-                          <div className="text-[10px] font-bold text-rose-400 uppercase mb-1">Total Liabilities</div>
-                          <div className="text-2xl font-black">{formatValue(liabilities)}</div>
+                        <div className="flex items-center gap-3">
+                           <HeartPulse className="h-5 w-5 text-rose-400" />
+                           <div>
+                              <div className="text-[10px] font-bold text-slate-500 uppercase">Impact Level</div>
+                              <div className="text-sm font-bold">High (Mission Critical)</div>
+                           </div>
                         </div>
-                      </div>
-                      <div className="pt-4 border-t border-white/10">
-                        <div className="text-[10px] font-bold text-primary uppercase mb-1">Net Worth</div>
-                        <div className="text-3xl font-black text-white">{formatValue(netWorth)}</div>
                       </div>
                     </CardContent>
                   </Card>
@@ -218,15 +431,15 @@ export default function GamesHub() {
               </div>
             )}
 
-            {activeGame === 'advisor' && showAdvisorResult && (
+            {(activeGame === 'advisor' || activeGame === 'pro') && showAdvisorResult && (
               <div className="space-y-8">
                 <Card className="border-none shadow-2xl bg-white overflow-hidden">
                   <div className="bg-emerald-500 p-8 text-white text-center">
                     <div className="h-16 w-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                       <ShieldCheck className="h-10 w-10" />
                     </div>
-                    <CardTitle className="text-4xl font-black mb-2">Architect Report Complete</CardTitle>
-                    <CardDescription className="text-emerald-100 text-lg">Your financial future, analyzed by SpendXP Advisor.</CardDescription>
+                    <CardTitle className="text-4xl font-black mb-2">Simulation Complete</CardTitle>
+                    <CardDescription className="text-emerald-100 text-lg">Your choices have been analyzed by the SpendXP Advisor.</CardDescription>
                   </div>
                   <CardContent className="p-0">
                     <div className="divide-y">
@@ -234,8 +447,8 @@ export default function GamesHub() {
                         <div key={i} className="p-8 grid md:grid-cols-2 gap-8 items-start hover:bg-slate-50 transition-colors">
                           <div className="space-y-4">
                             <div className="flex items-center gap-2">
-                              <Badge className="bg-primary/10 text-primary">Scenario {i+1}</Badge>
-                              <h4 className="font-black text-xl">{item.scenario}</h4>
+                              <Badge className="bg-primary/10 text-primary">Stage {i+1}</Badge>
+                              <h4 className="font-black text-xl text-slate-900">{item.scenario}</h4>
                             </div>
                             <div className="p-4 rounded-xl bg-white border-2 border-slate-100">
                               <span className="text-xs font-bold text-muted-foreground uppercase block mb-1">Your Choice</span>
@@ -267,7 +480,7 @@ export default function GamesHub() {
                     </div>
                     <div className="p-12 bg-slate-50 text-center">
                        <Button size="lg" className="h-16 px-12 text-xl font-black rounded-2xl shadow-xl shadow-primary/20" onClick={() => { setActiveGame(null); setShowAdvisorResult(false); }}>
-                          Return to Dashboard
+                          Finish Simulation
                        </Button>
                     </div>
                   </CardContent>
