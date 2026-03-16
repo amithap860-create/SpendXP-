@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { cn } from '@/lib/utils';
 import { useGameEngine } from '@/hooks/useGameEngine';
 import { useAgeAdapt } from '@/lib/ageAdapt';
 import { budgetBlitzItems, BudgetCategory } from '@/data/budgetBlitzItems';
