@@ -217,21 +217,22 @@ export function useGameEngine(config: GameConfig) {
 
     dispatch({ type: 'END_GAME' });
 
-    if (typeof window !== 'undefined') {
-      import('https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js' as any).then((module: any) => {
-        const isMobile = window.innerWidth < 768;
-        module.default({
-          particleCount: isMobile ? 60 : 120,
-          spread: 70,
-          origin: { y: 0.6 },
-          colors: ['#10b981', '#3b82f6', '#f59e0b']
-        });
-        
-        setTimeout(() => {
-          const canvas = document.querySelector('canvas[style*="position: fixed"]') as HTMLCanvasElement | null;
-          if (canvas) canvas.style.pointerEvents = 'none';
-        }, 100);
+    try {
+      const confetti = (await import('canvas-confetti')).default;
+      const isMobile = window.innerWidth < 768;
+      confetti({
+        particleCount: isMobile ? 60 : 120,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#10b981', '#3b82f6', '#f59e0b']
       });
+      
+      setTimeout(() => {
+        const canvas = document.querySelector('canvas[style*="position: fixed"]') as HTMLCanvasElement | null;
+        if (canvas) canvas.style.pointerEvents = 'none';
+      }, 100);
+    } catch (e) {
+      console.error('Confetti failed', e);
     }
 
     try {

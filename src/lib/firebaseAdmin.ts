@@ -1,3 +1,4 @@
+import 'server-only';
 import * as admin from 'firebase-admin';
 import { initializeApp, cert, getApp, getApps, App } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
@@ -7,7 +8,9 @@ import { getAuth } from 'firebase-admin/auth';
  * Singleton Firebase Admin SDK initialiser for server-side operations.
  */
 if (typeof window !== 'undefined') {
-  throw new Error('firebaseAdmin must only be imported in server-side code');
+  throw new Error(
+    '[SpendXP] firebaseAdmin imported in browser. Move this code to an API route.'
+  );
 }
 
 let adminApp: App;

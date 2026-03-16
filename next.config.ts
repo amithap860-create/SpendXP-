@@ -29,6 +29,7 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   compress: true,
+  transpilePackages: ['canvas-confetti'],
   images: {
     formats: ['image/webp'],
     deviceSizes: [360, 414, 768, 1024, 1280],
