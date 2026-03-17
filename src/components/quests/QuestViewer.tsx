@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Quest, QuestChoice } from '@/data/quests';
 import { useQuestEngine } from '@/hooks/useQuestEngine';
 import { useAgeAdapt } from '@/lib/ageAdapt';
@@ -28,6 +28,7 @@ import {
   History
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { fireConfettiQuestComplete } from '@/lib/confetti';
 
 interface QuestViewerProps {
   quest: Quest;
@@ -44,6 +45,12 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
 
   const activeChoice = currentStep?.choices.find(c => c.id === selectedChoiceId);
   const currentBalance = quest.startingBalance + state.totalWalletDelta;
+
+  useEffect(() => {
+    if (state.status === 'COMPLETE') {
+      fireConfettiQuestComplete();
+    }
+  }, [state.status]);
 
   const handleChoiceSelect = (choiceId: string) => {
     if (selectedChoiceId) return;

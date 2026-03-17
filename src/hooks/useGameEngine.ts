@@ -9,6 +9,7 @@ import { getRefreshedToken } from '@/lib/authHelpers';
 import { doc, writeBatch, serverTimestamp, increment } from 'firebase/firestore';
 import { updateLeaderboardEntry } from '@/lib/progressionService';
 import { waitForAuth } from '@/lib/waitForAuth';
+import { fireConfettiPersonalBest } from '@/lib/confetti';
 
 export type GameStatus = 'IDLE' | 'COUNTDOWN' | 'PLAYING' | 'PAUSED' | 'GAME_OVER' | 'RESULTS';
 
@@ -217,23 +218,8 @@ export function useGameEngine(config: GameConfig) {
 
     dispatch({ type: 'END_GAME' });
 
-    try {
-      const confetti = (await import('canvas-confetti')).default;
-      const isMobile = window.innerWidth < 768;
-      confetti({
-        particleCount: isMobile ? 60 : 120,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#10b981', '#3b82f6', '#f59e0b']
-      });
-      
-      setTimeout(() => {
-        const canvas = document.querySelector('canvas[style*="position: fixed"]') as HTMLCanvasElement | null;
-        if (canvas) canvas.style.pointerEvents = 'none';
-      }, 100);
-    } catch (e) {
-      console.error('Confetti failed', e);
-    }
+    // Celebration
+    fireConfettiPersonalBest();
 
     try {
       const gameScoreRef = doc(db, 'users', user.uid, 'gameScores', config.gameName);

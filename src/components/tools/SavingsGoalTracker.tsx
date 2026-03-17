@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { db, useCollection, useMemoFirebase, safeSetDoc, safeUpdateDoc } from '@/firebase';
 import { collection, query, orderBy, serverTimestamp, doc, increment, deleteDoc } from 'firebase/firestore';
@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Plus, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { validateDisplayName } from '@/firebase';
 import { cn } from '@/lib/utils';
+import { fireConfettiGoalReached } from '@/lib/confetti';
 
 type GoalShape = 'circle' | 'square' | 'triangle' | 'diamond' | 'hexagon' | 'pentagon' | 'star' | 'bolt';
 
@@ -24,6 +25,7 @@ interface SavingsGoal {
   monthlyContribution: number;
   shape: GoalShape;
   color: string;
+  isCompleted?: boolean;
 }
 
 const PRESET_SHAPES: { shape: GoalShape; color: string; label: string }[] = [
@@ -56,6 +58,21 @@ export function SavingsGoalTracker() {
   }, [user]);
   const { data: goals } = useCollection<SavingsGoal>(goalsQuery);
 
+  // Trigger celebration when a goal is newly completed
+  useEffect(() => {
+    if (!goals) return;
+    goals.forEach(goal => {
+      const isReached = goal.savedAmount >= goal.targetAmount;
+      if (isReached && !goal.isCompleted) {
+        fireConfettiGoalReached();
+        // Mark as completed in Firestore to prevent duplicate triggers
+        safeUpdateDoc(doc(db, 'users', user!.uid, 'savingsGoals', goal.id), {
+          isCompleted: true
+        });
+      }
+    });
+  }, [goals, user]);
+
   const handleAddGoal = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || (goals && goals.length >= 5)) return;
@@ -80,6 +97,7 @@ export function SavingsGoalTracker() {
       monthlyContribution: Math.round(target / months),
       shape: newShape,
       color: newColor,
+      isCompleted: false,
       createdAt: serverTimestamp()
     });
 
@@ -205,7 +223,7 @@ export function SavingsGoalTracker() {
                   ) : isLate ? (
                     <div className="flex items-center gap-2 text-amber-600 bg-amber-50 px-3 py-1 rounded-full"><AlertTriangle className="h-3 w-3" /> Past target date</div>
                   ) : (
-                    <div className="text-slate-50">Need {formatValue(goal.monthlyContribution)} / month</div>
+                    <div className="text-slate-500">Need {formatValue(goal.monthlyContribution)} / month</div>
                   )}
                   
                   {!isReached && (

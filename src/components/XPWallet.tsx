@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCurrency } from '@/hooks/useCurrency';
+import { fireConfettiBadgeUnlock } from '@/lib/confetti';
 
 const LEVELS = [
   { level: 1, title: 'Starter', minXP: 0, icon: User },
@@ -76,25 +77,11 @@ export function XPWallet() {
       const badgeInfo = BADGE_MAP.find(b => b.id === newlyAdded);
       if (badgeInfo) {
         setUnlockedBadge(badgeInfo);
-        triggerConfetti();
+        fireConfettiBadgeUnlock();
       }
     }
     setPrevBadges(data.badges);
   }, [data.badges, prevBadges]);
-
-  const triggerConfetti = async () => {
-    try {
-      const confetti = (await import('canvas-confetti')).default;
-      confetti({
-        particleCount: 150,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#10b981', '#3b82f6', '#f59e0b']
-      });
-    } catch (e) {
-      console.error('Confetti failed', e);
-    }
-  };
 
   const levelInfo = useMemo(() => {
     const current = [...LEVELS].reverse().find(l => data.totalXP >= l.minXP) || LEVELS[0];
@@ -107,7 +94,6 @@ export function XPWallet() {
   }, [data.totalXP]);
 
   const walletMilestone = useMemo(() => {
-    // These thresholds are relative to base currency unit, they scale well enough visually
     if (data.walletBalance >= 1000) return "That's a major milestone for your piggy bank!";
     if (data.walletBalance >= 500) return "You've got a solid safety net forming!";
     if (data.walletBalance >= 100) return "You're building real momentum!";
