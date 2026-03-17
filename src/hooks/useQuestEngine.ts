@@ -4,8 +4,8 @@ import { useState, useMemo, useCallback } from 'react';
 import { Quest, QuestStep, QuestChoice } from '@/data/quests';
 import { AgeGroup } from '@/lib/ageAdapt';
 import { useAuthContext } from '@/context/AuthContext';
-import { db, safeSetDoc, safeUpdateDoc } from '@/firebase';
-import { doc, serverTimestamp, increment, arrayUnion, collection } from 'firebase/firestore';
+import { db, safeSetDoc } from '@/firebase';
+import { doc, serverTimestamp } from 'firebase/firestore';
 import { updateFinancialHealth, updateLeaderboardEntry } from '@/lib/progressionService';
 import { checkAndAwardQuestBadges } from '@/lib/badgeService';
 
@@ -95,12 +95,11 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
     setState(nextState);
 
     if (choice.nextStepId === 'end' && user) {
-      // Finalize and Award
       const xpToAward = Math.max(0, nextState.totalXPEarned + quest.xpReward);
       const optimalRate = nextState.optimalChoiceCount / filteredSteps.length;
 
       try {
-        // 1. Submit Score (Server Action API)
+        // Submit Score
         await fetch('/api/scores/submit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -111,22 +110,22 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
           })
         });
 
-        // 2. Update Financial Health
+        // Update Financial Health
         await updateFinancialHealth(user.uid, nextState.totalHealthDelta);
 
-        // 3. Record Progress
+        // Record Progress
         const progressRef = doc(db, 'users', user.uid, 'questProgress', quest.id);
         await safeSetDoc(progressRef, {
           completedAt: serverTimestamp(),
           optimalChoiceRate: optimalRate,
           xpEarned: xpToAward,
           healthDelta: nextState.totalHealthDelta,
-          choiceHistory: newHistory
+          choiceHistory: newHistory,
+          endingBalance: quest.startingBalance + nextState.totalWalletDelta
         });
 
-        // 4. Award Badges
+        // Award Badges
         await checkAndAwardQuestBadges(user.uid, quest.id, optimalRate);
-
         await updateLeaderboardEntry(user.uid, user.displayName || 'Strategist');
       } catch (err) {
         console.error('[SpendXP Quest] Award Error:', err);
