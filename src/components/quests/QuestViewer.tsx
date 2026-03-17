@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { ConceptBreakdown } from '@/components/ConceptBreakdown';
 import { 
   ArrowRight, 
   ChevronRight, 
@@ -38,6 +39,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
   const { state, currentStep, progress, startQuest, resetQuest, makeChoice } = useQuestEngine(quest, ageGroup);
   
   const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(null);
+  const [showBreakdown, setShowBreakdown] = useState(true);
 
   const activeChoice = currentStep?.choices.find(c => c.id === selectedChoiceId);
 
@@ -61,6 +63,27 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
       default: return <Wallet className={className} />;
     }
   };
+
+  const questToBreakdownMap: Record<string, string> = {
+    'first-paycheck': 'first-job-salary',
+    'renting-apartment': 'renting-housing',
+    'buying-phone-emi': 'emi-and-debt',
+    'emergency-fund': 'emergency-fund',
+    'vacation-planning': 'vacation-planning',
+    'first-credit-card': 'credit-cards'
+  };
+
+  if (showBreakdown) {
+    return (
+      <ConceptBreakdown
+        breakdownId={questToBreakdownMap[quest.id] || 'budgeting-basics'}
+        ageGroup={ageGroup}
+        activityType="quest"
+        activityTitle={quest.title}
+        onContinue={() => setShowBreakdown(false)}
+      />
+    );
+  }
 
   if (state.status === 'INTRO') {
     return (
@@ -100,7 +123,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
             </div>
 
             <div className="mt-auto md:mt-0 pt-4">
-              <Button onClick={startQuest} className="w-full h-14 md:h-16 text-lg md:text-xl font-black rounded-2xl shadow-xl shadow-primary/20 gap-2">
+              <Button onClick={startQuest} className="w-full h-14 md:h-16 text-lg md:text-xl font-black rounded-2xl shadow-xl shadow-primary/20 gap-2 min-h-[44px]">
                 Begin Quest <ArrowRight className="h-5 w-5 md:h-6 md:w-6" />
               </Button>
             </div>
@@ -111,7 +134,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
   }
 
   if (state.status === 'COMPLETE') {
-    const starCount = state.optimalChoiceCount === quest.steps.length ? 3 : state.optimalChoiceCount >= quest.steps.length * 0.6 ? 2 : state.optimalChoiceCount >= quest.steps.length * 0.3 ? 1 : 0;
+    const starCount = state.optimalChoiceCount === filteredSteps.length ? 3 : state.optimalChoiceCount >= filteredSteps.length * 0.6 ? 2 : state.optimalChoiceCount >= filteredSteps.length * 0.3 ? 1 : 0;
 
     return (
       <div className="flex-1 flex flex-col p-4 md:p-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
@@ -150,10 +173,10 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
             </div>
 
             <div className="flex flex-col md:flex-row gap-3 pt-4">
-              <Button variant="outline" onClick={resetQuest} className="h-14 font-bold gap-2 order-2 md:order-1" suppressHydrationWarning>
+              <Button variant="outline" onClick={resetQuest} className="h-14 font-bold gap-2 order-2 md:order-1 min-h-[44px]" suppressHydrationWarning>
                 <RotateCcw className="h-4 w-4" /> Replay
               </Button>
-              <Button onClick={onComplete} className="flex-1 h-14 md:h-16 text-lg font-black order-1 md:order-2" suppressHydrationWarning>
+              <Button onClick={onComplete} className="flex-1 h-14 md:h-16 text-lg font-black order-1 md:order-2 min-h-[44px]" suppressHydrationWarning>
                 Back to Hub
               </Button>
             </div>
@@ -162,6 +185,8 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
       </div>
     );
   }
+
+  const filteredSteps = quest.steps.filter(step => step.ageGroups.includes(ageGroup));
 
   if (!currentStep) return null;
 
@@ -245,7 +270,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
               </div>
 
               <div className="mt-auto pt-4 pb-2">
-                <Button onClick={handleNext} className="w-full h-14 md:h-16 text-lg md:text-xl font-black rounded-2xl gap-2 group" suppressHydrationWarning>
+                <Button onClick={handleNext} className="w-full h-14 md:h-16 text-lg md:text-xl font-black rounded-2xl gap-2 group min-h-[44px]" suppressHydrationWarning>
                   {activeChoice.nextStepId === 'end' ? 'Complete Quest' : 'Continue'} 
                   <ChevronRight className="h-5 w-5 md:h-6 md:w-6 group-hover:translate-x-1 transition-transform" />
                 </Button>

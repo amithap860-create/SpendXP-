@@ -9,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { XPWallet } from '@/components/XPWallet';
+import { ConceptBreakdown } from '@/components/ConceptBreakdown';
 import { 
   Timer, 
   Trophy, 
@@ -27,6 +28,7 @@ import { cn } from '@/lib/utils';
 interface FinIQQuizProps {
   isDailyChallenge?: boolean;
   onExit: () => void;
+  // Category mapping for breakdownId
 }
 
 export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) {
@@ -34,6 +36,7 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [roundQuestions, setRoundQuestions] = useState<Question[]>([]);
+  const [showBreakdown, setShowBreakdown] = useState(true);
   const [categoryStats, setCategoryStats] = useState<Record<Category, { correct: number; total: number }>>({
     BUDGETING: { correct: 0, total: 0 },
     INVESTING: { correct: 0, total: 0 },
@@ -111,6 +114,31 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
     if (gameState === 'PLAYING' && timeLeft === 0 && selectedOption === null) handleSelect(-1);
   }, [timeLeft, gameState, selectedOption]);
 
+  const breakdownIdMap: Record<string, string> = {
+    BUDGETING: 'budgeting-basics',
+    INVESTING: 'investing-basics',
+    CREDIT: 'credit-scores',
+    TAXES: 'taxes-india',
+    SPENDING: 'spending-habits'
+  };
+
+  const currentBreakdownId = currentQuestion ? breakdownIdMap[currentQuestion.category] : 'budgeting-basics';
+
+  if (showBreakdown) {
+    return (
+      <ConceptBreakdown
+        breakdownId={currentBreakdownId}
+        ageGroup={ageGroup}
+        activityType={isDailyChallenge ? 'challenge' : 'quiz'}
+        activityTitle={isDailyChallenge ? "Daily Blitz" : "FinIQ Scenario"}
+        onContinue={() => {
+          setShowBreakdown(false);
+          if (gameState === 'IDLE') startGame();
+        }}
+      />
+    );
+  }
+
   if (gameState === 'IDLE') {
     return (
       <Card className="max-w-2xl mx-auto border-none shadow-2xl bg-white overflow-hidden">
@@ -124,7 +152,7 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
             <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-3"><Calendar className="h-5 w-5 text-primary" /><div className="text-xs md:text-sm font-bold">10 Scenarios</div></div>
             <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-3"><Timer className="h-5 w-5 text-accent" /><div className="text-xs md:text-sm font-bold">15s Limit</div></div>
           </div>
-          <Button onClick={startGame} className="w-full h-14 md:h-16 text-lg md:text-xl font-black rounded-2xl shadow-xl shadow-primary/20">START QUIZ</Button>
+          <Button onClick={startGame} className="w-full h-14 md:h-16 text-lg md:text-xl font-black rounded-2xl shadow-xl shadow-primary/20 min-h-[44px]">START QUIZ</Button>
         </CardContent>
       </Card>
     );
@@ -166,8 +194,8 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
                 </div>
               </div>
               <div className="flex gap-3 md:gap-4">
-                <Button variant="outline" onClick={startGame} className="flex-1 gap-2 h-12 md:h-14 font-bold text-xs md:text-sm"><RotateCcw className="h-4 w-4" /> Try Again</Button>
-                <Button onClick={onExit} className="flex-1 h-12 md:h-14 font-bold text-xs md:text-lg">Exit</Button>
+                <Button variant="outline" onClick={startGame} className="flex-1 gap-2 h-12 md:h-14 font-bold text-xs md:text-sm min-h-[44px]"><RotateCcw className="h-4 w-4" /> Try Again</Button>
+                <Button onClick={onExit} className="flex-1 h-12 md:h-14 font-bold text-xs md:text-lg min-h-[44px]">Exit</Button>
               </div>
             </CardContent>
           </Card>
@@ -229,7 +257,7 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
               <div className="h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center shrink-0 bg-white shadow-sm"><Info className="h-4 w-4 md:h-5 md:w-5 text-primary" /></div>
               <div><h4 className="font-black text-slate-900 mb-1 text-sm md:text-base">Learning Moment</h4><p className="text-xs md:text-sm text-slate-700 leading-relaxed font-medium">{currentQuestion.explanation}</p></div>
             </div>
-            <Button onClick={handleNext} className="w-full h-12 md:h-14 gap-2 text-base md:text-lg font-black group">{currentRound < 10 ? "Next Scenario" : "See Results"}<ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" /></Button>
+            <Button onClick={handleNext} className="w-full h-12 md:h-14 gap-2 text-base md:text-lg font-black group min-h-[44px]">{currentRound < 10 ? "Next Scenario" : "See Results"}<ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" /></Button>
           </div>
         )}
       </Card>

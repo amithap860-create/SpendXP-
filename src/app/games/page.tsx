@@ -6,6 +6,8 @@ import dynamic from 'next/dynamic';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import { cn } from '@/lib/utils';
 import { GameLoadingSkeleton } from '@/components/games/GameLoadingSkeleton';
+import { useAgeAdapt } from '@/lib/ageAdapt';
+import { ConceptBreakdown } from '@/components/ConceptBreakdown';
 
 const BudgetBlitz = dynamic(() => import('@/components/games/BudgetBlitz').then(mod => mod.BudgetBlitz), {
   loading: () => <GameLoadingSkeleton />,
@@ -41,10 +43,12 @@ interface GamesHubProps {
 export default function GamesHub({ searchParams }: GamesHubProps) {
   const router = useRouter();
   const resolvedParams = use(searchParams);
+  const { ageGroup } = useAgeAdapt();
   
   const [activeGame, setActiveGame] = useState<GameID | null>(null);
   const [isDaily, setIsDaily] = useState(false);
   const [highlightedGame, setHighlightedGame] = useState<string | null>(null);
+  const [showDailyBreakdown, setShowDailyBreakdown] = useState(false);
 
   useEffect(() => {
     const gameParam = resolvedParams.game as GameID;
@@ -62,8 +66,9 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
 
       if (validGames.includes(gameParam)) {
         if (gameParam === 'finIQQuiz' && modeParam === 'daily') {
-          setActiveGame('finIQQuiz');
           setIsDaily(true);
+          setShowDailyBreakdown(true);
+          setActiveGame('finIQQuiz');
         } else {
           setHighlightedGame(gameParam);
           setTimeout(() => {
@@ -81,7 +86,24 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
     }
   }, [resolvedParams, router]);
 
+  // Deterministic topic for daily challenge based on day of month
+  const dailyTopics = ['budgeting-basics', 'investing-basics', 'credit-scores', 'taxes-india', 'spending-habits', 'emergency-fund', 'emi-and-debt'];
+  const todayIndex = new Date().getDate() % dailyTopics.length;
+  const todayBreakdownId = dailyTopics[todayIndex];
+
   const renderGame = () => {
+    if (isDaily && showDailyBreakdown) {
+      return (
+        <ConceptBreakdown
+          breakdownId={todayBreakdownId}
+          ageGroup={ageGroup}
+          activityType="challenge"
+          activityTitle="FinIQ Daily Blitz"
+          onContinue={() => setShowDailyBreakdown(false)}
+        />
+      );
+    }
+
     switch (activeGame) {
       case 'budgetBlitz': return <BudgetBlitz onExit={() => setActiveGame(null)} />;
       case 'finIQQuiz': return <FinIQQuiz onExit={() => setActiveGame(null)} isDailyChallenge={isDaily} />;
@@ -156,17 +178,22 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
           </div>
         </main>
       ) : (
-        <main className="flex-1 p-4 flex items-center justify-center">
-          <div className="w-full max-w-4xl animate-in zoom-in duration-300">
-            <button 
-              onClick={() => {
-                setActiveGame(null);
-                setIsDaily(false);
-              }}
-              className="mb-4 text-xs font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest flex items-center gap-2 h-11 px-4 rounded-xl hover:bg-slate-100 transition-colors"
-            >
-              ← Back to Arcade
-            </button>
+        <main className="flex-1 p-0 md:p-4 flex items-center justify-center">
+          <div className={cn(
+            "w-full animate-in zoom-in duration-300",
+            (isDaily && showDailyBreakdown) ? "max-w-none" : "max-w-4xl p-4"
+          )}>
+            {!showDailyBreakdown && (
+              <button 
+                onClick={() => {
+                  setActiveGame(null);
+                  setIsDaily(false);
+                }}
+                className="mb-4 text-xs font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest flex items-center gap-2 h-11 px-4 rounded-xl hover:bg-slate-100 transition-colors"
+              >
+                ← Back to Arcade
+              </button>
+            )}
             {renderGame()}
           </div>
         </main>
