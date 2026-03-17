@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Quest } from '@/data/quests';
+import type { Quest } from '@/data/quests';
 import { useQuestEngine } from '@/hooks/useQuestEngine';
 import { useAgeAdapt } from '@/lib/ageAdapt';
 import { useCurrency } from '@/hooks/useCurrency';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -32,7 +32,7 @@ interface QuestViewerProps {
   onComplete: () => void;
 }
 
-export function QuestViewer({ quest, onComplete }: QuestViewerProps) {
+export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
   const { ageGroup } = useAgeAdapt();
   const { formatINR } = useCurrency();
   const { state, currentStep, progress, startQuest, resetQuest, makeChoice } = useQuestEngine(quest, ageGroup);

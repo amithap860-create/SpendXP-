@@ -5,7 +5,7 @@ import { useAuthContext } from '@/context/AuthContext';
 import { useProgression } from '@/hooks/useProgression';
 import { quests, Quest } from '@/data/quests';
 import { calculateHealthLabel } from '@/lib/financialHealth';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -18,11 +18,11 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { db } from '@/firebase';
+import { db } from '@/lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import dynamic from 'next/dynamic';
 
-const QuestViewer = dynamic(() => import('@/components/quests/QuestViewer').then(mod => mod.QuestViewer), {
+const QuestViewer = dynamic(() => import('@/components/quests/QuestViewer'), {
   ssr: false,
   loading: () => <div className="min-h-screen-safe flex items-center justify-center"><div className="w-10 h-10 border-4 border-primary/10 border-t-primary rounded-full animate-spin" /></div>
 });
@@ -152,7 +152,7 @@ export default function QuestsHub() {
         </section>
 
         {/* QUEST GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 md:gap-6">
           {quests.map((quest) => {
             const isCompleted = completedQuestIds.includes(quest.id);
             const isAvailableForAge = quest.ageGroups.includes(currentAgeGroup);
