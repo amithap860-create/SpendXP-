@@ -71,6 +71,13 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
     return 'text-rose-600';
   };
 
+  const getHealthLabel = (score: number) => {
+    if (score < 25) return 'At Risk';
+    if (score < 50) return 'Developing';
+    if (score < 75) return 'Stable';
+    return 'Thriving';
+  };
+
   if (showBreakdown) {
     return (
       <ConceptBreakdown
@@ -125,8 +132,8 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
     const starCount = state.optimalChoiceCount >= quest.steps.length * 0.8 ? 3 : state.optimalChoiceCount >= quest.steps.length * 0.5 ? 2 : 1;
 
     return (
-      <div className="flex-1 flex flex-col p-4 md:p-8 animate-in slide-in-from-bottom-8 duration-700 bg-slate-50 min-h-screen-safe">
-        <Card className="max-w-4xl w-full mx-auto border-none shadow-2xl overflow-hidden">
+      <div className="flex-1 flex flex-col p-4 md:p-8 animate-in slide-in-from-bottom-8 duration-700 bg-slate-50 min-h-screen-safe overflow-y-auto">
+        <Card className="max-w-4xl w-full mx-auto border-none shadow-2xl overflow-hidden mb-8">
           <div className="bg-emerald-500 p-8 md:p-12 text-white text-center">
             <Trophy className="h-16 w-16 mx-auto mb-6 animate-bounce" />
             <h2 className="text-4xl md:text-6xl font-black mb-6">Mission Success</h2>
@@ -138,14 +145,12 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
           </div>
           
           <CardContent className="p-8 md:p-12 space-y-12">
-            {/* Outcome Section */}
             <div className="grid md:grid-cols-3 gap-6">
               <ResultCard label="Starting Cash" val={formatValue(quest.startingBalance)} />
               <ResultCard label="Ending Cash" val={formatValue(currentBalance)} color={getBalanceColor()} icon={ArrowUpRight} />
               <ResultCard label="XP Gained" val={`+${state.totalXPEarned + quest.xpReward}`} color="text-primary" />
             </div>
 
-            {/* Replay Section */}
             <div className="space-y-6">
               <h3 className="text-2xl font-black flex items-center gap-3">
                 <History className="h-7 w-7 text-primary" /> Decision Replay
@@ -185,7 +190,6 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
               </div>
             </div>
 
-            {/* Actionable Advice */}
             <div className="bg-slate-900 p-8 md:p-10 rounded-[2.5rem] text-white space-y-8 relative overflow-hidden">
               <div className="absolute top-0 right-0 p-10 opacity-10"><Lightbulb className="h-40 w-40" /></div>
               <div className="space-y-2 relative z-10">
@@ -224,7 +228,6 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
 
   return (
     <div className="flex-1 flex flex-col p-4 md:p-6 gap-6 md:gap-8 bg-slate-50 min-h-screen-safe overflow-y-auto">
-      {/* Running Balance Bar */}
       <div className="sticky top-4 z-50 animate-in slide-in-from-top-4 duration-500">
         <div className="max-w-3xl mx-auto bg-white/90 backdrop-blur-md rounded-3xl border-2 border-slate-100 shadow-xl p-4 flex items-center justify-around">
           <div className="flex flex-col items-center">
@@ -240,8 +243,8 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
           </div>
           <div className="w-px h-8 bg-slate-100" />
           <div className="flex flex-col items-center">
-            <span className="text-[10px] font-black uppercase text-slate-400">Step</span>
-            <span className="text-lg md:text-xl font-black text-slate-900">{progress}%</span>
+            <span className="text-[10px] font-black uppercase text-slate-400">Health</span>
+            <span className="text-lg md:text-xl font-black text-slate-900">{getHealthLabel(50 + state.totalHealthDelta)}</span>
           </div>
         </div>
       </div>
@@ -253,15 +256,15 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
               <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                 <Target className="h-6 w-6" />
               </div>
-              <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">{currentStep.title}</h2>
+              <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">{currentStep?.title}</h2>
             </div>
             <div className="p-6 md:p-8 bg-slate-50 rounded-[2rem] border-l-8 border-primary italic text-lg md:text-2xl text-slate-700 leading-relaxed font-medium">
-              "{currentStep.narrative}"
+              "{currentStep?.narrative}"
             </div>
           </div>
 
           <div className="grid gap-4">
-            {currentStep.choices.map((choice) => (
+            {currentStep?.choices.map((choice) => (
               <button
                 key={choice.id}
                 disabled={!!selectedChoiceId}

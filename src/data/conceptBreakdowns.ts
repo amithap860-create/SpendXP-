@@ -2,8 +2,6 @@
  * @fileOverview 12 financial concept breakdowns tailored for SpendXP age groups.
  */
 
-import { AgeGroup } from '@/lib/ageAdapt';
-
 export type ConceptBreakdown = {
   id: string;
   title: string;
@@ -234,7 +232,7 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
       }
     },
     estimatedReadSeconds: 55,
-    relatedActivityIds: ['phone-emi-quest', 'moneyMaze-debt']
+    relatedActivityIds: ['phone-emi', 'moneyMaze-debt']
   },
   {
     id: 'taxes-india',
@@ -268,8 +266,7 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         hook: "The difference between old tax regime and new tax regime could mean ₹30,000 saved or lost — annually.",
         keyPoints: [
           "Old regime: more deductions (80C, HRA, home loan) — better if you invest heavily",
-          "New regime: lower rates, no deductions — better if you are just starting out",
-          "File ITR by July 31 every year — late filing costs ₹5,000 penalty minimum"
+          "New regime: lower rates, no deductions — better if you are just starting out"
         ],
         extraStat: "Salaried Indians who fully utilise Section 80C save an average ₹46,800 in taxes every year."
       }
@@ -287,7 +284,7 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
       "Diversification: never put all eggs in one basket — spread across asset types"
     ],
     realWorldStat: "The Nifty 50 index has returned an average 13.2% annually over the last 20 years — turning ₹1 lakh into ₹11.5 lakh.",
-    quickQuestion: "Would you rather have a guaranteed 5% return or a possible 15% return with a chance of losing 10%? What does your answer say about your risk tolerance?",
+    quickQuestion: "Would you rather have a guaranteed 5% return or a possible 15% return with a chance of losing 10%?",
     ageAdapted: {
       junior: {
         hook: "What if your money could grow by itself while you're at school?",
@@ -301,22 +298,22 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         hook: "A mutual fund SIP of ₹500/month started at 16 is worth more at 60 than ₹5,000/month started at 30.",
         keyPoints: [
           "Mutual funds pool money from many investors to buy diversified assets",
-          "SIP (Systematic Investment Plan) means investing a fixed amount monthly — removes the need to time the market",
+          "SIP (Systematic Investment Plan) means investing a fixed amount monthly",
           "Index funds track the market — they beat 80% of actively managed funds long-term"
         ]
       },
       senior: {
-        hook: "Your salary buys your lifestyle today. Your investments fund your life when you can no longer — or no longer want to — work.",
+        hook: "Your salary buys your lifestyle today. Your investments fund your life when you can no longer work.",
         keyPoints: [
-          "Asset allocation: age-appropriate split between equity (high risk), debt (low risk), and gold (hedge)",
-          "Thumb rule: subtract your age from 100 for equity percentage — at 25 keep 75% in equity",
+          "Asset allocation: split between equity (high risk), debt (low risk), and gold (hedge)",
+          "Thumb rule: subtract your age from 100 for equity percentage",
           "Rebalance once a year — bring allocation back to target as markets move"
         ],
         extraStat: "Indians who invest in equity mutual funds for 20+ years have never lost money in any rolling 20-year period in Nifty 50 history."
       }
     },
     estimatedReadSeconds: 60,
-    relatedActivityIds: ['stockMarketSim', 'finIQ-investing-advanced']
+    relatedActivityIds: ['stockMarketSim', 'finIQ-investing']
   },
   {
     id: 'spending-habits',
@@ -335,23 +332,23 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         keyPoints: [
           "Small daily spends add up faster than big occasional ones",
           "Before buying ask: do I need this or do I just want it right now?",
-          "Writing down every spend for one week is eye-opening — try it"
+          "Writing down every spend for one week is eye-opening"
         ]
       },
       teen: {
         hook: "Your friends' spending habits are the biggest threat to your savings goals.",
         keyPoints: [
-          "Social spending — eating out, concerts, clothes — is the hardest category to control because it feels necessary",
-          "FOMO (fear of missing out) is a billion-dollar marketing strategy — recognise it",
+          "Social spending — eating out, concerts, clothes — is the hardest to control",
+          "FOMO (fear of missing out) is a billion-dollar marketing strategy",
           "Automate savings on payday so the money is gone before you can spend it"
         ]
       },
       senior: {
         hook: "Lifestyle inflation is how people with good salaries end up broke at 45.",
         keyPoints: [
-          "Track every spend for 30 days — most people discover 3-5 categories they can cut without missing it",
+          "Track every spend for 30 days — discover 3-5 categories you can cut",
           "Subscriptions are the modern money drain — audit yours quarterly",
-          "Separate wants from needs by asking: would my life be meaningfully worse without this in 30 days?"
+          "Separate wants from needs by asking: would my life be worse without this in 30 days?"
         ],
         extraStat: "Indians earning ₹1 lakh/month who track spending save an average ₹18,000 more monthly than those who don't."
       }
@@ -390,23 +387,23 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
       senior: {
         hook: "Rent vs Buy: in India, renting is often mathematically cheaper than an EMI due to low rental yields.",
         keyPoints: [
-          "Rental yield in India is ~3%, while home loan rates are ~9% — renting and investing the difference often wins",
-          "Hidden costs: brokerage, annual rent hikes (usually 10%), and non-refundable move-in fees",
-          "Always inspect for water leakage and electrical safety before signing — repairs are expensive"
+          "Rental yield in India is ~3%, while home loan rates are ~9%",
+          "Hidden costs: brokerage, annual rent hikes (usually 10%), and move-in fees",
+          "Always inspect for water leakage and electrical safety before signing"
         ],
         extraStat: "Mumbai and Bangalore renters spend 45% of income on rent on average."
       }
     },
     estimatedReadSeconds: 65,
-    relatedActivityIds: ['renting-apartment']
+    relatedActivityIds: ['first-apartment']
   },
   {
     id: 'vacation-planning',
     title: "Vacation planning — travel without the debt",
     hook: "A vacation paid for in advance is a holiday. A vacation paid for on credit is a debt sentence.",
     keyPoints: [
-      "Sinking funds: save a small amount every month for your next big trip instead of a one-time hit",
-      "Opportunity cost: that ₹50,000 trip could be ₹5 lakh in 20 years if invested — is the memory worth it?",
+      "Sinking funds: save a small amount every month for your next big trip",
+      "Opportunity cost: that ₹50,000 trip could be ₹5 lakh in 20 years if invested",
       "Travel insurance: ₹1,000 spent now could save ₹10 lakh in foreign medical bills"
     ],
     realWorldStat: "42% of Indian millennials have taken a personal loan to fund a vacation at least once.",
@@ -429,25 +426,25 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         ]
       },
       senior: {
-        hook: "Travel hacking isn't just for experts. Credit card points can pay for your entire flight if used correctly.",
+        hook: "Travel hacking isn't just for experts. Credit card points can pay for your entire flight.",
         keyPoints: [
-          "Use a dedicated travel credit card for all daily spends to accumulate air miles",
+          "Use a dedicated travel credit card for all daily spends to accumulate miles",
           "Off-season travel can save 50% on luxury stays while avoiding crowds",
-          "Factor in 'Hidden Costs': airport transfers, visas, and roaming data packs"
+          "Factor in 'Hidden Costs': airport transfers, visas, and roaming data"
         ]
       }
     },
     estimatedReadSeconds: 55,
-    relatedActivityIds: ['vacation-planning-quest']
+    relatedActivityIds: ['vacation-planning']
   },
   {
     id: 'first-job-salary',
     title: "First job salary — the truth about your paycheck",
     hook: "Your 'Cost to Company' (CTC) is not your take-home pay. Understanding the gap saves you from payday surprises.",
     keyPoints: [
-      "Gross vs Net: Gross is what they promised, Net is what actually hits your bank account",
-      "PF (Provident Fund) is mandatory saving for your future — it's your money, just locked away",
-      "HRA (House Rent Allowance) is a major tax saver if you pay rent — keep your receipts!"
+      "Gross vs Net: Gross is what they promised, Net is what hits your account",
+      "PF (Provident Fund) is mandatory saving for your future — it's your money",
+      "HRA (House Rent Allowance) is a major tax saver if you pay rent"
     ],
     realWorldStat: "80% of first-time employees don't know their net salary until their first message from the bank.",
     quickQuestion: "If you were offered a ₹50,000 higher CTC but ₹5,000 lower take-home pay, would you take it?",
@@ -461,19 +458,19 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         ]
       },
       teen: {
-        hook: "Stipends and part-time pay are your first taste of financial freedom. Don't waste it on day one.",
+        hook: "Stipends and part-time pay are your first taste of financial freedom.",
         keyPoints: [
           "If you earn over ₹2.5 lakh a year, you need to know about taxes",
-          "Even a small stipend can start a massive investment if you save 30% of it",
+          "Even a small stipend can start a massive investment if you save 30%",
           "Your first paycheck is a milestone — celebrate, but save first"
         ]
       },
       senior: {
-        hook: "Negotiation matters: a 10% higher starting salary compounds to ₹1.2 crore extra over a 30-year career.",
+        hook: "Negotiation matters: a 10% higher starting salary compounds to ₹1.2 crore extra over a career.",
         keyPoints: [
-          "Form 16 is your most important tax document — your employer gives it to you every year",
-          "Professional Tax and Gratuity are other deductions that reduce your monthly take-home",
-          "Always negotiate on the 'Fixed' component of salary, as bonuses are never guaranteed"
+          "Form 16 is your most important tax document",
+          "Professional Tax and Gratuity are other deductions that reduce take-home",
+          "Always negotiate on the 'Fixed' component, as bonuses aren't guaranteed"
         ],
         extraStat: "A 10% higher starting salary compounds to ₹1.2 crore extra over a 30-year career."
       }
@@ -486,9 +483,9 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
     title: "Credit cards — the high-stakes game",
     hook: "Credit cards are not free money — they are interest-bearing loans with a 45-day interest-free window if you know the trick.",
     keyPoints: [
-      "The Grace Period: if you pay the full bill on time, you pay 0% interest. Even one day late costs 40%!",
+      "The Grace Period: if you pay in full on time, you pay 0% interest. Even one day late costs 40%!",
       "Minimum Payment Trap: banks only ask for 5% of what you owe to keep you in debt for years",
-      "Rewards vs Fees: if the annual fee is ₹2,000 and you only earn ₹500 in points, the card is costing you money"
+      "Rewards vs Fees: if the annual fee is ₹2,000 and you only earn ₹500 in points, the card costs you money"
     ],
     realWorldStat: "Indians pay over ₹10,000 crore in credit card interest and late fees every single year.",
     quickQuestion: "If a credit card company gives you ₹500 back for spending ₹10,000, who really won the deal?",
@@ -498,14 +495,14 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         keyPoints: [
           "It's not your money — it's the bank's money that you are borrowing",
           "If you don't pay it back fast, it becomes much more expensive",
-          "Only use a card if you already have the money in your piggy bank to pay it back"
+          "Only use a card if you already have the money in your piggy bank"
         ]
       },
       teen: {
         hook: "Credit cards are the ultimate double-edged sword: a free loan for the disciplined, and a debt trap for the unwary.",
         keyPoints: [
-          "Credit card companies make money when you FORGET to pay or can't afford to pay",
-          "Never spend more on a card than you have in your bank account right now",
+          "Companies make money when you FORGET to pay or can't afford to pay",
+          "Never spend more on a card than you have in your bank account",
           "One missed payment can haunt your credit score for 7 years"
         ]
       },
@@ -513,8 +510,8 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         hook: "Interest rates on credit cards are ~42% per year — the most expensive debt in the world.",
         keyPoints: [
           "Statement Date vs Due Date: knowing the gap helps you maximise interest-free days",
-          "Credit cards are great for building CIBIL score if utilised under 30% of the limit",
-          "Avoid 'Cash Withdrawal' on credit cards — interest starts from the second the cash leaves the ATM"
+          "Credit cards are great for building CIBIL score if utilised under 30%",
+          "Avoid 'Cash Withdrawal' on credit cards — interest starts instantly"
         ]
       }
     },

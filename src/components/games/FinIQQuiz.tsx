@@ -28,7 +28,6 @@ import { cn } from '@/lib/utils';
 interface FinIQQuizProps {
   isDailyChallenge?: boolean;
   onExit: () => void;
-  // Category mapping for breakdownId
 }
 
 export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) {
