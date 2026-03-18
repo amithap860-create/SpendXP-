@@ -398,7 +398,7 @@ export const quests: Quest[] = [
           {
             id: 'ra-c8',
             text: 'Sign without reading fully',
-            consequence: "Month 3: pipe bursts. You pay ₹3,200 out of pocket. Month 11: Rent jumps ₹2,200.",
+            consequence: "Month 3: pipe bursts. Repair cost ₹3,200. Clause 12 means you pay it. Month 11: Rent jumps ₹2,200.",
             xpDelta: 5,
             healthDelta: -8,
             walletDelta: -3200,

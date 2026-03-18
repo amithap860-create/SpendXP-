@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import type { Quest, QuestChoice } from '@/data/quests';
+import type { Quest } from '@/data/quests';
 import { useQuestEngine } from '@/hooks/useQuestEngine';
 import { useAgeAdapt } from '@/lib/ageAdapt';
 import { useCurrency } from '@/hooks/useCurrency';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { ConceptBreakdown } from '@/components/ConceptBreakdown';
@@ -16,16 +16,14 @@ import {
   CheckCircle2, 
   XCircle, 
   Trophy, 
-  Zap, 
-  Wallet, 
   Target,
   Star,
   Info,
   RotateCcw,
   ArrowUpRight,
   Lightbulb,
-  TrendingUp,
-  History
+  History,
+  TrendingUp
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { fireConfettiQuestComplete } from '@/lib/confetti';
@@ -65,8 +63,8 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
 
   const getBalanceColor = () => {
     const ratio = currentBalance / quest.startingBalance;
-    if (currentBalance >= quest.startingBalance) return 'text-emerald-600';
-    if (ratio > 0.8) return 'text-slate-600';
+    if (currentBalance > quest.startingBalance) return 'text-emerald-600';
+    if (currentBalance === quest.startingBalance) return 'text-slate-600';
     if (ratio > 0.5) return 'text-amber-600';
     return 'text-rose-600';
   };
@@ -81,7 +79,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
   if (showBreakdown) {
     return (
       <ConceptBreakdown
-        breakdownId={quest.id}
+        breakdownId={quest.id === 'calculations-quest' ? 'investing-basics' : quest.id}
         ageGroup={ageGroup}
         activityType="quest"
         activityTitle={quest.title}
@@ -119,7 +117,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
               </div>
             </div>
 
-            <Button onClick={startQuest} className="w-full h-16 md:h-20 text-xl md:text-2xl font-black rounded-3xl shadow-2xl shadow-primary/20 gap-3 group">
+            <Button onClick={startQuest} className="w-full h-16 md:h-20 text-xl md:text-2xl font-black rounded-3xl shadow-2xl shadow-primary/20 gap-3 group" suppressHydrationWarning>
               Accept Mission <ArrowRight className="h-6 w-6 group-hover:translate-x-2 transition-transform" />
             </Button>
           </CardContent>
@@ -216,7 +214,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
               <Button variant="outline" onClick={resetQuest} className="h-16 px-10 rounded-2xl font-black text-slate-500 border-2" suppressHydrationWarning>
                 <RotateCcw className="h-5 w-5 mr-2" /> Replay Simulation
               </Button>
-              <Button onClick={onComplete} className="flex-1 h-16 text-xl font-black rounded-2xl shadow-xl">
+              <Button onClick={onComplete} className="flex-1 h-16 text-xl font-black rounded-2xl shadow-xl" suppressHydrationWarning>
                 Return to Arcade Hub
               </Button>
             </div>
@@ -305,7 +303,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
                 </div>
               </div>
 
-              <Button onClick={handleNext} className="w-full h-16 md:h-20 text-xl font-black rounded-3xl gap-3 group">
+              <Button onClick={handleNext} className="w-full h-16 md:h-20 text-xl font-black rounded-3xl gap-3 group" suppressHydrationWarning>
                 {activeChoice.nextStepId === 'end' ? 'Complete Mission' : 'Continue Simulation'} 
                 <ChevronRight className="h-6 w-6 group-hover:translate-x-2 transition-transform" />
               </Button>

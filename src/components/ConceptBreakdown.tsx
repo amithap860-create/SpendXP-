@@ -27,7 +27,7 @@ export function ConceptBreakdown({
     return (
       <div className="flex flex-col items-center justify-center min-h-[100dvh] p-8 text-center bg-slate-50">
         <p className="text-slate-500 font-bold mb-4">Briefing data missing for: {breakdownId}</p>
-        <Button onClick={onContinue} className="w-full h-14 font-black">Continue Anyway</Button>
+        <Button onClick={onContinue} className="w-full h-14 font-black" suppressHydrationWarning>Continue Anyway</Button>
       </div>
     );
   }
@@ -148,6 +148,7 @@ export function ConceptBreakdown({
         <Button 
           onClick={onContinue} 
           className="w-full h-[52px] text-lg font-black bg-teal-600 hover:bg-teal-700 shadow-xl shadow-teal-100 rounded-2xl"
+          suppressHydrationWarning
         >
           I'm ready — let's go
         </Button>

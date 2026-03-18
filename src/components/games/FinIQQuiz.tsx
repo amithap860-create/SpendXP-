@@ -151,7 +151,7 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
             <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-3"><Calendar className="h-5 w-5 text-primary" /><div className="text-xs md:text-sm font-bold">10 Scenarios</div></div>
             <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-3"><Timer className="h-5 w-5 text-accent" /><div className="text-xs md:text-sm font-bold">15s Limit</div></div>
           </div>
-          <Button onClick={startGame} className="w-full h-14 md:h-16 text-lg md:text-xl font-black rounded-2xl shadow-xl shadow-primary/20 min-h-[44px]">START QUIZ</Button>
+          <Button onClick={startGame} className="w-full h-14 md:h-16 text-lg md:text-xl font-black rounded-2xl shadow-xl shadow-primary/20 min-h-[44px]" suppressHydrationWarning>START QUIZ</Button>
         </CardContent>
       </Card>
     );
@@ -193,8 +193,8 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
                 </div>
               </div>
               <div className="flex gap-3 md:gap-4">
-                <Button variant="outline" onClick={startGame} className="flex-1 gap-2 h-12 md:h-14 font-bold text-xs md:text-sm min-h-[44px]"><RotateCcw className="h-4 w-4" /> Try Again</Button>
-                <Button onClick={onExit} className="flex-1 h-12 md:h-14 font-bold text-xs md:text-lg min-h-[44px]">Exit</Button>
+                <Button variant="outline" onClick={startGame} className="flex-1 gap-2 h-12 md:h-14 font-bold text-xs md:text-sm min-h-[44px]" suppressHydrationWarning><RotateCcw className="h-4 w-4" /> Try Again</Button>
+                <Button onClick={onExit} className="flex-1 h-12 md:h-14 font-bold text-xs md:text-lg min-h-[44px]" suppressHydrationWarning>Exit</Button>
               </div>
             </CardContent>
           </Card>
@@ -256,7 +256,7 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
               <div className="h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center shrink-0 bg-white shadow-sm"><Info className="h-4 w-4 md:h-5 md:w-5 text-primary" /></div>
               <div><h4 className="font-black text-slate-900 mb-1 text-sm md:text-base">Learning Moment</h4><p className="text-xs md:text-sm text-slate-700 leading-relaxed font-medium">{currentQuestion.explanation}</p></div>
             </div>
-            <Button onClick={handleNext} className="w-full h-12 md:h-14 gap-2 text-base md:text-lg font-black group min-h-[44px]">{currentRound < 10 ? "Next Scenario" : "See Results"}<ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" /></Button>
+            <Button onClick={handleNext} className="w-full h-12 md:h-14 gap-2 text-base md:text-lg font-black group min-h-[44px]" suppressHydrationWarning>{currentRound < 10 ? "Next Scenario" : "See Results"}<ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" /></Button>
           </div>
         )}
       </Card>
