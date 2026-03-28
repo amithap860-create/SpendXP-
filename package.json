@@ -13,7 +13,7 @@
     "mvp:local": "npm run build && npm run start"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": "18"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.28.0",
