@@ -13,7 +13,18 @@ export {
   isFirebaseReady
 } from '@/lib/firebase';
 
+export {
+  applyActionCode,
+  sendPasswordResetEmail,
+  confirmPasswordReset
+} from 'firebase/auth';
+
 import { app, auth, db } from '@/lib/firebase';
+import { 
+  applyActionCode, 
+  sendPasswordResetEmail,
+  confirmPasswordReset 
+} from 'firebase/auth';
 
 /**
  * Initializes secondary Firebase services like App Check.
@@ -24,27 +35,8 @@ import { app, auth, db } from '@/lib/firebase';
  * hydration issues in Next.js 15.
  */
 export function initializeFirebase() {
-  if (typeof window !== 'undefined') {
-    if (process.env.NODE_ENV !== 'production') {
-      (self as any).FIREBASE_APPCHECK_DEBUG_TOKEN = true;
-    }
-    
-    // Initialize App Check asynchronously without blocking the return of core services
-    import('firebase/app-check').then(({ initializeAppCheck, ReCaptchaV3Provider }) => {
-      try {
-        initializeAppCheck(app, {
-          provider: new ReCaptchaV3Provider(
-            process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
-          ),
-          isTokenAutoRefreshEnabled: true
-        });
-      } catch (err) {
-        console.warn('[SpendXP] App Check initialization skipped or blocked by browser:', err);
-      }
-    }).catch(err => {
-      console.warn('[SpendXP] App Check module load failed:', err);
-    });
-  }
+  // App Check is initialized only in production from @/lib/firebase (see firebase.ts).
+  // Development / localhost must not enable App Check or debug tokens — they cause 403s outside Firebase Studio.
 
   // Return instances directly from lib/firebase which are initialized in module scope
   return {
@@ -58,7 +50,6 @@ export function initializeFirebase() {
 // Re-export Provider and Hooks from source of truth
 export {
   FirebaseProvider,
-  FirebaseClientProvider,
   useFirebase,
   useFirebaseApp,
   useFirestore,
@@ -67,6 +58,8 @@ export {
   FirebaseContext,
   useMemoFirebase
 } from './provider';
+
+export { FirebaseClientProvider } from './client-provider';
 
 export * from './firestore/use-collection';
 export * from './firestore/use-doc';
@@ -77,6 +70,7 @@ export * from './error-emitter';
 
 // Project Utility Re-exports
 export * from '@/lib/firestoreSafe';
+export { safeOnSnapshot, safeOnSnapshotDoc } from '@/lib/firestoreSafe';
 export * from '@/lib/authHelpers';
 export * from '@/lib/rateLimiter';
 export * from '@/lib/validation';

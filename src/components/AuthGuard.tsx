@@ -66,21 +66,49 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen-safe flex flex-col items-center justify-center bg-slate-50 gap-5 p-4">
-        <div className="text-3xl font-black text-primary tracking-tighter">
-          SpendXP
-        </div>
-        <div className="w-9 h-9 border-4 border-primary/10 border-t-primary rounded-full animate-spin" />
-        <style>{`
-          @keyframes spin {
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100dvh'
+      }}>
+        <div style={{
+          width: '32px',
+          height: '32px',
+          border: '3px solid #E1F5EE',
+          borderTop: '3px solid #0F6E56',
+          borderRadius: '50%',
+          animation: 'spin 0.8s linear infinite'
+        }}/>
+        <style>{`@keyframes spin {
+        to { transform: rotate(360deg); }
+      }`}</style>
       </div>
     );
   }
 
-  if (!user) return null;
+  if (!user) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100dvh'
+      }}>
+        <div style={{
+          width: '32px',
+          height: '32px',
+          border: '3px solid #E1F5EE',
+          borderTop: '3px solid #0F6E56',
+          borderRadius: '50%',
+          animation: 'spin 0.8s linear infinite'
+        }}/>
+        <style>{`@keyframes spin {
+        to { transform: rotate(360deg); }
+      }`}</style>
+      </div>
+    );
+  }
 
   return <>{children}</>;
 }

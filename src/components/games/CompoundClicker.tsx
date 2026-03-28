@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useGameEngine } from '@/hooks/useGameEngine';
-import { useAgeAdapt } from '@/lib/ageAdapt';
+import { useAgeAdapt } from '@/lib/ageAdaptProvider';
 import { COMPOUND_VEHICLES, VehicleId } from '@/data/compoundVehicles';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

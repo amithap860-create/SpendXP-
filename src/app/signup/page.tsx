@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, Suspense } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,7 +14,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { collection, query, where, getDocs, doc, serverTimestamp, writeBatch, FieldValue, arrayUnion } from 'firebase/firestore';
 import { db, safeSetDoc, safeUpdateDoc } from '@/firebase';
 
-export default function SignupPage() {
+function SignupContent() {
   const { signUpWithEmail, signInWithGoogle, error: authError } = useAuthContext();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -65,7 +65,7 @@ export default function SignupPage() {
 
         const inviteData = inviteDoc.data();
         const batch = writeBatch(db);
-        const newParentUid = res.userId; // Assume hook returns userId
+        const newParentUid = (res as any).userId;
 
         // Create Accepted Link
         const linkRef = doc(db, 'linkRequests', `${inviteData.childUid}_${newParentUid}`);
@@ -219,5 +219,13 @@ export default function SignupPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SignupContent />
+    </Suspense>
   );
 }

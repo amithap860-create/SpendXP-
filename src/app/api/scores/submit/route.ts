@@ -1,10 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminAuth, adminDb } from '@/lib/firebaseAdmin';
 import { validateScore, validateXP } from '@/lib/validation';
 import * as admin from 'firebase-admin';
+import { initializeApp, cert, getApps, getApp } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
+import { getFirestore } from 'firebase-admin/firestore';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
   try {
+    // Initialize Firebase Admin dynamically
+    const serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_SDK_KEY || '{}');
+    
+    if (!serviceAccount.project_id) {
+      return NextResponse.json({ error: 'Service not configured' }, { status: 503 });
+    }
+
+    const adminApp = getApps().find(app => app.name === 'admin') || 
+      initializeApp({
+        credential: cert(serviceAccount),
+      }, 'admin');
+
+    const adminAuth = getAuth(adminApp);
+    const adminDb = getFirestore(adminApp);
+
     const authHeader = request.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

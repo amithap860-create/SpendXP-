@@ -22,26 +22,26 @@
     {
       "id": "avatar-1",
       "description": "Student avatar 1",
-      "imageUrl": "https://picsum.photos/seed/user1/100/100",
-      "imageHint": "student portrait"
+      "imageUrl": "https://placehold.co/40x40/E1F5EE/0F6E56",
+      "imageHint": "student avatar"
     },
     {
       "id": "avatar-2",
       "description": "Student avatar 2",
-      "imageUrl": "https://picsum.photos/seed/user2/100/100",
-      "imageHint": "student portrait"
+      "imageUrl": "https://placehold.co/40x40/E6F1FB/185FA5",
+      "imageHint": "student avatar"
     },
     {
       "id": "avatar-3",
       "description": "Student avatar 3",
-      "imageUrl": "https://picsum.photos/seed/user3/100/100",
-      "imageHint": "student portrait"
+      "imageUrl": "https://placehold.co/40x40/FAEEDA/854F0B",
+      "imageHint": "student avatar"
     },
     {
       "id": "avatar-4",
       "description": "Student avatar 4",
-      "imageUrl": "https://picsum.photos/seed/user4/100/100",
-      "imageHint": "student portrait"
+      "imageUrl": "https://placehold.co/40x40/FAECE7/993C1D",
+      "imageHint": "student avatar"
     }
   ]
 }

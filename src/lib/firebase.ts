@@ -36,6 +36,28 @@ try {
   console.error('[SpendXP] Core Firebase initialization error:', error);
 }
 
+if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
+  void import('firebase/app-check')
+    .then(({ initializeAppCheck, ReCaptchaV3Provider }) => {
+      try {
+        const firebaseApp = getApps().length ? getApp() : undefined;
+        if (!firebaseApp) {
+          return;
+        }
+        initializeAppCheck(firebaseApp, {
+          provider: new ReCaptchaV3Provider(
+            process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? ''
+          ),
+        });
+      } catch (e) {
+        console.warn('[SpendXP] App Check skipped:', e);
+      }
+    })
+    .catch((e) => {
+      console.warn('[SpendXP] App Check skipped:', e);
+    });
+}
+
 // Auth Providers
 const googleProvider = new GoogleAuthProvider();
 const emailProvider = new EmailAuthProvider();

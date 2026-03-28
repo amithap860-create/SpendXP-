@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, where, orderBy, limit } from 'firebase/firestore';
+import { collection, query, where, orderBy, limit, type QueryDocumentSnapshot, type DocumentData } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { WeeklyReport } from '@/components/parent/WeeklyReport';
@@ -17,7 +17,8 @@ import {
   Users,
   UserPlus,
   HelpCircle,
-  ShieldCheck
+  ShieldCheck,
+  FileText
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -56,7 +57,9 @@ export default function ParentDashboard() {
     if (!selectedChildId || !user) return;
     const ref = collection(db, 'users', selectedChildId, 'gameScores');
     const unsubscribe = safeOnSnapshot(ref, (snap) => {
-      setGameScores(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setGameScores(
+        snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() }))
+      );
     });
     return () => unsubscribe();
   }, [db, selectedChildId, user]);
@@ -170,7 +173,8 @@ export default function ParentDashboard() {
                   <div className="h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600"><Gamepad2 className="h-6 w-6" /></div>
                   <div><div className="text-[10px] font-bold text-slate-400 uppercase">Latest Session</div><div className="text-2xl font-black">{activityLog?.[0]?.gameName || 'None'}</div></div>
                 </CardContent>
-              </div>
+              </Card>
+            </div>
 
             <div className="lg:col-span-8 space-y-8">
               <Card className="border-none shadow-xl bg-white overflow-hidden">

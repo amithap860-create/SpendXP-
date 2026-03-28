@@ -24,10 +24,10 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => {
-    if (isLoggedIn) {
+    if (!isInitialLoading && isLoggedIn) {
       router.push('/dashboard');
     }
-  }, [isLoggedIn, router]);
+  }, [isLoggedIn, isInitialLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,10 +52,26 @@ export default function LandingPage() {
     getPlaceholderById('avatar-4')
   ];
 
-  if (!isMounted || isInitialLoading) {
+  if (!isMounted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <LoaderCircle className="h-12 w-12 animate-spin text-primary" />
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100dvh',
+        background: 'white'
+      }}>
+        <div style={{
+          width: '32px',
+          height: '32px',
+          border: '3px solid #E1F5EE',
+          borderTop: '3px solid #0F6E56',
+          borderRadius: '50%',
+          animation: 'spin 0.8s linear infinite'
+        }}/>
+        <style>{`@keyframes spin {
+          to { transform: rotate(360deg); }
+        }`}</style>
       </div>
     );
   }

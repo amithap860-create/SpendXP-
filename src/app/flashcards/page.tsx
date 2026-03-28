@@ -17,7 +17,7 @@ export default function Flashcards() {
   const fetchFlashcards = async () => {
     setIsLoading(true);
     try {
-      const result = await generatePersonalizedFlashcards({ age, numFlashcards: 8 });
+      const result = await generatePersonalizedFlashcards({ age: age || 12, numFlashcards: 8 });
       setFlashcards(result.flashcards);
       setCurrentIndex(0);
       setIsFlipped(false);

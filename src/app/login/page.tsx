@@ -98,6 +98,10 @@ function LoginContent() {
     const res = await signUpWithEmail(email, password, displayName, isParent);
     if (res.success) {
       setSignupSuccess(true);
+      // Auto-redirect to onboarding after 3 seconds
+      setTimeout(() => {
+        router.push('/onboarding');
+      }, 3000);
     }
     setLoading(false);
   };

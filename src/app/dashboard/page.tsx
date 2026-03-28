@@ -13,7 +13,9 @@ import {
   query, 
   orderBy, 
   limit, 
-  getDocs, 
+  getDocs,
+  type QueryDocumentSnapshot,
+  type DocumentData,
 } from 'firebase/firestore';
 import { 
   getProgression, 
@@ -43,10 +45,15 @@ const RadarChart = dynamic(() => import('@/components/charts/RadarChart').then(m
 export default function DashboardPage() {
   const { user } = useAuthContext();
   const { formatValue, formatCompact } = useCurrency();
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [radarSize, setRadarSize] = useState(220);
-  
-  // Data State
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Data State - declare all hooks unconditionally
   const [profile, setProfile] = useState<any>(null);
   const [progression, setProgression] = useState<UserProgression | null>(null);
   const [gameScores, setGameScores] = useState<GameScores | null>(null);
@@ -85,7 +92,10 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     const loadData = async () => {
       setLoading(true);
@@ -111,7 +121,9 @@ export default function DashboardPage() {
         setProgression(progData);
         setGameScores(scoresData);
         setStrengths(strengthsData);
-        setCompletedLessonsCount(tasksSnap.docs.filter(d => d.data().completed).length);
+        setCompletedLessonsCount(
+          tasksSnap.docs.filter((d: QueryDocumentSnapshot<DocumentData>) => d.data()?.completed).length
+        );
         setDailyParticipantCount(dailyDoc?.participantCount || 0);
 
         const rankSnap = await getDocs(query(
@@ -121,7 +133,7 @@ export default function DashboardPage() {
         const userRankIndex = rankSnap.docs.findIndex(d => d.id === user.uid);
         if (userRankIndex !== -1) {
           setDailyRank({
-            score: rankSnap.docs[userRankIndex].data().score,
+            score: rankSnap.docs[userRankIndex]?.data()?.score ?? 0,
             rank: userRankIndex + 1
           });
         }
@@ -140,7 +152,9 @@ export default function DashboardPage() {
       limit(10)
     );
     const unsubActivity = safeOnSnapshot(activityQuery, (snap) => {
-      setActivityLog(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setActivityLog(
+        snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() }))
+      );
     });
 
     const timer = setInterval(() => {
@@ -166,11 +180,11 @@ export default function DashboardPage() {
   }, []);
 
   const subtitle = useMemo(() => {
-    if (!progression || progression.totalGamesPlayed === 0) 
+    if (!progression || (progression?.totalGamesPlayed ?? 0) === 0) 
       return "Welcome to SpendXP! Start your first game to earn XP.";
     if (!dailyRank) 
       return "Daily challenge available — play now to keep your streak!";
-    return `You've earned ${progression.totalXP?.toLocaleString()} XP so far. Keep going!`;
+    return `You've earned ${progression?.totalXP?.toLocaleString() ?? '0'} XP so far. Keep going!`;
   }, [progression, dailyRank]);
 
   const recommendedGames = useMemo(() => {
@@ -195,6 +209,30 @@ export default function DashboardPage() {
     return scored.sort((a, b) => b.recommendationScore - a.recommendationScore);
   }, [gameScores, profile]);
 
+  // Conditional returns after all hooks are declared
+  if (!mounted) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100dvh'
+      }}>
+        <div style={{
+          width: '32px',
+          height: '32px',
+          border: '3px solid #E1F5EE',
+          borderTop: '3px solid #0F6E56',
+          borderRadius: '50%',
+          animation: 'spin 0.8s linear infinite'
+        }}/>
+        <style>{`@keyframes spin {
+        to { transform: rotate(360deg); }
+      }`}</style>
+      </div>
+    );
+  }
+
   if (loading) return <DashboardSkeleton />;
 
   return (
@@ -206,7 +244,7 @@ export default function DashboardPage() {
           <div className="space-y-4 text-center md:text-left flex-1">
             <div>
               <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
-                {greeting}, {profile?.displayName?.split(' ')[0]}!
+                {greeting}, {profile?.displayName?.split(' ')?.[0] ?? 'there'}!
               </h1>
               <p className="text-slate-500 font-medium mt-1 text-sm md:text-base">{subtitle}</p>
             </div>
@@ -215,7 +253,7 @@ export default function DashboardPage() {
                 {progression?.level === 1 ? 'Starter' : progression?.level === 2 ? 'Saver' : 'Investor'}
               </span>
               <span className="px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-[10px] font-black uppercase tracking-widest">
-                {profile?.ageGroup} • {profile?.birthYear ? (new Date().getFullYear() - profile.birthYear) : '8-20'}
+                {profile?.ageGroup ?? 'Student'} • {profile?.birthYear != null ? (new Date().getFullYear() - profile.birthYear) : '8-20'}
               </span>
             </div>
           </div>

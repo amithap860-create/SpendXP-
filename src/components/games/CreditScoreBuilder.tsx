@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useGameEngine } from '@/hooks/useGameEngine';
-import { useAgeAdapt } from '@/lib/ageAdapt';
+import { useAgeAdapt } from '@/lib/ageAdaptProvider';
 import { CreditFactor, INITIAL_FACTORS, calculateScore, getScoreBand, getJuniorBand, applyEffect } from '@/lib/creditScoreEngine';
 import { creditChoices, CreditChoice, CreditOption } from '@/data/creditChoices';
 import { Button } from '@/components/ui/button';

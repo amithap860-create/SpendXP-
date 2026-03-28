@@ -1,13 +1,59 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+const publicPaths = [
+  '/',
+  '/login',
+  '/signup',
+  '/onboarding',
+  '/verify-email',
+  '/consent',
+  '/api/auth/login',
+  '/api/auth/signup',
+  '/api/auth/forgot-password',
+  '/api/auth/reset-password',
+  '/api/auth/verify-email',
+];
+
+function isPublicPathname(pathname: string): boolean {
+  return publicPaths.some((path) => {
+    if (path === '/') {
+      return pathname === '/';
+    }
+    return pathname === path || pathname.startsWith(`${path}/`);
+  });
+}
+
 /**
- * @fileOverview Middleware for route protection and default redirects.
+ * @fileOverview Enterprise-grade middleware for route protection, HTTPS enforcement, and security headers.
  */
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const protocol = request.headers.get('x-forwarded-proto') || 'http';
 
-  // 1. Admin Isolation: Prevent discovery of admin routes
+  // Force HTTPS in production
+  if (process.env.NODE_ENV === 'production' && protocol !== 'https') {
+    const httpsUrl = request.url.replace('http://', 'https://');
+    return NextResponse.redirect(httpsUrl);
+  }
+
+  // Apply security headers
+  const response = NextResponse.next();
+  
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  response.headers.set('Content-Security-Policy', 
+    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none';"
+  );
+
+  // Route protection
+  if (isPublicPathname(pathname)) {
+    return response;
+  }
+
   if (pathname.startsWith('/admin')) {
     const isAdminCookie = request.cookies.get('spendxp_admin_session');
     if (!isAdminCookie) {
@@ -15,23 +61,22 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // 2. Default Redirect for Root
-  if (pathname === '/') {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
-  }
-
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {
   matcher: [
     '/',
-    '/games/:path*', 
-    '/parent/:path*', 
-    '/onboarding/:path*', 
-    '/admin/:path*',
-    '/login', 
+    '/login',
     '/signup',
-    '/dashboard/:path*'
+    '/onboarding/:path*',
+    '/verify-email',
+    '/verify-email/:path*',
+    '/consent',
+    '/consent/:path*',
+    '/games/:path*',
+    '/parent/:path*',
+    '/admin/:path*',
+    '/dashboard/:path*',
   ],
 };

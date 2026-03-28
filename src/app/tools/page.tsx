@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { db, safeUpdateDoc, safeGetDoc } from '@/firebase';
 import { doc, arrayUnion } from 'firebase/firestore';
@@ -123,7 +123,9 @@ export default function ToolsHub() {
           {tools.map((tool) => (
             <div 
               key={tool.id} 
-              ref={el => scrollRefs.current[tool.id] = el}
+              ref={useCallback((el: HTMLDivElement | null) => {
+                scrollRefs.current[tool.id] = el;
+              }, [tool.id])}
               className="scroll-mt-4"
             >
               <Card 

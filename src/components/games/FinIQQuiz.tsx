@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useGameEngine } from '@/hooks/useGameEngine';
-import { useAgeAdapt } from '@/lib/ageAdapt';
+import { useAgeAdapt } from '@/lib/ageAdaptProvider';
 import { finIQQuestions, Question, Category } from '@/data/finIQQuestions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -106,7 +106,7 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
     setSelectedOption(null);
     setShowExplanation(false);
     if (currentRound < 10) nextRound();
-    else endGame(0, { categoryAccuracy: categoryStats });
+    else endGame(0);
   };
 
   useEffect(() => {

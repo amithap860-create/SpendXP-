@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { doc, serverTimestamp } from 'firebase/firestore';
-import { db, safeOnSnapshot, safeSetDoc } from '@/firebase';
+import { db, safeOnSnapshotDoc, safeSetDoc } from '@/firebase';
 import { useAuthContext } from '@/context/AuthContext';
 import { getProgressionRef, UserProgression, DEFAULT_PROGRESSION } from '@/lib/progressionService';
 
@@ -21,7 +21,7 @@ export function useProgression() {
     setIsLoading(true);
     const ref = getProgressionRef(user.uid);
 
-    const unsubscribe = safeOnSnapshot(ref, (snap) => {
+    const unsubscribe = safeOnSnapshotDoc(ref, (snap) => {
       if (snap.exists()) {
         setData(snap.data() as UserProgression);
       } else {

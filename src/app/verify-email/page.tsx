@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { applyActionCode, auth, safeUpdateDoc } from '@/firebase'
 import { doc, serverTimestamp } from 'firebase/firestore'
@@ -8,7 +8,7 @@ import { sendEmailVerification } from 'firebase/auth'
 import { RefreshCw, CheckCircle2, AlertCircle, Mail, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [status, setStatus] = useState<'loading' | 'success' | 'already_verified' | 'expired' | 'error'>('loading')
@@ -172,5 +172,13 @@ function ExpiredLinkUI() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <VerifyEmailContent />
+    </Suspense>
   )
 }

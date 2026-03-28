@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useGameEngine } from '@/hooks/useGameEngine';
-import { useAgeAdapt } from '@/lib/ageAdapt';
+import { useAgeAdapt } from '@/lib/ageAdaptProvider';
 import { STOCK_COMPANIES, NEWS_HEADLINES, StockCompany, NewsHeadline } from '@/data/stockMarketData';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { XPWallet } from '@/components/XPWallet';
 import { 

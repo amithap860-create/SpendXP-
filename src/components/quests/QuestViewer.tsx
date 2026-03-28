@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Quest } from '@/data/quests';
 import { useQuestEngine } from '@/hooks/useQuestEngine';
-import { useAgeAdapt } from '@/lib/ageAdapt';
+import { useAgeAdapt } from '@/lib/ageAdaptProvider';
 import { useCurrency } from '@/hooks/useCurrency';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardTitle } from '@/components/ui/card';

@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import { cn } from '@/lib/utils';
 import { GameLoadingSkeleton } from '@/components/games/GameLoadingSkeleton';
-import { useAgeAdapt } from '@/lib/ageAdapt';
+import { useAgeAdapt } from '@/lib/ageAdaptProvider';
 import { ConceptBreakdown } from '@/components/ConceptBreakdown';
 
 const BudgetBlitz = dynamic(() => import('@/components/games/BudgetBlitz').then(mod => mod.BudgetBlitz), {

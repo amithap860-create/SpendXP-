@@ -25,10 +25,10 @@ import { awardBadge } from '@/lib/badgeService';
 
 export default function LearnHub() {
   const { user } = useAuthContext();
-  const { tasks } = useUser();
+  const { tasks, ageGroup } = useUser();
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
 
-  const availableLessons = lessons.filter(l => l.ageGroups.includes(user?.ageGroup as any || 'junior'));
+  const availableLessons = lessons.filter(l => l.ageGroups.includes((ageGroup || 'junior') as any));
   const completedCount = lessons.filter(l => tasks.find(t => t.id === `lesson-${l.id}`)?.completed).length;
   const overallProgress = (completedCount / lessons.length) * 100;
 

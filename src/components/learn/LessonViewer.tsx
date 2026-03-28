@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Lesson, LessonCard } from '@/data/lessons';
-import { useAgeAdapt } from '@/lib/ageAdapt';
+import { useAgeAdapt } from '@/lib/ageAdaptProvider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';

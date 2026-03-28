@@ -20,9 +20,9 @@ export default function SavingsTracker() {
   const { savingsCurrent, savingsGoal, updateSavings, setSavingsGoal, balance, formatValue } = useUser();
   const { toast } = useToast();
   const [addAmount, setAddAmount] = useState('10');
-  const [newGoal, setNewGoal] = useState(savingsGoal.toString());
+  const [newGoal, setNewGoal] = useState((savingsGoal || 1000).toString());
 
-  const progress = Math.min(100, (savingsCurrent / savingsGoal) * 100);
+  const progress = savingsCurrent && savingsGoal ? Math.min(100, (savingsCurrent / savingsGoal) * 100) : 0;
   const isComplete = progress >= 100;
 
   const handleAddSavings = () => {
@@ -32,9 +32,9 @@ export default function SavingsTracker() {
       toast({ title: "Oops!", description: "You don't have enough in your virtual wallet.", variant: "destructive" });
       return;
     }
-    updateSavings(amountNum);
+    updateSavings?.(amountNum, savingsGoal || 1000);
     toast({ title: "Savings Boosted!", description: `Added ${formatValue(amountNum)} to your piggy bank.` });
-    if (savingsCurrent + amountNum >= savingsGoal) {
+    if ((savingsCurrent || 0) + amountNum >= (savingsGoal || 1000)) {
       toast({ title: "GOAL REACHED! 🏆", description: "You've crushed your savings goal!" });
     }
   };
@@ -42,7 +42,7 @@ export default function SavingsTracker() {
   const handleUpdateGoal = () => {
     const goalNum = parseFloat(newGoal);
     if (isNaN(goalNum) || goalNum <= 0) return;
-    setSavingsGoal(goalNum);
+    setSavingsGoal?.(goalNum);
     toast({ title: "Goal Updated", description: `Your new target is ${formatValue(goalNum)}.` });
   };
 
@@ -66,7 +66,7 @@ export default function SavingsTracker() {
                     <PartyPopper className="h-16 w-16 mb-4 animate-bounce" />
                     <h3 className="text-3xl font-extrabold mb-2">MISSION ACCOMPLISHED!</h3>
                     <p className="text-lg opacity-80 mb-6">You've saved enough for your goal.</p>
-                    <Button onClick={() => setSavingsGoal(savingsGoal + 500)} variant="secondary" className="font-bold" suppressHydrationWarning>Set Next Challenge</Button>
+                    <Button onClick={() => setSavingsGoal?.((savingsGoal || 1000) + 500)} variant="secondary" className="font-bold" suppressHydrationWarning>Set Next Challenge</Button>
                  </div>
                )}
 
@@ -74,8 +74,8 @@ export default function SavingsTracker() {
                 <PiggyBank className="h-12 w-12" />
                </div>
                <h3 className="text-xl font-bold mb-2">Current Piggy Bank</h3>
-               <div className="text-4xl font-black mb-4">{formatValue(savingsCurrent)}</div>
-               <div className="text-sm font-medium opacity-80">of {formatValue(savingsGoal)} Target</div>
+               <div className="text-4xl font-black mb-4">{formatValue(savingsCurrent || 0)}</div>
+               <div className="text-sm font-medium opacity-80">of {formatValue(savingsGoal || 1000)} Target</div>
             </div>
             
             <CardContent className="p-8 space-y-8">

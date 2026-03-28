@@ -39,19 +39,19 @@ export default function MarketSimulation() {
     try {
       const result = await generateMarketNewsAndExplanations({
         marketDescription: "The market is slightly volatile with tech growth.",
-        ageGroup: ageGroup,
-        fictionalCompanies: stocks.map(s => s.name)
+        ageGroup: (ageGroup === 'junior' ? '8-11' : ageGroup === 'teen' ? '11-15' : '16-20'),
+        fictionalCompanies: (stocks || []).map(s => s.name)
       });
       setNews(result);
       
-      const updatedStocks = stocks.map(stock => {
+      const updatedStocks = (stocks || []).map(stock => {
         if (stock.name === result.impactedCompany) {
           const impactPercent = result.impactDirection === 'positive' ? 1.05 : (result.impactDirection === 'negative' ? 0.95 : 1);
           return { ...stock, price: Math.max(1, stock.price * impactPercent), change: (impactPercent - 1) * 100 };
         }
         return stock;
       });
-      updateStocks(updatedStocks);
+      updateStocks?.(updatedStocks);
     } catch (error) {
       console.error(error);
     } finally {
@@ -77,7 +77,7 @@ export default function MarketSimulation() {
       toast({ title: "Insufficient Balance", variant: "destructive" });
       return;
     }
-    buyStock(selectedStock.symbol, amount, selectedStock.price);
+    buyStock?.(selectedStock.symbol, amount);
     toast({ title: "Purchase Successful!", description: `Bought ${amount} shares of ${selectedStock.name}` });
   };
 
@@ -93,7 +93,7 @@ export default function MarketSimulation() {
       toast({ title: "Insufficient Shares", variant: "destructive" });
       return;
     }
-    sellStock(selectedStock.symbol, amount, selectedStock.price);
+    sellStock?.(selectedStock.symbol, amount);
     toast({ title: "Sale Successful!", description: `Sold ${amount} shares of ${selectedStock.name}` });
   };
 
@@ -127,7 +127,7 @@ export default function MarketSimulation() {
                 </CardTitle>
               </CardHeader>
               <div className="bg-white">
-                {stocks.map((stock) => (
+                {(stocks || []).map((stock) => (
                   <div 
                     key={stock.symbol}
                     onClick={() => setSelectedStock(stock)}

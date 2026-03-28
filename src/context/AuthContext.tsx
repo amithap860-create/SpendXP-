@@ -131,6 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     emailVerified,
     currentAgeGroup,
     currencyCode,
+    signOut: (auth as any).signOut,
   };
 
   return (

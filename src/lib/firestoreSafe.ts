@@ -22,13 +22,27 @@ import { handlePermissionsError } from './rulesValidator';
  */
 
 export function safeOnSnapshot(
-  query: DocumentReference | Query,
+  query: Query,
   onNext: (snapshot: any) => void,
   onError?: (error: FirestoreError) => void
 ): Unsubscribe {
-  return onSnapshot(query, onNext, (error) => {
+  return onSnapshot(query, onNext, (error: FirestoreError) => {
     if (error.code === 'permission-denied') {
       handlePermissionsError(error, 'safeOnSnapshot');
+      return;
+    }
+    if (onError) onError(error);
+  });
+}
+
+export function safeOnSnapshotDoc(
+  ref: DocumentReference,
+  onNext: (snapshot: any) => void,
+  onError?: (error: FirestoreError) => void
+): Unsubscribe {
+  return onSnapshot(ref, onNext, (error: FirestoreError) => {
+    if (error.code === 'permission-denied') {
+      handlePermissionsError(error, 'safeOnSnapshotDoc');
       return;
     }
     if (onError) onError(error);

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { useGameEngine } from '@/hooks/useGameEngine';
-import { useAgeAdapt } from '@/lib/ageAdapt';
+import { useAgeAdapt } from '@/lib/ageAdaptProvider';
 import { budgetBlitzItems, BudgetCategory } from '@/data/budgetBlitzItems';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -289,7 +289,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
             style={{ left: `${card.x}%`, top: `${card.y}%`, transform: 'translateX(-50%)', touchAction: 'none' }}
           >
             <div className="font-bold text-slate-800 text-[10px] md:text-sm leading-tight mb-1 truncate">{card.item.name}</div>
-            <div className="text-xs md:text-base font-black text-primary">{formatValue(difficultyConfig.moneyAmounts[card.item.basePrice])}</div>
+            <div className="text-xs md:text-base font-black text-primary">{formatValue(difficultyConfig.moneyAmounts[card.item.basePrice as keyof typeof difficultyConfig.moneyAmounts])}</div>
           </div>
         ))}
       </div>

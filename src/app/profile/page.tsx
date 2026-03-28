@@ -4,9 +4,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { 
-  useDoc, 
-  useMemoFirebase,
   safeUpdateDoc,
+  safeGetDoc,
   db,
   auth,
   recordFailedAttempt
@@ -36,6 +35,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { 
   Mail, 
   RefreshCw,
@@ -52,7 +52,7 @@ import {
 } from 'lucide-react';
 import { validateDisplayName, validateEmail, validatePassword } from '@/lib/validation';
 import { rateLimiter } from '@/lib/rateLimiter';
-import { useUser } from '@/lib/store';
+import { useUser, type UserProfile } from '@/lib/store';
 import { XPWallet } from '@/components/XPWallet';
 import { useRouter } from 'next/navigation';
 import { useCurrency } from '@/hooks/useCurrency';
@@ -60,21 +60,60 @@ import { SUPPORTED_CURRENCIES, CurrencyOption, DEFAULT_CURRENCY } from '@/config
 import { scaleAmount, formatCurrency } from '@/lib/formatCurrency';
 import { cn } from '@/lib/utils';
 import { SectionErrorBoundary } from '@/components/profile/SectionErrorBoundary';
+import BugReport from '@/components/BugReport';
+
+type FirestoreUserProfile = UserProfile & {
+  currencyCode?: string;
+  pendingEmail?: string | null;
+  createdAt?: Timestamp;
+  pendingParentEmail?: string;
+  parentLinked?: boolean;
+  emailVerified?: boolean;
+  ageGroup?: string;
+  interests?: string[];
+};
 
 type ReauthMethod = 'password' | 'google' | 'both';
 type EmailChangeStep = 'idle' | 'form' | 'reauth' | 'pending' | 'success';
 type DeletionReauthState = 'idle' | 'confirm_warning' | 'reauth' | 'type_delete' | 'deleting' | 'error';
 
 export default function ProfilePage() {
-  const { user, loading: authLoading } = useAuthContext();
+  const { user, loading: authLoading, signOut } = useAuthContext();
   const { level } = useUser();
   const router = useRouter();
   const [providerRefreshKey, setProviderRefreshKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [profile, setProfile] = useState<FirestoreUserProfile | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
 
-  const profileRef = useMemoFirebase(() => user ? doc(db, 'users', user.uid) : null, [user]);
-  const { data: profile, isLoading: profileLoading } = useDoc(profileRef);
+  useEffect(() => {
+    if (!user) {
+      setProfile(null);
+      setProfileLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setProfileLoading(true);
+    const loadProfile = async () => {
+      try {
+        const data = await safeGetDoc(doc(db, 'users', user.uid) as any);
+        if (!cancelled) {
+          setProfile(data as any);
+        }
+      } catch (err) {
+        console.error('Profile load error:', err);
+      } finally {
+        if (!cancelled) {
+          setProfileLoading(false);
+        }
+      }
+    };
+    loadProfile();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   function getActualProviders(): {
     hasPassword: boolean
@@ -107,8 +146,8 @@ export default function ProfilePage() {
     return <ProfileSkeleton />;
   }
 
-  const memberSince = profile?.createdAt 
-    ? new Intl.DateTimeFormat('en-IN', { month: 'long', year: 'numeric' }).format((profile.createdAt as Timestamp).toDate())
+  const memberSince = profile?.createdAt
+    ? new Intl.DateTimeFormat('en-IN', { month: 'long', year: 'numeric' }).format((profile?.createdAt as Timestamp).toDate())
     : 'Recently';
 
   return (
@@ -119,22 +158,22 @@ export default function ProfilePage() {
           <CardContent className="p-6 md:p-8 flex flex-col md:flex-row items-center gap-6">
             <div className="h-20 w-20 md:h-24 md:w-24 rounded-full bg-primary flex items-center justify-center text-white text-3xl font-black shadow-lg overflow-hidden relative">
               {user?.photoURL ? (
-                <img src={user.photoURL} alt={profile?.displayName} className="h-full w-full object-cover" />
+                <img src={user.photoURL} alt={profile?.displayName ?? ''} className="h-full w-full object-cover" />
               ) : (
-                profile?.displayName?.charAt(0).toUpperCase() || 'S'
+                (profile?.displayName ?? 'S').charAt(0).toUpperCase()
               )}
             </div>
             <div className="flex-1 text-center md:text-left space-y-1">
               <div className="flex flex-col md:flex-row md:items-center gap-2">
-                <h1 className="text-2xl font-bold text-slate-900">{profile?.displayName}</h1>
+                <h1 className="text-2xl font-bold text-slate-900">{profile?.displayName ?? ''}</h1>
                 <Badge variant="secondary" className="w-fit mx-auto md:mx-0 bg-primary/10 text-primary border-none">
                   Level {level}
                 </Badge>
               </div>
               <div className="flex items-center justify-center md:justify-start gap-2 text-sm text-slate-500">
                 <Mail className="h-3 w-3" />
-                <span>{user?.email}</span>
-                {!user?.emailVerified && (
+                <span>{user?.email ?? ''}</span>
+                {user != null && !(user.emailVerified ?? false) && (
                   <Badge variant="outline" className="text-[10px] border-amber-200 text-amber-600 bg-amber-50">Unverified</Badge>
                 )}
               </div>
@@ -142,6 +181,11 @@ export default function ProfilePage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Bug Report Button */}
+        <div className="flex justify-center md:justify-start">
+          <BugReport />
+        </div>
 
         {error && (
           <div className="p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-xl font-bold text-sm flex items-center gap-2 animate-in fade-in">
@@ -160,16 +204,16 @@ export default function ProfilePage() {
         <div className="grid md:grid-cols-2 gap-8">
           <div className="space-y-8">
             <SectionErrorBoundary sectionName="Display name">
-              <DisplayNameSection profile={profile} uid={user?.uid!} />
+              <DisplayNameSection user={user} profile={profile} uid={user?.uid ?? ''} />
             </SectionErrorBoundary>
 
             <SectionErrorBoundary sectionName="Currency">
-              <CurrencySection profile={profile} uid={user?.uid!} />
+              <CurrencySection profile={profile} uid={user?.uid ?? ''} />
             </SectionErrorBoundary>
 
             <SectionErrorBoundary sectionName="Email address">
               <EmailSection 
-                user={user as User} 
+                user={user} 
                 profile={profile} 
                 reauthMethod={reauthMethod} 
                 providerRefreshKey={providerRefreshKey}
@@ -178,19 +222,21 @@ export default function ProfilePage() {
 
             <SectionErrorBoundary sectionName="Account password">
               <PasswordContainer 
-                user={user as User} 
+                user={user} 
+                profile={profile}
                 providers={providers} 
                 onRefresh={() => setProviderRefreshKey(k => k + 1)}
               />
             </SectionErrorBoundary>
 
             <SectionErrorBoundary sectionName="Parent connection">
-              <ParentSection profile={profile} uid={user?.uid!} />
+              <ParentSection user={user} profile={profile} uid={user?.uid ?? ''} />
             </SectionErrorBoundary>
 
             <SectionErrorBoundary sectionName="Danger zone">
               <DangerZone 
-                user={user as User} 
+                user={user} 
+                profile={profile}
                 reauthMethod={reauthMethod} 
                 providers={providers}
                 router={router}
@@ -212,8 +258,9 @@ export default function ProfilePage() {
   );
 }
 
-function PasswordContainer({ user, providers, onRefresh }: { 
-  user: User, 
+function PasswordContainer({ user, profile, providers, onRefresh }: { 
+  user: User | null, 
+  profile: FirestoreUserProfile | null,
   providers: { hasPassword: boolean }, 
   onRefresh: () => void
 }) {
@@ -241,7 +288,8 @@ function PasswordContainer({ user, providers, onRefresh }: {
   }
 
   async function setPasswordForFirstTime(): Promise<void> {
-    if (!user || !user.email) {
+    const accountEmail = user?.email ?? '';
+    if (!user || !accountEmail) {
       setPasswordError('Could not find your account email. Please sign out and sign back in.');
       return;
     }
@@ -261,7 +309,7 @@ function PasswordContainer({ user, providers, onRefresh }: {
     setPasswordError('');
 
     try {
-      const credential = EmailAuthProvider.credential(user.email, newPassword);
+      const credential = EmailAuthProvider.credential(accountEmail, newPassword);
       await linkWithCredential(user, credential);
       await user.reload();
       
@@ -271,7 +319,7 @@ function PasswordContainer({ user, providers, onRefresh }: {
       });
 
       onRefresh();
-      setPasswordSuccess(`Password set! You can now sign in with ${user.email} and this password.`);
+      setPasswordSuccess(`Password set! You can now sign in with ${accountEmail} and this password.`);
       setShowSetPasswordForm(false);
       setPasswordLoading(false);
       setNewPassword('');
@@ -309,7 +357,7 @@ function PasswordContainer({ user, providers, onRefresh }: {
           </div>
         ) : (
           <div className="space-y-4 animate-in slide-in-from-top-2">
-            <p className="text-[13px] text-slate-400 font-medium">Setting password for: <span className="font-bold">{user.email}</span></p>
+            <p className="text-[13px] text-slate-400 font-medium">Setting password for: <span className="font-bold">{user?.email ?? ''}</span></p>
             
             <div className="space-y-2">
               <Input 
@@ -367,7 +415,7 @@ function PasswordContainer({ user, providers, onRefresh }: {
     );
   }
 
-  return <PasswordSection user={user} onRefresh={onRefresh} />;
+  return <PasswordSection user={user} profile={profile} onRefresh={onRefresh} />;
 }
 
 function PasswordStrengthBars({ password }: { password: string }) {
@@ -408,7 +456,7 @@ function PasswordStrengthBars({ password }: { password: string }) {
   );
 }
 
-function PasswordSection({ user, onRefresh }: { user: User, onRefresh: () => void }) {
+function PasswordSection({ user, profile: _profile, onRefresh }: { user: User | null, profile: FirestoreUserProfile | null, onRefresh: () => void }) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [currentPass, setCurrentPass] = useState('');
@@ -419,14 +467,24 @@ function PasswordSection({ user, onRefresh }: { user: User, onRefresh: () => voi
   const [success, setSuccess] = useState<string | null>(null);
 
   const handleUpdatePassword = async () => {
+    if (!user) {
+      setError('Could not find your account. Please sign in again.');
+      return;
+    }
     if (newPass !== confirmPass) { setError("Passwords don't match."); return; }
     const validation = validatePassword(newPass);
     if (!validation.valid) { setError(validation.error!); return; }
 
+    const accountEmail = user?.email ?? '';
+    if (!accountEmail) {
+      setError('Could not find your account email. Please sign out and sign back in.');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
-      const credential = EmailAuthProvider.credential(user.email!, currentPass);
+      const credential = EmailAuthProvider.credential(accountEmail, currentPass);
       await reauthenticateWithCredential(user, credential);
       await updatePassword(user, newPass);
       setSuccess('Password updated!');
@@ -440,7 +498,7 @@ function PasswordSection({ user, onRefresh }: { user: User, onRefresh: () => voi
         router.push('/login?reason=reauth_required');
       } else {
         setError('Incorrect current password.');
-        await recordFailedAttempt(db, user.email!);
+        await recordFailedAttempt(db, accountEmail);
       }
     } finally { setLoading(false); }
   };
@@ -484,7 +542,7 @@ function PasswordSection({ user, onRefresh }: { user: User, onRefresh: () => voi
   );
 }
 
-function CurrencySection({ profile, uid }: { profile: any, uid: string }) {
+function CurrencySection({ profile, uid }: { profile: FirestoreUserProfile | null, uid: string }) {
   const { activeCurrency } = useCurrency();
   const [mounted, setMounted] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -494,7 +552,7 @@ function CurrencySection({ profile, uid }: { profile: any, uid: string }) {
   useEffect(() => { setMounted(true); }, []);
 
   const handleSelect = async (option: CurrencyOption) => {
-    if (!mounted || option.code === profile.currencyCode) return;
+    if (!mounted || option.code === (profile?.currencyCode ?? 'INR')) return;
 
     const success = await safeUpdateDoc(doc(db, 'users', uid), {
       currencyCode: option.code,
@@ -512,7 +570,7 @@ function CurrencySection({ profile, uid }: { profile: any, uid: string }) {
     return <Skeleton className="h-32 w-full rounded-2xl" />;
   }
 
-  const previewCode = hoveredCode || profile.currencyCode || 'INR';
+  const previewCode = hoveredCode || (profile?.currencyCode ?? 'INR');
   const previewOption = SUPPORTED_CURRENCIES.find(c => c.code === previewCode) || DEFAULT_CURRENCY;
   const previewFormatted = formatCurrency(scaleAmount(25000, previewCode), previewOption);
 
@@ -547,12 +605,12 @@ function CurrencySection({ profile, uid }: { profile: any, uid: string }) {
                 suppressHydrationWarning
                 className={cn(
                   "p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-1 active:scale-95",
-                  profile.currencyCode === c.code 
+                  (profile?.currencyCode ?? 'INR') === c.code 
                     ? "border-primary bg-primary/5 ring-4 ring-primary/5" 
                     : "border-slate-100 hover:border-slate-200"
                 )}
               >
-                <span className={cn("text-2xl font-black", profile.currencyCode === c.code ? "text-primary" : "text-slate-400")}>{c.symbol}</span>
+                <span className={cn("text-2xl font-black", (profile?.currencyCode ?? 'INR') === c.code ? "text-primary" : "text-slate-400")}>{c.symbol}</span>
                 <span className="text-[10px] font-black uppercase tracking-widest">{c.code}</span>
                 <span className="text-[8px] text-slate-400 font-bold text-center line-clamp-1">{c.name}</span>
               </button>
@@ -586,12 +644,16 @@ function CurrencySection({ profile, uid }: { profile: any, uid: string }) {
   );
 }
 
-function DisplayNameSection({ profile, uid }: { profile: any, uid: string }) {
+function DisplayNameSection({ user: _user, profile, uid }: { user: User | null, profile: FirestoreUserProfile | null, uid: string }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [newName, setNewName] = useState(profile?.displayName || '');
+  const [newName, setNewName] = useState(profile?.displayName ?? '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    setNewName(profile?.displayName ?? '');
+  }, [profile?.displayName]);
 
   const handleSave = async () => {
     const val = validateDisplayName(newName);
@@ -630,7 +692,7 @@ function DisplayNameSection({ profile, uid }: { profile: any, uid: string }) {
       <h3 className="text-[15px] font-medium text-primary border-b border-slate-100 pb-3 mb-4">Display name</h3>
       {!isEditing ? (
         <div className="flex items-center justify-between">
-          <span className="font-bold text-slate-700">{profile?.displayName}</span>
+          <span className="font-bold text-slate-700">{profile?.displayName ?? ''}</span>
           <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary font-bold">Edit</Button>
         </div>
       ) : (
@@ -656,7 +718,7 @@ function DisplayNameSection({ profile, uid }: { profile: any, uid: string }) {
   );
 }
 
-function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { user: User, profile: any, reauthMethod: ReauthMethod, providerRefreshKey: number }) {
+function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { user: User | null, profile: FirestoreUserProfile | null, reauthMethod: ReauthMethod, providerRefreshKey: number }) {
   const [emailChangeStep, setEmailChangeStep] = useState<EmailChangeStep>('idle');
   const [newEmail, setNewEmail] = useState('');
   const [reauthPassword, setReauthPassword] = useState('');
@@ -664,18 +726,20 @@ function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { use
   const [emailChangeLoading, setEmailChangeLoading] = useState(false);
 
   useEffect(() => {
-    if (profile?.pendingEmail && profile.pendingEmail !== user.email && emailChangeStep === 'idle') {
+    if (!user) return;
+    if (profile?.pendingEmail && profile.pendingEmail !== (user?.email ?? '') && emailChangeStep === 'idle') {
       setNewEmail(profile.pendingEmail);
       setEmailChangeStep('pending');
     }
-  }, [profile, user.email, emailChangeStep]);
+  }, [profile, user, user?.email, emailChangeStep]);
 
   useEffect(() => {
+    if (!user) return;
     if (emailChangeStep !== 'pending') return;
 
     const interval = setInterval(async () => {
       await user.reload();
-      if (user.email === newEmail) {
+      if ((user?.email ?? '') === newEmail) {
         setEmailChangeStep('success');
         clearInterval(interval);
         await safeUpdateDoc(doc(db, 'users', user.uid), { pendingEmail: null });
@@ -692,12 +756,16 @@ function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { use
   const handleContinue = () => {
     const val = validateEmail(newEmail);
     if (!val.valid) { setEmailChangeError(val.error!); return; }
-    if (newEmail === user.email) { setEmailChangeError('Please enter a different email address.'); return; }
+    if (newEmail === (user?.email ?? '')) { setEmailChangeError('Please enter a different email address.'); return; }
     setEmailChangeError('');
     setEmailChangeStep('reauth');
   };
 
   const reauthWithGoogle = async (): Promise<boolean> => {
+    if (!user) {
+      setEmailChangeError('Could not verify your identity.');
+      return false;
+    }
     setEmailChangeLoading(true);
     setEmailChangeError('');
     try {
@@ -714,10 +782,20 @@ function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { use
   };
 
   const reauthWithPassword = async (password: string): Promise<boolean> => {
+    if (!user) {
+      setEmailChangeError('Could not verify your identity.');
+      return false;
+    }
     setEmailChangeLoading(true);
     setEmailChangeError('');
+    const accountEmail = user?.email ?? '';
+    if (!accountEmail) {
+      setEmailChangeLoading(false);
+      setEmailChangeError('Could not verify your identity.');
+      return false;
+    }
     try {
-      const credential = EmailAuthProvider.credential(user.email!, password);
+      const credential = EmailAuthProvider.credential(accountEmail, password);
       await reauthenticateWithCredential(user, credential);
       setEmailChangeLoading(false);
       return true;
@@ -725,13 +803,17 @@ function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { use
       setEmailChangeLoading(false);
       if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
         setEmailChangeError('Incorrect password.');
-        await recordFailedAttempt(db, user.email!);
+        await recordFailedAttempt(db, accountEmail);
       } else setEmailChangeError('Could not verify your identity.');
       return false;
     }
   };
 
   const proceedWithEmailChange = async () => {
+    if (!user) {
+      setEmailChangeError('Could not complete email change.');
+      return;
+    }
     setEmailChangeLoading(true);
     setEmailChangeError('');
     try {
@@ -757,7 +839,7 @@ function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { use
         <div className="space-y-4 animate-in fade-in duration-300">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-slate-700">{user.email}</span>
+              <span className="text-sm font-bold text-slate-700">{user?.email ?? ''}</span>
               {reauthMethod === 'google' && <Badge variant="secondary" className="bg-slate-50 text-slate-400 text-[10px] border-none uppercase">Google account</Badge>}
             </div>
             <Button variant="ghost" size="sm" onClick={() => setEmailChangeStep('form')} className="text-primary font-bold">Change</Button>
@@ -861,7 +943,7 @@ function EmailSection({ user, profile, reauthMethod, providerRefreshKey }: { use
   );
 }
 
-function ParentSection({ profile, uid }: { profile: any, uid: string }) {
+function ParentSection({ user: _user, profile: _profile, uid }: { user: User | null, profile: FirestoreUserProfile | null, uid: string }) {
   const [parentEmail, setParentEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -893,8 +975,9 @@ function ParentSection({ profile, uid }: { profile: any, uid: string }) {
   );
 }
 
-function DangerZone({ user, reauthMethod, providers, router }: { 
-  user: User, 
+function DangerZone({ user: _user, profile: _profile, reauthMethod, providers, router }: { 
+  user: User | null, 
+  profile: FirestoreUserProfile | null,
   reauthMethod: ReauthMethod, 
   providers: any,
   router: any
@@ -931,8 +1014,13 @@ function DangerZone({ user, reauthMethod, providers, router }: {
         setDeletionError('Please enter your password.');
         return false;
       }
+      const currentEmail = currentUser?.email ?? '';
+      if (!currentEmail) {
+        setDeletionError('Could not verify your identity. Please try again.');
+        return false;
+      }
       try {
-        const credential = EmailAuthProvider.credential(currentUser.email!, reauthPassword);
+        const credential = EmailAuthProvider.credential(currentEmail, reauthPassword);
         await reauthenticateWithCredential(currentUser, credential);
         return true;
       } catch (err: any) {
@@ -1001,13 +1089,26 @@ function DangerZone({ user, reauthMethod, providers, router }: {
       <h3 className="text-[15px] font-bold text-rose-600 border-b border-rose-100 pb-3 mb-4">Danger Zone</h3>
       
       {deletionState === 'idle' && (
-        <Button 
-          variant="outline" 
-          onClick={() => setDeletionState('confirm_warning')} 
-          className="w-full h-12 border-rose-200 text-rose-600 hover:bg-rose-100 font-bold gap-2 text-sm"
-        >
-          <Trash2 className="h-4 w-4" /> Delete Account
-        </Button>
+        <div className="space-y-3">
+          <Button 
+            variant="outline" 
+            onClick={async () => {
+              const { signOut } = useAuthContext();
+              await signOut();
+            }}
+            className="w-full h-12 border-slate-200 text-slate-600 hover:bg-slate-100 font-bold gap-2 text-sm"
+          >
+            <Lock className="h-4 w-4" /> Sign Out
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            onClick={() => setDeletionState('confirm_warning')} 
+            className="w-full h-12 border-rose-200 text-rose-600 hover:bg-rose-100 font-bold gap-2 text-sm"
+          >
+            <Trash2 className="h-4 w-4" /> Delete Account
+          </Button>
+        </div>
       )}
 
       {deletionState === 'confirm_warning' && (
@@ -1025,7 +1126,10 @@ function DangerZone({ user, reauthMethod, providers, router }: {
       {deletionState === 'reauth' && (
         <div className="space-y-4 animate-in slide-in-from-top-2">
           {providers.hasCustom || (!providers.hasPassword && !providers.hasGoogle) ? (
-            <div className="hidden">{useEffect(() => { setDeletionState('type_delete'); }, [])}</div>
+            <div>
+              <p className="text-xs text-slate-500 mb-3 font-bold">Account will be deleted immediately:</p>
+              <Button variant="destructive" size="sm" className="font-bold" onClick={() => setDeletionState('type_delete')}>Delete Account</Button>
+            </div>
           ) : providers.hasGoogle && !providers.hasPassword ? (
             <div>
               <p className="text-xs text-slate-500 mb-3 font-bold">Confirm with Google to continue:</p>

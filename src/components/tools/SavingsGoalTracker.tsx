@@ -8,6 +8,7 @@ import { useCurrency } from '@/hooks/useCurrency';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Plus, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { validateDisplayName } from '@/firebase';
