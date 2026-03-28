@@ -18,7 +18,7 @@ const SECURITY_QUESTIONS = [
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting
-    const rateLimitResult = await checkRateLimit(request, signupRateLimiter);
+    const rateLimitResult = await checkRateLimit(signupRateLimiter, request);
     if (!rateLimitResult.allowed) {
       return NextResponse.json(
         { error: 'Too many signup attempts. Please try again later.' },

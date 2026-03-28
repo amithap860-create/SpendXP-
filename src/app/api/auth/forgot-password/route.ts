@@ -9,7 +9,7 @@ import { UserProfile, PasswordResetRequest } from '@/types/auth';
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting
-    const rateLimitResult = await checkRateLimit(request, passwordResetRateLimiter);
+    const rateLimitResult = await checkRateLimit(passwordResetRateLimiter, request);
     if (!rateLimitResult.allowed) {
       return NextResponse.json(
         { error: 'Too many password reset requests. Please try again later.' },

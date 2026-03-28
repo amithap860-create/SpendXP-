@@ -7,7 +7,7 @@ import { UserProfile } from '@/types/auth';
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting
-    const rateLimitResult = await checkRateLimit(request, emailVerificationRateLimiter);
+    const rateLimitResult = await checkRateLimit(emailVerificationRateLimiter, request);
     if (!rateLimitResult.allowed) {
       return NextResponse.json(
         { error: 'Too many verification attempts. Please try again later.' },
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting
-    const rateLimitResult = await checkRateLimit(request, emailVerificationRateLimiter);
+    const rateLimitResult = await checkRateLimit(emailVerificationRateLimiter, request);
     if (!rateLimitResult.allowed) {
       return NextResponse.json(
         { error: 'Too many verification requests. Please try again later.' },

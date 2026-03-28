@@ -9,7 +9,7 @@ import { UserProfile, LoginAttempt } from '@/types/auth';
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting
-    const rateLimitResult = await checkRateLimit(request, loginRateLimiter);
+    const rateLimitResult = await checkRateLimit(loginRateLimiter, request);
     if (!rateLimitResult.allowed) {
       return NextResponse.json(
         { error: 'Too many login attempts. Please try again later.' },
