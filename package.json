@@ -10,8 +10,7 @@
     "start": "next start -p 9002 -H 0.0.0.0",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "mvp:local": "npm run build && npm run start",
-    "mvp:restart": "taskkill /F /IM node.exe 2>nul || true && npm run mvp:local"
+    "mvp:local": "npm run build && npm run start"
   },
   "engines": {
     "node": ">=18.0.0"
