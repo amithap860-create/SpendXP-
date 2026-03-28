@@ -6,12 +6,15 @@
     "dev": "next dev --turbopack -p 9002 -H 0.0.0.0",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
     "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
-    "build": "SET NODE_ENV=production&& next build",
+    "build": "next build",
     "start": "next start -p 9002 -H 0.0.0.0",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "mvp:local": "npm run build && npm run start",
     "mvp:restart": "taskkill /F /IM node.exe 2>nul || true && npm run mvp:local"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.28.0",
