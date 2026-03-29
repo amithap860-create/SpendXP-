@@ -34,6 +34,7 @@ import {
 import { lessons } from '@/data/lessons';
 import { Skeleton } from '@/components/ui/skeleton';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 
@@ -43,8 +44,9 @@ const RadarChart = dynamic(() => import('@/components/charts/RadarChart').then(m
 });
 
 export default function DashboardPage() {
-  const { user } = useAuthContext();
+  const { user, loading: authLoading } = useAuthContext();
   const { formatValue, formatCompact } = useCurrency();
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [radarSize, setRadarSize] = useState(220);
@@ -52,6 +54,18 @@ export default function DashboardPage() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Redirect unauthenticated users to login
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.replace('/login?returnTo=/dashboard');
+    }
+  }, [user, authLoading, router]);
+
+  // Show loading while checking auth
+  if (authLoading || !user) {
+    return <DashboardSkeleton />;
+  }
 
   // Data State - declare all hooks unconditionally
   const [profile, setProfile] = useState<any>(null);

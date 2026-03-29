@@ -76,10 +76,12 @@ function LoginContent() {
     }
     const res = await signInWithEmail(email, password);
     if (res.success) {
+      // Get returnTo from URL params, default to dashboard
+      const returnTo = searchParams.get('returnTo') || '/dashboard';
       if (reason === 'reauth_required') {
         router.push('/profile');
       } else {
-        router.push('/dashboard');
+        router.replace(returnTo); // Use replace to avoid back button to login
       }
     } else {
       const newStatus = await checkLockout(db, email);

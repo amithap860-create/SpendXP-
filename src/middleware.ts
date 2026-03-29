@@ -54,6 +54,17 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
+  // Auth protection for dashboard and profile
+  if (pathname.startsWith('/dashboard') || pathname.startsWith('/profile')) {
+    const sessionCookie = request.cookies.get('spendxp_session');
+    if (!sessionCookie) {
+      // Preserve returnTo URL for post-login redirect
+      const url = new URL('/login', request.url);
+      url.searchParams.set('returnTo', pathname);
+      return NextResponse.redirect(url);
+    }
+  }
+
   if (pathname.startsWith('/admin')) {
     const isAdminCookie = request.cookies.get('spendxp_admin_session');
     if (!isAdminCookie) {
