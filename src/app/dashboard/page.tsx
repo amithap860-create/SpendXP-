@@ -37,6 +37,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import dynamic from 'next/dynamic';
+import OnboardingOverlay from '@/components/onboarding/OnboardingOverlay';
 
 const RadarChart = dynamic(() => import('@/components/charts/RadarChart').then(mod => mod.RadarChart), {
   ssr: false,
@@ -418,6 +419,9 @@ export default function DashboardPage() {
           </section>
         </div>
       </main>
+      
+      {/* Onboarding Overlay */}
+      <OnboardingOverlay />
     </div>
   );
 }

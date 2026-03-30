@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, ReactNode, useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { User, setPersistence, browserLocalPersistence, browserSessionPersistence, onIdTokenChanged } from 'firebase/auth';
+import { User, setPersistence, inMemoryPersistence, onIdTokenChanged } from 'firebase/auth';
 import { getAgeGroup, AgeGroup } from '@/lib/ageAdapt';
 import { auth as firebaseAuth, db } from '@/firebase';
 import { validateFingerprint, captureFingerprint } from '@/lib/sessionGuard';
@@ -102,8 +102,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setFingerprint(captureFingerprint());
         }
 
-        const mode = freshAgeGroup === 'junior' ? browserSessionPersistence : browserLocalPersistence;
-        setPersistence(firebaseAuth, mode).catch(console.error);
+        // Use inMemoryPersistence to avoid localStorage tokens
+        // Session will be maintained via Firebase ID token refresh and server-side cookies
+        setPersistence(firebaseAuth, inMemoryPersistence).catch(console.error);
+
+        // Create server-side session cookie
+        try {
+          const idToken = await firebaseUser.getIdToken();
+          await fetch('/api/auth/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken })
+          });
+        } catch (error) {
+          console.error('[SpendXP] Failed to create session cookie:', error);
+        }
       } else {
         setEmailVerified(false);
         setFingerprint(null);
@@ -131,7 +144,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     emailVerified,
     currentAgeGroup,
     currencyCode,
-    signOut: (auth as any).signOut,
+    signOut: async () => {
+      // Clear server-side session cookie
+      try {
+        await fetch('/api/auth/session', { method: 'DELETE' });
+      } catch (error) {
+        console.error('[SpendXP] Failed to clear session cookie:', error);
+      }
+      // Sign out from Firebase
+      await (auth as any).signOut();
+    },
   };
 
   return (

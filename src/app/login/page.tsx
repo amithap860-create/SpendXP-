@@ -76,12 +76,22 @@ function LoginContent() {
     }
     const res = await signInWithEmail(email, password);
     if (res.success) {
-      // Get returnTo from URL params, default to dashboard
-      const returnTo = searchParams.get('returnTo') || '/dashboard';
+      // Get next from URL params, default to dashboard
+      const nextUrl = searchParams.get('next') || '/dashboard';
       if (reason === 'reauth_required') {
         router.push('/profile');
       } else {
-        router.replace(returnTo); // Use replace to avoid back button to login
+        // Validate same-origin before redirecting
+        try {
+          const nextUrlObj = new URL(nextUrl, window.location.origin);
+          if (nextUrlObj.origin === window.location.origin) {
+            router.replace(nextUrl); // Use replace to avoid back button to login
+          } else {
+            router.replace('/dashboard'); // Fallback for invalid origin
+          }
+        } catch {
+          router.replace('/dashboard'); // Fallback for invalid URL
+        }
       }
     } else {
       const newStatus = await checkLockout(db, email);

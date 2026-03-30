@@ -58,10 +58,27 @@ export function middleware(request: NextRequest) {
   if (pathname.startsWith('/dashboard') || pathname.startsWith('/profile')) {
     const sessionCookie = request.cookies.get('spendxp_session');
     if (!sessionCookie) {
-      // Preserve returnTo URL for post-login redirect
+      // Preserve returnTo URL for post-login redirect (using 'next' param as requested)
       const url = new URL('/login', request.url);
-      url.searchParams.set('returnTo', pathname);
+      url.searchParams.set('next', pathname);
       return NextResponse.redirect(url);
+    }
+  }
+
+  // Redirect authenticated users away from login page
+  if (pathname === '/login') {
+    const sessionCookie = request.cookies.get('spendxp_session');
+    if (sessionCookie) {
+      // Get 'next' parameter for post-login redirect, default to dashboard
+      const nextUrl = new URL(request.url).searchParams.get('next') || '/dashboard';
+      
+      // Validate same-origin to prevent open redirects
+      const nextUrlObj = new URL(nextUrl, request.url);
+      if (nextUrlObj.origin === request.nextUrl.origin) {
+        return NextResponse.redirect(new URL(nextUrl, request.url));
+      }
+      // Fallback to dashboard if invalid origin
+      return NextResponse.redirect(new URL('/dashboard', request.url));
     }
   }
 
