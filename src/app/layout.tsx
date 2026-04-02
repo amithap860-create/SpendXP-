@@ -40,6 +40,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
     { label: 'Games', href: '/games', icon: 'arcade' },
     { label: 'Tools', href: '/tools', icon: 'wrench' },
     { label: 'Learn', href: '/learn', icon: 'book' },
+    { label: 'Resources', href: '/resources', icon: 'open-book' },
     { label: 'Profile', href: '/profile', icon: 'user' }
   ];
 
@@ -124,6 +125,15 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
                 <div className="w-4 h-5 bg-current rounded-sm relative">
                   <div className="absolute top-1 left-1 right-1 h-0.5 bg-white opacity-30" />
                   <div className="absolute top-2.5 left-1 right-1 h-0.5 bg-white opacity-30" />
+                </div>
+              )}
+              {link.icon === 'open-book' && (
+                <div className="w-4 h-5 relative">
+                  <div className="absolute inset-0 bg-current rounded-sm" />
+                  <div className="absolute top-0.5 left-0.5 w-3 h-4 bg-white rounded-sm" />
+                  <div className="absolute top-1 left-1 w-2.5 h-0.5 bg-current rounded-sm" />
+                  <div className="absolute top-2 left-1 w-2.5 h-0.5 bg-current rounded-sm" />
+                  <div className="absolute top-3 left-1 w-2.5 h-0.5 bg-current rounded-sm" />
                 </div>
               )}
               {link.icon === 'user' && (
