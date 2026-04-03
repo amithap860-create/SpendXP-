@@ -35,6 +35,10 @@ export default function QuestsHub() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    document.title = 'Quests | SpendXP';
+  }, []);
+
+  useEffect(() => {
     if (!user) return;
     const fetchProgress = async () => {
       const snap = await getDocs(collection(db, 'users', user.uid, 'questProgress'));

@@ -54,6 +54,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     setMounted(true);
+    document.title = 'Dashboard | SpendXP';
   }, []);
 
   // Redirect unauthenticated users to login

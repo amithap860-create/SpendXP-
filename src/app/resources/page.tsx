@@ -1007,6 +1007,10 @@ export default function ResourcesPage() {
   const [xpAnimations, setXpAnimations] = useState<XPAnimation[]>([]);
   const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    document.title = 'Resources | SpendXP';
+  }, []);
+
   const getDailyChallengeFramework = (): FrameworkId => {
     const dateKey = getISTDateKey();
     const frameworkIndex = parseInt(dateKey.slice(-2)) % 10;

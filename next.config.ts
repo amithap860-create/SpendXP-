@@ -70,6 +70,31 @@ const nextConfig: NextConfig = {
       'date-fns'
     ],
   },
+  webpack: (config: any, { isServer }: any) => {
+    if (isServer) {
+      config.externals.push({
+        '@opentelemetry/exporter-jaeger': 'commonjs @opentelemetry/exporter-jaeger',
+      })
+    }
+    // Ignore all opentelemetry modules that are
+    // optional and not needed for SpendXP
+    config.resolve = config.resolve || {}
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      '@opentelemetry/exporter-jaeger': false,
+      '@opentelemetry/sdk-node': false,
+    }
+    return config
+  },
+  // Also add to serverExternalPackages to prevent
+  // Next.js from trying to bundle firebase-admin
+  // server-side dependencies:
+  serverExternalPackages: [
+    'firebase-admin',
+    '@google-cloud/firestore',
+    '@opentelemetry/sdk-node',
+    '@opentelemetry/exporter-jaeger',
+  ],
   async headers() {
     return [
       {

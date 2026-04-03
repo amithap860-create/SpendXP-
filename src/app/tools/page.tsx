@@ -33,6 +33,10 @@ export default function ToolsHub() {
   const scrollRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
+    document.title = 'Tools | SpendXP';
+  }, []);
+
+  useEffect(() => {
     if (!user) return;
     const fetchToolsUsed = async () => {
       const snap = await safeGetDoc(doc(db, 'users', user.uid));

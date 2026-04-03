@@ -47,6 +47,10 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
   
   const [activeGame, setActiveGame] = useState<GameID | null>(null);
   const [isDaily, setIsDaily] = useState(false);
+
+  useEffect(() => {
+    document.title = 'Games | SpendXP';
+  }, []);
   const [highlightedGame, setHighlightedGame] = useState<string | null>(null);
   const [showDailyBreakdown, setShowDailyBreakdown] = useState(false);
 

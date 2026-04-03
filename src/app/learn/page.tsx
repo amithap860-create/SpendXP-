@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser } from '@/lib/store';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -27,6 +27,10 @@ export default function LearnHub() {
   const { user } = useAuthContext();
   const { tasks, ageGroup } = useUser();
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
+
+  useEffect(() => {
+    document.title = 'Learn | SpendXP';
+  }, []);
 
   const availableLessons = lessons.filter(l => l.ageGroups.includes((ageGroup || 'junior') as any));
   const completedCount = lessons.filter(l => tasks.find(t => t.id === `lesson-${l.id}`)?.completed).length;

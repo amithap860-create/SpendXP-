@@ -28,6 +28,10 @@ export default function ProfilePage() {
   const { user, loading: authLoading } = useAuthContext();
   const router = useRouter();
 
+  useEffect(() => {
+    document.title = 'Profile | SpendXP';
+  }, []);
+
   // Redirect authenticated users to dashboard
   useEffect(() => {
     if (!authLoading && user) {
