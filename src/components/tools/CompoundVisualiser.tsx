@@ -136,15 +136,15 @@ export function CompoundVisualiser() {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div className="p-6 bg-slate-900 text-white rounded-3xl col-span-2 md:col-span-1 flex flex-col justify-center text-center">
               <div className="text-[10px] font-black uppercase text-slate-500 mb-1">Final Wealth</div>
-              <div className="text-4xl font-black text-teal-400">{formatCompact(stats.futureValue)}</div>
+              <div className="text-4xl font-black text-[#4EA07A]">{formatCompact(stats.futureValue)}</div>
             </div>
             <div className="p-4 bg-slate-50 rounded-2xl border text-center">
               <div className="text-[10px] font-black uppercase text-slate-400 mb-1">Total Invested</div>
               <div className="text-lg font-black text-slate-900">{formatCompact(stats.totalInvested)}</div>
             </div>
-            <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 text-center">
-              <div className="text-[10px] font-black uppercase text-emerald-600 mb-1">Profit Made</div>
-              <div className="text-lg font-black text-emerald-600">+{formatCompact(stats.totalReturns)}</div>
+            <div className="p-4 bg-[#E8F5EE] rounded-2xl border border-[#C8E8D8] text-center">
+              <div className="text-[10px] font-black uppercase text-primary mb-1">Profit Made</div>
+              <div className="text-lg font-black text-primary">+{formatCompact(stats.totalReturns)}</div>
             </div>
           </div>
 
@@ -162,7 +162,7 @@ export function CompoundVisualiser() {
               ))}
 
               <path d={getPath(stats.savingsPoints)} fill="none" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="4 4" />
-              <path d={getPath(stats.points)} fill="none" stroke="#14b8a6" strokeWidth="4" strokeLinecap="round" className="animate-draw" />
+              <path d={getPath(stats.points)} fill="none" stroke="#2E7D5A" strokeWidth="4" strokeLinecap="round" className="animate-draw" />
 
               {Array.from({ length: 5 }).map((_, i) => {
                 const year = Math.round((years / 4) * i);
@@ -179,8 +179,8 @@ export function CompoundVisualiser() {
               <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase">
                 <div className="w-3 h-0.5 bg-slate-300 border-dashed border-t" /> Savings Account (3%)
               </div>
-              <div className="flex items-center gap-2 text-[10px] font-black text-teal-500 uppercase">
-                <div className="w-3 h-1 bg-teal-500 rounded-full" /> Investment ({rate}%)
+              <div className="flex items-center gap-2 text-[10px] font-black text-primary uppercase">
+                <div className="w-3 h-1 bg-primary rounded-full" /> Investment ({rate}%)
               </div>
             </div>
           </div>
@@ -202,9 +202,9 @@ export function CompoundVisualiser() {
         </Button>
       </div>
 
-      <div className="p-6 rounded-2xl bg-amber-50 border-2 border-amber-100 flex items-center gap-4">
-        <Zap className="h-6 w-6 text-amber-600 shrink-0" />
-        <p className="text-sm font-bold text-amber-900">
+      <div className="p-6 rounded-2xl bg-[#E8F5EE] border-2 border-[#A8D5BC] flex items-center gap-4">
+        <Zap className="h-6 w-6 text-[#2E7D5A] shrink-0" />
+        <p className="text-sm font-bold text-[#1A1F2E]">
           The Rule of 72: At {rate}%, your money will roughly double every {Math.round(72/rate)} years! 
           Investing is the only way to beat inflation.
         </p>

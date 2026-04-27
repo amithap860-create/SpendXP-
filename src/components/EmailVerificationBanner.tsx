@@ -13,6 +13,7 @@ export function EmailVerificationBanner() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [isVerified, setIsVerified] = useState(emailVerified);
+  const [cooldownMsg, setCooldownMsg] = useState('');
 
   useEffect(() => {
     setIsVerified(emailVerified);
@@ -45,8 +46,13 @@ export function EmailVerificationBanner() {
 
   const handleResend = async () => {
     setLoading(true);
+    setCooldownMsg('');
     const res = await resendVerificationEmail();
-    if (res.success) setSent(true);
+    if (res.success) {
+      setSent(true);
+    } else if (res.cooldown) {
+      setCooldownMsg(`Please wait ${res.cooldown}s before requesting another email.`);
+    }
     setLoading(false);
   };
 
@@ -54,15 +60,17 @@ export function EmailVerificationBanner() {
     <div className="sticky top-0 z-[70] bg-primary text-white px-4 py-3 shadow-lg flex items-center justify-between border-b border-white/10 animate-in slide-in-from-top duration-500">
       <div className="flex items-center gap-3 max-w-4xl mx-auto flex-1">
         <div className="h-8 w-8 bg-white/20 rounded-lg flex items-center justify-center shrink-0">
-          {sent ? <CheckCircle2 className="h-4 w-4 text-emerald-300" /> : <Mail className="h-4 w-4" />}
+          {sent ? <CheckCircle2 className="h-4 w-4 text-[#A8D5BC]" /> : <Mail className="h-4 w-4" />}
         </div>
         <p className="text-sm font-bold leading-tight">
           {sent ? (
             "Verification link resent! Check your inbox."
+          ) : cooldownMsg ? (
+            cooldownMsg
           ) : (
             <>
-              Please verify your email to unlock all features. 
-              <button 
+              Please verify your email to unlock all features.
+              <button
                 onClick={handleResend}
                 disabled={loading}
                 className="ml-2 underline hover:text-accent-foreground transition-colors inline-flex items-center gap-1"

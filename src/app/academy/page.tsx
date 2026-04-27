@@ -109,14 +109,14 @@ export default function Academy() {
 
               <TabsContent value="income">
                 <Card className="border-none shadow-sm bg-white overflow-hidden">
-                  <div className="bg-emerald-500 h-2 w-full" />
+                  <div className="bg-primary h-2 w-full" />
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-emerald-600">
+                      <div className="flex items-center gap-2 text-primary">
                         <CircleArrowUp className="h-5 w-5" />
                         <span className="text-xs font-bold uppercase tracking-wider">Concept One</span>
                       </div>
-                      {isTaskCompleted('academy-income') && <CircleCheckBig className="h-5 w-5 text-emerald-500" />}
+                      {isTaskCompleted('academy-income') && <CircleCheckBig className="h-5 w-5 text-primary" />}
                     </div>
                     <CardTitle className="text-2xl">What is Income?</CardTitle>
                     <CardDescription>Income is the money you receive or earn from various sources.</CardDescription>
@@ -126,12 +126,12 @@ export default function Academy() {
                       Think of income as your "fuel." Without fuel, your financial engine can't run! For students, income usually comes from:
                     </p>
                     <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <li className="p-3 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center gap-3">
-                        <Wallet className="h-4 w-4 text-emerald-600" />
+                      <li className="p-3 rounded-lg bg-[#E8F5EE] border border-[#C8E8D8] flex items-center gap-3">
+                        <Wallet className="h-4 w-4 text-primary" />
                         <span className="text-sm font-medium">Weekly Allowance</span>
                       </li>
-                      <li className="p-3 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center gap-3">
-                        <Plus className="h-4 w-4 text-emerald-600" />
+                      <li className="p-3 rounded-lg bg-[#E8F5EE] border border-[#C8E8D8] flex items-center gap-3">
+                        <Plus className="h-4 w-4 text-primary" />
                         <span className="text-sm font-medium">Gifts (Birthday/Holidays)</span>
                       </li>
                     </ul>
@@ -156,7 +156,7 @@ export default function Academy() {
                         <CircleArrowDown className="h-5 w-5" />
                         <span className="text-xs font-bold uppercase tracking-wider">Concept Two</span>
                       </div>
-                      {isTaskCompleted('academy-outcome') && <CircleCheckBig className="h-5 w-5 text-emerald-500" />}
+                      {isTaskCompleted('academy-outcome') && <CircleCheckBig className="h-5 w-5 text-primary" />}
                     </div>
                     <CardTitle className="text-2xl">Understanding Outcome (Expenses)</CardTitle>
                     <CardDescription>Outcome is the money you spend to buy things or pay for services.</CardDescription>
@@ -189,9 +189,9 @@ export default function Academy() {
 
               <TabsContent value="budgeting">
                 <Card className="border-none shadow-sm bg-white overflow-hidden">
-                  <div className="bg-amber-500 h-2 w-full" />
+                  <div className="bg-[#E8F5EE]0 h-2 w-full" />
                   <CardHeader>
-                    <div className="flex items-center gap-2 text-amber-600 mb-2">
+                    <div className="flex items-center gap-2 text-[#2E7D5A] mb-2">
                       <Calculator className="h-5 w-5" />
                       <span className="text-xs font-bold uppercase tracking-wider">Concept Three</span>
                     </div>
@@ -199,17 +199,17 @@ export default function Academy() {
                     <CardDescription>A budget is simply a plan for your money.</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="p-4 rounded-xl bg-amber-50 border border-amber-100 flex items-start gap-4">
-                      <Lightbulb className="h-6 w-6 text-amber-600 mt-1" />
+                    <div className="p-4 rounded-xl bg-[#E8F5EE] border border-[#A8D5BC] flex items-start gap-4">
+                      <Lightbulb className="h-6 w-6 text-[#2E7D5A] mt-1" />
                       <div>
-                        <h4 className="font-bold text-amber-900">The 50/30/20 Rule</h4>
-                        <p className="text-sm text-amber-800">50% for Needs, 30% for Wants, and 20% for Savings!</p>
+                        <h4 className="font-bold text-[#1A1F2E]">The 50/30/20 Rule</h4>
+                        <p className="text-sm text-[#1A4035]">50% for Needs, 30% for Wants, and 20% for Savings!</p>
                       </div>
                     </div>
                     <p className="text-sm text-slate-600 italic">
                       "A budget doesn't tell you what you can't do, it tells you what you CAN do with your money."
                     </p>
-                    <p className="text-center font-bold text-amber-600">Practice below in the Budget Lab to earn XP!</p>
+                    <p className="text-center font-bold text-[#2E7D5A]">Practice below in the Budget Lab to earn XP!</p>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -252,7 +252,7 @@ export default function Academy() {
                 <div className="grid grid-cols-3 border-b">
                   <div className="p-4 text-center border-r">
                     <div className="text-[10px] font-bold uppercase text-muted-foreground">Income</div>
-                    <div className="text-sm font-bold text-emerald-600">{formatValue(totalIncomeUsd)}</div>
+                    <div className="text-sm font-bold text-primary">{formatValue(totalIncomeUsd)}</div>
                   </div>
                   <div className="p-4 text-center border-r">
                     <div className="text-[10px] font-bold uppercase text-muted-foreground">Expenses</div>
@@ -330,11 +330,11 @@ export default function Academy() {
                         <TableRow key={item.id}>
                           <TableCell>
                             <div className="font-medium">{item.name}</div>
-                            <div className={`text-[10px] uppercase font-bold ${item.type === 'income' ? 'text-emerald-500' : 'text-rose-500'}`}>
+                            <div className={`text-[10px] uppercase font-bold ${item.type === 'income' ? 'text-primary' : 'text-rose-500'}`}>
                               {item.type}
                             </div>
                           </TableCell>
-                          <TableCell className={`text-right font-bold ${item.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                          <TableCell className={`text-right font-bold ${item.type === 'income' ? 'text-primary' : 'text-rose-600'}`}>
                             {item.type === 'income' ? '+' : '-'}{formatValue(item.amountUsd)}
                           </TableCell>
                           <TableCell>

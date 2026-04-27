@@ -1,10 +1,13 @@
 'use client';
 
 import { useReducer, useCallback, useEffect, useRef } from 'react';
+
+// Set to true during development to log every XP event to the console
+const DEBUG_XP = process.env.NODE_ENV === 'development';
 import { useUser, db, safeGetDoc, safeSetDoc } from '@/firebase';
 import { playCorrect, playWrong, playGameOver, playCombo } from '@/lib/sounds';
 import { validateScore, validateXP } from '@/lib/validation';
-import { rateLimiter } from '@/lib/rateLimiter';
+import { rateLimiter, check } from '@/lib/rateLimiting';
 import { getRefreshedToken } from '@/lib/authHelpers';
 import { doc, writeBatch, serverTimestamp, increment } from 'firebase/firestore';
 import { updateLeaderboardEntry } from '@/lib/progressionService';
@@ -93,6 +96,9 @@ function gameReducer(state: GameState, action: Action): GameState {
         playCorrect();
       }
       const totalXpGain = action.xpPerCorrectAnswer + (action.bonusXp || 0) + comboBonus;
+      if (DEBUG_XP) {
+        console.log(`[XP] CORRECT_ANSWER +${totalXpGain}xp (base=${action.xpPerCorrectAnswer} bonus=${action.bonusXp ?? 0} combo=${comboBonus}) streak=${state.streak + 1}`);
+      }
       const newStreak = state.streak + 1;
       return {
         ...state,
@@ -200,12 +206,14 @@ export function useGameEngine(config: GameConfig) {
   const endGame = useCallback(async (finalXpBonus = 0) => {
     const user = await waitForAuth();
     if (!user || hasEnded.current) return { isHighScore: false };
+    const uid = user.uid;
+    if (!uid || uid.trim() === '') return { isHighScore: false };
     hasEnded.current = true;
 
     const safeScore = Math.max(0, state.score);
     const safeXP = Math.max(0, state.xpEarned + finalXpBonus);
 
-    const allowed = rateLimiter.check({
+    const allowed = check({
       key: `game:${config.gameName}:score`,
       maxCalls: 1,
       windowMs: 30000
@@ -222,31 +230,53 @@ export function useGameEngine(config: GameConfig) {
     fireConfettiPersonalBest();
 
     try {
-      const gameScoreRef = doc(db, 'users', user.uid, 'gameScores', config.gameName);
+      const gameScoreRef = doc(db, 'users', uid, 'gameScores', config.gameName);
       const prevDoc = await safeGetDoc(gameScoreRef);
       const prevXP = prevDoc?.xpEarned ?? 0;
+      const prevHighScore = prevDoc?.highScore ?? 0;
+
+      // XP delta: only the amount earned ABOVE the previous best for this game
+      // This prevents infinite XP farming by replaying the same game
       const xpDelta = Math.max(0, safeXP - prevXP);
+      const newHighScore = Math.max(safeScore, prevHighScore);
+      const isHighScore = safeScore > prevHighScore;
+
+      if (DEBUG_XP) {
+        console.log(`[XP] endGame — game=${config.gameName} score=${safeScore} xp=${safeXP} prevXP=${prevXP} xpDelta=${xpDelta} isHighScore=${isHighScore}`);
+      }
 
       const batch = writeBatch(db);
-      const progressionRef = doc(db, 'users', user.uid, 'progression', 'stats');
-      
+      const progressionRef = doc(db, 'users', uid, 'progression', 'stats');
+
       batch.set(gameScoreRef, {
         gameName: config.gameName,
         lastScore: safeScore,
-        highScore: increment(0),
+        highScore: newHighScore,
         xpEarned: safeXP,
+        gamesPlayed: increment(1),
         lastPlayedAt: serverTimestamp(),
       }, { merge: true });
 
-      batch.set(progressionRef, {
-        totalXP: increment(xpDelta),
-        lastActivityAt: serverTimestamp(),
-      }, { merge: true });
+      if (xpDelta > 0) {
+        batch.set(progressionRef, {
+          totalXP: increment(xpDelta),
+          totalGamesPlayed: increment(1),
+          lastActivityAt: serverTimestamp(),
+        }, { merge: true });
+      } else {
+        // Still record the play, just no XP delta
+        batch.set(progressionRef, {
+          totalGamesPlayed: increment(1),
+          lastActivityAt: serverTimestamp(),
+        }, { merge: true });
+      }
 
       await batch.commit();
+      if (DEBUG_XP) console.log(`[XP] Firestore write committed. xpDelta=${xpDelta}`);
+
       await updateLeaderboardEntry(user.uid, user.displayName || 'Strategist');
-      
-      return { isHighScore: true };
+
+      return { isHighScore };
     } catch (error) {
       console.error('[SpendXP] Failed to submit score:', error);
       return { isHighScore: false };

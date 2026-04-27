@@ -18,7 +18,7 @@ function SignupContent() {
   const { signUpWithEmail, signInWithGoogle, error: authError } = useAuthContext();
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -26,6 +26,15 @@ function SignupContent() {
   const [loading, setLoading] = useState(false);
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const handleGoogleSignUp = async () => {
+    setLoading(true);
+    const res = await signInWithGoogle();
+    if (res.success) {
+      router.replace('/onboarding');
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
     const code = searchParams.get('inviteCode');
@@ -122,14 +131,15 @@ function SignupContent() {
               </p>
             </div>
           )}
-          <h1 className="text-4xl font-black text-primary mb-2">SpendXP</h1>
+          <h1 className="text-4xl font-black mb-2"><span className="text-slate-900">Spend</span><span style={{ color: "#2E7D5A" }}>XP</span></h1>
           <CardDescription className="text-lg">Create your account to start earning.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <Button 
-            onClick={signInWithGoogle} 
-            variant="outline" 
+          <Button
+            onClick={handleGoogleSignUp}
+            variant="outline"
             className="w-full h-12 gap-3 text-lg font-bold border-2"
+            disabled={loading}
             suppressHydrationWarning
           >
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
@@ -183,9 +193,9 @@ function SignupContent() {
                 />
               </div>
               <div className="flex gap-1 h-1.5 mt-2 px-1">
-                <div className={cn("flex-1 rounded-full transition-colors", passwordStrength >= 1 ? "bg-emerald-500" : "bg-slate-200")} />
-                <div className={cn("flex-1 rounded-full transition-colors", passwordStrength >= 2 ? "bg-emerald-500" : "bg-slate-200")} />
-                <div className={cn("flex-1 rounded-full transition-colors", passwordStrength >= 3 ? "bg-emerald-500" : "bg-slate-200")} />
+                <div className={cn("flex-1 rounded-full transition-colors", passwordStrength >= 1 ? "bg-primary" : "bg-slate-200")} />
+                <div className={cn("flex-1 rounded-full transition-colors", passwordStrength >= 2 ? "bg-primary" : "bg-slate-200")} />
+                <div className={cn("flex-1 rounded-full transition-colors", passwordStrength >= 3 ? "bg-primary" : "bg-slate-200")} />
               </div>
             </div>
 
@@ -216,6 +226,13 @@ function SignupContent() {
           <div className="text-center text-sm">
             Already have an account? <Link href="/login" className="text-primary font-bold hover:underline">Sign in</Link>
           </div>
+
+          <p className="text-center text-xs text-slate-400 leading-relaxed">
+            By signing up you agree to our{' '}
+            <Link href="/terms" className="underline hover:text-primary">Terms of Service</Link>
+            {' '}and{' '}
+            <Link href="/privacy" className="underline hover:text-primary">Privacy Policy</Link>.
+          </p>
         </CardContent>
       </Card>
     </div>

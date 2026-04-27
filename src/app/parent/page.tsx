@@ -25,6 +25,7 @@ import { cn } from '@/lib/utils';
 export default function ParentDashboard() {
   const { user } = useAuthContext();
   const db = useFirestore();
+  const uid = user?.uid ?? null;
   
   const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
   const [showReport, setShowReport] = useState(false);
@@ -32,8 +33,9 @@ export default function ParentDashboard() {
   const [gameScores, setGameScores] = useState<any[]>([]);
 
   const childrenQuery = useMemoFirebase(() => {
-    return user ? query(collection(db, 'users'), where('parentUid', '==', user.uid)) : null;
-  }, [db, user]);
+    if (!uid || typeof uid !== 'string' || uid.trim() === '' || uid.length < 5) return null;
+    return query(collection(db, 'users'), where('parentUid', '==', uid));
+  }, [db, uid]);
   const { data: children, isLoading: isChildrenLoading } = useCollection(childrenQuery);
 
   useEffect(() => {
@@ -54,7 +56,7 @@ export default function ParentDashboard() {
   const { data: activityLog } = useCollection(activityQuery);
 
   useEffect(() => {
-    if (!selectedChildId || !user) return;
+    if (!selectedChildId || !user || !uid || uid.length < 5) return;
     const ref = collection(db, 'users', selectedChildId, 'gameScores');
     const unsubscribe = safeOnSnapshot(ref, (snap) => {
       setGameScores(
@@ -65,9 +67,9 @@ export default function ParentDashboard() {
   }, [db, selectedChildId, user]);
 
   useEffect(() => {
-    if (!selectedChildId || !db || !user) return;
+    if (!selectedChildId || !db || !user || !uid || uid.length < 5) return;
     getConceptStrengths(selectedChildId).then(setStrengths);
-  }, [selectedChildId, db, activityLog, user]);
+  }, [selectedChildId, db, activityLog, user, uid]);
 
   if (isChildrenLoading) return <div className="flex h-screen items-center justify-center"><Activity className="animate-spin text-primary" /></div>;
 
@@ -164,13 +166,13 @@ export default function ParentDashboard() {
               </Card>
               <Card className="border-none shadow-md bg-white">
                 <CardContent className="p-6 flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600"><Trophy className="h-6 w-6" /></div>
+                  <div className="h-12 w-12 rounded-xl bg-[#E8F5EE] flex items-center justify-center text-[#2E7D5A]"><Trophy className="h-6 w-6" /></div>
                   <div><div className="text-[10px] font-bold text-slate-400 uppercase">Current Rank</div><div className="text-2xl font-black">Level {selectedChild.level || 1}</div></div>
                 </CardContent>
               </Card>
               <Card className="border-none shadow-md bg-white">
                 <CardContent className="p-6 flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600"><Gamepad2 className="h-6 w-6" /></div>
+                  <div className="h-12 w-12 rounded-xl bg-[#E8F5EE] flex items-center justify-center text-primary"><Gamepad2 className="h-6 w-6" /></div>
                   <div><div className="text-[10px] font-bold text-slate-400 uppercase">Latest Session</div><div className="text-2xl font-black">{activityLog?.[0]?.gameName || 'None'}</div></div>
                 </CardContent>
               </Card>
@@ -258,7 +260,7 @@ export default function ParentDashboard() {
 
             <div className="lg:col-span-4 space-y-8">
               <Card className="border-none shadow-xl bg-white overflow-hidden">
-                <CardHeader className="bg-slate-50 border-b"><CardTitle className="text-xl font-black flex items-center gap-2"><Activity className="h-5 w-5 text-emerald-500" /> Recent Activity</CardTitle></CardHeader>
+                <CardHeader className="bg-slate-50 border-b"><CardTitle className="text-xl font-black flex items-center gap-2"><Activity className="h-5 w-5 text-primary" /> Recent Activity</CardTitle></CardHeader>
                 <div className="divide-y">
                   {activityLog?.map((act) => (
                     <div key={act.id} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">

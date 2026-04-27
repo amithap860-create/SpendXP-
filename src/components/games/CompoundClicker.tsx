@@ -73,7 +73,7 @@ export function CompoundClicker({ onExit }: { onExit: () => void }) {
   if (isCompleted) return (
     <div className="grid lg:grid-cols-12 gap-8 max-w-6xl mx-auto">
       <div className="lg:col-span-7">
-        <Card className="border-none shadow-2xl bg-white overflow-hidden text-center"><div className="bg-emerald-500 p-8 md:p-12 text-white"><PartyPopper className="h-16 w-16 md:h-20 md:w-20 mx-auto mb-6" /><CardTitle className="text-4xl md:text-5xl font-black">10,000 SAVED!</CardTitle></div><CardContent className="p-8 md:p-10"><Button onClick={onExit} className="w-full h-14 md:h-16 text-lg md:text-xl font-black min-h-[44px]">Return to Hub</Button></CardContent></Card>
+        <Card className="border-none shadow-2xl bg-white overflow-hidden text-center"><div className="bg-primary p-8 md:p-12 text-white"><PartyPopper className="h-16 w-16 md:h-20 md:w-20 mx-auto mb-6" /><CardTitle className="text-4xl md:text-5xl font-black">10,000 SAVED!</CardTitle></div><CardContent className="p-8 md:p-10"><Button onClick={onExit} className="w-full h-14 md:h-16 text-lg md:text-xl font-black min-h-[44px]">Return to Hub</Button></CardContent></Card>
       </div>
       <div className="lg:col-span-5"><XPWallet /></div>
     </div>

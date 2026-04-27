@@ -180,7 +180,7 @@ function PasswordResetContent() {
         <Card className="w-full max-w-md">
           <CardContent className="pt-6">
             <div className="text-center">
-              <CheckCircle2 className="h-12 w-12 text-green-600 mx-auto mb-4" />
+              <CheckCircle2 className="h-12 w-12 text-primary mx-auto mb-4" />
               <h2 className="text-xl font-semibold mb-2">Password Reset Successful</h2>
               <p className="text-gray-600 mb-4">{success}</p>
               <p className="text-sm text-gray-500">

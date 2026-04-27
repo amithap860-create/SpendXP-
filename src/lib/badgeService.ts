@@ -87,7 +87,10 @@ export const BADGES: BadgeDefinition[] = [
 /**
  * Awards a badge to a user if they don't already have it.
  */
-export async function awardBadge(uid: string, badgeId: string): Promise<boolean> {
+export async function awardBadge(uid: string | null | undefined, badgeId: string): Promise<boolean> {
+  if (!uid || typeof uid !== 'string' || uid.trim() === '') {
+    return false;
+  }
   const badge = BADGES.find(b => b.id === badgeId);
   if (!badge) return false;
 

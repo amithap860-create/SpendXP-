@@ -16,7 +16,10 @@ export function requiresParentalConsent(birthYear: number): boolean {
 /**
  * Checks if a minor user has verifiable parental consent.
  */
-export async function hasParentalConsent(db: Firestore, uid: string): Promise<boolean> {
+export async function hasParentalConsent(db: Firestore, uid: string | null | undefined): Promise<boolean> {
+  if (!uid || typeof uid !== 'string' || uid.trim() === '') {
+    return false;
+  }
   try {
     const profileRef = doc(db, 'users', uid);
     const snap = await getDoc(profileRef);

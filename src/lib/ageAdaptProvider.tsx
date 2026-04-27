@@ -23,14 +23,16 @@ export const AgeGroupProvider = ({ children }: { children: ReactNode }) => {
   const firebaseContext = useContext(FirebaseContext);
   const user = firebaseContext?.areServicesAvailable ? firebaseContext.user : null;
   const isUserLoading = firebaseContext?.isUserLoading ?? true;
+  const uid = user?.uid ?? null;
 
   const [ageGroup, setAgeGroup] = useState<AgeGroup>('junior');
   const [config, setConfig] = useState<DifficultyConfig>(getDifficultyConfig('junior'));
 
   // Memoize document reference for profile
   const profileRef = useMemoFirebase(() => {
-    return user ? doc(db, 'users', user.uid) : null;
-  }, [db, user]);
+    if (!uid || typeof uid !== 'string' || uid.trim() === '' || uid.length < 5) return null;
+    return doc(db, 'users', uid);
+  }, [db, uid]);
 
   const { data: profile, isLoading: isProfileLoading } = useDoc(profileRef);
 

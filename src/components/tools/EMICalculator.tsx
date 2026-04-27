@@ -25,35 +25,51 @@ export function EMICalculator() {
   const [showBreakdown, setShowBreakdown] = useState(false);
 
   const stats = useMemo(() => {
-    const monthlyRate = rate / 12 / 100;
-    const emi = (principal * monthlyRate * Math.pow(1 + monthlyRate, tenure)) / (Math.pow(1 + monthlyRate, tenure) - 1);
-    const totalPayable = emi * tenure;
-    const totalInterest = totalPayable - principal;
-    const interestPercent = (totalInterest / principal) * 100;
+    // Guard against invalid inputs
+    const safePrincipal = Math.max(0, principal || 0);
+    const safeTenure = Math.max(1, tenure || 1);
+    const safeRate = Math.max(0, rate || 0);
+
+    let emi: number;
+    if (safeRate === 0) {
+      // 0% interest: equal principal payments each month
+      emi = safePrincipal / safeTenure;
+    } else {
+      const monthlyRate = safeRate / 12 / 100;
+      const factor = Math.pow(1 + monthlyRate, safeTenure);
+      emi = (safePrincipal * monthlyRate * factor) / (factor - 1);
+    }
+
+    const totalPayable = emi * safeTenure;
+    const totalInterest = Math.max(0, totalPayable - safePrincipal);
+    const interestPercent = safePrincipal > 0 ? (totalInterest / safePrincipal) * 100 : 0;
 
     return {
-      emi: isNaN(emi) ? 0 : emi,
-      totalPayable: isNaN(totalPayable) ? 0 : totalPayable,
-      totalInterest: isNaN(totalInterest) ? 0 : totalInterest,
-      interestPercent: isNaN(interestPercent) ? 0 : interestPercent
+      emi: isFinite(emi) ? emi : 0,
+      totalPayable: isFinite(totalPayable) ? totalPayable : 0,
+      totalInterest: isFinite(totalInterest) ? totalInterest : 0,
+      interestPercent: isFinite(interestPercent) ? interestPercent : 0,
     };
   }, [principal, rate, tenure]);
 
   const yearlyBreakdown = useMemo(() => {
     const data = [];
-    const monthlyRate = rate / 12 / 100;
-    let balance = principal;
-    const years = Math.ceil(tenure / 12);
+    const safePrincipal = Math.max(0, principal || 0);
+    const safeTenure = Math.max(1, tenure || 1);
+    const safeRate = Math.max(0, rate || 0);
+    const monthlyRate = safeRate / 12 / 100;
+    let balance = safePrincipal;
+    const years = Math.ceil(safeTenure / 12);
 
     for (let i = 1; i <= years; i++) {
       let principalPaidYear = 0;
       let interestPaidYear = 0;
-      
+
       for (let m = 1; m <= 12; m++) {
         if (balance <= 0) break;
         const interest = balance * monthlyRate;
-        const principalPaid = stats.emi - interest;
-        interestPaidYear += interest;
+        const principalPaid = Math.max(0, stats.emi - interest);
+        interestPaidYear += Math.max(0, interest);
         principalPaidYear += principalPaid;
         balance -= principalPaid;
       }
@@ -130,7 +146,7 @@ export function EMICalculator() {
         <div className="bg-slate-50 rounded-3xl p-6 md:p-8 space-y-6 md:space-y-8 flex flex-col justify-center">
           <div className="text-center space-y-1">
             <div className="text-[10px] md:text-xs font-black uppercase text-slate-400 tracking-widest">Monthly EMI</div>
-            <div className="text-4xl md:text-5xl font-black text-teal-600">{formatValue(stats.emi)}</div>
+            <div className="text-4xl md:text-5xl font-black text-primary">{formatValue(stats.emi)}</div>
           </div>
 
           <div className="grid grid-cols-2 gap-3 md:gap-4">
@@ -151,7 +167,7 @@ export function EMICalculator() {
             </div>
             <div className="h-8 md:h-10 w-full bg-slate-200 rounded-xl overflow-hidden flex">
               <div 
-                className="h-full bg-teal-500 transition-all duration-500 flex items-center justify-center text-[9px] md:text-[10px] font-black text-white" 
+                className="h-full bg-primary transition-all duration-500 flex items-center justify-center text-[9px] md:text-[10px] font-black text-white" 
                 style={{ width: `${100 - stats.interestPercent}%` }}
               >
                 {100 - stats.interestPercent > 25 && 'PRINCIPAL'}
@@ -209,7 +225,7 @@ export function EMICalculator() {
                   {yearlyBreakdown.map((row) => (
                     <TableRow key={row.year}>
                       <TableCell className="font-bold text-xs md:text-sm">Year {row.year}</TableCell>
-                      <TableCell className="text-teal-600 font-bold text-xs md:text-sm">{formatValue(row.principal)}</TableCell>
+                      <TableCell className="text-primary font-bold text-xs md:text-sm">{formatValue(row.principal)}</TableCell>
                       <TableCell className="text-rose-500 font-bold text-xs md:text-sm">{formatValue(row.interest)}</TableCell>
                       <TableCell className="font-black text-xs md:text-sm">{formatValue(row.balance)}</TableCell>
                     </TableRow>

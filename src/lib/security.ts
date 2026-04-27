@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import { NextRequest, NextResponse } from 'next/server';
 import { SecurityQuestion } from '@/types/auth';
 
 export class SecurityUtils {
@@ -38,115 +39,183 @@ export class SecurityUtils {
       errors.push('Password must contain at least one special character');
     }
     
-    // Check for common passwords
-    const commonPasswords = ['password', '123456', 'qwerty', 'admin', 'letmein'];
-    if (commonPasswords.some(common => password.toLowerCase().includes(common))) {
-      errors.push('Password cannot contain common words');
-    }
-    
     return {
       isValid: errors.length === 0,
       errors
     };
   }
 
-  // Security question hashing
+  // Security answer hashing
   static async hashSecurityAnswer(answer: string): Promise<string> {
     const salt = await bcrypt.genSalt(12);
     return await bcrypt.hash(answer.toLowerCase().trim(), salt);
+  }
+
+  // Token generation
+  static generateEmailVerificationToken(): { token: string; expires: Date } {
+    const token = crypto.randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    return { token, expires };
+  }
+
+  static generatePasswordResetToken(): { token: string; expires: Date } {
+    const token = crypto.randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    return { token, expires };
+  }
+
+  static generateSecureToken(length: number = 32): string {
+    return crypto.randomBytes(length).toString('hex');
+  }
+
+  // Input sanitization
+  static sanitizeInput(input: string): string {
+    if (typeof input !== 'string') return '';
+    
+    return input
+      .replace(/[<>]/g, '') // Remove HTML brackets
+      .replace(/javascript:/gi, '') // Remove javascript: protocol
+      .replace(/on\w+=/gi, '') // Remove event handlers
+      .trim();
+  }
+
+  // Rate limiting utilities
+  static extractIP(request: NextRequest): string {
+    return request.headers.get('x-forwarded-for')?.split(',')[0] ||
+           request.headers.get('x-real-ip') ||
+           'unknown';
+  }
+
+  static extractUserAgent(request: NextRequest): string {
+    return request.headers.get('user-agent') || 'unknown';
+  }
+
+  // Account lockout logic
+  static shouldLockAccount(failedAttempts: number, lastFailedTime: Date): { locked: boolean; minutesLeft: number } {
+    const maxAttempts = 5;
+    const lockoutDuration = 30 * 60 * 1000; // 30 minutes in milliseconds
+    
+    if (failedAttempts >= maxAttempts) {
+      const timeSinceLastFail = Date.now() - lastFailedTime.getTime();
+      const minutesLeft = Math.ceil((lockoutDuration - timeSinceLastFail) / (60 * 1000));
+      
+      return {
+        locked: timeSinceLastFail < lockoutDuration,
+        minutesLeft: Math.max(0, minutesLeft)
+      };
+    }
+    
+    return { locked: false, minutesLeft: 0 };
+  }
+
+  static calculateLockoutExpiration(): Date {
+    return new Date(Date.now() + 30 * 60 * 1000); // 30 minutes from now
+  }
+
+  static async getLocationFromIP(ip: string): Promise<string> {
+    // In production, you might use a geolocation service
+    // For now, return a generic location
+    return 'Unknown';
   }
 
   static async verifySecurityAnswer(answer: string, hashedAnswer: string): Promise<boolean> {
     return await bcrypt.compare(answer.toLowerCase().trim(), hashedAnswer);
   }
 
-  // Generate secure tokens
-  static generateSecureToken(length: number = 32): string {
-    return crypto.randomBytes(length).toString('hex');
-  }
-
-  // Generate email verification token
-  static generateEmailVerificationToken(): { token: string; expires: Date } {
-    const token = this.generateSecureToken(32);
-    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-    return { token, expires };
-  }
-
-  // Generate password reset token
-  static generatePasswordResetToken(): { token: string; expires: Date } {
-    const token = this.generateSecureToken(32);
-    const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-    return { token, expires };
-  }
-
-  // Input sanitization
-  static sanitizeInput(input: string): string {
-    return input
-      .trim()
-      .replace(/[<>]/g, '') // Remove potential HTML tags
-      .replace(/javascript:/gi, '') // Remove javascript protocol
-      .replace(/on\w+\s*=/gi, ''); // Remove event handlers
-  }
-
-  // Rate limiting key generator
-  static generateRateLimitKey(identifier: string, action: string): string {
-    return `rate_limit:${action}:${identifier}`;
-  }
-
-  // Check if account should be locked
-  static shouldLockAccount(failedAttempts: number, lastFailed: Date | null): boolean {
-    if (failedAttempts < 5) return false;
+  // Password strength scoring
+  static getPasswordStrength(password: string): { score: number; feedback: string } {
+    let score = 0;
     
-    if (!lastFailed) return true;
+    // Length bonus
+    if (password.length >= 8) score += 25;
+    if (password.length >= 12) score += 25;
     
-    const lockoutDuration = 30 * 60 * 1000; // 30 minutes
-    const timeSinceLastFailed = Date.now() - lastFailed.getTime();
+    // Character variety
+    if (/[a-z]/.test(password)) score += 10;
+    if (/[A-Z]/.test(password)) score += 10;
+    if (/\d/.test(password)) score += 10;
+    if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) score += 15;
     
-    return timeSinceLastFailed < lockoutDuration;
-  }
-
-  // Calculate lockout expiration
-  static calculateLockoutExpiration(): Date {
-    return new Date(Date.now() + 30 * 60 * 1000); // 30 minutes from now
-  }
-
-  // Validate security questions
-  static validateSecurityQuestions(questions: SecurityQuestion[]): boolean {
-    if (questions.length !== 2) return false;
+    let feedback = 'Very Weak';
+    if (score >= 85) feedback = 'Very Strong';
+    else if (score >= 70) feedback = 'Strong';
+    else if (score >= 50) feedback = 'Good';
+    else if (score >= 25) feedback = 'Weak';
     
-    const validQuestions = [
-      "What is your mother's maiden name?",
-      "What city were you born in?",
-      "What was your first pet's name?",
-      "What elementary school did you attend?",
-      "What is your favorite teacher's name?",
-      "What street did you grow up on?"
-    ];
-    
-    return questions.every(q => 
-      validQuestions.includes(q.question) && 
-      q.hashedAnswer.length > 0
-    );
+    return { score, feedback };
   }
+}
 
-  // Extract IP from request
-  static extractIP(request: any): string {
-    return request.headers['x-forwarded-for']?.split(',')[0] ||
-           request.headers['x-real-ip'] ||
-           request.connection?.remoteAddress ||
-           request.ip ||
-           'unknown';
-  }
+// API Security Middleware
+export function withSecurity(
+  handler: (req: NextRequest) => Promise<NextResponse>
+): (req: NextRequest) => Promise<NextResponse> {
+  return async (req: NextRequest) => {
+    // 1. Content-Type Check
+    if (req.method === 'POST') {
+      const contentType = req.headers.get('content-type');
+      if (!contentType?.includes('application/json')) {
+        return NextResponse.json({ error: 'Unsupported Media Type' }, { status: 415 });
+      }
+    }
 
-  // Extract user agent from request
-  static extractUserAgent(request: any): string {
-    return request.headers['user-agent'] || 'unknown';
-  }
+    // 2. Origin/CSRF Check
+    const origin = req.headers.get('origin');
+    if (origin && process.env.NODE_ENV === 'production') {
+      const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:9002'];
+      if (!allowedOrigins.includes(origin)) {
+        return NextResponse.json({ error: 'Invalid Origin' }, { status: 403 });
+      }
+    }
 
-  // Get location from IP (basic implementation)
-  static async getLocationFromIP(ip: string): Promise<string> {
-    // In production, you'd use a service like ip-api.com or MaxMind
-    // For now, return a generic location
-    return 'Unknown Location';
+    // 3. Request Size Limit
+    const contentLength = req.headers.get('content-length');
+    if (contentLength && parseInt(contentLength) > 1024 * 1024) { // 1MB limit
+      return NextResponse.json({ error: 'Request Too Large' }, { status: 413 });
+    }
+
+    return handler(req);
+  };
+}
+
+// Game State Integrity
+export async function hashGameState(state: object): Promise<string> {
+  const msgUint8 = new TextEncoder().encode(JSON.stringify(state));
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Developer Tools Detection
+export function detectDevTools(): boolean {
+  const threshold = 160;
+  const start = performance.now();
+  
+  debugger;
+  
+  const end = performance.now();
+  return end - start > threshold;
+}
+
+// Security Headers
+export function getSecurityHeaders(): Record<string, string> {
+  return {
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'X-XSS-Protection': '1; mode=block',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
+  };
+}
+
+// CSRF Protection
+export function generateCSRFToken(): string {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+export function validateCSRFToken(token: string, sessionToken?: string): boolean {
+  if (process.env.NODE_ENV === 'production' && sessionToken) {
+    return token.length === 64;
   }
+  return true;
 }

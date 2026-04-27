@@ -46,7 +46,8 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         keyPoints: [
           "Split your money before spending any of it",
           "Needs first (food, school), wants second (games, snacks)",
-          "Even ₹10 saved every day becomes ₹3,650 in a year"
+          "Even ₹10 saved every day becomes ₹3,650 in a year",
+          "A simple rule: spend half, save half — even on small amounts"
         ]
       },
       teen: {
@@ -54,7 +55,8 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         keyPoints: [
           "Write down every spend for one week — the results will shock you",
           "50% needs, 30% wants, 20% savings works at any income level",
-          "A budget isn't a cage — it's a map"
+          "A budget isn't a cage — it's a map",
+          "Apps like Walnut or just a notes app can track every rupee automatically"
         ]
       },
       senior: {
@@ -62,7 +64,8 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         keyPoints: [
           "Fixed expenses (rent, EMIs) should not exceed 50% of take-home pay",
           "Variable expenses are where budgets break — track them weekly not monthly",
-          "Zero-based budgeting: assign every rupee a job before the month starts"
+          "Zero-based budgeting: assign every rupee a job before the month starts",
+          "Pay yourself first — automate a savings transfer on the same day salary arrives"
         ],
         extraStat: "The average Indian 22-year-old spends 40% of income on food and transport without realising it."
       }
@@ -169,7 +172,8 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         keyPoints: [
           "Banks check this score before lending you money for big things like a house",
           "Paying back money you borrow — on time, every time — builds this score",
-          "It takes years to build and is hard to fix once broken"
+          "It takes years to build and is hard to fix once broken",
+          "Think of it like a class report card but for money behaviour — you want A grades"
         ]
       },
       teen: {
@@ -177,7 +181,8 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         keyPoints: [
           "No credit history means banks see you as risky — you may get rejected for your first loan",
           "A student credit card used responsibly is the fastest way to build history",
-          "Never miss a payment — even one 30-day late payment stays on your record 7 years"
+          "Never miss a payment — even one 30-day late payment stays on your record 7 years",
+          "Credit utilisation: using less than 30% of your credit limit is the sweet spot"
         ]
       },
       senior: {
@@ -185,7 +190,8 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         keyPoints: [
           "Check your CIBIL score free at cibil.com — errors are common and can be disputed",
           "Keep credit utilisation below 30% — if limit is ₹10,000 don't spend over ₹3,000",
-          "Hard inquiries (applying for credit) drop your score temporarily — don't apply for multiple cards in a month"
+          "Hard inquiries (applying for credit) drop your score temporarily — don't apply for multiple cards in a month",
+          "Five factors: payment history (35%), utilisation (30%), length (15%), mix (10%), inquiries (10%)"
         ],
         extraStat: "40% of Indians who check their CIBIL report find at least one error that is dragging their score down."
       }
@@ -251,7 +257,8 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         keyPoints: [
           "Tax is how the government pays for things everyone uses",
           "The more you earn, the higher percentage you pay — this is called progressive tax",
-          "Honest tax payment is a legal requirement — not optional"
+          "Honest tax payment is a legal requirement — not optional",
+          "GST is a tax you already pay — it's added to every product you buy in a shop"
         ]
       },
       teen: {
@@ -259,14 +266,17 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         keyPoints: [
           "Income under ₹2.5 lakh per year is not taxed in India currently",
           "TDS is deducted by whoever pays you — check your salary slip",
-          "File an ITR even if you don't owe tax — it builds your financial record"
+          "File an ITR even if you don't owe tax — it builds your financial record",
+          "GST applies at different rates: 0% on essentials, 5–28% on other goods and services"
         ]
       },
       senior: {
         hook: "The difference between old tax regime and new tax regime could mean ₹30,000 saved or lost — annually.",
         keyPoints: [
           "Old regime: more deductions (80C, HRA, home loan) — better if you invest heavily",
-          "New regime: lower rates, no deductions — better if you are just starting out"
+          "New regime: lower slab rates, no deductions — better if you are just starting out",
+          "Section 80C covers EPF, ELSS, PPF, LIC, home loan principal up to ₹1.5 lakh",
+          "HRA exemption can save ₹20,000–₹80,000 per year if you live in a rented home"
         ],
         extraStat: "Salaried Indians who fully utilise Section 80C save an average ₹46,800 in taxes every year."
       }
@@ -291,7 +301,8 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         keyPoints: [
           "Investing means letting your money work for you instead of just sitting there",
           "A piggy bank keeps money safe but doesn't grow it — investing grows it",
-          "More risk means more potential reward — and more potential loss"
+          "More risk means more potential reward — and more potential loss",
+          "Starting small is fine — even ₹100 in a recurring deposit teaches the habit"
         ]
       },
       teen: {
@@ -299,7 +310,8 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         keyPoints: [
           "Mutual funds pool money from many investors to buy diversified assets",
           "SIP (Systematic Investment Plan) means investing a fixed amount monthly",
-          "Index funds track the market — they beat 80% of actively managed funds long-term"
+          "Index funds track the market — they beat 80% of actively managed funds long-term",
+          "Diversify: don't put all your money in one stock, one company, or one sector"
         ]
       },
       senior: {
@@ -307,7 +319,8 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         keyPoints: [
           "Asset allocation: split between equity (high risk), debt (low risk), and gold (hedge)",
           "Thumb rule: subtract your age from 100 for equity percentage",
-          "Rebalance once a year — bring allocation back to target as markets move"
+          "Rebalance once a year — bring allocation back to target as markets move",
+          "ELSS mutual funds give you tax deduction under Section 80C AND equity growth"
         ],
         extraStat: "Indians who invest in equity mutual funds for 20+ years have never lost money in any rolling 20-year period in Nifty 50 history."
       }
@@ -332,7 +345,8 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         keyPoints: [
           "Small daily spends add up faster than big occasional ones",
           "Before buying ask: do I need this or do I just want it right now?",
-          "Writing down every spend for one week is eye-opening"
+          "Writing down every spend for one week is eye-opening",
+          "Waiting 1 day before buying something you really want helps avoid regret spending"
         ]
       },
       teen: {
@@ -340,7 +354,8 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         keyPoints: [
           "Social spending — eating out, concerts, clothes — is the hardest to control",
           "FOMO (fear of missing out) is a billion-dollar marketing strategy",
-          "Automate savings on payday so the money is gone before you can spend it"
+          "Automate savings on payday so the money is gone before you can spend it",
+          "Unsubscribe from promotional emails — they are designed to make you spend"
         ]
       },
       senior: {
@@ -348,7 +363,8 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         keyPoints: [
           "Track every spend for 30 days — discover 3-5 categories you can cut",
           "Subscriptions are the modern money drain — audit yours quarterly",
-          "Separate wants from needs by asking: would my life be worse without this in 30 days?"
+          "Separate wants from needs by asking: would my life be worse without this in 30 days?",
+          "The latte factor: ₹200/day on coffee is ₹6,000/month, ₹72,000/year — invest it instead"
         ],
         extraStat: "Indians earning ₹1 lakh/month who track spending save an average ₹18,000 more monthly than those who don't."
       }

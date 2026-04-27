@@ -41,7 +41,7 @@ export const COMPOUND_VEHICLES: Vehicle[] = [
     unlockCost: 200,
     annualReturnRate: 0.04,
     clickMultiplier: 3,
-    colour: 'bg-indigo-400',
+    colour: 'bg-primary',
   },
   {
     id: 'index',
@@ -50,7 +50,7 @@ export const COMPOUND_VEHICLES: Vehicle[] = [
     unlockCost: 500,
     annualReturnRate: 0.07,
     clickMultiplier: 5,
-    colour: 'bg-emerald-400',
+    colour: 'bg-[#4EA07A]',
   },
   {
     id: 'stocks',
@@ -59,7 +59,7 @@ export const COMPOUND_VEHICLES: Vehicle[] = [
     unlockCost: 1500,
     annualReturnRate: 0.10,
     clickMultiplier: 8,
-    colour: 'bg-violet-400',
+    colour: 'bg-primary',
   },
   {
     id: 'property',
@@ -68,6 +68,6 @@ export const COMPOUND_VEHICLES: Vehicle[] = [
     unlockCost: 5000,
     annualReturnRate: 0.06,
     clickMultiplier: 6,
-    colour: 'bg-amber-400',
+    colour: 'bg-[#4EA07A]',
   }
 ];

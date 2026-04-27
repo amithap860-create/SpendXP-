@@ -188,10 +188,10 @@ export const FRAMEWORKS: FrameworkData[] = [
 ];
 
 export const SOURCE_COLORS = {
-  'FDIC': 'bg-teal-100 text-teal-800 border-teal-200',
+  'FDIC': 'bg-blue-50 text-blue-700 border-blue-200',
   'CFPB': 'bg-blue-100 text-blue-800 border-blue-200',
-  'Khan Academy': 'bg-amber-100 text-amber-800 border-amber-200',
-  'OECD': 'bg-purple-100 text-purple-800 border-purple-200'
+  'Khan Academy': 'bg-[#C8E8D8] text-[#1A4035] border-[#A8D5BC]',
+  'OECD': 'bg-blue-100 text-blue-800 border-blue-200'
 } as const;
 
 export const getAgeGroupIncome = (ageGroup: 'junior' | 'teen' | 'senior') => {

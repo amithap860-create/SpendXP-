@@ -54,9 +54,9 @@ export class EmailService {
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: #0F6E56; color: white; padding: 20px; text-align: center; }
+            .header { background: #1A1F2E; color: white; padding: 20px; text-align: center; }
             .content { padding: 20px; background: #f9f9f9; }
-            .button { display: inline-block; background: #0F6E56; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; margin: 20px 0; }
+            .button { display: inline-block; background: #1A1F2E; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; margin: 20px 0; }
             .footer { text-align: center; padding: 20px; font-size: 12px; color: #666; }
           </style>
         </head>
@@ -114,7 +114,7 @@ export class EmailService {
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: #0F6E56; color: white; padding: 20px; text-align: center; }
+            .header { background: #1A1F2E; color: white; padding: 20px; text-align: center; }
             .content { padding: 20px; background: #f9f9f9; }
             .alert { background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 4px; margin: 10px 0; }
             .footer { text-align: center; padding: 20px; font-size: 12px; color: #666; }
@@ -141,7 +141,7 @@ export class EmailService {
                 <li>Review your account activity</li>
                 <li>Contact support if needed</li>
               </ul>
-              <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/profile" style="color: #0F6E56;">Go to Your Account</a></p>
+              <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/profile" style="color: #1A1F2E;">Go to Your Account</a></p>
             </div>
             <div class="footer">
               <p>© 2024 SpendXP. All rights reserved.</p>
@@ -219,7 +219,7 @@ export class EmailService {
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: #0F6E56; color: white; padding: 20px; text-align: center; }
+            .header { background: #1A1F2E; color: white; padding: 20px; text-align: center; }
             .content { padding: 20px; background: #f9f9f9; }
             .alert { background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin: 10px 0; }
             .footer { text-align: center; padding: 20px; font-size: 12px; color: #666; }
@@ -237,7 +237,7 @@ export class EmailService {
               </div>
               <p>If this was you, no action is needed. You can now log in with your new password.</p>
               <p><strong>If this wasn't you</strong>, please contact support immediately as your account may have been compromised.</p>
-              <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/login" style="color: #0F6E56;">Log In to Your Account</a></p>
+              <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/login" style="color: #1A1F2E;">Log In to Your Account</a></p>
             </div>
             <div class="footer">
               <p>© 2024 SpendXP. All rights reserved.</p>

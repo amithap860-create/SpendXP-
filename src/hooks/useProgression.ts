@@ -12,28 +12,51 @@ export function useProgression() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) {
+    const uid = user?.uid;
+    // uid.length < 5 rejects stub uids such as '1' that come from the
+    // localStorage-based AuthContext during page reload before Firebase
+    // Auth has confirmed the real user. Real Firebase uids are 28 chars.
+    if (!user || !uid || typeof uid !== 'string' || uid.length < 5) {
+      setData(DEFAULT_PROGRESSION);
+      setIsLoading(false);
+      return;
+    }
+    
+    const ref = getProgressionRef(uid);
+    if (!ref) {
       setData(DEFAULT_PROGRESSION);
       setIsLoading(false);
       return;
     }
 
     setIsLoading(true);
-    const ref = getProgressionRef(user.uid);
-
     const unsubscribe = safeOnSnapshotDoc(ref, (snap) => {
       if (snap.exists()) {
         setData(snap.data() as UserProgression);
       } else {
         safeSetDoc(ref, {
-          ...DEFAULT_PROGRESSION,
+          totalXP: 0,
+          totalGamesPlayed: 0,
           lastActivityAt: serverTimestamp(),
+          gameHighScores: {
+            budgetBlitz: 0,
+            finIQQuiz: 0,
+            moneyMaze: 0,
+            stockMarketSim: 0,
+            creditScoreBuilder: 0,
+            compoundClicker: 0,
+          },
+          badges: [],
+          level: 'Saver',
+          walletBalance: 0,
+          financialHealth: 50,
+          healthHistory: [],
         }, { merge: true });
         setData(DEFAULT_PROGRESSION);
       }
       setIsLoading(false);
     }, (error) => {
-      console.error("Progression listener error:", error);
+      console.error('[SpendXP] useProgression error:', error);
       setIsLoading(false);
     });
 

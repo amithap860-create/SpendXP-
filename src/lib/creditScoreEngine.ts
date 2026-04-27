@@ -35,10 +35,10 @@ export function calculateScore(factors: CreditFactor[]): number {
  */
 export function getScoreBand(score: number) {
   if (score < 580) return { label: 'Poor', color: 'text-rose-600', bg: 'bg-rose-100' };
-  if (score < 670) return { label: 'Fair', color: 'text-orange-500', bg: 'bg-orange-100' };
-  if (score < 740) return { label: 'Good', color: 'text-yellow-600', bg: 'bg-yellow-100' };
-  if (score < 800) return { label: 'Very Good', color: 'text-teal-600', bg: 'bg-teal-100' };
-  return { label: 'Exceptional', color: 'text-emerald-600', bg: 'bg-emerald-100' };
+  if (score < 670) return { label: 'Fair', color: 'text-[#4EA07A]', bg: 'bg-[#E8F5EE]' };
+  if (score < 740) return { label: 'Good', color: 'text-[#2E7D5A]', bg: 'bg-[#C8E8D8]' };
+  if (score < 800) return { label: 'Very Good', color: 'text-primary', bg: 'bg-[#C8E8D8]' };
+  return { label: 'Exceptional', color: 'text-primary', bg: 'bg-[#C8E8D8]' };
 }
 
 /**
@@ -46,8 +46,8 @@ export function getScoreBand(score: number) {
  */
 export function getJuniorBand(score: number) {
   if (score < 600) return { label: 'Needs Work', color: 'text-rose-600', bg: 'bg-rose-100' };
-  if (score < 720) return { label: 'Getting There', color: 'text-amber-600', bg: 'bg-amber-100' };
-  return { label: 'Great!', color: 'text-emerald-600', bg: 'bg-emerald-100' };
+  if (score < 720) return { label: 'Getting There', color: 'text-[#2E7D5A]', bg: 'bg-[#C8E8D8]' };
+  return { label: 'Great!', color: 'text-primary', bg: 'bg-[#C8E8D8]' };
 }
 
 /**

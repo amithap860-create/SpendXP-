@@ -17,15 +17,23 @@ export function SIPCalculator() {
   const [stepUpRate, setStepUpRate] = useState(10);
 
   const calculateSIP = (amount: number, r: number, t: number, stepUp = 0) => {
-    const monthlyRate = r / 12 / 100;
-    const months = t * 12;
+    const safeAmount = Math.max(0, amount || 0);
+    const safeR = Math.max(0, r || 0);
+    const safeT = Math.max(1, t || 1);
+    const monthlyRate = safeR / 12 / 100;
+    const months = safeT * 12;
     let totalCorpus = 0;
-    let currentSip = amount;
+    let currentSip = safeAmount;
     let totalInvested = 0;
 
     if (stepUp === 0) {
-      totalCorpus = amount * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * (1 + monthlyRate);
-      totalInvested = amount * months;
+      if (monthlyRate === 0) {
+        // 0% return: no growth, simple sum
+        totalCorpus = safeAmount * months;
+      } else {
+        totalCorpus = safeAmount * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * (1 + monthlyRate);
+      }
+      totalInvested = safeAmount * months;
     } else {
       for (let year = 1; year <= t; year++) {
         const yearMonths = 12;
@@ -36,7 +44,8 @@ export function SIPCalculator() {
       }
     }
 
-    return { corpus: totalCorpus, invested: totalInvested };
+    const corpus = isFinite(totalCorpus) ? totalCorpus : 0;
+    return { corpus, invested: totalInvested };
   };
 
   const results = useMemo(() => calculateSIP(sip, rate, years, isStepUp ? stepUpRate : 0), [sip, rate, years, isStepUp, stepUpRate]);
@@ -102,32 +111,32 @@ export function SIPCalculator() {
         </div>
 
         {/* OUTPUTS */}
-        <div className="bg-indigo-50 rounded-3xl p-8 space-y-8">
+        <div className="bg-blue-50 rounded-3xl p-8 space-y-8">
           <div className="text-center space-y-1">
-            <div className="text-xs font-black uppercase text-indigo-400 tracking-widest">Total Value (Corpus)</div>
-            <div className="text-6xl font-black text-indigo-600">{formatCompact(results.corpus)}</div>
+            <div className="text-xs font-black uppercase text-primary tracking-widest">Total Value (Corpus)</div>
+            <div className="text-6xl font-black text-primary">{formatCompact(results.corpus)}</div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 bg-white rounded-2xl shadow-sm border border-indigo-100">
+            <div className="p-4 bg-white rounded-2xl shadow-sm border border-blue-100">
               <div className="text-[10px] font-black uppercase text-slate-400 mb-1">Total Invested</div>
               <div className="text-lg font-black text-slate-900">{formatCompact(results.invested)}</div>
             </div>
-            <div className="p-4 bg-white rounded-2xl shadow-sm border border-indigo-100">
+            <div className="p-4 bg-white rounded-2xl shadow-sm border border-blue-100">
               <div className="text-[10px] font-black uppercase text-slate-400 mb-1">Total Wealth Gain</div>
-              <div className="text-lg font-black text-emerald-600">+{formatCompact(results.corpus - results.invested)}</div>
+              <div className="text-lg font-black text-primary">+{formatCompact(results.corpus - results.invested)}</div>
             </div>
           </div>
 
-          <div className="p-6 bg-indigo-600 rounded-2xl text-white text-center">
+          <div className="p-6 bg-primary rounded-2xl text-white text-center">
             <p className="text-xs font-bold uppercase tracking-widest opacity-70">Wealth Multiplier</p>
             <div className="text-2xl font-black">Every unit invested became {(results.corpus / results.invested).toFixed(1)} units</div>
           </div>
 
           {isStepUp && (
-            <div className="p-4 bg-white/50 rounded-xl border border-indigo-200 flex items-center gap-3">
-              <Zap className="h-5 w-5 text-indigo-600" />
-              <p className="text-xs font-bold text-indigo-900 italic">
+            <div className="p-4 bg-white/50 rounded-xl border border-blue-200 flex items-center gap-3">
+              <Zap className="h-5 w-5 text-primary" />
+              <p className="text-xs font-bold text-slate-900 italic">
                 Stepping up adds an extra {formatCompact(results.corpus - normalResults.corpus)} to your final wealth!
               </p>
             </div>

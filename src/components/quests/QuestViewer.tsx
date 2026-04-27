@@ -35,7 +35,7 @@ interface QuestViewerProps {
 
 export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
   const { ageGroup } = useAgeAdapt();
-  const { formatValue } = useCurrency();
+  const { formatINR } = useCurrency();
   const { state, currentStep, progress, startQuest, resetQuest, makeChoice } = useQuestEngine(quest, ageGroup);
   
   const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(null);
@@ -63,9 +63,9 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
 
   const getBalanceColor = () => {
     const ratio = currentBalance / quest.startingBalance;
-    if (currentBalance > quest.startingBalance) return 'text-emerald-600';
+    if (currentBalance > quest.startingBalance) return 'text-primary';
     if (currentBalance === quest.startingBalance) return 'text-slate-600';
-    if (ratio > 0.5) return 'text-amber-600';
+    if (ratio > 0.5) return 'text-[#2E7D5A]';
     return 'text-rose-600';
   };
 
@@ -102,16 +102,16 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
           </div>
           <CardContent className="p-8 md:p-12 space-y-10">
             <div className="grid grid-cols-3 gap-4">
-              <StatPill label="Starting" val={formatValue(quest.startingBalance)} />
+              <StatPill label="Starting" val={formatINR(quest.startingBalance)} />
               <StatPill label="Difficulty" val={quest.difficulty} />
               <StatPill label="XP Reward" val={`+${quest.xpReward}`} />
             </div>
             
-            <div className="p-6 md:p-8 bg-amber-50 rounded-3xl border-2 border-amber-100 flex items-start gap-5">
-              <Info className="h-8 w-8 text-amber-600 shrink-0 mt-1" />
+            <div className="p-6 md:p-8 bg-[#E8F5EE] rounded-3xl border-2 border-[#A8D5BC] flex items-start gap-5">
+              <Info className="h-8 w-8 text-[#2E7D5A] shrink-0 mt-1" />
               <div className="space-y-1">
-                <h4 className="font-black text-amber-900">Mission Intel</h4>
-                <p className="text-sm font-medium text-amber-800 leading-relaxed">
+                <h4 className="font-black text-[#1A1F2E]">Mission Intel</h4>
+                <p className="text-sm font-medium text-[#1A4035] leading-relaxed">
                   Every decision impacts your <strong>Real-Time Balance</strong>. Depleting your cash too early will lock out optimal choices in the final stages.
                 </p>
               </div>
@@ -132,20 +132,20 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
     return (
       <div className="flex-1 flex flex-col p-4 md:p-8 animate-in slide-in-from-bottom-8 duration-700 bg-slate-50 min-h-screen-safe overflow-y-auto">
         <Card className="max-w-4xl w-full mx-auto border-none shadow-2xl overflow-hidden mb-8">
-          <div className="bg-emerald-500 p-8 md:p-12 text-white text-center">
+          <div className="bg-primary p-8 md:p-12 text-white text-center">
             <Trophy className="h-16 w-16 mx-auto mb-6 animate-bounce" />
             <h2 className="text-4xl md:text-6xl font-black mb-6">Mission Success</h2>
             <div className="flex justify-center gap-3">
               {[1, 2, 3].map(i => (
-                <Star key={i} className={cn("h-10 w-10 md:h-14 md:w-14 fill-current", i <= starCount ? "text-yellow-300" : "text-emerald-400")} />
+                <Star key={i} className={cn("h-10 w-10 md:h-14 md:w-14 fill-current", i <= starCount ? "text-[#C8E8D8]" : "text-[#4EA07A]")} />
               ))}
             </div>
           </div>
           
           <CardContent className="p-8 md:p-12 space-y-12">
             <div className="grid md:grid-cols-3 gap-6">
-              <ResultCard label="Starting Cash" val={formatValue(quest.startingBalance)} />
-              <ResultCard label="Ending Cash" val={formatValue(currentBalance)} color={getBalanceColor()} icon={ArrowUpRight} />
+              <ResultCard label="Starting Cash" val={formatINR(quest.startingBalance)} />
+              <ResultCard label="Ending Cash" val={formatINR(currentBalance)} color={getBalanceColor()} icon={ArrowUpRight} />
               <ResultCard label="XP Gained" val={`+${state.totalXPEarned + quest.xpReward}`} color="text-primary" />
             </div>
 
@@ -163,7 +163,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
                     <div key={i} className="p-6 rounded-3xl border-2 border-slate-100 space-y-4">
                       <div className="flex justify-between items-start gap-4">
                         <div className="font-bold text-slate-900 leading-tight">Step {i+1}: {step.title}</div>
-                        <Badge className={choice.isOptimal ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}>
+                        <Badge className={choice.isOptimal ? "bg-[#C8E8D8] text-primary" : "bg-[#C8E8D8] text-[#2E7D5A]"}>
                           {choice.isOptimal ? 'Optimal' : 'Sub-optimal'}
                         </Badge>
                       </div>
@@ -174,8 +174,8 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
                         </div>
                         {!choice.isOptimal && (
                           <div className="space-y-1">
-                            <p className="text-emerald-500 font-bold uppercase text-[10px]">Better Move</p>
-                            <p className="font-medium text-emerald-700">{optimal.text}</p>
+                            <p className="text-primary font-bold uppercase text-[10px]">Better Move</p>
+                            <p className="font-medium text-primary">{optimal.text}</p>
                           </div>
                         )}
                       </div>
@@ -205,7 +205,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
                   ) : null;
                 })}
                 {state.optimalChoiceCount === quest.steps.length && (
-                  <p className="text-emerald-400 font-black text-xl italic">Flawless performance! You are ready to manage crores. Continue building your portfolio.</p>
+                  <p className="text-[#4EA07A] font-black text-xl italic">Flawless performance! You are ready to manage crores. Continue building your portfolio.</p>
                 )}
               </div>
             </div>
@@ -231,7 +231,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
           <div className="flex flex-col items-center">
             <span className="text-[10px] font-black uppercase text-slate-400">Balance</span>
             <span className={cn("text-lg md:text-xl font-black transition-colors duration-500", getBalanceColor())}>
-              {formatValue(currentBalance)}
+              {formatINR(currentBalance)}
             </span>
           </div>
           <div className="w-px h-8 bg-slate-100" />
@@ -273,14 +273,14 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
                     ? "hover:border-primary hover:bg-primary/5 border-slate-100" 
                     : choice.id === selectedChoiceId
                       ? choice.isOptimal 
-                        ? "bg-emerald-50 border-emerald-500 text-emerald-900 scale-[1.02] shadow-xl" 
-                        : "bg-amber-50 border-amber-500 text-amber-900 scale-[1.02] shadow-xl"
+                        ? "bg-[#E8F5EE] border-[#2E7D5A] text-[#1A1F2E] scale-[1.02] shadow-xl"
+                        : "bg-[#E8F5EE] border-[#4A556B] text-[#1A1F2E] scale-[1.02] shadow-xl"
                       : "opacity-40 grayscale"
                 )}
               >
                 <span className="text-lg md:text-xl font-bold pr-6">{choice.text}</span>
                 {selectedChoiceId === choice.id && (
-                  choice.isOptimal ? <CheckCircle2 className="h-8 w-8 text-emerald-600 shrink-0" /> : <XCircle className="h-8 w-8 text-amber-600 shrink-0" />
+                  choice.isOptimal ? <CheckCircle2 className="h-8 w-8 text-primary shrink-0" /> : <XCircle className="h-8 w-8 text-[#2E7D5A] shrink-0" />
                 )}
               </button>
             ))}

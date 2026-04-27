@@ -2,13 +2,12 @@
 
 import { useState } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
-import { db } from '@/firebase';
+import { db, safeSetDoc } from '@/firebase';
 import { collection, addDoc, serverTimestamp, doc } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ShieldCheck, Mail, CheckCircle2 } from 'lucide-react';
-import { safeSetDoc } from '@/firebase';
 
 export default function ConsentPage() {
   const { user } = useAuthContext();
@@ -63,8 +62,8 @@ export default function ConsentPage() {
             <div className="space-y-4">
               <h3 className="font-bold text-slate-900">What we store:</h3>
               <ul className="space-y-2 text-sm text-slate-600">
-                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-500" /> Your name and birth year</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-500" /> Your game scores and XP</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-primary" /> Your name and birth year</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-primary" /> Your game scores and XP</li>
               </ul>
             </div>
           </div>
@@ -96,7 +95,7 @@ export default function ConsentPage() {
             </div>
           ) : (
             <div className="text-center py-12 space-y-4 animate-in zoom-in duration-500">
-              <Mail className="h-10 w-10 mx-auto text-emerald-600" />
+              <Mail className="h-10 w-10 mx-auto text-primary" />
               <h3 className="text-2xl font-black">Request Sent!</h3>
               <Button variant="outline" onClick={() => setSubmitted(false)} suppressHydrationWarning>Use a different email</Button>
             </div>

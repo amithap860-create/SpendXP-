@@ -95,6 +95,8 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
     setState(nextState);
 
     if (choice.nextStepId === 'end' && user) {
+      const uid = user.uid;
+      if (!uid || uid.trim() === '') return;
       const xpToAward = Math.max(0, nextState.totalXPEarned + quest.xpReward);
       const optimalRate = nextState.optimalChoiceCount / filteredSteps.length;
 
@@ -111,10 +113,10 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
         });
 
         // Update Financial Health
-        await updateFinancialHealth(user.uid, nextState.totalHealthDelta);
+        await updateFinancialHealth(uid, nextState.totalHealthDelta);
 
         // Record Progress
-        const progressRef = doc(db, 'users', user.uid, 'questProgress', quest.id);
+        const progressRef = doc(db, 'users', uid, 'questProgress', quest.id);
         await safeSetDoc(progressRef, {
           completedAt: serverTimestamp(),
           optimalChoiceRate: optimalRate,
@@ -125,8 +127,8 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
         });
 
         // Award Badges
-        await checkAndAwardQuestBadges(user.uid, quest.id, optimalRate);
-        await updateLeaderboardEntry(user.uid, user.displayName || 'Strategist');
+        await checkAndAwardQuestBadges(uid, quest.id, optimalRate);
+        await updateLeaderboardEntry(uid, user.displayName || 'Strategist');
       } catch (err) {
         console.error('[SpendXP Quest] Award Error:', err);
       }

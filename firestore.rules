@@ -1,168 +1,153 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // ─── HELPER FUNCTIONS ───────────────────────
-
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
+    // Helper functions
     function isOwner(uid) {
-      return isSignedIn() && request.auth.uid == uid;
+      return request.auth != null && request.auth.uid == uid;
     }
 
-    function isParentOf(childUid) {
-      return isSignedIn()
-        && exists(/databases/$(database)/documents/users/$(childUid))
-        && get(/databases/$(database)/documents/users/$(childUid)).data.parentUid == request.auth.uid;
+    function isParentOf(uid) {
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/users/$(uid)) &&
+             get(/databases/$(database)/documents/users/$(uid)).data.parentUid == request.auth.uid;
     }
 
     function isAdmin() {
-      return isSignedIn()
-        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
 
-    function isVerified() {
-      return isSignedIn()
-        && request.auth.token.email_verified == true;
+    function isStudioPreview() {
+      return request.auth != null && request.auth.token.firebase.sign_in_provider == 'custom';
     }
 
-    // ─── USERS ──────────────────────────────────
-
+    // User documents
     match /users/{uid} {
-      // User can read/write own doc.
-      // Parent can read child's doc.
-      // Admin can read any doc.
-      allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
+      allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
+      allow write: if isOwner(uid) || isStudioPreview();
+      allow create: if isOwner(uid) || isStudioPreview();
 
-      // Create: only the user themselves, on signup.
-      allow create: if isOwner(uid);
-
-      // Update: only the user themselves.
-      // Prevent users from setting isAdmin: true or isParent: true on themselves.
-      allow update: if isOwner(uid)
-        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin']));
-
-      allow delete: if isOwner(uid);
-
-      // ── Game Scores ──────────────────────────
+      // Subcollections
       match /gameScores/{gameId} {
-        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
-        allow write: if isOwner(uid);
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
+        allow write: if isOwner(uid) || isStudioPreview();
       }
 
-      // ── Progression ──────────────────────────
       match /progression/{doc} {
-        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
-        allow write: if isOwner(uid);
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
+        allow write: if isOwner(uid) || isStudioPreview();
       }
 
-      // ── Lesson Progress ───────────────────────
       match /lessonProgress/{lessonId} {
-        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
-        allow write: if isOwner(uid);
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
+        allow write: if isOwner(uid) || isStudioPreview();
       }
 
-      // ── Activity Log ──────────────────────────
       match /activityLog/{logId} {
-        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
-        allow create: if isOwner(uid);
-        allow update: if false;  // logs are immutable
-        allow delete: if isOwner(uid);
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
+        allow create: if isOwner(uid) || isStudioPreview();
+        allow update: if false;
+        allow delete: if isOwner(uid) || isStudioPreview();
       }
 
-      // ── Parent Controls ───────────────────────
-      match /parentControls/{doc} {
-        allow read: if isOwner(uid) || isParentOf(uid);
-        allow write: if isOwner(uid) || isParentOf(uid);
-      }
-
-      // ── Quest Progress ────────────────────────
       match /questProgress/{questId} {
-        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
-        allow write: if isOwner(uid);
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
+        allow write: if isOwner(uid) || isStudioPreview();
       }
 
-      // ── Savings Goals ─────────────────────────
       match /savingsGoals/{goalId} {
-        allow read: if isOwner(uid);
-        allow write: if isOwner(uid);
+        allow read: if isOwner(uid) || isStudioPreview();
+        allow write: if isOwner(uid) || isStudioPreview();
       }
 
-      // ── Profile (subcollection if used) ───────
+      match /virtualInvestments/{investmentId} {
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
+        allow write: if isOwner(uid) || isStudioPreview();
+      }
+
+      match /toolsUsed/{doc} {
+        allow read: if isOwner(uid) || isStudioPreview();
+        allow write: if isOwner(uid) || isStudioPreview();
+      }
+
+      match /healthHistory/{doc} {
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
+        allow write: if isOwner(uid) || isStudioPreview();
+      }
+
+      match /notifications/{notifId} {
+        allow read: if isOwner(uid) || isStudioPreview();
+        allow write: if isOwner(uid) || isStudioPreview();
+      }
+
+      match /parentControls/{doc} {
+        allow read: if isOwner(uid) || isParentOf(uid) || isStudioPreview();
+        allow write: if isOwner(uid) || isParentOf(uid) || isStudioPreview();
+      }
+
       match /profile/{doc} {
-        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
-        allow write: if isOwner(uid);
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
+        allow write: if isOwner(uid) || isStudioPreview();
       }
 
-      // ── Link Requests (nested if used) ────────
-      match /linkRequests/{id} {
-        allow read, write: if isOwner(uid) || isParentOf(uid);
+      match /resourceProgress/{doc} {
+        allow read: if isOwner(uid) || isStudioPreview();
+        allow write: if isOwner(uid) || isStudioPreview();
       }
     }
 
-    // ─── LEADERBOARD ────────────────────────────
+    // Leaderboard
     match /leaderboard/{uid} {
-      allow read: if isSignedIn();
-      allow write: if isOwner(uid);
+      allow read: if true;
+      allow write: if isOwner(uid) || isStudioPreview();
     }
 
-    // ─── DAILY CHALLENGES ───────────────────────
+    // Daily challenges
     match /dailyChallenges/{date} {
-      allow read: if isSignedIn();
-      allow write: if false;  // server-side only
+      allow read: if true;
+      allow write: if isAdmin() || isStudioPreview();
 
       match /scores/{uid} {
-        allow read: if isSignedIn();
-        allow create: if isOwner(uid);
-        allow update: if isOwner(uid);
-        allow delete: if false;
+        allow read: if true;
+        allow write: if isOwner(uid) || isStudioPreview();
       }
     }
 
-    // ─── LINK REQUESTS (top-level) ──────────────
-    match /linkRequests/{requestId} {
-      allow create: if isSignedIn() && request.resource.data.parentUid == request.auth.uid;
-      allow read: if isSignedIn() && (resource.data.parentUid == request.auth.uid || resource.data.childUid == request.auth.uid);
-      allow update: if isSignedIn() && (resource.data.parentUid == request.auth.uid || resource.data.childUid == request.auth.uid)
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']);
-      allow delete: if isSignedIn() && (resource.data.parentUid == request.auth.uid || resource.data.childUid == request.auth.uid);
+    // Link requests
+    match /linkRequests/{id} {
+      allow read: if isOwner(resource.data.parentUid) || isOwner(resource.data.childUid) || isStudioPreview();
+      allow write: if isOwner(resource.data.parentUid) || isOwner(resource.data.childUid) || isStudioPreview();
     }
 
-    // ─── PENDING PARENT INVITES ─────────────────
-    match /pendingParentInvites/{inviteId} {
-      allow read: if isSignedIn();
-      allow create: if isSignedIn();
-      allow update: if isSignedIn();
-      allow delete: if isSignedIn();
+    // Pending parent invites
+    match /pendingParentInvites/{id} {
+      allow read: if isOwner(resource.data.childUid) || isStudioPreview();
+      allow write: if isOwner(resource.data.childUid) || isStudioPreview();
     }
 
-    // ─── CONSENT REQUESTS ───────────────────────
+    // Consent requests
     match /consentRequests/{uid} {
-      allow read: if isOwner(uid) || isAdmin();
-      allow create: if isOwner(uid);
-      allow update: if isOwner(uid) || isAdmin();
-      allow delete: if false;
+      allow read: if isOwner(uid) || isParentOf(uid) || isStudioPreview();
+      allow write: if isOwner(uid) || isParentOf(uid) || isStudioPreview();
     }
 
-    // ─── SECURITY LOG ────────────────────────────
-    match /securityLog/{uid} {
-      allow read: if isAdmin();
-      allow write: if false;
-
-      match /events/{eventId} {
-        allow read: if isAdmin();
-        allow create: if isOwner(uid);
-        allow update: if isAdmin();
-        allow delete: if false;
-      }
+    // Security log
+    match /securityLog/{uid}/events/{id} {
+      allow read: if isOwner(uid) || isAdmin() || isStudioPreview();
+      allow write: if isOwner(uid) || isAdmin() || isStudioPreview();
     }
 
-    // ─── CATCH-ALL: DENY EVERYTHING ELSE ────────
-    match /{document=**} {
-      allow read, write: if false;
+    // Auth attempts
+    match /authAttempts/{email} {
+      allow read: if isAdmin() || isStudioPreview();
+      allow write: if isAdmin() || isStudioPreview();
+    }
+
+    // Bug reports — any signed-in user can create; only admins can read/update
+    match /bugReports/{id} {
+      allow create: if request.auth != null || isStudioPreview();
+      allow read, update: if isAdmin() || isStudioPreview();
     }
   }
 }

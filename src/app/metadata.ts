@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     statusBarStyle: 'default',
     title: 'SpendXP',
   },
-  themeColor: '#0F6E56',
+  themeColor: '#1A1F2E',
   robots: {
     index: false,
     follow: true,

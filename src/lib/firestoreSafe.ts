@@ -1,25 +1,43 @@
 'use client';
 
-import { 
-  onSnapshot, 
-  getDoc, 
-  setDoc, 
-  updateDoc, 
+import {
+  onSnapshot,
+  getDoc,
+  setDoc,
+  updateDoc,
   addDoc,
-  DocumentReference, 
+  DocumentReference,
   CollectionReference,
-  Query, 
-  FirestoreError, 
-  Unsubscribe, 
-  SetOptions, 
-  UpdateData 
+  Query,
+  FirestoreError,
+  Unsubscribe,
+  SetOptions,
+  UpdateData
 } from 'firebase/firestore';
 import { handlePermissionsError } from './rulesValidator';
 
 /**
- * @fileOverview Wraps standard Firestore operations with error handling to prevent
- * internal assertion crashes when auth state is in transition.
+ * @fileOverview Wraps standard Firestore operations with error handling to
+ * prevent crashes when auth state is in transition or security rules deny
+ * access. Also handles INTERNAL ASSERTION FAILED (ca9/b815) errors that
+ * occur when onSnapshot listeners are denied by Firestore security rules
+ * while using persistentLocalCache — suppressed gracefully here so the
+ * error boundary can manage recovery at the component tree level.
  */
+
+/**
+ * Returns true when the error is a Firestore internal assertion crash.
+ * These errors (ca9, b815) are caused by the persistent cache entering an
+ * unrecoverable state after a security rule denial on an active listener.
+ */
+function isAssertionError(error: { message?: string } | null | undefined): boolean {
+  if (!error?.message) return false;
+  return (
+    error.message.includes('INTERNAL ASSERTION') ||
+    error.message.includes('ca9') ||
+    error.message.includes('b815')
+  );
+}
 
 export function safeOnSnapshot(
   query: Query,
@@ -31,6 +49,16 @@ export function safeOnSnapshot(
       handlePermissionsError(error, 'safeOnSnapshot');
       return;
     }
+
+    if (isAssertionError(error)) {
+      console.warn(
+        '[SpendXP] Firestore assertion error in safeOnSnapshot.',
+        'Listener detached. Will not retry.',
+        error.message
+      );
+      return;
+    }
+
     if (onError) onError(error);
   });
 }
@@ -45,6 +73,16 @@ export function safeOnSnapshotDoc(
       handlePermissionsError(error, 'safeOnSnapshotDoc');
       return;
     }
+
+    if (isAssertionError(error)) {
+      console.warn(
+        '[SpendXP] Firestore assertion error in safeOnSnapshotDoc.',
+        'Listener detached. Will not retry.',
+        error.message
+      );
+      return;
+    }
+
     if (onError) onError(error);
   });
 }
@@ -56,6 +94,13 @@ export async function safeGetDoc<T>(
     const snap = await getDoc(ref);
     return snap.exists() ? (snap.data() as T) : null;
   } catch (error: any) {
+    if (isAssertionError(error)) {
+      console.warn(
+        '[SpendXP] Firestore assertion error in safeGetDoc. Returning null.',
+        error.message
+      );
+      return null;
+    }
     handlePermissionsError(error, 'safeGetDoc');
     return null;
   }
@@ -70,6 +115,13 @@ export async function safeSetDoc<T extends object>(
     await setDoc(ref, data, options ?? {});
     return true;
   } catch (error: any) {
+    if (isAssertionError(error)) {
+      console.warn(
+        '[SpendXP] Firestore assertion error in safeSetDoc. Returning false.',
+        error.message
+      );
+      return false;
+    }
     handlePermissionsError(error, 'safeSetDoc');
     return false;
   }
@@ -83,6 +135,13 @@ export async function safeUpdateDoc(
     await updateDoc(ref, data);
     return true;
   } catch (error: any) {
+    if (isAssertionError(error)) {
+      console.warn(
+        '[SpendXP] Firestore assertion error in safeUpdateDoc. Returning false.',
+        error.message
+      );
+      return false;
+    }
     handlePermissionsError(error, 'safeUpdateDoc');
     return false;
   }
@@ -95,6 +154,13 @@ export async function safeAddDoc<T extends object>(
   try {
     return await addDoc(ref, data);
   } catch (error: any) {
+    if (isAssertionError(error)) {
+      console.warn(
+        '[SpendXP] Firestore assertion error in safeAddDoc. Returning null.',
+        error.message
+      );
+      return null;
+    }
     handlePermissionsError(error, 'safeAddDoc');
     return null;
   }

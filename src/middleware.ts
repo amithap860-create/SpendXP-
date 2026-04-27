@@ -45,41 +45,27 @@ export function middleware(request: NextRequest) {
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-  response.headers.set('Content-Security-Policy', 
-    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none';"
+  response.headers.set('Content-Security-Policy',
+    [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com https://apis.google.com",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "img-src 'self' data: https:",
+      "font-src 'self' data: https://fonts.gstatic.com",
+      "connect-src 'self' https: wss:",
+      "frame-src 'self' https://www.google.com https://*.firebaseapp.com",
+      "frame-ancestors 'none'",
+      "worker-src 'self' blob:",
+    ].join('; ')
   );
 
-  // Route protection
+  // Route protection — public paths pass through immediately.
+  // Dashboard and game pages are protected client-side via AuthContext so that
+  // Firebase Auth state (which is client-only) can be the gate. Middleware
+  // cannot verify Firebase ID tokens without the Admin SDK, so cookie-based
+  // blocking was always wrong and caused a permanent redirect loop.
   if (isPublicPathname(pathname)) {
     return response;
-  }
-
-  // Auth protection for dashboard and profile
-  if (pathname.startsWith('/dashboard') || pathname.startsWith('/profile')) {
-    const sessionCookie = request.cookies.get('spendxp_session');
-    if (!sessionCookie) {
-      // Preserve returnTo URL for post-login redirect (using 'next' param as requested)
-      const url = new URL('/login', request.url);
-      url.searchParams.set('next', pathname);
-      return NextResponse.redirect(url);
-    }
-  }
-
-  // Redirect authenticated users away from login page
-  if (pathname === '/login') {
-    const sessionCookie = request.cookies.get('spendxp_session');
-    if (sessionCookie) {
-      // Get 'next' parameter for post-login redirect, default to dashboard
-      const nextUrl = new URL(request.url).searchParams.get('next') || '/dashboard';
-      
-      // Validate same-origin to prevent open redirects
-      const nextUrlObj = new URL(nextUrl, request.url);
-      if (nextUrlObj.origin === request.nextUrl.origin) {
-        return NextResponse.redirect(new URL(nextUrl, request.url));
-      }
-      // Fallback to dashboard if invalid origin
-      return NextResponse.redirect(new URL('/dashboard', request.url));
-    }
   }
 
   if (pathname.startsWith('/admin')) {

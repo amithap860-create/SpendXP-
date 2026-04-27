@@ -72,7 +72,7 @@ function VerifyEmailContent() {
   if (status === 'success') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-8 text-center animate-in fade-in zoom-in duration-500">
-        <div className="h-20 w-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+        <div className="h-20 w-20 bg-[#C8E8D8] text-primary rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
           <CheckCircle2 className="h-10 w-10" />
         </div>
         <h1 className="text-3xl font-black text-slate-900 mb-2">Email verified!</h1>
@@ -143,7 +143,7 @@ function ExpiredLinkUI() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="h-20 w-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-6">
+      <div className="h-20 w-20 bg-[#C8E8D8] text-[#2E7D5A] rounded-full flex items-center justify-center mx-auto mb-6">
         <Mail className="h-10 w-10" />
       </div>
       <h1 className="text-3xl font-black text-slate-900 mb-2">Link Expired</h1>
@@ -161,11 +161,11 @@ function ExpiredLinkUI() {
           >
             {loading ? <RefreshCw className="h-5 w-5 animate-spin" /> : sent ? `Resend in ${cooldown}s` : 'Send new link'}
           </Button>
-          {sent && <p className="text-xs font-bold text-emerald-600">Verification link resent! Check your inbox.</p>}
+          {sent && <p className="text-xs font-bold text-primary">Verification link resent! Check your inbox.</p>}
         </div>
       ) : (
         <div className="space-y-4">
-          <p className="text-sm font-bold text-amber-700">Sign in first, then resend from your profile.</p>
+          <p className="text-sm font-bold text-[#2E7D5A]">Sign in first, then resend from your profile.</p>
           <Button onClick={() => router.push('/login')} className="h-14 px-10 text-lg font-black rounded-2xl" suppressHydrationWarning>
             Sign in <ArrowRight className="ml-2 h-5 w-5" />
           </Button>

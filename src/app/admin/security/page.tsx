@@ -33,10 +33,13 @@ export default function SecurityDashboard() {
     setIsAdmin(true); // For prototype visibility
   }, [user, db]);
 
-  // Fetch Events
+  // Fetch Events — only after user is confirmed to be admin.
+  // Without the uid guard, this collectionGroup query fires before auth
+  // is ready and gets permission denied from Firestore rules.
   const eventsQuery = useMemoFirebase(() => {
+    if (!user?.uid || typeof user.uid !== 'string' || user.uid.length < 5 || !isAdmin) return null;
     return query(collectionGroup(db, 'events'), orderBy('timestamp', 'desc'), limit(50));
-  }, [db]);
+  }, [db, user?.uid, isAdmin]);
   const { data: events, isLoading } = useCollection(eventsQuery);
 
   // Calculate Metrics (Mocked for 24h window)
@@ -75,9 +78,9 @@ export default function SecurityDashboard() {
       <div className="grid md:grid-cols-4 gap-6 mb-12">
         {[
           { label: 'Suspicious Scores', val: metrics.suspiciousScores, icon: ShieldAlert, color: 'text-rose-500' },
-          { label: 'Failed Auth Attempts', val: metrics.failedAuth, icon: Lock, color: 'text-amber-500' },
+          { label: 'Failed Auth Attempts', val: metrics.failedAuth, icon: Lock, color: 'text-[#2E7D5A]' },
           { label: 'Rate Limit Triggers', val: metrics.rateLimits, icon: Zap, color: 'text-blue-500' },
-          { label: 'Active Sessions', val: metrics.activeSessions, icon: Activity, color: 'text-emerald-500' },
+          { label: 'Active Sessions', val: metrics.activeSessions, icon: Activity, color: 'text-primary' },
         ].map((m, i) => (
           <Card key={i} className="bg-slate-800 border-slate-700">
             <CardContent className="p-6 flex items-center gap-4">
@@ -123,7 +126,7 @@ export default function SecurityDashboard() {
                     <Badge className={cn(
                       "font-black text-[10px]",
                       e.type === 'impossible_score' ? "bg-rose-500/20 text-rose-500" :
-                      e.type === 'rate_limit_exceeded' ? "bg-amber-500/20 text-amber-500" :
+                      e.type === 'rate_limit_exceeded' ? "bg-[#E8F5EE]0/20 text-[#2E7D5A]" :
                       "bg-slate-500/20 text-slate-400"
                     )}>
                       {e.type.replace(/_/g, ' ')}
@@ -137,7 +140,7 @@ export default function SecurityDashboard() {
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        className="text-emerald-500 hover:text-emerald-400 hover:bg-emerald-500/10 h-8"
+                        className="text-primary hover:text-[#4EA07A] hover:bg-primary/10 h-8"
                         onClick={() => resolveEvent(e.id, `securityLog/${e.uid}/events/${e.id}`)}
                       >
                         <CheckCircle2 className="h-4 w-4 mr-2" /> Mark Resolved

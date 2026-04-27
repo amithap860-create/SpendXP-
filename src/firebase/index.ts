@@ -4,11 +4,13 @@
 // for all Firebase and utility exports.
 // Import path for components and hooks: '@/firebase'
 
-export { 
-  app, 
-  auth, 
-  db, 
-  googleProvider, 
+export {
+  app,
+  auth,
+  db,
+  getDb,
+  resetFirestore,
+  googleProvider,
   emailProvider,
   isFirebaseReady
 } from '@/lib/firebase';
@@ -18,6 +20,17 @@ export {
   sendPasswordResetEmail,
   confirmPasswordReset
 } from 'firebase/auth';
+
+export {
+  checkRateLimit,
+  signupRateLimiter,
+  loginRateLimiter
+} from '@/lib/rateLimiting';
+
+export {
+  hashGameState,
+  detectDevTools
+} from '@/lib/security';
 
 import { app, auth, db } from '@/lib/firebase';
 import { 
@@ -72,9 +85,9 @@ export * from './error-emitter';
 export * from '@/lib/firestoreSafe';
 export { safeOnSnapshot, safeOnSnapshotDoc } from '@/lib/firestoreSafe';
 export * from '@/lib/authHelpers';
-export * from '@/lib/rateLimiter';
+export * from '@/lib/rateLimiting';
 export * from '@/lib/validation';
 export * from '@/lib/accountLockout';
 export * from '@/lib/privacyGuard';
 export * from '@/lib/sessionGuard';
-export * from '@/lib/antiTamper';
+export * from '@/lib/security';

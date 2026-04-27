@@ -69,7 +69,10 @@ export const DEFAULT_PROGRESSION: UserProgression = {
 /**
  * Client-side leaderboard update workaround
  */
-export async function updateLeaderboardEntry(uid: string, displayName: string) {
+export async function updateLeaderboardEntry(uid: string | null | undefined, displayName: string) {
+  if (!uid || typeof uid !== 'string' || uid.trim() === '') {
+    return;
+  }
   const user = await waitForAuth();
   if (!user) return;
 
@@ -87,15 +90,22 @@ export async function updateLeaderboardEntry(uid: string, displayName: string) {
   }
 }
 
-export function getProgressionRef(uid: string) {
+export function getProgressionRef(uid: string | null | undefined) {
+  if (!uid || typeof uid !== 'string' || uid.trim() === '') {
+    return null;
+  }
   return doc(db, 'users', uid, 'progression', 'stats');
 }
 
-export async function getProgression(uid: string): Promise<UserProgression> {
+export async function getProgression(uid: string | null | undefined): Promise<UserProgression> {
+  if (!uid || typeof uid !== 'string' || uid.trim() === '') {
+    return DEFAULT_PROGRESSION;
+  }
   const user = await waitForAuth();
   if (!user) return DEFAULT_PROGRESSION;
 
   const progressionRef = getProgressionRef(uid);
+  if (!progressionRef) return DEFAULT_PROGRESSION;
   
   try {
     const snap = await safeGetDoc(progressionRef);
@@ -120,11 +130,15 @@ export async function getProgression(uid: string): Promise<UserProgression> {
 /**
  * Updates the user's Financial Health score and records history.
  */
-export async function updateFinancialHealth(uid: string, delta: number) {
+export async function updateFinancialHealth(uid: string | null | undefined, delta: number) {
+  if (!uid || typeof uid !== 'string' || uid.trim() === '') {
+    return;
+  }
   const user = await waitForAuth();
   if (!user) return;
 
   const ref = getProgressionRef(uid);
+  if (!ref) return;
   const current = await getProgression(uid);
   const newScore = clampHealth(current.financialHealth + delta);
   const dateKey = getISTDateKey();
@@ -146,7 +160,10 @@ export async function updateFinancialHealth(uid: string, delta: number) {
   }
 }
 
-export async function getAllGameScores(uid: string): Promise<GameScores> {
+export async function getAllGameScores(uid: string | null | undefined): Promise<GameScores> {
+  if (!uid || typeof uid !== 'string' || uid.trim() === '') {
+    return {};
+  }
   const authUser = await waitForAuth();
   if (!authUser) return {};
 
@@ -171,7 +188,10 @@ export async function getAllGameScores(uid: string): Promise<GameScores> {
   }
 }
 
-export async function getConceptStrengths(uid: string): Promise<ConceptStrengths> {
+export async function getConceptStrengths(uid: string | null | undefined): Promise<ConceptStrengths> {
+  if (!uid || typeof uid !== 'string' || uid.trim() === '') {
+    return { budgeting: 0, saving: 0, investing: 0, credit: 0, taxes: 0, spending: 0 };
+  }
   const authUser = await waitForAuth();
   if (!authUser) return { budgeting: 0, saving: 0, investing: 0, credit: 0, taxes: 0, spending: 0 };
 

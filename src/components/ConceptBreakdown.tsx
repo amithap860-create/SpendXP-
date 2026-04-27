@@ -88,9 +88,9 @@ export function ConceptBreakdown({
         <div className={cn(
           "inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 text-white shadow-sm",
           activityType === 'quest' ? "bg-rose-500" :
-          activityType === 'quiz' ? "bg-teal-500" :
+          activityType === 'quiz' ? "bg-primary" :
           activityType === 'game' ? "bg-blue-500" :
-          "bg-amber-500"
+          "bg-[#E8F5EE]0"
         )}>
           {activityType === 'challenge' ? 'Daily Challenge' : activityType}
         </div>
@@ -99,7 +99,7 @@ export function ConceptBreakdown({
       </header>
 
       <div className="space-y-8 flex-1">
-        <section className="relative bg-white p-5 pl-6 rounded-xl border-l-[3px] border-teal-500 shadow-sm overflow-hidden">
+        <section className="relative bg-white p-5 pl-6 rounded-xl border-l-[3px] border-primary shadow-sm overflow-hidden">
           <div className="quote-shape" />
           <p className="relative z-10 text-[18px] font-medium text-slate-800 leading-relaxed">
             "{hook}"
@@ -111,20 +111,20 @@ export function ConceptBreakdown({
           <ul className="space-y-4 list-none p-0">
             {keyPoints.map((point, i) => (
               <li key={i} className="flex items-start gap-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-teal-500 mt-2 shrink-0" />
+                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
                 <span className="text-[14px] font-medium text-slate-600 leading-relaxed">{point}</span>
               </li>
             ))}
           </ul>
         </section>
 
-        <section className="bg-amber-50/40 p-5 rounded-xl border-l-[3px] border-amber-500">
-          <span className="text-[11px] font-black uppercase text-amber-600 tracking-widest block mb-1">Real world</span>
+        <section className="bg-[#E8F5EE]/40 p-5 rounded-xl border-l-[3px] border-[#2E7D5A]">
+          <span className="text-[11px] font-black uppercase text-[#2E7D5A] tracking-widest block mb-1">Real world</span>
           <p className="text-[14px] font-bold text-slate-700 leading-relaxed">
             {breakdown.realWorldStat}
           </p>
           {isSenior && breakdown.ageAdapted.senior.extraStat && (
-            <p className="text-[12px] font-medium text-slate-500 mt-3 italic border-t border-amber-500/10 pt-2">
+            <p className="text-[12px] font-medium text-slate-500 mt-3 italic border-t border-[#4EA07A]/10 pt-2">
               Note: {breakdown.ageAdapted.senior.extraStat}
             </p>
           )}
@@ -147,7 +147,7 @@ export function ConceptBreakdown({
       <footer className="mt-10 pb-2 space-y-3 shrink-0">
         <Button 
           onClick={onContinue} 
-          className="w-full h-[52px] text-lg font-black bg-teal-600 hover:bg-teal-700 shadow-xl shadow-teal-100 rounded-2xl"
+          className="w-full h-[52px] text-lg font-black bg-primary hover:bg-primary-700 shadow-xl shadow-blue-100 rounded-2xl"
           suppressHydrationWarning
         >
           I'm ready — let's go

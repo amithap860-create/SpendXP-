@@ -1,162 +1,153 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@/lib/store';
+import { useAuthContext } from '@/context/AuthContext';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { WalletCards, Sparkles, LoaderCircle } from 'lucide-react';
-import Image from 'next/image';
-import { getPlaceholderById } from '@/lib/placeholder-images';
+import { Sparkles, TrendingUp, Shield, GamepadIcon, BookOpen, Trophy } from 'lucide-react';
 
 export default function LandingPage() {
   const router = useRouter();
-  const { login, isLoggedIn, isInitialLoading } = useUser();
-  const [email, setEmail] = useState('');
-  const [age, setAge] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
+  const { user, loading } = useAuthContext();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    setMounted(true);
+    document.title = 'SpendXP — Learn Money. Earn XP.';
   }, []);
 
+  // Redirect already-authenticated users straight to the dashboard
   useEffect(() => {
-    if (!isInitialLoading && isLoggedIn) {
-      router.push('/dashboard');
+    if (!loading && user) {
+      router.replace('/dashboard');
     }
-  }, [isLoggedIn, isInitialLoading, router]);
+  }, [user, loading, router]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const ageNum = parseInt(age);
-    if (!email || isNaN(ageNum)) return;
-    
-    setIsSubmitting(true);
-    try {
-      await login(email, ageNum);
-      router.push('/dashboard');
-    } catch (error) {
-      console.error("Login failed", error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const avatars = [
-    getPlaceholderById('avatar-1'),
-    getPlaceholderById('avatar-2'),
-    getPlaceholderById('avatar-3'),
-    getPlaceholderById('avatar-4')
-  ];
-
-  if (!isMounted) {
+  if (!mounted || loading) {
     return (
       <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100dvh',
-        background: 'white'
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        minHeight: '100dvh', background: 'white'
       }}>
         <div style={{
-          width: '32px',
-          height: '32px',
-          border: '3px solid #E1F5EE',
-          borderTop: '3px solid #0F6E56',
-          borderRadius: '50%',
-          animation: 'spin 0.8s linear infinite'
-        }}/>
-        <style>{`@keyframes spin {
-          to { transform: rotate(360deg); }
-        }`}</style>
+          width: '32px', height: '32px',
+          border: '3px solid #E1F5EE', borderTop: '3px solid #1A1F2E',
+          borderRadius: '50%', animation: 'spin 0.8s linear infinite'
+        }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-100 via-blue-50 to-white">
-      <div className="max-w-4xl w-full grid md:grid-cols-2 gap-8 items-center">
-        <div className="space-y-6 text-center md:text-left">
-          <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border animate-bounce">
-            <Sparkles className="h-4 w-4 text-accent" />
-            <span className="text-sm font-semibold text-primary">Join 50,000+ young investors</span>
+    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-100 via-blue-50 to-white">
+      {/* Nav */}
+      <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
+        <div className="flex items-center gap-2">
+          <div className="h-9 w-9 bg-primary rounded-xl flex items-center justify-center">
+            <Sparkles className="h-5 w-5 text-white" />
           </div>
-          <h1 className="text-5xl md:text-6xl font-extrabold text-primary leading-tight">
-            Master your money with <span className="text-accent">SpendXP</span>
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-md mx-auto md:mx-0">
-            The fun, gamified way to learn about stocks, savings, and budgeting. Built for the next generation of financial pros.
-          </p>
-          <div className="flex items-center gap-4 justify-center md:justify-start pt-4">
-            <div className="flex -space-x-3">
-              {avatars.map((avatar, i) => (
-                <div key={i} className="h-10 w-10 rounded-full border-2 border-white bg-blue-200 overflow-hidden relative">
-                   {avatar && (
-                     <Image 
-                      src={avatar.imageUrl} 
-                      alt={avatar.description} 
-                      fill 
-                      className="object-cover"
-                      data-ai-hint={avatar.imageHint}
-                    />
-                   )}
-                </div>
-              ))}
-            </div>
-            <p className="text-sm font-medium text-primary">Already trusted by students worldwide</p>
-          </div>
+          <span className="text-2xl font-black text-primary tracking-tighter">SpendXP</span>
         </div>
+        <div className="flex items-center gap-3">
+          <Link href="/login">
+            <Button variant="ghost" className="font-bold text-primary">Sign In</Button>
+          </Link>
+          <Link href="/signup">
+            <Button className="font-bold shadow-lg shadow-primary/20">Get Started Free</Button>
+          </Link>
+        </div>
+      </nav>
 
-        <Card className="shadow-xl border-none ring-1 ring-black/5 bg-white/80 backdrop-blur-sm">
-          <CardHeader>
-            <div className="h-12 w-12 bg-primary rounded-xl flex items-center justify-center mb-4">
-              <WalletCards className="h-6 w-6 text-white" />
+      {/* Hero */}
+      <section className="max-w-6xl mx-auto px-6 pt-16 pb-20 text-center">
+        <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border mb-6 animate-bounce">
+          <Sparkles className="h-4 w-4 text-accent" />
+          <span className="text-sm font-semibold text-primary">Built for ages 8 to 20 · India-first</span>
+        </div>
+        <h1 className="text-5xl md:text-7xl font-extrabold text-primary leading-tight mb-6">
+          Master your money<br />
+          <span className="text-accent">with SpendXP</span>
+        </h1>
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
+          Learn budgeting, investing, saving, and credit through games, quests, and real-life scenarios.
+          Everything adapts to your age — from pocket money to salary.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link href="/signup">
+            <Button size="lg" className="h-14 px-10 text-lg font-black shadow-xl shadow-primary/30 w-full sm:w-auto">
+              Create Free Account
+            </Button>
+          </Link>
+          <Link href="/login">
+            <Button size="lg" variant="outline" className="h-14 px-10 text-lg font-bold border-2 w-full sm:w-auto">
+              Sign In
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="max-w-6xl mx-auto px-6 pb-20 grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[
+          {
+            icon: <GamepadIcon className="h-7 w-7 text-primary" />,
+            title: '6 Learning Games',
+            desc: 'Budget Blitz, Stock Market Simulator, Credit Score Builder, and more — real skills disguised as fun.'
+          },
+          {
+            icon: <BookOpen className="h-7 w-7 text-primary" />,
+            title: '7 Real-Life Quests',
+            desc: 'Make decisions about your first paycheck, renting, EMIs, emergencies, and credit cards.'
+          },
+          {
+            icon: <Trophy className="h-7 w-7 text-primary" />,
+            title: 'XP & Badges',
+            desc: 'Earn XP, level up from Saver to Money Master, and unlock 19 achievement badges.'
+          },
+          {
+            icon: <TrendingUp className="h-7 w-7 text-primary" />,
+            title: 'Financial Health Score',
+            desc: 'Track how your decisions improve your financial health score from 0 to 100.'
+          },
+          {
+            icon: <Shield className="h-7 w-7 text-primary" />,
+            title: 'Parent Dashboard',
+            desc: 'Parents can monitor progress, set time limits, and receive weekly reports.'
+          },
+          {
+            icon: <Sparkles className="h-7 w-7 text-primary" />,
+            title: 'Age-Adapted Content',
+            desc: 'Juniors (8–12) learn with pocket money. Teens (13–16) tackle allowances. Seniors (17–20) handle salaries.'
+          }
+        ].map((f, i) => (
+          <div key={i} className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border shadow-sm">
+            <div className="h-12 w-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
+              {f.icon}
             </div>
-            <CardTitle className="text-2xl font-bold">Start Your Journey</CardTitle>
-            <CardDescription>Enter your details to enter your personalized learning portal.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="email">Student Email</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="name@school.com" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="h-12 rounded-lg bg-white/50"
-                  suppressHydrationWarning
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="age">How old are you?</Label>
-                <Input 
-                  id="age" 
-                  type="number" 
-                  placeholder="Your age (8-20)" 
-                  min="8" 
-                  max="20"
-                  value={age}
-                  onChange={(e) => setAge(e.target.value)}
-                  required
-                  className="h-12 rounded-lg bg-white/50"
-                  suppressHydrationWarning
-                />
-                <p className="text-[10px] text-muted-foreground pt-1">We customize SpendXP based on your age!</p>
-              </div>
-              <Button type="submit" className="w-full h-12 text-lg font-bold shadow-lg shadow-primary/20" disabled={isSubmitting}>
-                {isSubmitting ? <LoaderCircle className="h-5 w-5 animate-spin mr-2" /> : null}
-                Unlock My XP
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+            <h3 className="text-lg font-bold text-primary mb-2">{f.title}</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
+          </div>
+        ))}
+      </section>
+
+      {/* CTA */}
+      <section className="max-w-2xl mx-auto px-6 pb-20 text-center">
+        <div className="bg-primary rounded-3xl p-10 shadow-2xl">
+          <h2 className="text-3xl font-black text-white mb-3">Ready to level up?</h2>
+          <p className="text-primary-foreground/80 mb-8">Free to use. No ads. No in-app purchases. Built for India.</p>
+          <Link href="/signup">
+            <Button size="lg" variant="secondary" className="h-14 px-10 text-lg font-black">
+              Start Earning XP Now
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      <footer className="text-center text-sm text-muted-foreground pb-8">
+        © 2025 SpendXP · <Link href="/login" className="hover:underline">Sign In</Link>
+      </footer>
     </div>
   );
 }

@@ -135,7 +135,7 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
               id="budgetBlitz"
               name="Budget Blitz" 
               desc="Sort needs, wants and savings at speed." 
-              color="bg-emerald-500" 
+              color="bg-primary" 
               isHighlighted={highlightedGame === 'budgetBlitz'}
               onClick={() => setActiveGame('budgetBlitz')} 
             />
@@ -151,7 +151,7 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
               id="stockMarketSim"
               name="Stock Market Sim" 
               desc="Trade virtual stocks based on live news." 
-              color="bg-indigo-500" 
+              color="bg-primary" 
               isHighlighted={highlightedGame === 'stockMarketSim'}
               onClick={() => setActiveGame('stockMarketSim')} 
             />
@@ -159,7 +159,7 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
               id="creditScoreBuilder"
               name="Credit Builder" 
               desc="Manage your score through lifecycle choices." 
-              color="bg-purple-500" 
+              color="bg-primary" 
               isHighlighted={highlightedGame === 'creditScoreBuilder'}
               onClick={() => setActiveGame('creditScoreBuilder')} 
             />
@@ -167,7 +167,7 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
               id="compoundClicker"
               name="Compound Clicker" 
               desc="See the magic of long-term growth." 
-              color="bg-amber-500" 
+              color="bg-[#E8F5EE]0" 
               isHighlighted={highlightedGame === 'compoundClicker'}
               onClick={() => setActiveGame('compoundClicker')} 
             />
@@ -228,17 +228,17 @@ function GameCard({
       className={cn(
         "bg-white rounded-3xl border-[0.5px] border-slate-200 p-6 md:p-8 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all text-left group overflow-hidden relative",
         "ring-offset-2",
-        isHighlighted ? "ring-2 ring-teal-500" : "ring-0 transition-all duration-1000",
+        isHighlighted ? "ring-2 ring-primary" : "ring-0 transition-all duration-1000",
         "min-h-[160px] flex flex-col justify-between"
       )}
     >
       <div className={cn("absolute top-0 left-0 w-2 h-full", color)} />
       <div>
-        <h3 className="text-xl font-black text-slate-900 mb-2 group-hover:text-teal-600 transition-colors">{name}</h3>
+        <h3 className="text-xl font-black text-slate-900 mb-2 group-hover:text-primary transition-colors">{name}</h3>
         <p className="text-sm text-slate-500 font-medium leading-snug">{desc}</p>
       </div>
       <div className="flex justify-end pt-4">
-        <span className="text-[10px] font-black text-slate-300 group-hover:text-teal-600 transition-colors uppercase tracking-widest">PLAY NOW →</span>
+        <span className="text-[10px] font-black text-slate-300 group-hover:text-primary transition-colors uppercase tracking-widest">PLAY NOW →</span>
       </div>
     </button>
   );

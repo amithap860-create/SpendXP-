@@ -44,25 +44,25 @@ const LEVELS = [
 ];
 
 const BADGE_MAP = [
-  { id: 'first-win', title: 'First Win', icon: Trophy, color: 'text-amber-500' },
-  { id: 'streak-5', title: '5-Game Streak', icon: Flame, color: 'text-orange-500' },
-  { id: 'budget-master', title: 'Budget Master', icon: Wallet, color: 'text-emerald-500' },
+  { id: 'first-win', title: 'First Win', icon: Trophy, color: 'text-[#2E7D5A]' },
+  { id: 'streak-5', title: '5-Game Streak', icon: Flame, color: 'text-[#4EA07A]' },
+  { id: 'budget-master', title: 'Budget Master', icon: Wallet, color: 'text-primary' },
   { id: 'debt-slayer', title: 'Debt Slayer', icon: ShieldCheck, color: 'text-blue-500' },
-  { id: 'stock-picker', title: 'Stock Picker', icon: TrendingUp, color: 'text-indigo-500' },
+  { id: 'stock-picker', title: 'Stock Picker', icon: TrendingUp, color: 'text-primary' },
   { id: 'tax-whiz', title: 'Tax Whiz', icon: Calculator, color: 'text-rose-500' },
-  { id: 'daily-challenger', title: 'Daily Challenger', icon: Calendar, color: 'text-purple-500' },
-  { id: 'speed-demon', title: 'Speed Demon', icon: Zap, color: 'text-yellow-500' },
-  { id: 'perfect-round', title: 'Perfect Round', icon: Star, color: 'text-cyan-500' },
-  { id: 'emergency_fund_builder', title: 'Safety First', icon: ShieldCheck, color: 'text-emerald-600' },
+  { id: 'daily-challenger', title: 'Daily Challenger', icon: Calendar, color: 'text-primary' },
+  { id: 'speed-demon', title: 'Speed Demon', icon: Zap, color: 'text-[#2E7D5A]' },
+  { id: 'perfect-round', title: 'Perfect Round', icon: Star, color: 'text-primary' },
+  { id: 'emergency_fund_builder', title: 'Safety First', icon: ShieldCheck, color: 'text-primary' },
   { id: 'debt_destroyer', title: 'Debt Destroyer', icon: Zap, color: 'text-rose-500' },
   { id: 'smart_investor', title: 'Smart Investor', icon: TrendingUp, color: 'text-blue-500' },
-  { id: 'scam_spotter', title: 'Scam Spotter', icon: AlertTriangle, color: 'text-amber-600' },
-  { id: 'budget_master', title: 'Strategic Saver', icon: Wallet, color: 'text-teal-500' },
+  { id: 'scam_spotter', title: 'Scam Spotter', icon: AlertTriangle, color: 'text-[#2E7D5A]' },
+  { id: 'budget_master', title: 'Strategic Saver', icon: Wallet, color: 'text-primary' },
   { id: 'tool_explorer', title: 'Tool Explorer', icon: Wrench, color: 'text-slate-600' },
-  { id: 'goal_getter', title: 'Goal Getter', icon: Target, color: 'text-indigo-500' },
+  { id: 'goal_getter', title: 'Goal Getter', icon: Target, color: 'text-primary' },
   { id: 'financially_stable', title: 'Financially Stable', icon: Heart, color: 'text-rose-400' },
-  { id: 'money_master', title: 'Money Master', icon: Trophy, color: 'text-yellow-500' },
-  { id: 'scholar', title: 'Finance Scholar', icon: Star, color: 'text-emerald-500' },
+  { id: 'money_master', title: 'Money Master', icon: Trophy, color: 'text-[#2E7D5A]' },
+  { id: 'scholar', title: 'Finance Scholar', icon: Star, color: 'text-primary' },
 ];
 
 export function XPWallet() {
@@ -191,7 +191,7 @@ export function XPWallet() {
       {unlockedBadge && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-md animate-in fade-in zoom-in duration-300">
           <Card className="max-w-sm w-full border-none shadow-2xl bg-white text-center overflow-hidden">
-            <div className="bg-emerald-500 p-12 text-white relative">
+            <div className="bg-primary p-12 text-white relative">
               <PartyPopper className="h-20 w-20 mx-auto mb-6 animate-bounce" />
               <div className="absolute inset-0 opacity-10 flex items-center justify-center overflow-hidden pointer-events-none">
                 <unlockedBadge.icon className="h-64 w-64 rotate-12" />

@@ -28,7 +28,7 @@ type ConfettiOptions = {
 };
 
 const DEFAULT_COLORS = [
-  '#0F6E56', // SpendXP teal
+  '#2E7D5A', // SpendXP gold
   '#3b82f6', // blue
   '#f59e0b', // amber
   '#EC4899', // pink
@@ -168,7 +168,7 @@ export function fireConfetti(options: ConfettiOptions = {}): void {
 export function fireConfettiPersonalBest(): void {
   fireConfetti({
     particleCount: 100,
-    colors: ['#0F6E56', '#10b981', '#f59e0b'],
+    colors: ['#1A1F2E', '#2E7D5A', '#10b981'],
     origin: { x: 0.5, y: 0.7 },
   });
 }
@@ -191,7 +191,7 @@ export function fireConfettiBadgeUnlock(): void {
 export function fireConfettiGoalReached(): void {
   fireConfetti({
     particleCount: 120,
-    colors: ['#0F6E56', '#3b82f6', '#f59e0b', '#10b981'],
+    colors: ['#1A1F2E', '#2E7D5A', '#f59e0b', '#10b981'],
     origin: { x: 0.5, y: 0.5 },
     scalar: 1.2,
   });

@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Plus, Trash2, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { MiniCalc } from '@/components/MiniCalc';
 import { validateDisplayName } from '@/firebase';
 import { cn } from '@/lib/utils';
 import { fireConfettiGoalReached } from '@/lib/confetti';
@@ -30,53 +31,55 @@ interface SavingsGoal {
 }
 
 const PRESET_SHAPES: { shape: GoalShape; color: string; label: string }[] = [
-  { shape: 'circle', color: 'bg-teal-500', label: 'Emergency' },
+  { shape: 'circle', color: 'bg-primary', label: 'Emergency' },
   { shape: 'square', color: 'bg-blue-500', label: 'Tech' },
-  { shape: 'triangle', color: 'bg-amber-500', label: 'Travel' },
+  { shape: 'triangle', color: 'bg-[#E8F5EE]0', label: 'Travel' },
   { shape: 'diamond', color: 'bg-rose-500', label: 'Big Purchase' },
-  { shape: 'hexagon', color: 'bg-indigo-500', label: 'Education' },
-  { shape: 'pentagon', color: 'bg-purple-500', label: 'Gifts' },
+  { shape: 'hexagon', color: 'bg-primary', label: 'Education' },
+  { shape: 'pentagon', color: 'bg-[#E8F5EE]0', label: 'Gifts' },
   { shape: 'star', color: 'bg-yellow-500', label: 'Dream' },
-  { shape: 'bolt', color: 'bg-emerald-500', label: 'Investment' },
+  { shape: 'bolt', color: 'bg-primary', label: 'Investment' },
 ];
 
 export function SavingsGoalTracker() {
   const { user } = useAuthContext();
   const { formatValue } = useCurrency();
+  const uid = user?.uid ?? null;
   
   const [isAdding, setIsAdding] = useState(false);
   const [newName, setNewName] = useState('');
   const [newTarget, setNewTarget] = useState('');
   const [newDate, setNewDate] = useState('');
   const [newShape, setNewShape] = useState<GoalShape>('circle');
-  const [newColor, setNewColor] = useState('bg-teal-500');
+  const [newColor, setNewColor] = useState('bg-primary');
   
   const [addingFundsTo, setAddingFundsTo] = useState<string | null>(null);
   const [fundAmount, setFundAmount] = useState('');
 
   const goalsQuery = useMemoFirebase(() => {
-    return user ? query(collection(db, 'users', user.uid, 'savingsGoals'), orderBy('createdAt', 'desc')) : null;
-  }, [user]);
+    if (!uid || typeof uid !== 'string' || uid.trim() === '' || uid.length < 5) return null;
+    return query(collection(db, 'users', uid, 'savingsGoals'), orderBy('createdAt', 'desc'));
+  }, [uid]);
   const { data: goals } = useCollection<SavingsGoal>(goalsQuery);
 
   // Trigger celebration when a goal is newly completed
   useEffect(() => {
-    if (!goals) return;
+    if (!goals || !uid) return;
     goals.forEach(goal => {
       const isReached = goal.savedAmount >= goal.targetAmount;
       if (isReached && !goal.isCompleted) {
         fireConfettiGoalReached();
         // Mark as completed in Firestore to prevent duplicate triggers
-        safeUpdateDoc(doc(db, 'users', user!.uid, 'savingsGoals', goal.id), {
+        safeUpdateDoc(doc(db, 'users', uid, 'savingsGoals', goal.id), {
           isCompleted: true
         });
       }
     });
-  }, [goals, user]);
+  }, [goals, uid]);
 
   const handleAddGoal = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || (goals && goals.length >= 5)) return;
+    if (!uid || (goals && goals.length >= 5)) return;
 
     const val = validateDisplayName(newName);
     if (!val.valid) return;
@@ -89,7 +92,7 @@ export function SavingsGoalTracker() {
     const today = new Date();
     const months = Math.max(1, (targetD.getFullYear() - today.getFullYear()) * 12 + (targetD.getMonth() - today.getMonth()));
     
-    await safeSetDoc(doc(db, 'users', user.uid, 'savingsGoals', goalId), {
+    await safeSetDoc(doc(db, 'users', uid, 'savingsGoals', goalId), {
       id: goalId,
       name: newName,
       targetAmount: target,
@@ -109,11 +112,11 @@ export function SavingsGoalTracker() {
   };
 
   const handleAddFunds = async (goalId: string) => {
-    if (!user) return;
+    if (!uid) return;
     const amount = Number(fundAmount);
     if (isNaN(amount) || amount <= 0) return;
 
-    await safeUpdateDoc(doc(db, 'users', user.uid, 'savingsGoals', goalId), {
+    await safeUpdateDoc(doc(db, 'users', uid, 'savingsGoals', goalId), {
       savedAmount: increment(amount)
     });
 
@@ -154,7 +157,10 @@ export function SavingsGoalTracker() {
               </div>
               <div className="space-y-2">
                 <Label>Target Amount</Label>
-                <Input type="number" value={newTarget} onChange={e => setNewTarget(e.target.value)} placeholder="50000" required suppressHydrationWarning />
+                <div className="flex items-center gap-2">
+                  <Input type="number" value={newTarget} onChange={e => setNewTarget(e.target.value)} placeholder="50000" required suppressHydrationWarning className="flex-1" />
+                  <MiniCalc onInsert={(v) => setNewTarget(v)} />
+                </div>
               </div>
               <div className="space-y-2">
                 <Label>Target Date</Label>
@@ -214,15 +220,15 @@ export function SavingsGoalTracker() {
               <div className="space-y-4">
                 <div className="flex justify-between items-end">
                   <div className="text-2xl font-black text-primary">{formatValue(goal.savedAmount)} <span className="text-sm font-medium text-slate-400">/ {formatValue(goal.targetAmount)}</span></div>
-                  <div className={cn("text-lg font-black", isReached ? "text-emerald-500" : "text-primary")}>{progress}%</div>
+                  <div className={cn("text-lg font-black", isReached ? "text-primary" : "text-primary")}>{progress}%</div>
                 </div>
                 <Progress value={progress} className="h-2" />
                 
                 <div className="flex items-center justify-between text-xs font-bold">
                   {isReached ? (
-                    <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full"><CheckCircle2 className="h-3 w-3" /> Mission Accomplished!</div>
+                    <div className="flex items-center gap-2 text-primary bg-[#E8F5EE] px-3 py-1 rounded-full"><CheckCircle2 className="h-3 w-3" /> Mission Accomplished!</div>
                   ) : isLate ? (
-                    <div className="flex items-center gap-2 text-amber-600 bg-amber-50 px-3 py-1 rounded-full"><AlertTriangle className="h-3 w-3" /> Past target date</div>
+                    <div className="flex items-center gap-2 text-[#2E7D5A] bg-[#E8F5EE] px-3 py-1 rounded-full"><AlertTriangle className="h-3 w-3" /> Past target date</div>
                   ) : (
                     <div className="text-slate-500">Need {formatValue(goal.monthlyContribution)} / month</div>
                   )}
@@ -236,7 +242,8 @@ export function SavingsGoalTracker() {
               {addingFundsTo === goal.id && (
                 <div className="mt-6 pt-6 border-t animate-in slide-in-from-top-2 duration-300">
                   <div className="flex gap-2">
-                    <Input type="number" value={fundAmount} onChange={e => setFundAmount(e.target.value)} placeholder="Amount" className="h-12" suppressHydrationWarning />
+                    <Input type="number" value={fundAmount} onChange={e => setFundAmount(e.target.value)} placeholder="Amount" className="h-12 flex-1" suppressHydrationWarning />
+                    <MiniCalc onInsert={(v) => setFundAmount(v)} />
                     <Button onClick={() => handleAddFunds(goal.id)} className="h-12 font-black px-8" suppressHydrationWarning>Save</Button>
                     <Button variant="ghost" onClick={() => setAddingFundsTo(null)} className="h-12" suppressHydrationWarning>Cancel</Button>
                   </div>

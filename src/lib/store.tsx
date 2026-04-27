@@ -1,23 +1,14 @@
 "use client"
 
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { 
-  useFirestore, 
-  useDoc,
-  useCollection,
-  useMemoFirebase,
-  safeUpdateDoc
-} from '@/firebase';
-import { 
-  doc, 
-  collection, 
-  serverTimestamp,
-} from 'firebase/firestore';
+import React, { createContext, useContext, useReducer, useMemo, useState, useEffect } from 'react';
+import { doc, collection, query, where, orderBy, limit, getDocs, getDoc, onSnapshot, DocumentReference, DocumentData, serverTimestamp } from 'firebase/firestore';
 import { signInAnonymously } from 'firebase/auth';
 import { updateDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { useAuthContext } from '@/context/AuthContext';
 import { auth, isFirebaseReady } from '@/lib/firebase';
-import { safeSetDoc } from '@/lib/firestoreSafe';
+import { useFirestore, useDoc, useCollection, useMemoFirebase, useFirebase, useUser as useFirebaseUser } from '@/firebase';
+import { safeSetDoc, safeUpdateDoc } from '@/lib/firestoreSafe';
+import { SecurityQuestion, UserProfile } from '@/types/user';
 
 export interface AppTask {
   id: string;
@@ -33,23 +24,6 @@ export interface Stock {
   name: string;
   price: number;
   change: number;
-}
-
-export interface UserProfile {
-  id: string;
-  email: string;
-  displayName: string;
-  age: number;
-  birthYear: number;
-  country: string;
-  currency: string;
-  balance: number;
-  savingsGoal: number;
-  savingsCurrent: number;
-  liabilities: number;
-  xp: number;
-  level: number;
-  onboardingComplete: boolean;
 }
 
 interface UserContextType {
@@ -78,67 +52,87 @@ interface UserContextType {
   portfolio: any[];
 }
 
+const DEFAULT_USER_CONTEXT: UserContextType = {
+  name: 'Strategist',
+  balance: 0,
+  xp: 0,
+  level: 1,
+  tasks: [],
+  formatValue: (amount: number) => amount.toString(),
+  completeTask: () => {},
+  isInitialLoading: true,
+  isLoggedIn: false,
+  login: async () => {},
+  portfolio: [],
+};
+
 const UserContext = createContext<UserContextType | undefined>(undefined);
+
+/**
+ * Returns true only when the uid is a valid Firebase Auth uid.
+ * Firebase Auth uids are 28 characters long. We use a minimum of 5 to
+ * also reject stub uids like '1' that come from the legacy localStorage
+ * auth system in AuthContext.tsx during page reloads.
+ */
+function isValidUid(uid: string | null | undefined): uid is string {
+  return typeof uid === 'string' && uid.length >= 5;
+}
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuthContext();
+  const firebaseUser = useFirebaseUser();
   const db = useFirestore();
-  const isLoggedIn = !!user;
-  
+  const isLoggedIn = !!firebaseUser.user;
+
+  // uid must come from the real Firebase Auth user, not from the
+  // localStorage-based AuthContext which may contain a stub uid of '1'.
+  const uid = isValidUid(firebaseUser.user?.uid) ? firebaseUser.user!.uid : null;
+
   const profileRef = useMemoFirebase(() => {
-    return user ? doc(db, 'users', user.uid) : null;
-  }, [db, user]);
+    if (!uid) return null;
+    return doc(db, 'users', uid);
+  }, [db, uid]);
   const { data: profile, isLoading: isProfileLoading } = useDoc<UserProfile>(profileRef);
 
   const portfolioQuery = useMemoFirebase(() => {
-    return user ? collection(db, 'users', user.uid, 'virtualInvestments') : null;
-  }, [db, user]);
+    if (!uid) return null;
+    return collection(db, 'users', uid, 'virtualInvestments');
+  }, [db, uid]);
   const { data: portfolioData, isLoading: isPortfolioLoading } = useCollection(portfolioQuery);
   const portfolio = useMemo(() => Array.isArray(portfolioData) ? portfolioData : [], [portfolioData]);
 
   const tasksQuery = useMemoFirebase(() => {
-    return user ? collection(db, 'users', user.uid, 'lessonProgress') : null;
-  }, [db, user]);
+    if (!uid) return null;
+    return collection(db, 'users', uid, 'lessonProgress');
+  }, [db, uid]);
   const { data: remoteTasksData, isLoading: isTasksLoading } = useCollection<AppTask>(tasksQuery);
   const remoteTasks = useMemo(() => Array.isArray(remoteTasksData) ? remoteTasksData : [], [remoteTasksData]);
 
-  const rawInitialLoading = isProfileLoading || isPortfolioLoading || isTasksLoading;
+  const rawInitialLoading = uid ? (isProfileLoading || isPortfolioLoading || isTasksLoading) : false;
   const [isInitialLoading, setIsInitialLoading] = useState(false);
+  const [stocks, setStocks] = useState<any[]>([]);
 
   useEffect(() => {
     setIsInitialLoading(rawInitialLoading);
   }, [rawInitialLoading]);
 
   useEffect(() => {
-    try {
-      if (typeof window !== 'undefined' && !isFirebaseReady()) {
-        console.warn('[SpendXP] UserProvider: Firebase core is not ready');
-      }
-    } catch (e) {
-      console.warn('Auth init error:', e);
-    } finally {
-      if (!rawInitialLoading) {
-        setIsInitialLoading(false);
-      }
-    }
-  }, [rawInitialLoading]);
-
-  useEffect(() => {
-    const t = setTimeout(() => {
+    const timeout = setTimeout(() => {
       setIsInitialLoading(false);
     }, 3000);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timeout);
   }, []);
 
-  useEffect(() => {
-    if (!rawInitialLoading) {
-      return;
-    }
-    const t = setTimeout(() => {
-      setIsInitialLoading(false);
-    }, 3000);
-    return () => clearTimeout(t);
-  }, [rawInitialLoading]);
+  // Guard: do not render live data into context while Firebase Auth is still
+  // resolving. Children see default values and a loading spinner instead of
+  // stale / incorrectly-permissioned Firestore data.
+  if (firebaseUser.isUserLoading || !uid) {
+    return (
+      <UserContext.Provider value={DEFAULT_USER_CONTEXT}>
+        {children}
+      </UserContext.Provider>
+    );
+  }
 
   const formatValue = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -154,14 +148,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     const birthYear = new Date().getFullYear() - age;
     const credential = await signInAnonymously(auth);
-    const uid = credential.user.uid;
-    const userRef = doc(db, 'users', uid);
+    const anonUid = credential.user.uid;
+    const userRef = doc(db, 'users', anonUid);
     const localPart = email.split('@')[0] ?? 'Student';
     const displayName = localPart.replace(/[._]+/g, ' ').trim() || 'Student';
     await safeSetDoc(
       userRef,
       {
-        id: uid,
+        id: anonUid,
         email: email.toLowerCase(),
         birthYear,
         displayName,
@@ -173,60 +167,121 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const completeTask = (taskId: string) => {
-    if (!user) return;
+    // Use uid from Firebase Auth, not from the localStorage AuthContext
+    if (!uid) return;
     const existing = remoteTasks.find(t => t.id === taskId);
     if (existing?.completed) return;
 
-    const taskRef = doc(db, 'users', user.uid, 'lessonProgress', taskId);
-    setDocumentNonBlocking(taskRef, { 
+    const taskRef = doc(db, 'users', uid, 'lessonProgress', taskId);
+    setDocumentNonBlocking(taskRef, {
       id: taskId,
-      completed: true, 
+      completed: true,
       completedAt: serverTimestamp(),
-      userId: user.uid,
+      userId: uid,
       category: 'Academy'
     }, { merge: true });
-    
-    const userRef = doc(db, 'users', user.uid);
-    safeUpdateDoc(userRef, { 
-      xp: (profile?.xp || 0) + 80, // Flat reward for lessons
+
+    const userRef = doc(db, 'users', uid);
+    safeUpdateDoc(userRef, {
+      xp: (profile?.xp || 0) + 80,
       level: Math.floor(((profile?.xp || 0) + 80) / 500) + 1
     });
   };
 
   const updateSavings = (current: number, goal: number) => {
-    if (!user) return;
-    const userRef = doc(db, 'users', user.uid);
-    safeUpdateDoc(userRef, { 
+    if (!uid) return;
+    const userRef = doc(db, 'users', uid);
+    safeUpdateDoc(userRef, {
       savingsCurrent: current,
       savingsGoal: goal
     });
   };
 
   const setSavingsGoal = (goal: number) => {
-    if (!user) return;
-    const userRef = doc(db, 'users', user.uid);
-    safeUpdateDoc(userRef, { 
+    if (!uid) return;
+    const userRef = doc(db, 'users', uid);
+    safeUpdateDoc(userRef, {
       savingsGoal: goal
     });
   };
 
-  // Market/Stock functions - minimal implementations
-  const [stocks, setStocks] = useState<any[]>([]);
   const updateStocks = (newStocks: any[]) => setStocks(newStocks);
+
   const buyStock = (symbol: string, quantity: number) => {
-    console.log('Buy stock:', symbol, quantity);
-  };
-  const sellStock = (symbol: string, quantity: number) => {
-    console.log('Sell stock:', symbol, quantity);
+    if (!uid) return;
+    const stock = stocks.find((s: any) => s.symbol === symbol);
+    if (!stock) return;
+
+    const totalCost = stock.price * quantity;
+    const currentBalance = profile?.balance || 0;
+    if (currentBalance < totalCost) return;
+
+    // Deduct balance
+    const userRef = doc(db, 'users', uid);
+    safeUpdateDoc(userRef, { balance: currentBalance - totalCost });
+
+    // Upsert portfolio entry
+    const investmentRef = doc(db, 'users', uid, 'virtualInvestments', symbol);
+    const existing = portfolio.find((p: any) => p.symbol === symbol);
+    if (existing && existing.shares > 0) {
+      const newShares = existing.shares + quantity;
+      const prevAvg = existing.avgPrice || existing.currentPrice || stock.price;
+      const newAvgPrice = (prevAvg * existing.shares + totalCost) / newShares;
+      safeSetDoc(investmentRef, {
+        symbol,
+        name: stock.name,
+        shares: newShares,
+        avgPrice: newAvgPrice,
+        currentPrice: stock.price,
+        updatedAt: serverTimestamp(),
+      }, { merge: true });
+    } else {
+      safeSetDoc(investmentRef, {
+        symbol,
+        name: stock.name,
+        shares: quantity,
+        avgPrice: stock.price,
+        currentPrice: stock.price,
+        purchasedAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+    }
   };
 
-  const value = {
+  const sellStock = (symbol: string, quantity: number) => {
+    if (!uid) return;
+    const stock = stocks.find((s: any) => s.symbol === symbol);
+    if (!stock) return;
+
+    const existing = portfolio.find((p: any) => p.symbol === symbol);
+    if (!existing || existing.shares < quantity) return;
+
+    const proceeds = stock.price * quantity;
+    const currentBalance = profile?.balance || 0;
+
+    // Add proceeds to balance
+    const userRef = doc(db, 'users', uid);
+    safeUpdateDoc(userRef, { balance: currentBalance + proceeds });
+
+    // Update portfolio
+    const investmentRef = doc(db, 'users', uid, 'virtualInvestments', symbol);
+    const remainingShares = existing.shares - quantity;
+    safeSetDoc(investmentRef, {
+      symbol,
+      name: stock.name,
+      shares: remainingShares,
+      currentPrice: stock.price,
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+  };
+
+  const value: UserContextType = {
     name: profile?.displayName || user?.displayName || 'Strategist',
     balance: profile?.balance || 0,
     xp: profile?.xp || 0,
     level: profile?.level || 1,
     age: profile?.age,
-    ageGroup: 'junior', // Default age group
+    ageGroup: 'junior',
     user,
     savingsCurrent: profile?.savingsCurrent,
     savingsGoal: profile?.savingsGoal,

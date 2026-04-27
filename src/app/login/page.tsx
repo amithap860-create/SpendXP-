@@ -14,23 +14,40 @@ import { cn } from '@/lib/utils';
 type Tab = 'signin' | 'signup';
 
 function LoginContent() {
-  const { 
-    signInWithGoogle, 
-    signInWithEmail, 
-    signUpWithEmail, 
-    sendPasswordReset, 
+  const {
+    signInWithGoogle,
+    signInWithEmail,
+    signUpWithEmail,
+    sendPasswordReset,
     resendVerificationEmail,
-    error: authError 
+    error: authError,
+    user,
+    loading: authLoading,
   } = useAuthContext();
-  
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const reason = searchParams.get('reason');
-  
+
   const [activeTab, setActiveTab] = useState<Tab>('signin');
   const [showReset, setShowReset] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  // Redirect already-authenticated users away from the login page
+  useEffect(() => {
+    if (!authLoading && user) {
+      const nextUrl = searchParams.get('next') || '/dashboard';
+      try {
+        const parsed = new URL(nextUrl, window.location.origin);
+        if (parsed.origin === window.location.origin) {
+          router.replace(nextUrl);
+          return;
+        }
+      } catch {}
+      router.replace('/dashboard');
+    }
+  }, [user, authLoading, router, searchParams]);
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -64,6 +81,24 @@ function LoginContent() {
     }
     return () => clearInterval(timer);
   }, [resendCooldown]);
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    const res = await signInWithGoogle();
+    if (res.success) {
+      const nextUrl = searchParams.get('next') || '/dashboard';
+      try {
+        const parsed = new URL(nextUrl, window.location.origin);
+        if (parsed.origin === window.location.origin) {
+          router.replace(nextUrl);
+          setLoading(false);
+          return;
+        }
+      } catch {}
+      router.replace('/dashboard');
+    }
+    setLoading(false);
+  };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,7 +165,7 @@ function LoginContent() {
     <div className="min-h-screen-safe bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-100 via-blue-50 to-white flex items-center justify-center p-4">
       <Card className="max-w-[420px] w-full shadow-2xl border-none overflow-hidden animate-in fade-in zoom-in duration-500">
         {reason === 'reauth_required' && (
-          <div className="bg-amber-500 text-white px-4 py-2 text-xs font-bold flex items-center gap-2">
+          <div className="bg-[#E8F5EE]0 text-white px-4 py-2 text-xs font-bold flex items-center gap-2">
             <Info className="h-3 w-3" />
             For security, please sign in again to change your password.
           </div>
@@ -140,7 +175,7 @@ function LoginContent() {
             <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-lg">
               <Sparkles className="h-5 w-5" />
             </div>
-            <h1 className="text-3xl font-black text-primary tracking-tighter">SpendXP</h1>
+            <h1 className="text-3xl font-black tracking-tighter"><span className="text-slate-900">Spend</span><span style={{ color: "#2E7D5A" }}>XP</span></h1>
           </div>
           <CardDescription className="text-slate-600 font-medium">
             Learn money. Earn XP. Level up your future.
@@ -211,14 +246,12 @@ function LoginContent() {
                       </button>
                     </div>
                     <div className="text-right">
-                      <button 
-                        type="button" 
-                        onClick={() => setShowReset(true)}
-                        suppressHydrationWarning
+                      <a 
+                        href="/forgot-password"
                         className="text-xs font-bold text-primary hover:underline py-2"
                       >
                         Forgot password?
-                      </button>
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -242,13 +275,17 @@ function LoginContent() {
                   {loading ? <RefreshCw className="h-5 w-5 animate-spin" /> : 'Sign In'}
                 </Button>
 
-                <Button 
-                  onClick={signInWithGoogle} 
-                  variant="outline" 
-                  type="button" 
+                <Button
+                  onClick={handleGoogleSignIn}
+                  variant="outline"
+                  type="button"
                   className="w-full h-12 gap-3 font-bold border-2 min-h-[44px]"
+                  disabled={loading}
                   suppressHydrationWarning
                 >
+                  {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : (
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
+                  )}
                   Continue with Google
                 </Button>
               </form>

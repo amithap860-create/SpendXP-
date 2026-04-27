@@ -62,9 +62,11 @@ export default function OnboardingOverlay() {
 
   const initializeOnboarding = async () => {
     if (!user) return;
+    const uid = user.uid;
+    if (!uid || uid.trim() === '') return;
 
     try {
-      const userRef = doc(db, 'users', user.uid);
+      const userRef = doc(db, 'users', uid);
       
       // Create default wallet with starting balance
       await setDoc(doc(db, 'wallets', `${user.uid}_default`), {
@@ -114,6 +116,8 @@ export default function OnboardingOverlay() {
 
   const completeStep = async (stepId: string) => {
     if (!user || loading) return;
+    const uid = user.uid;
+    if (!uid || uid.trim() === '') return;
 
     setLoading(true);
     try {
@@ -126,7 +130,7 @@ export default function OnboardingOverlay() {
       ));
 
       // Award XP
-      const userRef = doc(db, 'users', user.uid);
+      const userRef = doc(db, 'users', uid);
       const userSnap = await getDoc(userRef);
       const currentXP = userSnap.data()?.xp || 0;
       
@@ -193,13 +197,13 @@ export default function OnboardingOverlay() {
                 key={step.id}
                 className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
                   step.completed 
-                    ? 'border-green-200 bg-green-50' 
+                    ? 'border-green-200 bg-[#E8F5EE]' 
                     : 'border-slate-200 bg-white hover:border-slate-300'
                 }`}
               >
                 <div className="flex-shrink-0">
                   {step.completed ? (
-                    <CheckCircle2 className="h-6 w-6 text-green-600" />
+                    <CheckCircle2 className="h-6 w-6 text-primary" />
                   ) : (
                     <Circle className="h-6 w-6 text-slate-400" />
                   )}
@@ -240,7 +244,7 @@ export default function OnboardingOverlay() {
             
             {allCompleted && (
               <div className="text-center">
-                <p className="text-lg font-bold text-green-600 mb-2">🎉 Onboarding Complete!</p>
+                <p className="text-lg font-bold text-primary mb-2">🎉 Onboarding Complete!</p>
                 <p className="text-sm text-slate-600">Redirecting to dashboard...</p>
               </div>
             )}

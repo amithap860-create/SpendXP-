@@ -59,7 +59,7 @@ export function WeeklyReport({ child, onClose }: WeeklyReportProps) {
                 <div className="text-4xl font-black text-slate-900">4,250</div>
               </div>
               <div className="text-right">
-                <div className="flex items-center gap-1 text-emerald-600 font-black">
+                <div className="flex items-center gap-1 text-primary font-black">
                   <ArrowUpRight className="h-5 w-5" /> 12%
                 </div>
                 <div className="text-[10px] font-bold text-slate-400 uppercase">vs last week</div>
@@ -71,7 +71,7 @@ export function WeeklyReport({ child, onClose }: WeeklyReportProps) {
                 <div className="text-4xl font-black text-slate-900">82%</div>
               </div>
               <div className="text-right">
-                <div className="flex items-center gap-1 text-emerald-600 font-black">
+                <div className="flex items-center gap-1 text-primary font-black">
                   <ArrowUpRight className="h-5 w-5" /> 5%
                 </div>
                 <div className="text-[10px] font-bold text-slate-400 uppercase">New High</div>
@@ -92,8 +92,8 @@ export function WeeklyReport({ child, onClose }: WeeklyReportProps) {
                   <p className="text-sm text-slate-600">Stock Market Sim performance increased by 40% after focusing on "Diversification" news events.</p>
                 </div>
               </div>
-              <div className="p-4 rounded-xl border-2 border-amber-100 bg-amber-50/30 flex items-start gap-4">
-                <div className="h-10 w-10 rounded-lg bg-amber-100 flex items-center justify-center text-amber-600 shrink-0"><Zap className="h-5 w-5" /></div>
+              <div className="p-4 rounded-xl border-2 border-[#A8D5BC] bg-[#E8F5EE]/30 flex items-start gap-4">
+                <div className="h-10 w-10 rounded-lg bg-[#C8E8D8] flex items-center justify-center text-[#2E7D5A] shrink-0"><Zap className="h-5 w-5" /></div>
                 <div>
                   <h4 className="font-bold">New Skill Unlocked: Tax Efficiency</h4>
                   <p className="text-sm text-slate-600">Successfully completed 10 scenarios in the FinIQ Quiz regarding Income Tax brackets.</p>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import {
   Query,
   onSnapshot,
@@ -11,6 +11,7 @@ import {
 } from 'firebase/firestore';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
+import { FirebaseContext } from '@/firebase/provider';
 
 /** Utility type to add an 'id' field to a given type T. */
 export type WithId<T> = T & { id: string };
@@ -40,19 +41,22 @@ export interface InternalQuery extends Query<DocumentData> {
 /**
  * React hook to subscribe to a Firestore collection or query in real-time.
  * Handles nullable references/queries.
- * 
+ *
+ * Waits for Firebase Auth to confirm the user (isUserLoading = false) before
+ * opening any Firestore listener. This prevents permission-denied errors that
+ * occur when listeners race ahead of auth state during page load.
  *
  * IMPORTANT! YOU MUST MEMOIZE the inputted memoizedTargetRefOrQuery or BAD THINGS WILL HAPPEN
- * use useMemo to memoize it per React guidence.  Also make sure that it's dependencies are stable
- * references
- *  
+ * use useMemo to memoize it per React guidance. Also make sure that its dependencies are stable
+ * references.
+ *
  * @template T Optional type for document data. Defaults to any.
  * @param {CollectionReference<DocumentData> | Query<DocumentData> | null | undefined} targetRefOrQuery -
  * The Firestore CollectionReference or Query. Waits if null/undefined.
  * @returns {UseCollectionResult<T>} Object with data, isLoading, error.
  */
 export function useCollection<T = any>(
-    memoizedTargetRefOrQuery: ((CollectionReference<DocumentData> | Query<DocumentData>) & {__memo?: boolean})  | null | undefined,
+    memoizedTargetRefOrQuery: ((CollectionReference<DocumentData> | Query<DocumentData>) & {__memo?: boolean}) | null | undefined,
 ): UseCollectionResult<T> {
   type ResultItemType = WithId<T>;
   type StateDataType = ResultItemType[] | null;
@@ -61,10 +65,20 @@ export function useCollection<T = any>(
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<FirestoreError | Error | null>(null);
 
+  // Wait for Firebase Auth to finish its initial check before subscribing.
+  // When isUserLoading is true the user's identity is not yet confirmed — opening
+  // a Firestore listener at that point causes permission-denied errors because
+  // the SDK sends the request before the auth token is attached.
+  const firebaseCtx = useContext(FirebaseContext);
+  const isAuthReady = firebaseCtx !== undefined ? !firebaseCtx.isUserLoading : false;
+
   useEffect(() => {
-    if (!memoizedTargetRefOrQuery) {
+    if (!memoizedTargetRefOrQuery || !isAuthReady) {
       setData(null);
-      setIsLoading(false);
+      // Keep isLoading true while auth is resolving so callers show a spinner
+      // rather than an empty state. Once auth is ready the effect re-runs and
+      // starts the real listener.
+      setIsLoading(!isAuthReady);
       setError(null);
       return;
     }
@@ -106,8 +120,9 @@ export function useCollection<T = any>(
     );
 
     return () => unsubscribe();
-  }, [memoizedTargetRefOrQuery]); // Re-run if the target query/reference changes.
-  if(memoizedTargetRefOrQuery && !memoizedTargetRefOrQuery.__memo) {
+  }, [memoizedTargetRefOrQuery, isAuthReady]); // Re-run when auth state settles
+
+  if (memoizedTargetRefOrQuery && !memoizedTargetRefOrQuery.__memo) {
     throw new Error(memoizedTargetRefOrQuery + ' was not properly memoized using useMemoFirebase');
   }
   return { data, isLoading, error };

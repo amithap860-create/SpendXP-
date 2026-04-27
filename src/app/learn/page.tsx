@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useUser } from '@/lib/store';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -65,7 +66,7 @@ export default function LearnHub() {
                 </div>
                 <Progress value={overallProgress} className="h-2" />
                 {completedCount === lessons.length ? (
-                  <div className="flex items-center gap-2 text-emerald-600 font-bold text-xs uppercase tracking-tighter">
+                  <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-tighter">
                     <Star className="h-4 w-4 fill-current" /> Finance Scholar Badge Earned!
                   </div>
                 ) : (
@@ -94,10 +95,10 @@ export default function LearnHub() {
                   <div className={cn(
                     "h-2",
                     lesson.topic === 'budgeting' ? "bg-blue-500" :
-                    lesson.topic === 'investing' ? "bg-indigo-500" :
-                    lesson.topic === 'saving' ? "bg-emerald-500" :
-                    lesson.topic === 'credit' ? "bg-amber-500" :
-                    lesson.topic === 'taxes' ? "bg-rose-500" : "bg-teal-500"
+                    lesson.topic === 'investing' ? "bg-primary" :
+                    lesson.topic === 'saving' ? "bg-primary" :
+                    lesson.topic === 'credit' ? "bg-[#E8F5EE]0" :
+                    lesson.topic === 'taxes' ? "bg-rose-500" : "bg-slate-500"
                   )} />
                   <CardHeader>
                     <div className="flex justify-between items-start mb-2">
@@ -105,7 +106,7 @@ export default function LearnHub() {
                         <BookOpen className="h-6 w-6" />
                       </div>
                       {isCompleted ? (
-                        <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none gap-1 font-black">
+                        <Badge className="bg-[#C8E8D8] text-primary hover:bg-[#C8E8D8] border-none gap-1 font-black">
                           <CheckCircle2 className="h-3 w-3" /> DONE
                         </Badge>
                       ) : !isAgeAppropriate ? (
@@ -144,11 +145,13 @@ export default function LearnHub() {
             })}
           </div>
 
-          {activeLesson && (
-            <LessonViewer 
-              lesson={activeLesson} 
-              onClose={() => handleLessonFinish(activeLesson.id)} 
-            />
+          {/* Rendered via portal so it sits above the sticky nav at document.body level */}
+          {activeLesson && typeof document !== 'undefined' && createPortal(
+            <LessonViewer
+              lesson={activeLesson}
+              onClose={() => handleLessonFinish(activeLesson.id)}
+            />,
+            document.body
           )}
         </div>
       </main>

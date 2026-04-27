@@ -1,23 +1,54 @@
-'use client';
-
 import { auth } from '@/lib/firebase';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 
 /**
- * Returns a promise that resolves with the current user once auth is initialized.
+ * Waits for Firebase Auth to determine the current user's state and returns
+ * the authenticated user object, or null if no user is signed in.
+ *
+ * Uses auth.currentUser as a fast path when the SDK has already resolved
+ * the state (e.g. mid-session). Falls back to a one-shot onAuthStateChanged
+ * listener for the initial page load case.
+ *
+ * Replaces the old stub that always returned uid: '1'.
  */
-export function waitForAuth(): Promise<User | null> {
+export const waitForAuth = (): Promise<{
+  id: string;
+  uid: string;
+  email: string;
+  displayName: string;
+} | null> => {
   return new Promise((resolve) => {
-    // Check if auth state is already determined
+    // Fast path: Firebase Auth has already determined the user state.
+    // This is the common case after the initial auth check has settled.
     if (auth.currentUser !== undefined) {
-      resolve(auth.currentUser);
+      const u = auth.currentUser;
+      if (u) {
+        resolve({
+          id: u.uid,
+          uid: u.uid,
+          email: u.email ?? '',
+          displayName: u.displayName ?? 'Strategist',
+        });
+      } else {
+        resolve(null);
+      }
       return;
     }
-    
-    // Otherwise wait for the first auth state change event
-    const unsub = onAuthStateChanged(auth, (user) => {
+
+    // Slow path: Auth state has not resolved yet (first paint).
+    // Subscribe once and immediately unsubscribe after the first event.
+    const unsub = onAuthStateChanged(auth, (firebaseUser) => {
       unsub();
-      resolve(user);
+      if (firebaseUser) {
+        resolve({
+          id: firebaseUser.uid,
+          uid: firebaseUser.uid,
+          email: firebaseUser.email ?? '',
+          displayName: firebaseUser.displayName ?? 'Strategist',
+        });
+      } else {
+        resolve(null);
+      }
     });
   });
-}
+};

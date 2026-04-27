@@ -152,7 +152,7 @@ export default function SavingsTracker() {
             <Card className="border-none shadow-sm bg-secondary/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Trophy className="h-5 w-5 text-amber-500" />
+                  <Trophy className="h-5 w-5 text-[#2E7D5A]" />
                   Savings Badges
                 </CardTitle>
               </CardHeader>

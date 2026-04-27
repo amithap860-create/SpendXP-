@@ -49,20 +49,20 @@ const DailyChallengeCard: React.FC<{ featuredFramework: FrameworkId }> = ({ feat
   if (!framework) return null;
 
   return (
-    <Card className="border-teal-200 bg-teal-50/50 mb-6">
+    <Card className="border-primary/20 bg-primary/5 mb-6">
       <CardContent className="p-4">
         <div className="flex items-center gap-2 mb-2">
-          <Sparkles className="h-5 w-5 text-teal-600" />
-          <h3 className="font-bold text-teal-900">Today's Resource Challenge</h3>
+          <Sparkles className="h-5 w-5 text-primary" />
+          <h3 className="font-bold text-slate-900">Today's Resource Challenge</h3>
         </div>
-        <p className="text-sm text-teal-700 mb-2">
+        <p className="text-sm text-primary mb-2">
           Complete {framework.name} today for double XP!
         </p>
         <div className="flex items-center gap-2">
           <Badge className={SOURCE_COLORS[framework.source]}>
             {framework.source}
           </Badge>
-          <Badge variant="outline" className="text-teal-600 border-teal-200">
+          <Badge variant="outline" className="text-primary border-[#A8D5BC]">
             2x XP
           </Badge>
         </div>
@@ -188,8 +188,8 @@ const FrameworkCard: React.FC<{
     <Card 
       className={cn(
         "relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1",
-        isCompleted && "bg-teal-50/30",
-        isExplored && "border-teal-200"
+        isCompleted && "bg-[#E8F5EE]/30",
+        isExplored && "border-[#A8D5BC]"
       )}
     >
       <CardContent className="p-6">
@@ -201,7 +201,7 @@ const FrameworkCard: React.FC<{
         {/* Completion Checkmark */}
         {isCompleted && (
           <div className="absolute top-4 right-4">
-            <CheckCircle2 className="h-6 w-6 text-teal-600" />
+            <CheckCircle2 className="h-6 w-6 text-primary" />
           </div>
         )}
 
@@ -344,8 +344,8 @@ const FDICQuiz: React.FC<{
         ))}
       </div>
       {showTip && (
-        <div className="mt-3 p-3 bg-teal-50 border border-teal-200 rounded-lg">
-          <p className="text-sm text-teal-800">
+        <div className="mt-3 p-3 bg-[#E8F5EE] border border-[#A8D5BC] rounded-lg">
+          <p className="text-sm text-slate-800">
             <strong>FDIC Tip:</strong> {ageOptions.find(opt => opt.value === selectedAge)?.tip}
           </p>
         </div>
@@ -405,8 +405,8 @@ const FDICSkills: React.FC<{
         </div>
       </div>
       {skillCount >= 2 && (
-        <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-sm text-green-800">Great! You have solid real-world skills!</p>
+        <div className="mt-3 p-2 bg-[#E8F5EE] border border-green-200 rounded-lg">
+          <p className="text-sm text-primary">Great! You have solid real-world skills!</p>
         </div>
       )}
     </div>
@@ -446,14 +446,14 @@ const CFPBTimeline: React.FC<{
             className={cn(
               "p-3 rounded-lg border-2 transition-all",
               index === currentStage 
-                ? "border-teal-300 bg-teal-50" 
+                ? "border-primary bg-[#E8F5EE]" 
                 : "border-slate-200 bg-white"
             )}
           >
             <div className="flex items-center justify-between mb-2">
               <h5 className="font-semibold text-sm">Ages {stage.age}</h5>
               {index === currentStage && (
-                <Badge className="bg-teal-100 text-teal-800">You are here</Badge>
+                <Badge className="bg-[#C8E8D8] text-slate-800">You are here</Badge>
               )}
             </div>
             <div className="space-y-1">
@@ -541,19 +541,19 @@ const CFPBProgression: React.FC<{
             className={cn(
               "relative p-3 rounded-lg border transition-all",
               index + 1 === currentLevel 
-                ? "border-teal-300 bg-teal-50 ring-2 ring-teal-200" 
+                ? "border-primary bg-[#E8F5EE] ring-2 ring-primary/30" 
                 : index + 1 < currentLevel
-                ? "border-green-200 bg-green-50"
+                ? "border-green-200 bg-[#E8F5EE]"
                 : "border-slate-200 bg-white"
             )}
           >
             {index + 1 === currentLevel && (
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-teal-500 rounded-full animate-pulse" />
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-pulse" />
             )}
             <div className="flex items-center justify-between mb-2">
               <h5 className="font-semibold text-sm">Level {level.level}: {level.name}</h5>
-              {index + 1 < currentLevel && <CheckCircle2 className="h-4 w-4 text-green-600" />}
-              {index + 1 === currentLevel && <Circle className="h-4 w-4 text-teal-600 fill-current" />}
+              {index + 1 < currentLevel && <CheckCircle2 className="h-4 w-4 text-primary" />}
+              {index + 1 === currentLevel && <Circle className="h-4 w-4 text-primary fill-current" />}
             </div>
             <div className="text-xs text-slate-600">
               {level.skills.join(' • ')}
@@ -764,7 +764,7 @@ const KhanBudget: React.FC<{
       {feedback && (
         <div className={cn(
           "p-2 rounded-lg border mb-4",
-          values[2] >= 20 ? "bg-green-50 border-green-200 text-green-800" : "bg-amber-50 border-amber-200 text-amber-800"
+          values[2] >= 20 ? "bg-[#E8F5EE] border-green-200 text-primary" : "bg-[#E8F5EE] border-[#A8D5BC] text-[#1A4035]"
         )}>
           {feedback}
         </div>
@@ -905,7 +905,7 @@ const OECDCompetency: React.FC<{
             <div className="grid grid-cols-1 gap-1">
               {competencies.map((competency) => (
                 <div key={competency} className="text-xs text-slate-600 flex items-center">
-                  <CheckCircle2 className="h-3 w-3 text-teal-600 mr-2" />
+                  <CheckCircle2 className="h-3 w-3 text-primary mr-2" />
                   {competency}
                 </div>
               ))}
@@ -974,7 +974,7 @@ const CFPBRating: React.FC<{
                     className={cn(
                       "h-4 w-4",
                       star <= ratings[criterion.key as keyof typeof ratings]
-                        ? "fill-yellow-400 text-yellow-400"
+                        ? "fill-yellow-400 text-[#A8D5BC]"
                         : "text-gray-300"
                     )}
                   />
@@ -1100,7 +1100,7 @@ export default function ResourcesPage() {
       {xpAnimations.map((anim) => (
         <div
           key={anim.id}
-          className="fixed pointer-events-none z-50 text-green-600 font-bold text-lg xp-float"
+          className="fixed pointer-events-none z-50 text-primary font-bold text-lg xp-float"
           style={{ left: anim.x, top: anim.y }}
         >
           +{anim.amount} XP
@@ -1127,9 +1127,9 @@ export default function ResourcesPage() {
           </div>
           
           {/* XP Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 rounded-full">
-            <Sparkles className="h-4 w-4 text-amber-600" />
-            <span className="text-sm font-semibold text-amber-800">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#E8F5EE] border border-[#A8D5BC] rounded-full">
+            <Sparkles className="h-4 w-4 text-[#2E7D5A]" />
+            <span className="text-sm font-semibold text-[#1A4035]">
               Earn XP by exploring resources ({resourceProgress.totalXPFromResources || 0} XP earned)
             </span>
           </div>
@@ -1156,12 +1156,12 @@ export default function ResourcesPage() {
 
         {/* Completion Bonus */}
         {resourceProgress.exploredCards.length >= 10 && !resourceProgress.completedInteractions.includes('all_cards_explored') && (
-          <div className="mt-8 p-6 bg-gradient-to-r from-teal-50 to-blue-50 border-2 border-teal-200 rounded-2xl text-center">
-            <Award className="h-12 w-12 text-teal-600 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-teal-900 mb-2">
+          <div className="mt-8 p-6 bg-gradient-to-r from-primary/5 to-blue-50 border-2 border-[#A8D5BC] rounded-2xl text-center">
+            <Award className="h-12 w-12 text-primary mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-slate-900 mb-2">
               🎉 Framework Master Achievement!
             </h3>
-            <p className="text-teal-700 mb-4">
+            <p className="text-primary mb-4">
               You've explored all 10 financial literacy frameworks! You've earned the Framework Master badge and 150 XP.
             </p>
             <Button 
@@ -1177,7 +1177,7 @@ export default function ResourcesPage() {
                   });
                 }
               }}
-              className="bg-teal-600 hover:bg-teal-700"
+              className="bg-primary hover:bg-primary/90"
             >
               Claim Badge & Reward
             </Button>

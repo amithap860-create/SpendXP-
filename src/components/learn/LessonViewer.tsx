@@ -7,6 +7,10 @@ import { Progress } from '@/components/ui/progress';
 import { ChevronRight, ChevronLeft, CheckCircle2, Zap, ArrowRight, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/lib/store';
+import { LearnMoreLink } from '@/components/LearnMoreLink';
+import { useAuthContext } from '@/context/AuthContext';
+import { db, safeUpdateDoc } from '@/firebase';
+import { doc, increment } from 'firebase/firestore';
 
 interface LessonViewerProps {
   lesson: Lesson;
@@ -16,15 +20,22 @@ interface LessonViewerProps {
 export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
   const { ageGroup } = useAgeAdapt();
   const { completeTask } = useUser();
+  const { user } = useAuthContext();
+  // Steps: 0..cards.length-1 = lesson cards, cards.length = briefs, cards.length+1 = quiz
+  const BRIEF_STEP = lesson.cards.length;
+  const QUIZ_STEP = lesson.cards.length + 1;
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedQuizIndex, setSelectedQuizIndex] = useState<number | null>(null);
   const [showQuizResult, setShowQuizResult] = useState(false);
+  const [briefIndex, setBriefIndex] = useState(0);
 
-  const isLastCard = currentStep === lesson.cards.length;
-  const progress = ((currentStep + 1) / (lesson.cards.length + 1)) * 100;
+  const isBriefStep = currentStep === BRIEF_STEP;
+  const isLastCard = currentStep === QUIZ_STEP;
+  const totalSteps = QUIZ_STEP + 1;
+  const progress = ((currentStep + 1) / totalSteps) * 100;
 
   const handleNext = () => {
-    if (currentStep < lesson.cards.length) {
+    if (currentStep < BRIEF_STEP) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -41,8 +52,17 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
     setShowQuizResult(true);
   };
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
     completeTask(`lesson-${lesson.id}`);
+    // Award quiz completion bonus XP
+    if (user?.uid) {
+      const totalCardXP = lesson.cards.reduce((acc, c) => acc + c.xpReward, 0);
+      const quizBonus = 20;
+      await safeUpdateDoc(doc(db, 'users', user.uid, 'progression', 'stats'), {
+        totalXP: increment(totalCardXP + quizBonus),
+        lastActivityAt: new Date(),
+      });
+    }
     onClose();
   };
 
@@ -141,7 +161,7 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-background flex flex-col">
+    <div className="fixed inset-0 z-[9999] bg-background flex flex-col">
       <header className="p-4 border-b bg-white flex items-center justify-between">
         <Button variant="ghost" size="icon" onClick={onClose}><ChevronLeft className="h-6 w-6" /></Button>
         <div className="flex-1 px-8 space-y-2">
@@ -154,9 +174,30 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
         <div className="w-10" />
       </header>
 
-      <main className="flex-1 overflow-hidden relative bg-slate-50 p-4 md:p-8 flex items-center justify-center">
+      <main className="flex-1 overflow-y-auto relative bg-slate-50 p-4 md:p-8 flex items-center justify-center">
         <div className="max-w-2xl w-full">
-          {!isLastCard ? (
+          {isBriefStep && lesson.briefs?.length ? (
+            <Card className="border-none shadow-2xl overflow-hidden animate-in fade-in slide-in-from-right-8 duration-500">
+              <div className="bg-[#E8F5EE]0 p-6 text-white text-center">
+                <div className="text-4xl mb-2">{lesson.briefs[briefIndex].emoji}</div>
+                <p className="text-xs font-black uppercase tracking-widest opacity-80">Did You Know?</p>
+                <p className="text-xs text-[#A8D5BC] mt-1">{briefIndex + 1} of {lesson.briefs.length}</p>
+              </div>
+              <CardContent className="p-8 space-y-6">
+                <p className="text-lg font-bold text-slate-800 leading-relaxed text-center">{lesson.briefs[briefIndex].fact}</p>
+                <div className="flex gap-3">
+                  {briefIndex > 0 && (
+                    <Button variant="outline" onClick={() => setBriefIndex(i => i - 1)} className="flex-none h-12 px-6 font-bold">Back</Button>
+                  )}
+                  {briefIndex < lesson.briefs.length - 1 ? (
+                    <Button onClick={() => setBriefIndex(i => i + 1)} className="flex-1 h-12 font-black">Next Fact</Button>
+                  ) : (
+                    <Button onClick={() => setCurrentStep(QUIZ_STEP)} className="flex-1 h-12 font-black">Take the Quiz →</Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ) : !isLastCard ? (
             <Card className="border-none shadow-2xl overflow-hidden animate-in fade-in slide-in-from-right-8 duration-500">
               <CardContent className="p-8 md:p-12 space-y-8">
                 <h2 className="text-3xl md:text-4xl font-black text-primary tracking-tight leading-tight">
@@ -214,14 +255,14 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
                         !showQuizResult 
                           ? "hover:border-primary hover:bg-primary/5 border-slate-100" 
                           : i === lesson.quizCard.correctIndex 
-                            ? "bg-emerald-50 border-emerald-500 text-emerald-900" 
+                            ? "bg-[#E8F5EE] border-[#2E7D5A] text-[#1A1F2E]"
                             : selectedQuizIndex === i 
                               ? "bg-rose-50 border-rose-500 text-rose-900" 
                               : "opacity-40"
                       )}
                     >
                       <span className="font-bold">{opt}</span>
-                      {showQuizResult && i === lesson.quizCard.correctIndex && <CheckCircle2 className="h-5 w-5 text-emerald-600" />}
+                      {showQuizResult && i === lesson.quizCard.correctIndex && <CheckCircle2 className="h-5 w-5 text-primary" />}
                     </button>
                   ))}
                 </div>
@@ -232,9 +273,12 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
                       <div className="h-10 w-10 rounded-full bg-white shadow-sm flex items-center justify-center shrink-0">
                         <Info className="h-5 w-5 text-primary" />
                       </div>
-                      <p className="text-sm font-medium text-slate-600 leading-relaxed">
-                        {lesson.quizCard.explanation}
-                      </p>
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-slate-600 leading-relaxed">
+                          {lesson.quizCard.explanation}
+                        </p>
+                        <LearnMoreLink href="/learn" label="Explore more lessons" variant="chip" />
+                      </div>
                     </div>
                     <Button onClick={handleFinish} className="w-full h-16 text-2xl font-black rounded-2xl gap-2">
                       Complete Lesson <ArrowRight className="h-6 w-6" />

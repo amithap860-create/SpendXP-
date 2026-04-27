@@ -1,6 +1,6 @@
 'use client';
-    
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useContext } from 'react';
 import {
   DocumentReference,
   onSnapshot,
@@ -10,6 +10,7 @@ import {
 } from 'firebase/firestore';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
+import { FirebaseContext } from '@/firebase/provider';
 
 /** Utility type to add an 'id' field to a given type T. */
 type WithId<T> = T & { id: string };
@@ -27,11 +28,14 @@ export interface UseDocResult<T> {
 /**
  * React hook to subscribe to a single Firestore document in real-time.
  * Handles nullable references.
- * 
- * IMPORTANT! YOU MUST MEMOIZE the inputted memoizedTargetRefOrQuery or BAD THINGS WILL HAPPEN
- * use useMemo to memoize it per React guidence.  Also make sure that it's dependencies are stable
- * references
  *
+ * Waits for Firebase Auth to confirm the user (isUserLoading = false) before
+ * opening any Firestore listener. This prevents permission-denied errors that
+ * occur when listeners race ahead of auth state during page load.
+ *
+ * IMPORTANT! YOU MUST MEMOIZE the inputted memoizedTargetRefOrQuery or BAD THINGS WILL HAPPEN
+ * use useMemo to memoize it per React guidance. Also make sure that its dependencies are stable
+ * references.
  *
  * @template T Optional type for document data. Defaults to any.
  * @param {DocumentReference<DocumentData> | null | undefined} docRef -
@@ -47,17 +51,26 @@ export function useDoc<T = any>(
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<FirestoreError | Error | null>(null);
 
+  // Wait for Firebase Auth to finish its initial check before subscribing.
+  // When isUserLoading is true the user's identity is not yet confirmed — opening
+  // a Firestore listener at that point causes permission-denied errors because
+  // the SDK sends the request before the auth token is attached.
+  const firebaseCtx = useContext(FirebaseContext);
+  const isAuthReady = firebaseCtx !== undefined ? !firebaseCtx.isUserLoading : false;
+
   useEffect(() => {
-    if (!memoizedDocRef) {
+    if (!memoizedDocRef || !isAuthReady) {
       setData(null);
-      setIsLoading(false);
+      // Keep isLoading true while auth is resolving so callers show a spinner
+      // rather than an empty state. Once auth is ready the effect re-runs and
+      // starts the real listener.
+      setIsLoading(!isAuthReady);
       setError(null);
       return;
     }
 
     setIsLoading(true);
     setError(null);
-    // Optional: setData(null); // Clear previous data instantly
 
     const unsubscribe = onSnapshot(
       memoizedDocRef,
@@ -87,7 +100,7 @@ export function useDoc<T = any>(
     );
 
     return () => unsubscribe();
-  }, [memoizedDocRef]); // Re-run if the memoizedDocRef changes.
+  }, [memoizedDocRef, isAuthReady]); // Re-run when auth state settles
 
   return { data, isLoading, error };
 }

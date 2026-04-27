@@ -1,23 +1,28 @@
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useUser, Stock } from '@/lib/store';
+import { useAuthContext } from '@/context/AuthContext';
+import { db, safeUpdateDoc } from '@/firebase';
+import { doc, increment } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Newspaper, 
-  Info, 
+import {
+  TrendingUp,
+  TrendingDown,
+  Newspaper,
+  Info,
   CircleCheckBig,
   LoaderCircle,
   HelpCircle,
   Lightbulb,
   ArrowRight,
   Target,
-  BarChart3
+  BarChart3,
+  AlertTriangle,
+  BookOpen,
 } from 'lucide-react';
 import { generateMarketNewsAndExplanations } from '@/ai/flows/generate-market-news-and-explanations-flow';
 import { useToast } from '@/hooks/use-toast';
@@ -26,6 +31,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 
 export default function MarketSimulation() {
   const { ageGroup, balance, portfolio, buyStock, sellStock, formatValue, stocks, updateStocks, currency } = useUser();
+  const { user } = useAuthContext();
+  const newsXpAwarded = useRef(false);
   const { toast } = useToast();
   const [isLoadingNews, setIsLoadingNews] = useState(false);
   const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
@@ -72,13 +79,18 @@ export default function MarketSimulation() {
       toast({ title: "Invalid Amount", description: "Please enter a valid number of shares.", variant: "destructive" });
       return;
     }
-    const totalCostUsd = selectedStock.price * amount;
-    if (balance < totalCostUsd) {
-      toast({ title: "Insufficient Balance", variant: "destructive" });
+    const totalCost = selectedStock.price * amount;
+    if (balance < totalCost) {
+      toast({ title: "Insufficient Balance", description: `You need ${formatValue(totalCost)} but only have ${formatValue(balance)}.`, variant: "destructive" });
       return;
     }
-    buyStock?.(selectedStock.symbol, amount);
-    toast({ title: "Purchase Successful!", description: `Bought ${amount} shares of ${selectedStock.name}` });
+    if (!buyStock) {
+      toast({ title: "Not ready", description: "Please log in to trade.", variant: "destructive" });
+      return;
+    }
+    buyStock(selectedStock.symbol, amount);
+    toast({ title: "Purchase Successful! 🎉", description: `Bought ${amount} share${amount > 1 ? 's' : ''} of ${selectedStock.name} for ${formatValue(totalCost)}` });
+    setTradeAmount('1');
   };
 
   const handleSell = () => {
@@ -90,11 +102,17 @@ export default function MarketSimulation() {
     }
     const item = portfolio.find(p => p.symbol === selectedStock.symbol);
     if (!item || item.shares < amount) {
-      toast({ title: "Insufficient Shares", variant: "destructive" });
+      toast({ title: "Insufficient Shares", description: `You only own ${item?.shares ?? 0} share${(item?.shares ?? 0) !== 1 ? 's' : ''} of ${selectedStock.name}.`, variant: "destructive" });
       return;
     }
-    sellStock?.(selectedStock.symbol, amount);
-    toast({ title: "Sale Successful!", description: `Sold ${amount} shares of ${selectedStock.name}` });
+    if (!sellStock) {
+      toast({ title: "Not ready", description: "Please log in to trade.", variant: "destructive" });
+      return;
+    }
+    sellStock(selectedStock.symbol, amount);
+    const proceeds = selectedStock.price * amount;
+    toast({ title: "Sale Successful! 💰", description: `Sold ${amount} share${amount > 1 ? 's' : ''} of ${selectedStock.name} for ${formatValue(proceeds)}` });
+    setTradeAmount('1');
   };
 
   return (
@@ -144,7 +162,7 @@ export default function MarketSimulation() {
                     </div>
                     <div className="text-right">
                       <div className="font-bold">{formatValue(stock.price)}</div>
-                      <div className={`flex items-center justify-end text-xs font-bold ${stock.change >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                      <div className={`flex items-center justify-end text-xs font-bold ${stock.change >= 0 ? 'text-primary' : 'text-rose-500'}`}>
                         {stock.change >= 0 ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
                         {Math.abs(stock.change).toFixed(1)}%
                       </div>
@@ -221,7 +239,7 @@ export default function MarketSimulation() {
                       {portfolio.find(p => p.symbol === selectedStock.symbol) ? (
                         <div className="flex justify-between items-center bg-white/5 p-3 rounded-lg">
                           <span className="text-sm">Held: {portfolio.find(p => p.symbol === selectedStock.symbol)?.shares} shares</span>
-                          <span className="text-xs bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full">Active</span>
+                          <span className="text-xs bg-primary/20 text-[#A8D5BC] px-2 py-0.5 rounded-full">Active</span>
                         </div>
                       ) : (
                         <div className="text-xs italic text-primary-foreground/40">You don't own any shares of this company yet.</div>
@@ -237,6 +255,37 @@ export default function MarketSimulation() {
                 )}
               </CardContent>
             </Card>
+          </div>
+        </div>
+
+        {/* Short Selling Explainer Card */}
+        <div className="mt-6 rounded-2xl border-2 border-[#A8D5BC] bg-[#E8F5EE] p-5 space-y-3">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-[#2E7D5A] shrink-0" />
+            <h3 className="font-black text-[#1A1F2E] text-base">What is Short Selling?</h3>
+          </div>
+          <p className="text-sm text-[#1A4035] leading-relaxed">
+            <strong>Short selling</strong> is an advanced strategy where an investor <em>borrows</em> shares they don't own, sells them immediately at the current high price, and hopes to buy them back later at a lower price to return to the lender — pocketing the difference as profit.
+          </p>
+          <div className="grid sm:grid-cols-3 gap-3 pt-1">
+            <div className="bg-white rounded-xl p-3 border border-[#A8D5BC]">
+              <p className="text-[10px] font-black uppercase text-[#4EA07A] mb-1">Step 1 — Borrow & Sell</p>
+              <p className="text-xs text-slate-700">Borrow 10 shares worth ₹100 each. Sell immediately for ₹1,000.</p>
+            </div>
+            <div className="bg-white rounded-xl p-3 border border-[#A8D5BC]">
+              <p className="text-[10px] font-black uppercase text-[#4EA07A] mb-1">Step 2 — Wait</p>
+              <p className="text-xs text-slate-700">Price drops to ₹60. Buy back 10 shares for ₹600 and return them.</p>
+            </div>
+            <div className="bg-white rounded-xl p-3 border border-[#A8D5BC]">
+              <p className="text-[10px] font-black uppercase text-[#4EA07A] mb-1">Step 3 — Profit or Loss</p>
+              <p className="text-xs text-slate-700">Profit: ₹1,000 − ₹600 = ₹400. But if price <em>rises</em>, your loss is unlimited.</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-2 pt-1 bg-red-50 border border-red-100 rounded-xl p-3">
+            <AlertTriangle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+            <p className="text-xs text-red-800 font-medium">
+              <strong>High Risk:</strong> Regular investors can lose at most what they invested. Short sellers face theoretically <em>unlimited</em> losses because a price can keep rising forever. Short selling is banned for most retail investors in India without a broker-issued margin account.
+            </p>
           </div>
         </div>
 
@@ -260,7 +309,21 @@ export default function MarketSimulation() {
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={() => setShowExplanation(false)} className="w-full h-12 text-lg" suppressHydrationWarning>I Got It! +10 XP</Button>
+              <Button
+                onClick={async () => {
+                  setShowExplanation(false);
+                  if (user?.uid && !newsXpAwarded.current) {
+                    newsXpAwarded.current = true;
+                    await safeUpdateDoc(doc(db, 'users', user.uid, 'progression', 'stats'), {
+                      totalXP: increment(10),
+                    });
+                  }
+                }}
+                className="w-full h-12 text-lg"
+                suppressHydrationWarning
+              >
+                I Got It! +10 XP
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -300,11 +363,11 @@ export default function MarketSimulation() {
               <AccordionItem value="when-buy">
                 <AccordionTrigger className="text-lg font-bold">2. When to Buy</AccordionTrigger>
                 <AccordionContent className="space-y-4 pt-2">
-                  <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-start gap-3">
-                    <Lightbulb className="h-5 w-5 text-emerald-600 mt-1" />
+                  <div className="p-4 bg-[#E8F5EE] border border-[#C8E8D8] rounded-xl flex items-start gap-3">
+                    <Lightbulb className="h-5 w-5 text-primary mt-1" />
                     <div>
-                      <h4 className="font-bold text-emerald-900">Strategy: Buy Low</h4>
-                      <p className="text-sm text-emerald-800">The best time to buy is when a company has strong potential but the price is still low. Look for **Positive Breaking News** stories at the bottom of the screen—these often indicate a price jump is coming!</p>
+                      <h4 className="font-bold text-[#1A1F2E]">Strategy: Buy Low</h4>
+                      <p className="text-sm text-[#1A4035]">The best time to buy is when a company has strong potential but the price is still low. Look for **Positive Breaking News** stories at the bottom of the screen—these often indicate a price jump is coming!</p>
                     </div>
                   </div>
                 </AccordionContent>
@@ -341,6 +404,28 @@ export default function MarketSimulation() {
                       <span className="text-sm font-medium">Lower volatility (less extreme price swings)</span>
                     </li>
                   </ul>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="short-selling">
+                <AccordionTrigger className="text-lg font-bold">5. Short Selling — What It Is &amp; Why It's Risky</AccordionTrigger>
+                <AccordionContent className="space-y-4 pt-2">
+                  <p className="text-slate-600">Most investors <strong>buy first, sell later</strong>. Short sellers do the opposite — they <strong>sell first, buy later</strong>, betting prices will fall.</p>
+                  <div className="grid gap-3">
+                    <div className="p-3 bg-slate-50 rounded-lg border">
+                      <p className="text-xs font-black uppercase text-slate-400 mb-1">How it works</p>
+                      <p className="text-sm text-slate-700">Borrow shares from a broker → sell at today's high price → wait for price to drop → buy back cheaper → return shares → keep the difference as profit.</p>
+                    </div>
+                    <div className="p-3 bg-[#E8F5EE] border border-[#C8E8D8] rounded-lg flex items-start gap-2">
+                      <Lightbulb className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                      <p className="text-sm text-[#1A4035]"><strong>Example:</strong> Borrow &amp; sell 5 shares at ₹200 = ₹1,000. Price falls to ₹120. Buy back for ₹600. Profit: ₹400.</p>
+                    </div>
+                    <div className="p-3 bg-red-50 border border-red-100 rounded-lg flex items-start gap-2">
+                      <AlertTriangle className="h-4 w-4 text-red-600 mt-0.5 shrink-0" />
+                      <p className="text-sm text-red-800"><strong>The Risk:</strong> If the price rises instead of falls, losses are <em>unlimited</em>. Regular investing limits your loss to what you put in. Short selling has no such limit.</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-500 italic">Short selling in India requires a SEBI-registered broker margin account. It is not available on most basic trading apps.</p>
                 </AccordionContent>
               </AccordionItem>
             </Accordion>

@@ -179,7 +179,7 @@ export default function ParentSetup() {
         {step === 3 && (
           <Card className="border-none shadow-2xl">
             <CardHeader className="text-center">
-              <div className="h-16 w-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-emerald-600">
+              <div className="h-16 w-16 bg-[#C8E8D8] rounded-2xl flex items-center justify-center mx-auto mb-4 text-primary">
                 <Bell className="h-8 w-8" />
               </div>
               <CardTitle className="text-3xl font-black">Notification Prefs</CardTitle>
@@ -202,7 +202,7 @@ export default function ParentSetup() {
                   <Switch checked={notifs.badges} onCheckedChange={(v) => setNotificationPrefs(p => ({...p, badges: v}))} />
                 </div>
               </div>
-              <Button onClick={handleComplete} className="w-full h-14 text-lg font-black bg-emerald-600 hover:bg-emerald-700 shadow-xl shadow-emerald-200">Go to Dashboard</Button>
+              <Button onClick={handleComplete} className="w-full h-14 text-lg font-black bg-primary hover:bg-[#3A9068] shadow-xl shadow-[#A8D5BC]">Go to Dashboard</Button>
             </CardContent>
           </Card>
         )}
