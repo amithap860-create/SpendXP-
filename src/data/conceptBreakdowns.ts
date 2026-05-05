@@ -533,5 +533,489 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
     },
     estimatedReadSeconds: 60,
     relatedActivityIds: ['first-credit-card']
+  },
+
+  // ─── Quest-specific breakdowns ───────────────────────────────────────────
+
+  {
+    id: 'birthday-loot',
+    title: "Windfalls — what to do when money arrives all at once",
+    hook: "Getting a lump sum feels amazing. What you do in the next 24 hours decides if it lasts 24 days or 24 years.",
+    keyPoints: [
+      "A windfall is any money that arrives unexpectedly or all at once — birthday cash, bonuses, gifts",
+      "The '48-hour rule': don't touch windfall money for two days — let the excitement settle first",
+      "The smart split: save 50%, enjoy 40%, give or invest 10% — a ratio that feels good AND builds wealth"
+    ],
+    realWorldStat: "Studies show people spend 70% of unexpected money within 30 days. Those who save first spend less than 30%.",
+    quickQuestion: "If you got ₹5,000 right now, what would you do with it in the next 10 minutes?",
+    ageAdapted: {
+      junior: {
+        hook: "Birthday money is the best! But it disappears fast if you don't have a plan.",
+        keyPoints: [
+          "Split it before you spend it — decide how much to save first, then enjoy the rest",
+          "Put savings in a separate place so the 'spend' pile feels separate",
+          "What would make you happier: one big thing you really want, or lots of small things you forget next week?",
+          "Saving birthday money every year is how kids build their first big goal fund"
+        ]
+      },
+      teen: {
+        hook: "₹3,000 from relatives on your birthday. Spend it all on one day or let it work for you?",
+        keyPoints: [
+          "Decide your split before you see something you want — otherwise emotions decide",
+          "Even saving ₹1,000 from each birthday adds up: ₹10,000 in 10 years, more with interest",
+          "Experiences (trips, events) create longer happiness than things (gadgets, clothes)",
+          "Start a 'goal jar' — write what you're saving for so you stay motivated"
+        ]
+      },
+      senior: {
+        hook: "A bonus, a gift, a freelance payment — windfalls are wealth-building opportunities in disguise.",
+        keyPoints: [
+          "Treat windfalls as 'extra' — your regular budget should never depend on them",
+          "Invest the majority before lifestyle inflation kicks in and absorbs it",
+          "Use lump sums to fast-track goals: top up emergency fund, pay down high-interest debt, start a SIP"
+        ],
+        extraStat: "People who pre-commit to saving 50% of bonuses before receiving them save 3x more than those who decide after."
+      }
+    },
+    estimatedReadSeconds: 45,
+    relatedActivityIds: ['birthday-loot']
+  },
+
+  {
+    id: 'pocket-money-puzzle',
+    title: "Goal-based saving — wanting something so much you plan for it",
+    hook: "The gap between what you want and what you have is bridged by one thing: a plan with a deadline.",
+    keyPoints: [
+      "Goal-based saving means assigning every saved rupee a purpose — it's far more powerful than 'saving in general'",
+      "Break big goals into weekly targets: ₹600 goal ÷ 4 weeks = ₹150 per week feels doable",
+      "Delayed gratification is a superpower — research shows kids who wait for bigger rewards earn more as adults"
+    ],
+    realWorldStat: "People with written savings goals are 42% more likely to achieve them than those who just 'try to save'.",
+    quickQuestion: "What is one thing you've really wanted but never saved up for? How long would it actually take if you saved every week?",
+    ageAdapted: {
+      junior: {
+        hook: "There's something you really want but can't afford yet. The secret? A savings countdown.",
+        keyPoints: [
+          "Write down what you want and how much it costs",
+          "Divide the cost by your weekly pocket money to find how many weeks to save",
+          "Every time you don't spend, colour in a box on a chart — make the progress visible",
+          "Telling a parent or friend your goal makes you 2x more likely to reach it"
+        ]
+      },
+      teen: {
+        hook: "You want something. Your pocket money isn't enough. Most people give up — but there's a better move.",
+        keyPoints: [
+          "Set a specific goal with a date: 'Save ₹2,000 by March 15' beats 'save more'",
+          "Track progress weekly — momentum keeps you going when motivation dips",
+          "Look for small ways to top up: selling things you don't use, small side jobs",
+          "Ask: is this still what I want? Sometimes goals change — that's okay to admit"
+        ]
+      },
+      senior: {
+        hook: "Every large financial achievement started as a specific goal with a specific date.",
+        keyPoints: [
+          "SMART goals: Specific, Measurable, Achievable, Relevant, Time-bound — works for money too",
+          "Automate transfers on payday so savings happen before you can spend",
+          "Separate savings accounts per goal make progress feel real and prevent 'borrowing from yourself'"
+        ],
+        extraStat: "People with specific savings goals accumulate 3x more wealth over 10 years than those without goals."
+      }
+    },
+    estimatedReadSeconds: 40,
+    relatedActivityIds: ['pocket-money-puzzle']
+  },
+
+  {
+    id: 'lemonade-stand',
+    title: "Running a business — revenue, costs, and profit",
+    hook: "Every business in the world runs on three numbers: how much comes in, how much goes out, and what's left.",
+    keyPoints: [
+      "Revenue is the total money earned. Cost is what you spent to earn it. Profit = Revenue − Cost.",
+      "Pricing too low means working hard for nothing. Pricing too high means no customers. Finding the sweet spot is the job.",
+      "Reinvesting profit back into the business is how small ventures become big ones"
+    ],
+    realWorldStat: "90% of small businesses fail in their first year — most because they never tracked their costs carefully.",
+    quickQuestion: "If you spent ₹200 making something and sold it for ₹350, how much profit did you make per unit? What if you sold 10?",
+    ageAdapted: {
+      junior: {
+        hook: "What if you could make money from something you enjoy doing? That's exactly what a business is.",
+        keyPoints: [
+          "Revenue = all the money customers pay you",
+          "Costs = everything you spent to make your product (ingredients, supplies, time)",
+          "Profit = what's left after subtracting costs from revenue — that's YOUR money",
+          "The more customers you serve, the more profit you can make — this is called scaling"
+        ]
+      },
+      teen: {
+        hook: "Starting a business sounds big. But every business started with someone solving one small problem.",
+        keyPoints: [
+          "Start small and test: sell 10 units before investing in 100",
+          "Fixed costs (equipment, setup) happen once. Variable costs (ingredients, time) grow with sales",
+          "A simple profit margin rule: charge at least 2x your material cost",
+          "Keep a notebook of income and expenses from day one — guessing kills small businesses"
+        ]
+      },
+      senior: {
+        hook: "The difference between a hobby and a business is whether you track the numbers.",
+        keyPoints: [
+          "Break-even point: how many units you must sell before you stop losing money",
+          "Cash flow vs profit: a business can be profitable on paper but broke in reality",
+          "Always separate business money from personal money — even for tiny ventures"
+        ],
+        extraStat: "Entrepreneurs who track expenses from day one are 2.5x more likely to still be running after 3 years."
+      }
+    },
+    estimatedReadSeconds: 50,
+    relatedActivityIds: ['lemonade-stand']
+  },
+
+  {
+    id: 'group-chat-dilemma',
+    title: "Peer pressure and money — when social life attacks your budget",
+    hook: "The most expensive thing you'll ever buy is trying to keep up with people who can't actually afford what they're buying either.",
+    keyPoints: [
+      "Social spending is spending triggered by others' expectations — the hardest category to control",
+      "FOMO (fear of missing out) is a marketing strategy and a social pressure strategy at the same time",
+      "You don't have to explain your budget to anyone — 'I'm saving for something' is a complete sentence"
+    ],
+    realWorldStat: "62% of millennials say they've spent money they didn't have because of social pressure from friends or social media.",
+    quickQuestion: "Think of the last time you spent money to 'keep up' with someone. Did it make you feel better or worse a week later?",
+    ageAdapted: {
+      junior: {
+        hook: "When all your friends have something, it feels like you need it too. But do you really?",
+        keyPoints: [
+          "Just because everyone has it doesn't mean it's worth the money",
+          "Real friends don't care if you have the latest thing or not",
+          "It's okay to say 'I'm saving my money for something else'",
+          "Ask yourself: do I want this, or do I want people to see me having this?"
+        ]
+      },
+      teen: {
+        hook: "Group chats, outings, and social media create invisible spending pressure every single day.",
+        keyPoints: [
+          "Suggest free or low-cost alternatives — a walk, a home hangout, a free event",
+          "Set a 'social budget' each month so you can say yes sometimes without guilt",
+          "If friends mock your budget, that's information about those friends — not about you",
+          "The most confident person in the room isn't always the one who spends the most"
+        ]
+      },
+      senior: {
+        hook: "Lifestyle creep often comes from keeping up with colleagues, not your own genuine desires.",
+        keyPoints: [
+          "Distinguish between genuine shared experiences and performative spending",
+          "Suggest cost-sharing for group plans — most people are quietly relieved",
+          "Your financial goals deserve the same respect as your social goals — guard them equally"
+        ],
+        extraStat: "Indians who track 'social spending' as a separate budget category reduce it by 30% within 3 months."
+      }
+    },
+    estimatedReadSeconds: 45,
+    relatedActivityIds: ['group-chat-dilemma']
+  },
+
+  {
+    id: 'first-side-hustle',
+    title: "Side hustles — turning skills into income",
+    hook: "Your main job pays your bills. Your side hustle builds your freedom. But only if you treat it like a business.",
+    keyPoints: [
+      "Pricing your time: charge what the work is worth, not what feels comfortable to say out loud",
+      "Freelance income is not guaranteed — save 30% of every payment before spending anything",
+      "As a freelancer, YOU are the HR, tax, accounts, and marketing department — build simple systems early"
+    ],
+    realWorldStat: "India has over 15 million freelancers — the third-largest freelance workforce globally. Top earners charge 10x what beginners do for the same skill.",
+    quickQuestion: "What skill do you have that someone, somewhere, would pay for? Have you ever charged for it?",
+    ageAdapted: {
+      junior: {
+        hook: "Did you know kids can earn money from things they're already good at?",
+        keyPoints: [
+          "Drawing, gaming, music, coding — any skill can become something others pay for",
+          "Teaching someone else what you know is one of the easiest ways to earn",
+          "Start small: one customer, one project, one skill",
+          "Keep your earnings separate so you know exactly how much your hustle made"
+        ]
+      },
+      teen: {
+        hook: "Your design skills, video editing, tutoring — these are real services people pay real money for.",
+        keyPoints: [
+          "Platforms like Fiverr and Upwork let you find clients from day one",
+          "Your first price will feel too high. It isn't — time has value.",
+          "Build a simple portfolio of 3 projects before approaching paid clients",
+          "Track every hour worked and every rupee earned — know your hourly rate"
+        ]
+      },
+      senior: {
+        hook: "A side hustle that earns ₹10,000/month in your 20s becomes ₹40,000/month by your 30s if you build it right.",
+        keyPoints: [
+          "Register as a freelancer and pay advance tax quarterly if earnings exceed ₹2.5 lakh/year",
+          "Keep business and personal accounts separate from the first payment",
+          "Raise prices with every new client — your experience has value that compounds"
+        ],
+        extraStat: "Freelancers who raise their rates every 6 months earn 70% more than those who keep their starting rate for 2+ years."
+      }
+    },
+    estimatedReadSeconds: 50,
+    relatedActivityIds: ['first-side-hustle']
+  },
+
+  {
+    id: 'phone-plan-trap',
+    title: "Reading the fine print — total cost vs monthly cost",
+    hook: "Companies don't advertise total cost because if they did, you'd rarely buy.",
+    keyPoints: [
+      "Always multiply: monthly price × 12 (or contract months) = the real price you're committing to",
+      "Free trials auto-convert to paid plans — calendar reminders before trial end are essential",
+      "Upgrades are cheap. Downgrades are hard. Always ask what happens if you want to cancel or switch."
+    ],
+    realWorldStat: "The average Indian household pays for 2.3 subscriptions they don't actively use — ₹8,000/year wasted.",
+    quickQuestion: "How many apps, plans, or subscriptions are you currently paying for? Have you checked in the last 3 months?",
+    ageAdapted: {
+      junior: {
+        hook: "Sometimes something looks cheap but costs a LOT more than you think.",
+        keyPoints: [
+          "Always ask: what's the TOTAL price, not just what I pay today?",
+          "Monthly plans add up fast — ₹99/month is ₹1,188 every year",
+          "Ask a parent to help you read the rules before agreeing to anything",
+          "Free sometimes means you pay with your data or attention instead of money"
+        ]
+      },
+      teen: {
+        hook: "That ₹149/month plan sounds fine until you add it up and realise it's costing you a new phone every 2 years.",
+        keyPoints: [
+          "Compare plans by annual cost, not monthly — companies use monthly to hide the total",
+          "Read cancellation terms before you subscribe — some charge fees for early exit",
+          "Bundled plans are only a deal if you use ALL the features you're paying for",
+          "The 'best deal' often isn't — calculate price per GB, not just headline data allowance"
+        ]
+      },
+      senior: {
+        hook: "Every service contract has a paragraph designed to make you stay longer than you planned.",
+        keyPoints: [
+          "Lock-in periods on phones and plans can cost ₹3,000–₹8,000 to exit early",
+          "Compare 'total cost of ownership' not sticker price — includes accessories, insurance, repairs",
+          "Audit all subscriptions quarterly — set a phone reminder every 3 months"
+        ],
+        extraStat: "Indians overspend ₹12,000/year on average on unused data, streaming, and subscription plan upgrades."
+      }
+    },
+    estimatedReadSeconds: 45,
+    relatedActivityIds: ['phone-plan-trap']
+  },
+
+  {
+    id: 'first-paycheck',
+    title: "Your first salary — CTC vs take-home and where the rest goes",
+    hook: "Your offer letter says ₹35,000. Your bank notification says ₹28,500. You didn't get robbed — you just didn't understand the payslip.",
+    keyPoints: [
+      "CTC (Cost to Company) includes PF, gratuity, and benefits that never reach your account — your take-home is always less",
+      "PF (Provident Fund) is 12% of your basic salary saved for your future — it's yours, just locked until retirement",
+      "HRA (House Rent Allowance) is a tax-free component if you live in a rented home — it reduces your tax significantly"
+    ],
+    realWorldStat: "80% of first-time employees don't understand their payslip until month 3 — and many overpay tax the entire first year.",
+    quickQuestion: "If your CTC is ₹5 lakh and your take-home is ₹38,000/month, where do you think the difference is going?",
+    ageAdapted: {
+      junior: {
+        hook: "When you grow up and get a job, the number on your contract and what arrives in your bank are different!",
+        keyPoints: [
+          "Companies set aside some of your salary as savings for your future — it's still your money",
+          "The government takes a small part as income tax for schools, roads, and hospitals",
+          "Your 'take-home' is what's left after these — and it's what you plan your life around",
+          "Always look at your payslip to understand where every rupee went"
+        ]
+      },
+      teen: {
+        hook: "Your first internship or part-time stipend has deductions too — knowing what they are is financial literacy 101.",
+        keyPoints: [
+          "TDS (Tax Deducted at Source) is tax taken before you see the money — it can be refunded if overpaid",
+          "Professional Tax is a small state tax deducted monthly — usually ₹200",
+          "Your first payslip will confuse you. Print it, google every line, and understand it fully"
+        ]
+      },
+      senior: {
+        hook: "Negotiate on the fixed component — bonuses aren't guaranteed, but your basic salary compounds every hike.",
+        keyPoints: [
+          "Basic salary determines your PF contribution and HRA calculation — a higher basic helps both",
+          "Form 16 is your annual tax summary — keep every year's filed safely",
+          "Declare rent receipts and investments to HR at the start of the financial year to avoid excess TDS",
+          "Check if your company offers flexible benefits (meal coupons, NPS) — they reduce taxable income"
+        ],
+        extraStat: "Employees who submit investment proofs on time save an average ₹18,000–₹36,000 in excess TDS every year."
+      }
+    },
+    estimatedReadSeconds: 55,
+    relatedActivityIds: ['first-paycheck']
+  },
+
+  {
+    id: 'first-apartment',
+    title: "Renting your first home — the costs nobody warns you about",
+    hook: "The rent is ₹25,000. Moving in actually costs ₹2.5 lakh. Here's what they don't put in the listing.",
+    keyPoints: [
+      "Security deposit in cities like Mumbai and Bangalore can be 5–10 months of rent — that's ₹1.25–2.5 lakh just to move in",
+      "Brokerage is typically one month's rent paid upfront — factor this into your move-in budget",
+      "Monthly rent is just the start: society maintenance, electricity, internet, and annual hikes add 15–20% to your real cost"
+    ],
+    realWorldStat: "The average first-time Mumbai renter underestimates move-in costs by ₹80,000 — leading many to borrow in their first month.",
+    quickQuestion: "If rent is ₹22,000/month in BKC, how much cash do you need on day one before accounting for food or furniture?",
+    ageAdapted: {
+      junior: {
+        hook: "Getting your own place someday sounds exciting! But it costs a LOT more than just the monthly rent.",
+        keyPoints: [
+          "You usually pay several months of rent upfront as a 'deposit' that you get back when you leave",
+          "Electricity, water, and internet are extra every month on top of rent",
+          "Moving furniture and setting up a home has its own big cost",
+          "Saving early makes the first move-out much less stressful"
+        ]
+      },
+      teen: {
+        hook: "Your first apartment costs ₹18,000/month. Your actual move-in expense? Closer to ₹1.5 lakh.",
+        keyPoints: [
+          "Security deposit (2–10 months), brokerage (1 month), moving costs — add them all up before you sign",
+          "Always negotiate the deposit — in some cities it's negotiable by 1–2 months",
+          "Split with a flatmate to cut rent in half — but set clear rules about money from day one",
+          "Read the lease before signing: check notice period, rent hike clause, and who pays for repairs"
+        ]
+      },
+      senior: {
+        hook: "Rent vs Buy in India: at 9% home loan rates and 3% rental yields, renting is often the financially smarter choice in your 20s.",
+        keyPoints: [
+          "Keep rent below 30% of take-home — above 40% and you have no room to build wealth",
+          "Annual rent hikes of 10% are standard in most leases — budget for them in year 2",
+          "Inspect for water seepage, building age, and lift maintenance before committing"
+        ],
+        extraStat: "Renters in Mumbai who split with one flatmate save an average ₹4.2 lakh over 3 years compared to living alone."
+      }
+    },
+    estimatedReadSeconds: 55,
+    relatedActivityIds: ['first-apartment']
+  },
+
+  {
+    id: 'phone-emi',
+    title: "EMI traps — the real price of buying now",
+    hook: "That ₹80,000 iPhone on 12-month EMI feels like ₹6,666/month. It actually costs you ₹92,000. Here's the maths.",
+    keyPoints: [
+      "EMI total = monthly amount × number of months — always calculate this before signing",
+      "Interest rates on consumer electronics EMIs range from 14–24% per year — far higher than most people realise",
+      "No-cost EMI is rarely free: the 'discount' you get upfront is exactly equal to the interest you're paying in disguise"
+    ],
+    realWorldStat: "Indians spend over ₹2.3 lakh crore on consumer electronics EMIs annually — the fastest growing debt category among under-30s.",
+    quickQuestion: "If you saved ₹6,666 per month for 12 months instead of paying EMI, you'd have ₹80,000 cash. Why does most of India choose EMI instead?",
+    ageAdapted: {
+      junior: {
+        hook: "Paying a little every month sounds easier than paying it all at once — but it ends up costing more!",
+        keyPoints: [
+          "When you split a payment, the shop or bank charges extra — that's the interest",
+          "The longer you take to pay, the more extra money you give them",
+          "Saving up and paying at once almost always costs less than paying in instalments"
+        ]
+      },
+      teen: {
+        hook: "Your friend's ₹80,000 phone on 'easy EMI' — by the time they finish paying, it cost ₹95,000.",
+        keyPoints: [
+          "Calculate total payout before agreeing: monthly EMI × total months",
+          "Ask if there's a processing fee — it adds to the real cost on top of interest",
+          "The question isn't 'can I afford the EMI?' — it's 'do I need this enough to pay ₹15,000 extra?'"
+        ]
+      },
+      senior: {
+        hook: "Debt for depreciating assets is a double loss — you pay interest AND the asset loses value simultaneously.",
+        keyPoints: [
+          "Electronics lose 30–40% of value in year one — you're paying interest on something worth less every month",
+          "EMIs on consumer goods reduce your investable income — the real cost is lost compounding",
+          "If you must use EMI: choose shortest tenure, pre-close when possible, and never on a credit card"
+        ],
+        extraStat: "Indians who avoid consumer electronics EMIs and save instead accumulate ₹6–12 lakh more by age 35, purely from redirected EMI amounts invested in SIPs."
+      }
+    },
+    estimatedReadSeconds: 50,
+    relatedActivityIds: ['phone-emi']
+  },
+
+  {
+    id: 'emergency-expense',
+    title: "When income stops — surviving and rebuilding after a financial shock",
+    hook: "A job loss, a medical bill, a sudden repair — financial shocks don't announce themselves. Your emergency fund is the announcement they never made.",
+    keyPoints: [
+      "3–6 months of essential expenses in liquid savings is the target — not total income, just what you need to survive",
+      "Liquid means accessible in 24 hours: savings account or liquid mutual fund, not FD, stocks, or real estate",
+      "In a crisis, cut non-essentials immediately and ruthlessly — survival mode is temporary, but debt is permanent"
+    ],
+    realWorldStat: "Only 22% of Indian households could survive a ₹50,000 emergency without borrowing. Among millennials, it's under 15%.",
+    quickQuestion: "If your income stopped today, how many days could you cover your rent, food, and EMIs without help?",
+    ageAdapted: {
+      junior: {
+        hook: "What happens if something breaks and you need money fast? That's what a rainy day fund is for.",
+        keyPoints: [
+          "A rainy day fund is money saved for unexpected problems, not fun things",
+          "Start with ₹500, then grow it to ₹2,000 — a small safety net is better than none",
+          "Never spend it on things you want — only on things you genuinely need right now",
+          "After using it, rebuild it before saving for anything else"
+        ]
+      },
+      teen: {
+        hook: "Your phone breaks. Your bike needs repairs. Life's emergencies are expensive and don't wait for a convenient time.",
+        keyPoints: [
+          "Aim for 3 months of your essential costs saved and completely separate from spending money",
+          "A separate savings account you don't look at daily is the best emergency fund",
+          "List your 'survival expenses' — rent, food, transport — that's the target amount to cover",
+          "Health insurance covers medical emergencies — it's part of your emergency strategy too"
+        ]
+      },
+      senior: {
+        hook: "Getting laid off feels like the floor dropped. An emergency fund is the new floor.",
+        keyPoints: [
+          "6 months of expenses if self-employed, 3 months minimum if salaried with stable employment",
+          "Liquid mutual funds offer slightly better returns than savings accounts with same-day redemption",
+          "In a layoff: cut discretionary spending before touching savings, negotiate notice pay, claim PF immediately"
+        ],
+        extraStat: "Professionals with a 6-month emergency fund recover from job loss 2.4x faster and with 60% less debt than those without one."
+      }
+    },
+    estimatedReadSeconds: 55,
+    relatedActivityIds: ['emergency-expense']
+  },
+
+  {
+    id: 'first-credit-card',
+    title: "Your first credit card — power tool or debt trap",
+    hook: "A credit card is the best financial tool ever created — for people who pay it in full every month. For everyone else, it's a 42% loan.",
+    keyPoints: [
+      "Grace period: pay your full statement balance by due date and you pay exactly 0% interest — not a rupee more",
+      "The minimum payment trap: paying just 5% of what you owe means the rest grows at 3–4% per MONTH",
+      "Credit utilisation: use under 30% of your credit limit to build a strong CIBIL score"
+    ],
+    realWorldStat: "The average Indian credit card holder carries a balance of ₹38,000 at 3.5% monthly interest — paying ₹1,330 in interest every single month for nothing.",
+    quickQuestion: "If your credit card limit is ₹50,000 and you spend ₹40,000 and pay only the minimum, what do you think happens to the remaining ₹38,000?",
+    ageAdapted: {
+      junior: {
+        hook: "A credit card lets you buy things now and pay later — but if you wait too long, you pay a LOT more.",
+        keyPoints: [
+          "Credit cards lend you the bank's money — not your own",
+          "Pay it back fast and you pay nothing extra",
+          "Pay it back slow and you pay a lot more than the original price",
+          "It's not free money — think of it like a very short-term loan"
+        ]
+      },
+      teen: {
+        hook: "Your first credit card feels like free money. It absolutely is not. Here's what actually happens.",
+        keyPoints: [
+          "Always spend only what you already have in your bank account — never more",
+          "Set up autopay for the full statement balance so you never miss a due date",
+          "Never withdraw cash from a credit card — interest starts instantly with no grace period",
+          "One card, low limit, zero rollover balance — the starter formula that builds great credit"
+        ]
+      },
+      senior: {
+        hook: "Used right, a credit card gives you 45 days free credit, purchase protection, and reward points. Used wrong, it charges 42% annually.",
+        keyPoints: [
+          "Statement date vs due date: spend just after statement date to maximise interest-free window to ~45 days",
+          "Never close your oldest card — account age is 15% of your CIBIL score",
+          "Choose a card that matches your spending: travel card for flying, cashback card for daily expenses"
+        ],
+        extraStat: "CIBIL scores above 750 — mostly built on consistent credit card payment history — save an average ₹8 lakh in lower interest over a home loan."
+      }
+    },
+    estimatedReadSeconds: 55,
+    relatedActivityIds: ['first-credit-card']
   }
 ];
