@@ -30,7 +30,7 @@ export {
 export {
   hashGameState,
   detectDevTools
-} from '@/lib/security';
+} from '@/lib/gameIntegrity';
 
 import { app, auth, db } from '@/lib/firebase';
 import { 
@@ -90,4 +90,5 @@ export * from '@/lib/validation';
 export * from '@/lib/accountLockout';
 export * from '@/lib/privacyGuard';
 export * from '@/lib/sessionGuard';
-export * from '@/lib/security';
+// NOTE: @/lib/security is server-only (uses bcryptjs + next/server).
+// Client-safe exports from that file have been moved to @/lib/gameIntegrity.

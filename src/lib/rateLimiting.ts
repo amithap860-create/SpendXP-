@@ -1,6 +1,6 @@
-import { NextRequest } from 'next/server';
-
 // Simple in-memory rate limiter for development
+// NOTE: NextRequest is intentionally NOT imported here so this file stays
+// client-safe. We use a minimal interface instead.
 // Replace with Redis/Upstash Redis for production
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
@@ -83,14 +83,19 @@ export const emailVerificationRateLimiter = new RateLimiter(
   'auth_email_verification'
 );
 
+// Minimal request interface — avoids importing next/server so this file stays client-safe.
+interface RequestLike {
+  headers: { get(name: string): string | null };
+}
+
 // Helper function to extract identifier from request
-export function getIdentifier(request: NextRequest): string {
+export function getIdentifier(request: RequestLike): string {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ||
             request.headers.get('x-real-ip') ||
             'unknown';
-  
+
   const userAgent = request.headers.get('user-agent') || 'unknown';
-  
+
   // Create a unique identifier based on IP and user agent
   return Buffer.from(`${ip}:${userAgent}`).toString('base64');
 }
@@ -98,7 +103,7 @@ export function getIdentifier(request: NextRequest): string {
 // Rate limiting middleware helper
 export async function checkRateLimit(
   rateLimiter: RateLimiter,
-  request: NextRequest,
+  request: RequestLike,
   customIdentifier?: string
 ): Promise<{ allowed: boolean; remaining: number; resetTime: number }> {
   const identifier = customIdentifier || getIdentifier(request);

@@ -1,3 +1,4 @@
+import 'server-only';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
