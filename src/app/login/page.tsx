@@ -165,7 +165,7 @@ function LoginContent() {
     <div className="min-h-screen-safe bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-100 via-blue-50 to-white flex items-center justify-center p-4">
       <Card className="max-w-[420px] w-full shadow-2xl border-none overflow-hidden animate-in fade-in zoom-in duration-500">
         {reason === 'reauth_required' && (
-          <div className="bg-[#E8F5EE]0 text-white px-4 py-2 text-xs font-bold flex items-center gap-2">
+          <div className="bg-primary text-white px-4 py-2 text-xs font-bold flex items-center gap-2">
             <Info className="h-3 w-3" />
             For security, please sign in again to change your password.
           </div>

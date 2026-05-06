@@ -189,7 +189,7 @@ export default function Academy() {
 
               <TabsContent value="budgeting">
                 <Card className="border-none shadow-sm bg-white overflow-hidden">
-                  <div className="bg-[#E8F5EE]0 h-2 w-full" />
+                  <div className="bg-secondary h-2 w-full" />
                   <CardHeader>
                     <div className="flex items-center gap-2 text-[#2E7D5A] mb-2">
                       <Calculator className="h-5 w-5" />

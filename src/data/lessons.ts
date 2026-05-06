@@ -292,7 +292,7 @@ export const lessons: Lesson[] = [
   {
     id: 'l-saving',
     topic: 'saving',
-    relatedGame: 'compoundClicker',
+    relatedGame: 'budgetBlitz',
     title: 'The Art of Saving',
     estimatedMinutes: 3,
     ageGroups: ['junior', 'teen', 'senior'],
@@ -567,7 +567,7 @@ export const lessons: Lesson[] = [
   {
     id: 'l-emergency',
     topic: 'saving',
-    relatedGame: 'compoundClicker',
+    relatedGame: 'budgetBlitz',
     title: 'Emergency Funds',
     estimatedMinutes: 3,
     ageGroups: ['junior', 'teen', 'senior'],

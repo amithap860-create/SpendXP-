@@ -490,7 +490,7 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
     cash:     { icon: Wallet,    label: 'Cash',     color: 'bg-slate-500',  desc: 'Safest. Loses value to inflation over time. Good for emergencies.' },
     bonds:    { icon: Landmark,  label: 'Bonds',    color: 'bg-blue-500',   desc: 'Fixed interest payments. Lower risk. Steady income.' },
     stocks:   { icon: TrendingUp,label: 'Stocks',   color: 'bg-primary',desc: 'Ownership in companies. Higher risk, higher long-term return.' },
-    property: { icon: Building2, label: 'Property', color: 'bg-[#E8F5EE]0',  desc: 'Real estate. Good hedge against inflation but hard to liquidate.' },
+    property: { icon: Building2, label: 'Property', color: 'bg-secondary',  desc: 'Real estate. Good hedge against inflation but hard to liquidate.' },
   };
 
   return (

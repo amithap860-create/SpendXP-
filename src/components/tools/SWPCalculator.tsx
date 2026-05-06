@@ -150,7 +150,7 @@ export function SWPCalculator() {
             <div className="h-3 bg-white rounded-full overflow-hidden border border-blue-100">
               <div
                 className={cn('h-full rounded-full transition-all duration-700',
-                  sustainabilityPct >= 100 ? 'bg-primary' : sustainabilityPct >= 60 ? 'bg-[#E8F5EE]0' : 'bg-rose-500'
+                  sustainabilityPct >= 100 ? 'bg-primary' : sustainabilityPct >= 60 ? 'bg-amber-400' : 'bg-rose-500'
                 )}
                 style={{ width: `${Math.min(100, sustainabilityPct)}%` }}
               />

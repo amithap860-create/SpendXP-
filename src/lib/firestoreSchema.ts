@@ -10,7 +10,7 @@
  */
 
 export interface GameScore {
-  gameName: 'budgetBlitz' | 'finIQ' | 'moneyMaze' | 'stockMarketSim' | 'creditScoreBuilder' | 'compoundClicker';
+  gameName: 'budgetBlitz' | 'finIQ' | 'moneyMaze' | 'stockMarketSim' | 'creditScoreBuilder';
   lastScore: number;
   highScore: number;
   lastXpEarned: number;

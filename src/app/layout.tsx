@@ -112,7 +112,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
       <Toaster />
       {/* Legal footer — desktop only, hidden on auth pages */}
       {!isAuthPage && (
-        <footer className="hidden md:flex items-center justify-center gap-4 py-3 border-t border-slate-100 bg-white text-[11px] font-bold text-slate-300">
+        <footer className="hidden md:flex items-center justify-center gap-4 py-3 border-t border-slate-100 bg-white text-[11px] font-bold text-slate-500">
           <Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
           <span>·</span>
           <Link href="/terms" className="hover:text-primary transition-colors">Terms of Service</Link>
@@ -200,7 +200,7 @@ function NavLink({ href, label, active, isSmallScreen }: { href: string; label: 
       {!isSmallScreen && (
         <span className={cn(
           "text-[9px] font-black uppercase tracking-wider truncate w-full text-center px-0.5 transition-colors",
-          active ? "text-primary" : "text-slate-300"
+          active ? "text-primary" : "text-slate-400"
         )}>
           {label}
         </span>

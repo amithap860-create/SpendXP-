@@ -29,12 +29,7 @@ const CreditScoreBuilder = dynamic(() => import('@/components/games/CreditScoreB
   loading: () => <GameLoadingSkeleton />,
   ssr: false
 });
-const CompoundClicker = dynamic(() => import('@/components/games/CompoundClicker').then(mod => mod.CompoundClicker), {
-  loading: () => <GameLoadingSkeleton />,
-  ssr: false
-});
-
-type GameID = 'budgetBlitz' | 'finIQQuiz' | 'moneyMaze' | 'stockMarketSim' | 'creditScoreBuilder' | 'compoundClicker';
+type GameID = 'budgetBlitz' | 'finIQQuiz' | 'moneyMaze' | 'stockMarketSim' | 'creditScoreBuilder';
 
 interface GamesHubProps {
   searchParams: Promise<{ game?: string; mode?: string }>;
@@ -60,12 +55,11 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
     
     if (gameParam) {
       const validGames: GameID[] = [
-        'budgetBlitz', 
-        'finIQQuiz', 
-        'moneyMaze', 
-        'stockMarketSim', 
-        'creditScoreBuilder', 
-        'compoundClicker'
+        'budgetBlitz',
+        'finIQQuiz',
+        'moneyMaze',
+        'stockMarketSim',
+        'creditScoreBuilder'
       ];
 
       if (validGames.includes(gameParam)) {
@@ -114,7 +108,6 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
       case 'moneyMaze': return <MoneyMaze onExit={() => setActiveGame(null)} />;
       case 'stockMarketSim': return <StockMarketSim onExit={() => setActiveGame(null)} />;
       case 'creditScoreBuilder': return <CreditScoreBuilder onExit={() => setActiveGame(null)} />;
-      case 'compoundClicker': return <CompoundClicker onExit={() => setActiveGame(null)} />;
       default: return null;
     }
   };
@@ -163,15 +156,7 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
               isHighlighted={highlightedGame === 'creditScoreBuilder'}
               onClick={() => setActiveGame('creditScoreBuilder')} 
             />
-            <GameCard 
-              id="compoundClicker"
-              name="Compound Clicker" 
-              desc="See the magic of long-term growth." 
-              color="bg-[#E8F5EE]0" 
-              isHighlighted={highlightedGame === 'compoundClicker'}
-              onClick={() => setActiveGame('compoundClicker')} 
-            />
-            <GameCard 
+            <GameCard
               id="moneyMaze"
               name="Money Maze" 
               desc="Solve puzzles to optimize your allocation." 

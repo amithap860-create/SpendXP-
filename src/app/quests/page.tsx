@@ -46,13 +46,13 @@ function CaseFileBriefing({ quest, index, onAccept, onDecline }: {
   );
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-slate-950 flex flex-col overflow-y-auto">
+    <div className="fixed inset-0 z-[9999] bg-slate-50 flex flex-col overflow-y-auto">
       {/* Header */}
-      <div className="border-b border-slate-800 px-6 py-4 flex items-center justify-between">
-        <button onClick={onDecline} className="text-xs font-black uppercase tracking-widest text-slate-500 hover:text-slate-300 transition-colors">
+      <div className="border-b border-slate-200 bg-white px-6 py-4 flex items-center justify-between">
+        <button onClick={onDecline} className="text-xs font-black uppercase tracking-widest text-slate-500 hover:text-slate-800 transition-colors">
           ← Back to HQ
         </button>
-        <div className="text-[10px] font-black uppercase tracking-widest text-slate-600">
+        <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">
           Order of the Golden Ledger · Intelligence Division
         </div>
       </div>
@@ -62,70 +62,70 @@ function CaseFileBriefing({ quest, index, onAccept, onDecline }: {
         {/* Dossier stamp */}
         <div className="flex items-start justify-between">
           <div>
-            <div className="text-[10px] font-black uppercase tracking-widest text-slate-600 mb-1">Case File</div>
-            <div className="text-3xl font-black text-[#4EA07A] tracking-tight font-mono">{caseId}</div>
+            <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Case File</div>
+            <div className="text-3xl font-black text-primary tracking-tight font-mono">{caseId}</div>
           </div>
           <div className="text-right">
-            <div className="text-[10px] font-black uppercase tracking-widest text-slate-600 mb-1">Classification</div>
+            <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Classification</div>
             <div className={cn(
               'text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full',
-              quest.difficulty === 'beginner' ? 'bg-[#1A1F2E] text-[#4EA07A]' :
-              quest.difficulty === 'intermediate' ? 'bg-[#1A1F2E] text-[#4EA07A]' :
-              'bg-rose-900 text-rose-400'
+              quest.difficulty === 'beginner' ? 'bg-primary/10 text-primary' :
+              quest.difficulty === 'intermediate' ? 'bg-amber-100 text-amber-700' :
+              'bg-rose-100 text-rose-600'
             )}>{quest.difficulty}</div>
           </div>
         </div>
 
         {/* Divider */}
-        <div className="border border-dashed border-slate-700" />
+        <div className="border border-dashed border-slate-300" />
 
         {/* Case title */}
         <div>
-          <div className="text-[10px] font-black uppercase tracking-widest text-slate-600 mb-2">Investigation</div>
-          <h1 className="text-2xl md:text-3xl font-black text-white leading-tight">{quest.title}</h1>
+          <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Investigation</div>
+          <h1 className="text-2xl md:text-3xl font-black text-slate-900 leading-tight">{quest.title}</h1>
         </div>
 
         {/* Situation report */}
-        <div className="bg-slate-900 border border-slate-700 rounded-xl p-5 space-y-3">
-          <div className="text-[10px] font-black uppercase tracking-widest text-slate-500">Situation Report</div>
-          <p className="text-slate-300 text-sm leading-relaxed">{quest.description}</p>
+        <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-3 shadow-sm">
+          <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">Situation Report</div>
+          <p className="text-slate-700 text-sm leading-relaxed">{quest.description}</p>
         </div>
 
         {/* Fog enemy intel */}
-        <div className="bg-red-950/40 border border-red-900/40 rounded-xl p-5 space-y-3">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-5 space-y-3">
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-red-500" />
-            <div className="text-[10px] font-black uppercase tracking-widest text-red-500">Active Threat</div>
+            <div className="text-[10px] font-black uppercase tracking-widest text-red-600">Active Threat</div>
           </div>
           <div className="flex items-start gap-3">
             <span className="text-2xl">{fogEnemy.emoji}</span>
             <div>
-              <p className="font-black text-red-300 text-sm">{fogEnemy.name}</p>
-              <p className="text-red-400/70 text-xs mt-1 leading-relaxed">{fogEnemy.description}</p>
+              <p className="font-black text-red-700 text-sm">{fogEnemy.name}</p>
+              <p className="text-red-500 text-xs mt-1 leading-relaxed">{fogEnemy.description}</p>
             </div>
           </div>
-          <div className="border-t border-red-900/30 pt-3">
-            <div className="text-[10px] font-black uppercase tracking-widest text-slate-600 mb-1">Weakness</div>
-            <p className="text-slate-400 text-xs leading-relaxed">{fogEnemy.weakness}</p>
+          <div className="border-t border-red-200 pt-3">
+            <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Weakness</div>
+            <p className="text-slate-600 text-xs leading-relaxed">{fogEnemy.weakness}</p>
           </div>
         </div>
 
         {/* Mission stats */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center">
-            <Clock className="h-4 w-4 text-slate-500 mx-auto mb-1" />
-            <div className="text-lg font-black text-white">{quest.estimatedMinutes}m</div>
-            <div className="text-[9px] font-black uppercase text-slate-600">Duration</div>
+          <div className="bg-white border border-slate-200 rounded-xl p-4 text-center shadow-sm">
+            <Clock className="h-4 w-4 text-slate-400 mx-auto mb-1" />
+            <div className="text-lg font-black text-slate-900">{quest.estimatedMinutes}m</div>
+            <div className="text-[9px] font-black uppercase text-slate-500">Duration</div>
           </div>
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center">
-            <Zap className="h-4 w-4 text-[#2E7D5A] mx-auto mb-1" />
-            <div className="text-lg font-black text-[#4EA07A]">+{quest.xpReward}</div>
-            <div className="text-[9px] font-black uppercase text-slate-600">Ledger Points</div>
+          <div className="bg-white border border-slate-200 rounded-xl p-4 text-center shadow-sm">
+            <Zap className="h-4 w-4 text-primary mx-auto mb-1" />
+            <div className="text-lg font-black text-primary">+{quest.xpReward}</div>
+            <div className="text-[9px] font-black uppercase text-slate-500">Ledger Points</div>
           </div>
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-center">
+          <div className="bg-white border border-slate-200 rounded-xl p-4 text-center shadow-sm">
             <Shield className="h-4 w-4 text-primary mx-auto mb-1" />
-            <div className="text-lg font-black text-white">{quest.steps.length}</div>
-            <div className="text-[9px] font-black uppercase text-slate-600">Decisions</div>
+            <div className="text-lg font-black text-slate-900">{quest.steps.length}</div>
+            <div className="text-[9px] font-black uppercase text-slate-500">Decisions</div>
           </div>
         </div>
 
@@ -133,12 +133,12 @@ function CaseFileBriefing({ quest, index, onAccept, onDecline }: {
         <div className="space-y-3 pb-8">
           <Button
             onClick={onAccept}
-            className="w-full h-14 text-lg font-black rounded-2xl gap-2 bg-[#E8F5EE]0 hover:bg-[#4EA07A] text-slate-900"
+            className="w-full h-14 text-lg font-black rounded-2xl gap-2 bg-primary hover:bg-primary/90 text-white"
             suppressHydrationWarning
           >
             Accept Case File <ArrowRight className="h-5 w-5" />
           </Button>
-          <p className="text-center text-[10px] font-bold text-slate-600 uppercase tracking-widest">
+          <p className="text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest">
             Your choices will affect SpendCity's stability
           </p>
         </div>
@@ -229,7 +229,7 @@ export default function QuestsHub() {
             <div className="md:col-span-7 p-6 md:p-10 space-y-6">
 
               {/* Order badge */}
-              <div className="inline-flex items-center gap-2 bg-[#E8F5EE]0/10 border border-[#4EA07A]/30 rounded-full px-4 py-1.5">
+              <div className="inline-flex items-center gap-2 bg-primary/10 border border-[#4EA07A]/30 rounded-full px-4 py-1.5">
                 <span className="text-[#4EA07A] text-sm">⚖️</span>
                 <span className="text-[10px] font-black uppercase tracking-widest text-[#4EA07A]">
                   Order of the Golden Ledger
@@ -297,7 +297,7 @@ export default function QuestsHub() {
                     className={cn('h-full rounded-full transition-all duration-1000',
                       health.color === 'green' ? 'bg-primary' :
                       health.color === 'teal' ? 'bg-primary' :
-                      health.color === 'amber' ? 'bg-[#E8F5EE]0' : 'bg-rose-500'
+                      health.color === 'amber' ? 'bg-amber-400' : 'bg-rose-500'
                     )}
                     style={{ width: `${progression?.financialHealth || 50}%` }}
                   />

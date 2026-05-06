@@ -156,7 +156,7 @@ function InlineCalculator({ question }: { question: string }) {
               <button key={k} onClick={() => pressKey(k)}
                 className={cn('h-10 rounded-xl font-bold text-sm transition-colors',
                   k === '=' ? 'bg-primary text-white' :
-                  ['+','-','×','÷'].includes(k) ? 'bg-[#E8F5EE]0 text-white' :
+                  ['+','-','×','÷'].includes(k) ? 'bg-primary text-white' :
                   k === 'C' ? 'bg-rose-500 text-white' : 'bg-slate-700 text-white hover:bg-slate-600')}
                 suppressHydrationWarning>{k}</button>
             ))}
@@ -462,7 +462,7 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
         {/* Timer bar */}
         <div className="sticky top-0 z-20 h-2 md:h-3 w-full bg-slate-200 rounded-full overflow-hidden">
           <div
-            className={cn("h-full transition-all duration-1000", timeLeft > questionTimerSeconds * 0.5 ? "bg-primary" : timeLeft > questionTimerSeconds * 0.25 ? "bg-[#E8F5EE]0" : "bg-rose-500")}
+            className={cn("h-full transition-all duration-1000", timeLeft > questionTimerSeconds * 0.5 ? "bg-primary" : timeLeft > questionTimerSeconds * 0.25 ? "bg-amber-400" : "bg-rose-500")}
             style={{ width: `${(timeLeft / questionTimerSeconds) * 100}%` }}
           />
         </div>

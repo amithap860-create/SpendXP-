@@ -343,7 +343,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
       {/* Timer bar */}
       <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
         <div
-          className={cn("h-full transition-all duration-1000", timeLeft > 12 ? "bg-primary" : timeLeft > 6 ? "bg-[#E8F5EE]0" : "bg-rose-500")}
+          className={cn("h-full transition-all duration-1000", timeLeft > 12 ? "bg-primary" : timeLeft > 6 ? "bg-amber-400" : "bg-rose-500")}
           style={{ width: `${(timeLeft / ROUND_TIME) * 100}%` }}
         />
       </div>

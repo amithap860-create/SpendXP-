@@ -438,7 +438,7 @@ export default function OnboardingPage() {
                 onClick={completeOnboarding}
                 disabled={loading}
                 size="lg"
-                className="w-full h-14 text-xl font-black rounded-2xl shadow-2xl bg-[#E8F5EE]0 hover:bg-[#4EA07A] text-slate-900 gap-2"
+                className="w-full h-14 text-xl font-black rounded-2xl shadow-2xl bg-primary hover:bg-primary/90 text-white gap-2"
                 suppressHydrationWarning
               >
                 {loading ? '⚖️ Entering the Order...' : '⚖️ Accept Induction'}

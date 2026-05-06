@@ -178,7 +178,7 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
         <div className="max-w-2xl w-full">
           {isBriefStep && lesson.briefs?.length ? (
             <Card className="border-none shadow-2xl overflow-hidden animate-in fade-in slide-in-from-right-8 duration-500">
-              <div className="bg-[#E8F5EE]0 p-6 text-white text-center">
+              <div className="bg-primary p-6 text-white text-center">
                 <div className="text-4xl mb-2">{lesson.briefs[briefIndex].emoji}</div>
                 <p className="text-xs font-black uppercase tracking-widest opacity-80">Did You Know?</p>
                 <p className="text-xs text-[#A8D5BC] mt-1">{briefIndex + 1} of {lesson.briefs.length}</p>

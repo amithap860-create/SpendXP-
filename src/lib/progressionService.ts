@@ -21,7 +21,6 @@ export interface UserProgression {
     moneyMaze: number;
     stockMarketSim: number;
     creditScoreBuilder: number;
-    compoundClicker: number;
   };
 }
 
@@ -61,8 +60,7 @@ export const DEFAULT_PROGRESSION: UserProgression = {
     finIQQuiz: 0,
     moneyMaze: 0,
     stockMarketSim: 0,
-    creditScoreBuilder: 0,
-    compoundClicker: 0
+    creditScoreBuilder: 0
   }
 };
 
@@ -167,7 +165,7 @@ export async function getAllGameScores(uid: string | null | undefined): Promise<
   const authUser = await waitForAuth();
   if (!authUser) return {};
 
-  const games = ['budgetBlitz', 'finIQ', 'moneyMaze', 'stockMarketSim', 'creditScoreBuilder', 'compoundClicker'];
+  const games = ['budgetBlitz', 'finIQ', 'moneyMaze', 'stockMarketSim', 'creditScoreBuilder'];
   const scores: GameScores = {};
 
   try {
@@ -230,10 +228,6 @@ export async function getConceptStrengths(uid: string | null | undefined): Promi
   
   if ((scores.creditScoreBuilder?.highScore || 0) > 700) strengths.credit += 15;
   if ((scores.stockMarketSim?.totalProfit || 0) > 0) strengths.investing += 10;
-  if (scores.compoundClicker?.completed) {
-    strengths.saving += 15;
-    strengths.investing += 15;
-  }
 
   Object.keys(strengths).forEach((key) => {
     const k = key as keyof ConceptStrengths;

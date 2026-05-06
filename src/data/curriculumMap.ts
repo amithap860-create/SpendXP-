@@ -28,7 +28,7 @@ export const CURRICULUM_MAP = {
     topics: ['Activities', 'Missions', 'Skills']
   },
   'cfpb-building-blocks-learn': {
-    relatedGames: ['compoundClicker'],
+    relatedGames: ['budgetBlitz'],
     relatedQuests: ['first-paycheck'],
     relatedLessons: ['saving', 'investing'],
     ageGroups: ['junior', 'teen', 'senior'],
@@ -42,7 +42,7 @@ export const CURRICULUM_MAP = {
     topics: ['Budgeting', 'Saving', 'Debt', 'Insurance']
   },
   'khan-saving-budgeting': {
-    relatedGames: ['budgetBlitz', 'compoundClicker'],
+    relatedGames: ['budgetBlitz', 'finIQQuiz'],
     relatedQuests: ['vacation-planning'],
     relatedLessons: ['budgeting', 'saving'],
     ageGroups: ['junior', 'teen', 'senior'],

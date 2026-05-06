@@ -90,7 +90,7 @@ export function ConceptBreakdown({
           activityType === 'quest' ? "bg-rose-500" :
           activityType === 'quiz' ? "bg-primary" :
           activityType === 'game' ? "bg-blue-500" :
-          "bg-[#E8F5EE]0"
+          "bg-secondary"
         )}>
           {activityType === 'challenge' ? 'Daily Challenge' : activityType}
         </div>

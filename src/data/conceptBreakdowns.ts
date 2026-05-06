@@ -38,7 +38,7 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
       "The 50/30/20 rule: needs, wants, savings — one number to remember",
       "People who budget don't earn more — they just lose less"
     ],
-    realWorldStat: "68% of Indians have no monthly budget. Those who do save 3x more on average.",
+    realWorldStat: "68% of young adults globally have no monthly budget. Those who do save 3x more on average.",
     quickQuestion: "If your income doubled tomorrow, would your spending double too? Why?",
     ageAdapted: {
       junior: {
@@ -46,7 +46,7 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         keyPoints: [
           "Split your money before spending any of it",
           "Needs first (food, school), wants second (games, snacks)",
-          "Even ₹10 saved every day becomes ₹3,650 in a year",
+          "Even $1 saved every day becomes $365 in a year",
           "A simple rule: spend half, save half — even on small amounts"
         ]
       },
@@ -56,7 +56,7 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
           "Write down every spend for one week — the results will shock you",
           "50% needs, 30% wants, 20% savings works at any income level",
           "A budget isn't a cage — it's a map",
-          "Apps like Walnut or just a notes app can track every rupee automatically"
+          "Apps like YNAB or just a notes app can track every dollar automatically"
         ]
       },
       senior: {
@@ -64,10 +64,10 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         keyPoints: [
           "Fixed expenses (rent, EMIs) should not exceed 50% of take-home pay",
           "Variable expenses are where budgets break — track them weekly not monthly",
-          "Zero-based budgeting: assign every rupee a job before the month starts",
+          "Zero-based budgeting: assign every dollar a job before the month starts",
           "Pay yourself first — automate a savings transfer on the same day salary arrives"
         ],
-        extraStat: "The average Indian 22-year-old spends 40% of income on food and transport without realising it."
+        extraStat: "The average 22-year-old globally spends 40% of income on food and transport without realizing it."
       }
     },
     estimatedReadSeconds: 45,
@@ -82,7 +82,7 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
       "Not investing — this money lives in a savings account where you can reach it in 24 hours",
       "Building it takes months. Not having it can cost years."
     ],
-    realWorldStat: "Only 22% of Indian households can cover a ₹50,000 emergency without borrowing.",
+    realWorldStat: "Only 22% of households worldwide can cover a $5,000 emergency without borrowing.",
     quickQuestion: "If you lost your income tomorrow, how many days could you survive on your savings?",
     ageAdapted: {
       junior: {
@@ -90,7 +90,7 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         keyPoints: [
           "Keep some money that you NEVER touch unless it's a real emergency",
           "Not for games, treats, or things you want — only for real problems",
-          "Start with ₹500. Then ₹1,000. Build slowly."
+          "Start with $50. Then $100. Build slowly."
         ]
       },
       teen: {
@@ -105,10 +105,10 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         hook: "Job loss, medical bills, car breakdown — emergencies don't wait for a good time.",
         keyPoints: [
           "6 months expenses minimum if self-employed or on contract work",
-          "High-yield savings account or liquid mutual fund — not a fixed deposit (can't break FD instantly)",
+          "High-yield savings account or money market fund — not a certificate of deposit (can't break CD instantly)",
           "Emergency fund first, investing second — always in that order"
         ],
-        extraStat: "Indians with an emergency fund are 4x less likely to take high-interest personal loans during a crisis."
+        extraStat: "Households with an emergency fund are 4x less likely to take high-interest personal loans during a crisis."
       }
     },
     estimatedReadSeconds: 50,
@@ -123,15 +123,15 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
       "Time is the ingredient that makes compounding magical — starting early matters more than starting big",
       "The same principle that builds wealth also destroys it — credit card debt compounds too"
     ],
-    realWorldStat: "₹5,000 invested monthly from age 22 becomes ₹3.5 crore by age 60 at 12% returns. Starting at 32 gives only ₹1.1 crore.",
-    quickQuestion: "Would you rather have ₹10 lakh today or 1 paisa that doubles every day for 30 days?",
+    realWorldStat: "$600 invested monthly from age 22 becomes $500,000 by age 60 at 12% returns. Starting at 32 gives only $150,000.",
+    quickQuestion: "Would you rather have $12,000 today or $1 that doubles every day for 30 days?",
     ageAdapted: {
       junior: {
         hook: "What if your savings could grow by themselves while you sleep?",
         keyPoints: [
           "Interest means the bank pays YOU to keep money there",
           "Every year the interest gets added and then earns even more interest",
-          "₹1,000 at 8% interest becomes ₹2,159 in 10 years — without adding anything"
+          "$1,000 at 8% interest becomes $2,159 in 10 years — without adding anything"
         ]
       },
       teen: {
@@ -145,26 +145,26 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
       senior: {
         hook: "Your 20s are the most valuable investing decade of your life. Most people waste them.",
         keyPoints: [
-          "SIP of ₹2,000/month from 22 beats ₹5,000/month from 30 by the time you're 60",
-          "Equity mutual funds have historically returned 12-15% annually over 20+ years",
+          "SIP of $240/month from 22 beats $600/month from 30 by the time you're 60",
+          "Equity index funds have historically returned 12-15% annually over 20+ years",
           "Inflation compounds too — money in a savings account at 4% loses value at 6% inflation"
         ],
-        extraStat: "Indians who start SIPs before 25 accumulate 2.8x more wealth by retirement than those who start at 35."
+        extraStat: "Investors who start index fund contributions before 25 accumulate 2.8x more wealth by retirement than those who start at 35."
       }
     },
     estimatedReadSeconds: 60,
-    relatedActivityIds: ['compoundClicker', 'finIQ-investing']
+    relatedActivityIds: ['stockMarketSim', 'finIQ-investing']
   },
   {
     id: 'credit-scores',
     title: "Credit scores — your financial report card",
     hook: "A three-digit number will decide whether you get the apartment, the loan, and the rate.",
     keyPoints: [
-      "CIBIL score ranges from 300 to 900 — above 750 is where good things happen",
+      "Credit scores range from 300 to 850 (in most countries) — above 750 is where good things happen",
       "Payment history is 35% of your score — one missed payment can drop it 50-100 points",
       "It takes years to build a good score and months to destroy one"
     ],
-    realWorldStat: "People with CIBIL scores above 750 get home loan interest rates 1.5% lower — saving ₹8 lakh over a 20-year loan.",
+    realWorldStat: "People with credit scores above 750 get home loan interest rates 1.5% lower — saving $80,000 over a 20-year loan.",
     quickQuestion: "If your credit score was 580 today, what is the one thing you would change first?",
     ageAdapted: {
       junior: {
@@ -188,12 +188,12 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
       senior: {
         hook: "Your first credit card, your first apartment, your first loan — all depend on a number you've probably never checked.",
         keyPoints: [
-          "Check your CIBIL score free at cibil.com — errors are common and can be disputed",
-          "Keep credit utilisation below 30% — if limit is ₹10,000 don't spend over ₹3,000",
+          "Check your credit score free online (AnnualCreditReport.com in the US, or check your country's equivalent) — errors are common and can be disputed",
+          "Keep credit utilization below 30% — if limit is $10,000 don't spend over $3,000",
           "Hard inquiries (applying for credit) drop your score temporarily — don't apply for multiple cards in a month",
-          "Five factors: payment history (35%), utilisation (30%), length (15%), mix (10%), inquiries (10%)"
+          "Five factors: payment history (35%), utilization (30%), length (15%), mix (10%), inquiries (10%)"
         ],
-        extraStat: "40% of Indians who check their CIBIL report find at least one error that is dragging their score down."
+        extraStat: "40% of people who check their credit report find at least one error that is dragging their score down."
       }
     },
     estimatedReadSeconds: 55,
@@ -201,18 +201,18 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
   },
   {
     id: 'emi-and-debt',
-    title: "EMI and debt — the real cost of buying now",
-    hook: "That ₹40,000 phone on EMI? By the time you finish paying, it cost you ₹52,000.",
+    title: "Installment payments and debt — the real cost of buying now",
+    hook: "That $400 phone on 12 payments? By the time you finish paying, it cost you $520.",
     keyPoints: [
-      "EMI spreads cost over time but adds interest — always calculate total payment not monthly",
+      "Installment plans spread cost over time but add interest — always calculate total payment not monthly",
       "Good debt (education, home) builds assets. Bad debt (gadgets, holidays) builds nothing.",
       "The minimum payment trap: paying minimum on credit cards means you're mostly paying interest, not reducing debt"
     ],
-    realWorldStat: "The average Indian between 25-35 spends 22% of income on EMIs — most of it on depreciating assets like phones and bikes.",
-    quickQuestion: "Name one thing you currently own or want to buy — is it worth paying ₹12,000 extra in interest to have it sooner?",
+    realWorldStat: "The average person aged 25-35 spends 22% of income on installment payments — most of it on depreciating assets like phones and vehicles.",
+    quickQuestion: "Name one thing you currently own or want to buy — is it worth paying $120 extra in interest to have it sooner?",
     ageAdapted: {
       junior: {
-        hook: "Buy now pay later sounds great until you realise you're paying more than the price tag.",
+        hook: "Buy now pay later sounds great until you realize you're paying more than the price tag.",
         keyPoints: [
           "Borrowing money always costs extra — that extra is called interest",
           "The longer you take to pay back, the more extra you pay",
@@ -220,11 +220,11 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         ]
       },
       teen: {
-        hook: "That phone on 12-month EMI feels affordable at ₹4,000/month. But you're paying ₹6,000 more than the price.",
+        hook: "That phone on 12-month installments feels affordable at $40/month. But you're paying $60 more than the price.",
         keyPoints: [
-          "Always multiply: monthly EMI × number of months = total you actually pay",
-          "Interest rate matters — 14% APR on a ₹30,000 loan adds ₹2,200 in interest",
-          "If you can't afford it in cash in 3 months of saving, can you really afford the EMI?"
+          "Always multiply: monthly payment × number of months = total you actually pay",
+          "Interest rate matters — 14% APR on a $300 loan adds $22 in interest",
+          "If you can't afford it in cash in 3 months of saving, can you really afford the installments?"
         ]
       },
       senior: {
@@ -234,23 +234,23 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
           "Avalanche method: pay highest interest debt first — saves the most money overall",
           "Snowball method: pay smallest balance first — builds psychological momentum"
         ],
-        extraStat: "Indians in their late 20s with more than 3 active EMIs save 60% less for retirement than those with 1 or none."
+        extraStat: "Young adults in their late 20s with more than 3 active installment payments save 60% less for retirement than those with 1 or none."
       }
     },
     estimatedReadSeconds: 55,
     relatedActivityIds: ['phone-emi', 'moneyMaze-debt']
   },
   {
-    id: 'taxes-india',
+    id: 'taxes-global',
     title: "Taxes — what the government takes and why",
-    hook: "You will earn crores over your lifetime. Understanding taxes could keep lakhs of it.",
+    hook: "You will earn hundreds of thousands over your lifetime. Understanding taxes could keep tens of thousands of it.",
     keyPoints: [
-      "Income tax in India uses slabs — different rates for different income levels, not a flat percentage",
-      "TDS (Tax Deducted at Source) means your employer pays tax before you even see the money",
-      "Section 80C lets you legally reduce taxable income by up to ₹1.5 lakh — most people never use this fully"
+      "Income tax uses brackets — different rates for different income levels, not a flat percentage",
+      "Withholding tax means your employer deducts tax before you even see the money",
+      "Tax deductions let you legally reduce taxable income — most people never use all of them fully"
     ],
-    realWorldStat: "Only 1.5% of India's population files income tax. Those who do miss ₹45,000 in average refunds by not claiming all deductions.",
-    quickQuestion: "If you could legally pay ₹20,000 less in taxes every year, would you take 2 hours to learn how?",
+    realWorldStat: "On average, working adults leave $5,000 in unclaimed refunds by not claiming all deductions they qualify for.",
+    quickQuestion: "If you could legally pay $2,000 less in taxes every year, would you take 2 hours to learn how?",
     ageAdapted: {
       junior: {
         hook: "When you earn money someday, a part of it goes to the government to build roads, schools and hospitals.",
@@ -258,27 +258,27 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
           "Tax is how the government pays for things everyone uses",
           "The more you earn, the higher percentage you pay — this is called progressive tax",
           "Honest tax payment is a legal requirement — not optional",
-          "GST is a tax you already pay — it's added to every product you buy in a shop"
+          "Sales tax is added to many products you buy in shops"
         ]
       },
       teen: {
-        hook: "Your first part-time job or internship stipend may have tax deducted before you even receive it.",
+        hook: "Your first part-time job or internship may have tax withheld before you even receive it.",
         keyPoints: [
-          "Income under ₹2.5 lakh per year is not taxed in India currently",
-          "TDS is deducted by whoever pays you — check your salary slip",
-          "File an ITR even if you don't owe tax — it builds your financial record",
-          "GST applies at different rates: 0% on essentials, 5–28% on other goods and services"
+          "In many countries, income below a threshold is not taxed",
+          "Withholding tax is deducted by whoever pays you — check your pay stub",
+          "File your tax return even if you don't owe tax — it builds your financial record",
+          "Sales tax and VAT apply at different rates depending on the item"
         ]
       },
       senior: {
-        hook: "The difference between old tax regime and new tax regime could mean ₹30,000 saved or lost — annually.",
+        hook: "Tax deductions and credits could mean $3,000 saved or lost — annually.",
         keyPoints: [
-          "Old regime: more deductions (80C, HRA, home loan) — better if you invest heavily",
-          "New regime: lower slab rates, no deductions — better if you are just starting out",
-          "Section 80C covers EPF, ELSS, PPF, LIC, home loan principal up to ₹1.5 lakh",
-          "HRA exemption can save ₹20,000–₹80,000 per year if you live in a rented home"
+          "Some tax deductions are better for different situations — review your options each year",
+          "Retirement account contributions may reduce your taxable income",
+          "Home loan interest may provide a tax deduction depending on your country",
+          "Housing deductions can save $2,000–$8,000 per year if you rent or own with a mortgage"
         ],
-        extraStat: "Salaried Indians who fully utilise Section 80C save an average ₹46,800 in taxes every year."
+        extraStat: "Working adults who claim all available tax deductions save an average $4,680 in taxes every year."
       }
     },
     estimatedReadSeconds: 60,
@@ -293,36 +293,36 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
       "Risk and return are inseparable — higher potential return always means higher risk",
       "Diversification: never put all eggs in one basket — spread across asset types"
     ],
-    realWorldStat: "The Nifty 50 index has returned an average 13.2% annually over the last 20 years — turning ₹1 lakh into ₹11.5 lakh.",
+    realWorldStat: "Global stock indices have returned an average 10% annually over the last 20 years — turning $10,000 into $67,000.",
     quickQuestion: "Would you rather have a guaranteed 5% return or a possible 15% return with a chance of losing 10%?",
     ageAdapted: {
       junior: {
         hook: "What if your money could grow by itself while you're at school?",
         keyPoints: [
           "Investing means letting your money work for you instead of just sitting there",
-          "A piggy bank keeps money safe but doesn't grow it — investing grows it",
+          "A savings account keeps money safe but doesn't grow it — investing grows it",
           "More risk means more potential reward — and more potential loss",
-          "Starting small is fine — even ₹100 in a recurring deposit teaches the habit"
+          "Starting small is fine — even $10 in a regular investment plan teaches the habit"
         ]
       },
       teen: {
-        hook: "A mutual fund SIP of ₹500/month started at 16 is worth more at 60 than ₹5,000/month started at 30.",
+        hook: "An index fund contribution of $60/month started at 16 is worth more at 60 than $600/month started at 30.",
         keyPoints: [
-          "Mutual funds pool money from many investors to buy diversified assets",
-          "SIP (Systematic Investment Plan) means investing a fixed amount monthly",
-          "Index funds track the market — they beat 80% of actively managed funds long-term",
+          "Index funds pool investments to track the entire market",
+          "Automatic investing means contributing a fixed amount monthly",
+          "Index funds beat 80% of actively managed funds long-term",
           "Diversify: don't put all your money in one stock, one company, or one sector"
         ]
       },
       senior: {
         hook: "Your salary buys your lifestyle today. Your investments fund your life when you can no longer work.",
         keyPoints: [
-          "Asset allocation: split between equity (high risk), debt (low risk), and gold (hedge)",
-          "Thumb rule: subtract your age from 100 for equity percentage",
+          "Asset allocation: split between stocks (high risk), bonds (low risk), and real assets (hedge)",
+          "Thumb rule: subtract your age from 100 for stock percentage",
           "Rebalance once a year — bring allocation back to target as markets move",
-          "ELSS mutual funds give you tax deduction under Section 80C AND equity growth"
+          "Tax-advantaged retirement accounts offer growth with tax benefits"
         ],
-        extraStat: "Indians who invest in equity mutual funds for 20+ years have never lost money in any rolling 20-year period in Nifty 50 history."
+        extraStat: "Investors who invest in stock index funds for 20+ years have never lost money in any rolling 20-year period in modern history."
       }
     },
     estimatedReadSeconds: 60,
@@ -331,13 +331,13 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
   {
     id: 'spending-habits',
     title: "Spending habits — the invisible money drain",
-    hook: "It's never the big purchases that empty your account. It's the ₹50 here, ₹200 there, every single day.",
+    hook: "It's never the big purchases that empty your account. It's the $5 here, $20 there, every single day.",
     keyPoints: [
       "Lifestyle inflation: as income rises, spending rises to match — net savings stay zero",
       "Emotional spending: stress, boredom, and social pressure are the real budget killers",
-      "The 24-hour rule: wait one day before any unplanned purchase over ₹500"
+      "The 24-hour rule: wait one day before any unplanned purchase over $50"
     ],
-    realWorldStat: "Indians spend an average ₹3,200 per month on impulse purchases — ₹38,400 per year that was never planned.",
+    realWorldStat: "Young adults spend an average $300 per month on impulse purchases — $3,600 per year that was never planned.",
     quickQuestion: "Think of the last purchase you regretted. What emotion were you feeling when you bought it?",
     ageAdapted: {
       junior: {
@@ -364,9 +364,9 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
           "Track every spend for 30 days — discover 3-5 categories you can cut",
           "Subscriptions are the modern money drain — audit yours quarterly",
           "Separate wants from needs by asking: would my life be worse without this in 30 days?",
-          "The latte factor: ₹200/day on coffee is ₹6,000/month, ₹72,000/year — invest it instead"
+          "The daily factor: $5/day on coffee is $150/month, $1,800/year — invest it instead"
         ],
-        extraStat: "Indians earning ₹1 lakh/month who track spending save an average ₹18,000 more monthly than those who don't."
+        extraStat: "Young adults earning $12,000/month who track spending save an average $1,800 more monthly than those who don't."
       }
     },
     estimatedReadSeconds: 55,
@@ -381,8 +381,8 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
       "Lease agreements: always read the notice period and maintenance clauses carefully",
       "The deposit trap: in some cities, deposits can be 10 months of rent—plan for this upfront"
     ],
-    realWorldStat: "In cities like Mumbai and Bangalore, the average renter spends 45% of their income on housing.",
-    quickQuestion: "Is living closer to work worth an extra ₹5,000 in rent if it saves you 2 hours of travel every day?",
+    realWorldStat: "In major cities globally, the average renter spends 45% of their income on housing.",
+    quickQuestion: "Is living closer to work worth an extra $500 in rent if it saves you 2 hours of travel every day?",
     ageAdapted: {
       junior: {
         hook: "Someday you will have your own place. It costs money every month just to live there!",
@@ -401,13 +401,13 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         ]
       },
       senior: {
-        hook: "Rent vs Buy: in India, renting is often mathematically cheaper than an EMI due to low rental yields.",
+        hook: "Rent vs Buy: in many markets, renting is mathematically cheaper due to lower rental yields vs mortgage rates.",
         keyPoints: [
-          "Rental yield in India is ~3%, while home loan rates are ~9%",
-          "Hidden costs: brokerage, annual rent hikes (usually 10%), and move-in fees",
-          "Always inspect for water leakage and electrical safety before signing"
+          "Compare rental yields to home loan rates in your area — lower yield usually means renting is cheaper",
+          "Hidden costs: broker fees, annual rent hikes, and move-in fees",
+          "Always inspect for water damage, electrical safety, and structural issues before signing"
         ],
-        extraStat: "Mumbai and Bangalore renters spend 45% of income on rent on average."
+        extraStat: "Renters in major cities spend 45% of income on rent on average, making the rent-vs-buy calculation critical."
       }
     },
     estimatedReadSeconds: 65,
@@ -419,10 +419,10 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
     hook: "A vacation paid for in advance is a holiday. A vacation paid for on credit is a debt sentence.",
     keyPoints: [
       "Sinking funds: save a small amount every month for your next big trip",
-      "Opportunity cost: that ₹50,000 trip could be ₹5 lakh in 20 years if invested",
-      "Travel insurance: ₹1,000 spent now could save ₹10 lakh in foreign medical bills"
+      "Opportunity cost: that $5,000 trip could be $50,000 in 20 years if invested",
+      "Travel insurance: $100 spent now could save $100,000 in foreign medical bills"
     ],
-    realWorldStat: "42% of Indian millennials have taken a personal loan to fund a vacation at least once.",
+    realWorldStat: "42% of young adults globally have taken a personal loan to fund a vacation at least once.",
     quickQuestion: "Would you rather have one luxury 3-day trip or three budget 7-day trips?",
     ageAdapted: {
       junior: {
@@ -434,7 +434,7 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         ]
       },
       teen: {
-        hook: "How to travel on ₹15,000 that most people spend ₹40,000 on.",
+        hook: "How to travel on $1,500 that most people spend $4,000 on.",
         keyPoints: [
           "Book flights 3 months early — last minute prices are for people who don't plan",
           "Hostels and homestays are 70% cheaper than hotels and often more fun",
@@ -456,14 +456,14 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
   {
     id: 'first-job-salary',
     title: "First job salary — the truth about your paycheck",
-    hook: "Your 'Cost to Company' (CTC) is not your take-home pay. Understanding the gap saves you from payday surprises.",
+    hook: "Your total compensation package is not your take-home pay. Understanding the gap saves you from payday surprises.",
     keyPoints: [
       "Gross vs Net: Gross is what they promised, Net is what hits your account",
-      "PF (Provident Fund) is mandatory saving for your future — it's your money",
-      "HRA (House Rent Allowance) is a major tax saver if you pay rent"
+      "Retirement contributions are mandatory saving for your future — it's your money",
+      "Housing-related deductions can be major tax savers if you pay rent"
     ],
-    realWorldStat: "80% of first-time employees don't know their net salary until their first message from the bank.",
-    quickQuestion: "If you were offered a ₹50,000 higher CTC but ₹5,000 lower take-home pay, would you take it?",
+    realWorldStat: "80% of first-time employees don't know their net salary until their first paycheck from the bank.",
+    quickQuestion: "If you were offered a $5,000 higher total compensation but $500 lower take-home pay, would you take it?",
     ageAdapted: {
       junior: {
         hook: "Someday you will get a job and earn a salary! But some money is saved for you automatically.",
@@ -476,19 +476,19 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
       teen: {
         hook: "Stipends and part-time pay are your first taste of financial freedom.",
         keyPoints: [
-          "If you earn over ₹2.5 lakh a year, you need to know about taxes",
+          "Check if you need to file taxes based on your country's threshold",
           "Even a small stipend can start a massive investment if you save 30%",
           "Your first paycheck is a milestone — celebrate, but save first"
         ]
       },
       senior: {
-        hook: "Negotiation matters: a 10% higher starting salary compounds to ₹1.2 crore extra over a career.",
+        hook: "Negotiation matters: a 10% higher starting salary compounds to $1.2 million extra over a career.",
         keyPoints: [
-          "Form 16 is your most important tax document",
-          "Professional Tax and Gratuity are other deductions that reduce take-home",
+          "Keep all tax documents and pay stubs for your records",
+          "Various taxes and benefits affect your take-home — understand each one",
           "Always negotiate on the 'Fixed' component, as bonuses aren't guaranteed"
         ],
-        extraStat: "A 10% higher starting salary compounds to ₹1.2 crore extra over a 30-year career."
+        extraStat: "A 10% higher starting salary compounds to $1.2 million extra over a 30-year career."
       }
     },
     estimatedReadSeconds: 65,
@@ -501,10 +501,10 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
     keyPoints: [
       "The Grace Period: if you pay in full on time, you pay 0% interest. Even one day late costs 40%!",
       "Minimum Payment Trap: banks only ask for 5% of what you owe to keep you in debt for years",
-      "Rewards vs Fees: if the annual fee is ₹2,000 and you only earn ₹500 in points, the card costs you money"
+      "Rewards vs Fees: if the annual fee is $200 and you only earn $50 in points, the card costs you money"
     ],
-    realWorldStat: "Indians pay over ₹10,000 crore in credit card interest and late fees every single year.",
-    quickQuestion: "If a credit card company gives you ₹500 back for spending ₹10,000, who really won the deal?",
+    realWorldStat: "Consumers globally pay over $10 billion in credit card interest and late fees every single year.",
+    quickQuestion: "If a credit card company gives you $50 back for spending $10,000, who really won the deal?",
     ageAdapted: {
       junior: {
         hook: "A credit card is like a 'Trust Card'. The bank trusts you to pay them back later.",
@@ -523,10 +523,10 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         ]
       },
       senior: {
-        hook: "Interest rates on credit cards are ~42% per year — the most expensive debt in the world.",
+        hook: "Interest rates on credit cards are ~20-30% per year — among the most expensive debt available.",
         keyPoints: [
-          "Statement Date vs Due Date: knowing the gap helps you maximise interest-free days",
-          "Credit cards are great for building CIBIL score if utilised under 30%",
+          "Statement Date vs Due Date: knowing the gap helps you maximize interest-free days",
+          "Credit cards are great for building credit score if utilized under 30%",
           "Avoid 'Cash Withdrawal' on credit cards — interest starts instantly"
         ]
       }
@@ -547,7 +547,7 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
       "The smart split: save 50%, enjoy 40%, give or invest 10% — a ratio that feels good AND builds wealth"
     ],
     realWorldStat: "Studies show people spend 70% of unexpected money within 30 days. Those who save first spend less than 30%.",
-    quickQuestion: "If you got ₹5,000 right now, what would you do with it in the next 10 minutes?",
+    quickQuestion: "If you got $500 right now, what would you do with it in the next 10 minutes?",
     ageAdapted: {
       junior: {
         hook: "Birthday money is the best! But it disappears fast if you don't have a plan.",
@@ -559,10 +559,10 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         ]
       },
       teen: {
-        hook: "₹3,000 from relatives on your birthday. Spend it all on one day or let it work for you?",
+        hook: "$300 from relatives on your birthday. Spend it all on one day or let it work for you?",
         keyPoints: [
           "Decide your split before you see something you want — otherwise emotions decide",
-          "Even saving ₹1,000 from each birthday adds up: ₹10,000 in 10 years, more with interest",
+          "Even saving $100 from each birthday adds up: $1,000 in 10 years, more with interest",
           "Experiences (trips, events) create longer happiness than things (gadgets, clothes)",
           "Start a 'goal jar' — write what you're saving for so you stay motivated"
         ]
@@ -586,8 +586,8 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
     title: "Goal-based saving — wanting something so much you plan for it",
     hook: "The gap between what you want and what you have is bridged by one thing: a plan with a deadline.",
     keyPoints: [
-      "Goal-based saving means assigning every saved rupee a purpose — it's far more powerful than 'saving in general'",
-      "Break big goals into weekly targets: ₹600 goal ÷ 4 weeks = ₹150 per week feels doable",
+      "Goal-based saving means assigning every saved dollar a purpose — it's far more powerful than 'saving in general'",
+      "Break big goals into weekly targets: $600 goal ÷ 4 weeks = $150 per week feels doable",
       "Delayed gratification is a superpower — research shows kids who wait for bigger rewards earn more as adults"
     ],
     realWorldStat: "People with written savings goals are 42% more likely to achieve them than those who just 'try to save'.",
@@ -598,14 +598,14 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         keyPoints: [
           "Write down what you want and how much it costs",
           "Divide the cost by your weekly pocket money to find how many weeks to save",
-          "Every time you don't spend, colour in a box on a chart — make the progress visible",
+          "Every time you don't spend, color in a box on a chart — make the progress visible",
           "Telling a parent or friend your goal makes you 2x more likely to reach it"
         ]
       },
       teen: {
         hook: "You want something. Your pocket money isn't enough. Most people give up — but there's a better move.",
         keyPoints: [
-          "Set a specific goal with a date: 'Save ₹2,000 by March 15' beats 'save more'",
+          "Set a specific goal with a date: 'Save $200 by March 15' beats 'save more'",
           "Track progress weekly — momentum keeps you going when motivation dips",
           "Look for small ways to top up: selling things you don't use, small side jobs",
           "Ask: is this still what I want? Sometimes goals change — that's okay to admit"
@@ -635,7 +635,7 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
       "Reinvesting profit back into the business is how small ventures become big ones"
     ],
     realWorldStat: "90% of small businesses fail in their first year — most because they never tracked their costs carefully.",
-    quickQuestion: "If you spent ₹200 making something and sold it for ₹350, how much profit did you make per unit? What if you sold 10?",
+    quickQuestion: "If you spent $20 making something and sold it for $35, how much profit did you make per unit? What if you sold 10?",
     ageAdapted: {
       junior: {
         hook: "What if you could make money from something you enjoy doing? That's exactly what a business is.",
@@ -678,7 +678,7 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
       "FOMO (fear of missing out) is a marketing strategy and a social pressure strategy at the same time",
       "You don't have to explain your budget to anyone — 'I'm saving for something' is a complete sentence"
     ],
-    realWorldStat: "62% of millennials say they've spent money they didn't have because of social pressure from friends or social media.",
+    realWorldStat: "62% of young adults say they've spent money they didn't have because of social pressure from friends or social media.",
     quickQuestion: "Think of the last time you spent money to 'keep up' with someone. Did it make you feel better or worse a week later?",
     ageAdapted: {
       junior: {
@@ -706,7 +706,7 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
           "Suggest cost-sharing for group plans — most people are quietly relieved",
           "Your financial goals deserve the same respect as your social goals — guard them equally"
         ],
-        extraStat: "Indians who track 'social spending' as a separate budget category reduce it by 30% within 3 months."
+        extraStat: "Young adults who track 'social spending' as a separate budget category reduce it by 30% within 3 months."
       }
     },
     estimatedReadSeconds: 45,
@@ -722,7 +722,7 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
       "Freelance income is not guaranteed — save 30% of every payment before spending anything",
       "As a freelancer, YOU are the HR, tax, accounts, and marketing department — build simple systems early"
     ],
-    realWorldStat: "India has over 15 million freelancers — the third-largest freelance workforce globally. Top earners charge 10x what beginners do for the same skill.",
+    realWorldStat: "Globally, freelancers who establish themselves earn 10x what beginners charge for the same skill within 5 years.",
     quickQuestion: "What skill do you have that someone, somewhere, would pay for? Have you ever charged for it?",
     ageAdapted: {
       junior: {
@@ -740,13 +740,13 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
           "Platforms like Fiverr and Upwork let you find clients from day one",
           "Your first price will feel too high. It isn't — time has value.",
           "Build a simple portfolio of 3 projects before approaching paid clients",
-          "Track every hour worked and every rupee earned — know your hourly rate"
+          "Track every hour worked and every dollar earned — know your hourly rate"
         ]
       },
       senior: {
-        hook: "A side hustle that earns ₹10,000/month in your 20s becomes ₹40,000/month by your 30s if you build it right.",
+        hook: "A side hustle that earns $1,200/month in your 20s becomes $4,800/month by your 30s if you build it right.",
         keyPoints: [
-          "Register as a freelancer and pay advance tax quarterly if earnings exceed ₹2.5 lakh/year",
+          "Keep records and understand tax obligations for freelance income in your country",
           "Keep business and personal accounts separate from the first payment",
           "Raise prices with every new client — your experience has value that compounds"
         ],
@@ -766,20 +766,20 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
       "Free trials auto-convert to paid plans — calendar reminders before trial end are essential",
       "Upgrades are cheap. Downgrades are hard. Always ask what happens if you want to cancel or switch."
     ],
-    realWorldStat: "The average Indian household pays for 2.3 subscriptions they don't actively use — ₹8,000/year wasted.",
+    realWorldStat: "The average household pays for 2.3 subscriptions they don't actively use — $800/year wasted.",
     quickQuestion: "How many apps, plans, or subscriptions are you currently paying for? Have you checked in the last 3 months?",
     ageAdapted: {
       junior: {
         hook: "Sometimes something looks cheap but costs a LOT more than you think.",
         keyPoints: [
           "Always ask: what's the TOTAL price, not just what I pay today?",
-          "Monthly plans add up fast — ₹99/month is ₹1,188 every year",
+          "Monthly plans add up fast — $9.99/month is $120 every year",
           "Ask a parent to help you read the rules before agreeing to anything",
           "Free sometimes means you pay with your data or attention instead of money"
         ]
       },
       teen: {
-        hook: "That ₹149/month plan sounds fine until you add it up and realise it's costing you a new phone every 2 years.",
+        hook: "That $15/month plan sounds fine until you add it up and realize it's costing you a new phone every 2 years.",
         keyPoints: [
           "Compare plans by annual cost, not monthly — companies use monthly to hide the total",
           "Read cancellation terms before you subscribe — some charge fees for early exit",
@@ -790,11 +790,11 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
       senior: {
         hook: "Every service contract has a paragraph designed to make you stay longer than you planned.",
         keyPoints: [
-          "Lock-in periods on phones and plans can cost ₹3,000–₹8,000 to exit early",
+          "Early termination fees on contracts can cost $300–$800 to exit",
           "Compare 'total cost of ownership' not sticker price — includes accessories, insurance, repairs",
           "Audit all subscriptions quarterly — set a phone reminder every 3 months"
         ],
-        extraStat: "Indians overspend ₹12,000/year on average on unused data, streaming, and subscription plan upgrades."
+        extraStat: "Consumers overspend $1,200/year on average on unused data, streaming, and subscription plan upgrades."
       }
     },
     estimatedReadSeconds: 45,
@@ -803,42 +803,42 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
 
   {
     id: 'first-paycheck',
-    title: "Your first salary — CTC vs take-home and where the rest goes",
-    hook: "Your offer letter says ₹35,000. Your bank notification says ₹28,500. You didn't get robbed — you just didn't understand the payslip.",
+    title: "Your first salary — total compensation vs take-home and where the rest goes",
+    hook: "Your offer letter says $3,500. Your bank notification says $2,850. You didn't get robbed — you just didn't understand the pay stub.",
     keyPoints: [
-      "CTC (Cost to Company) includes PF, gratuity, and benefits that never reach your account — your take-home is always less",
-      "PF (Provident Fund) is 12% of your basic salary saved for your future — it's yours, just locked until retirement",
-      "HRA (House Rent Allowance) is a tax-free component if you live in a rented home — it reduces your tax significantly"
+      "Total compensation includes retirement contributions, benefits, and taxes that never reach your account — your take-home is always less",
+      "Retirement contributions are typically 5-10% of your salary saved for your future — it's yours, just locked until retirement",
+      "Housing-related deductions may be tax-free if you live in a rented home — they reduce your taxable income significantly"
     ],
-    realWorldStat: "80% of first-time employees don't understand their payslip until month 3 — and many overpay tax the entire first year.",
-    quickQuestion: "If your CTC is ₹5 lakh and your take-home is ₹38,000/month, where do you think the difference is going?",
+    realWorldStat: "80% of first-time employees don't understand their pay stub until month 3 — and many overpay tax the entire first year.",
+    quickQuestion: "If your total compensation is $50,000 and your take-home is $3,800/month, where do you think the difference is going?",
     ageAdapted: {
       junior: {
         hook: "When you grow up and get a job, the number on your contract and what arrives in your bank are different!",
         keyPoints: [
           "Companies set aside some of your salary as savings for your future — it's still your money",
-          "The government takes a small part as income tax for schools, roads, and hospitals",
+          "The government takes a part as income tax for schools, roads, and hospitals",
           "Your 'take-home' is what's left after these — and it's what you plan your life around",
-          "Always look at your payslip to understand where every rupee went"
+          "Always look at your pay stub to understand where every dollar went"
         ]
       },
       teen: {
-        hook: "Your first internship or part-time stipend has deductions too — knowing what they are is financial literacy 101.",
+        hook: "Your first internship or part-time income has deductions too — knowing what they are is financial literacy 101.",
         keyPoints: [
-          "TDS (Tax Deducted at Source) is tax taken before you see the money — it can be refunded if overpaid",
-          "Professional Tax is a small state tax deducted monthly — usually ₹200",
-          "Your first payslip will confuse you. Print it, google every line, and understand it fully"
+          "Withholding tax is taken before you see the money — it can be refunded if overpaid",
+          "Various taxes may be deducted monthly depending on your location",
+          "Your first pay stub will confuse you. Print it, read every line, and understand it fully"
         ]
       },
       senior: {
-        hook: "Negotiate on the fixed component — bonuses aren't guaranteed, but your basic salary compounds every hike.",
+        hook: "Negotiate on the base component — bonuses aren't guaranteed, but your base salary compounds every raise.",
         keyPoints: [
-          "Basic salary determines your PF contribution and HRA calculation — a higher basic helps both",
-          "Form 16 is your annual tax summary — keep every year's filed safely",
-          "Declare rent receipts and investments to HR at the start of the financial year to avoid excess TDS",
-          "Check if your company offers flexible benefits (meal coupons, NPS) — they reduce taxable income"
+          "Base salary determines many deductions and benefits — a higher base helps your overall package",
+          "Keep annual tax documents safely for your records",
+          "Declare all applicable deductions and investments at the start of the tax year to avoid excess withholding",
+          "Check if your company offers flexible benefits (stipends, retirement matching) — they reduce taxable income"
         ],
-        extraStat: "Employees who submit investment proofs on time save an average ₹18,000–₹36,000 in excess TDS every year."
+        extraStat: "Employees who claim all available deductions on time save an average $1,800–$3,600 in excess taxes every year."
       }
     },
     estimatedReadSeconds: 55,
@@ -848,41 +848,41 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
   {
     id: 'first-apartment',
     title: "Renting your first home — the costs nobody warns you about",
-    hook: "The rent is ₹25,000. Moving in actually costs ₹2.5 lakh. Here's what they don't put in the listing.",
+    hook: "The rent is $2,500. Moving in actually costs $25,000. Here's what they don't put in the listing.",
     keyPoints: [
-      "Security deposit in cities like Mumbai and Bangalore can be 5–10 months of rent — that's ₹1.25–2.5 lakh just to move in",
-      "Brokerage is typically one month's rent paid upfront — factor this into your move-in budget",
-      "Monthly rent is just the start: society maintenance, electricity, internet, and annual hikes add 15–20% to your real cost"
+      "Security deposit in major cities can be 1–3 months of rent — that's $2,500–$7,500 just to move in",
+      "Broker fees or first-month upfront — factor this into your move-in budget",
+      "Monthly rent is just the start: utilities, insurance, internet, and annual hikes add 15–20% to your real cost"
     ],
-    realWorldStat: "The average first-time Mumbai renter underestimates move-in costs by ₹80,000 — leading many to borrow in their first month.",
-    quickQuestion: "If rent is ₹22,000/month in BKC, how much cash do you need on day one before accounting for food or furniture?",
+    realWorldStat: "The average first-time renter underestimates move-in costs by $8,000 — leading many to borrow in their first month.",
+    quickQuestion: "If rent is $2,200/month in a major city, how much cash do you need on day one before accounting for food or furniture?",
     ageAdapted: {
       junior: {
         hook: "Getting your own place someday sounds exciting! But it costs a LOT more than just the monthly rent.",
         keyPoints: [
           "You usually pay several months of rent upfront as a 'deposit' that you get back when you leave",
-          "Electricity, water, and internet are extra every month on top of rent",
+          "Utilities, and internet are extra every month on top of rent",
           "Moving furniture and setting up a home has its own big cost",
           "Saving early makes the first move-out much less stressful"
         ]
       },
       teen: {
-        hook: "Your first apartment costs ₹18,000/month. Your actual move-in expense? Closer to ₹1.5 lakh.",
+        hook: "Your first apartment costs $1,800/month. Your actual move-in expense? Closer to $15,000.",
         keyPoints: [
-          "Security deposit (2–10 months), brokerage (1 month), moving costs — add them all up before you sign",
-          "Always negotiate the deposit — in some cities it's negotiable by 1–2 months",
-          "Split with a flatmate to cut rent in half — but set clear rules about money from day one",
-          "Read the lease before signing: check notice period, rent hike clause, and who pays for repairs"
+          "Security deposit (1–3 months), broker fees, moving costs — add them all up before you sign",
+          "Always negotiate the deposit — in some places it's negotiable by 1–2 months",
+          "Split with a roommate to cut rent in half — but set clear rules about money from day one",
+          "Read the lease before signing: check notice period, rent increase clause, and who pays for repairs"
         ]
       },
       senior: {
-        hook: "Rent vs Buy in India: at 9% home loan rates and 3% rental yields, renting is often the financially smarter choice in your 20s.",
+        hook: "Rent vs Buy: Compare mortgage rates to rental yields in your market — renting is often smarter in your 20s.",
         keyPoints: [
           "Keep rent below 30% of take-home — above 40% and you have no room to build wealth",
-          "Annual rent hikes of 10% are standard in most leases — budget for them in year 2",
-          "Inspect for water seepage, building age, and lift maintenance before committing"
+          "Annual rent increases are standard in most leases — budget for them in year 2",
+          "Inspect for water damage, building condition, and maintenance quality before committing"
         ],
-        extraStat: "Renters in Mumbai who split with one flatmate save an average ₹4.2 lakh over 3 years compared to living alone."
+        extraStat: "Renters in major cities who split with one roommate save an average $50,000 over 3 years compared to living alone."
       }
     },
     estimatedReadSeconds: 55,
@@ -891,40 +891,40 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
 
   {
     id: 'phone-emi',
-    title: "EMI traps — the real price of buying now",
-    hook: "That ₹80,000 iPhone on 12-month EMI feels like ₹6,666/month. It actually costs you ₹92,000. Here's the maths.",
+    title: "Installment payment traps — the real price of buying now",
+    hook: "That $800 phone on 12-month installments feels like $67/month. It actually costs you $920. Here's the math.",
     keyPoints: [
-      "EMI total = monthly amount × number of months — always calculate this before signing",
-      "Interest rates on consumer electronics EMIs range from 14–24% per year — far higher than most people realise",
-      "No-cost EMI is rarely free: the 'discount' you get upfront is exactly equal to the interest you're paying in disguise"
+      "Total cost = monthly amount × number of months — always calculate this before signing",
+      "Interest rates on consumer electronics installments range from 14–24% per year — far higher than most people realize",
+      "No-cost installments are rarely free: the 'discount' you get upfront is exactly equal to the interest you're paying in disguise"
     ],
-    realWorldStat: "Indians spend over ₹2.3 lakh crore on consumer electronics EMIs annually — the fastest growing debt category among under-30s.",
-    quickQuestion: "If you saved ₹6,666 per month for 12 months instead of paying EMI, you'd have ₹80,000 cash. Why does most of India choose EMI instead?",
+    realWorldStat: "Consumers globally spend billions on consumer electronics installment payments annually — the fastest growing debt category among under-30s.",
+    quickQuestion: "If you saved $67 per month for 12 months instead of paying installments, you'd have $800 cash. Why do most people choose installments instead?",
     ageAdapted: {
       junior: {
         hook: "Paying a little every month sounds easier than paying it all at once — but it ends up costing more!",
         keyPoints: [
           "When you split a payment, the shop or bank charges extra — that's the interest",
           "The longer you take to pay, the more extra money you give them",
-          "Saving up and paying at once almost always costs less than paying in instalments"
+          "Saving up and paying at once almost always costs less than paying in installments"
         ]
       },
       teen: {
-        hook: "Your friend's ₹80,000 phone on 'easy EMI' — by the time they finish paying, it cost ₹95,000.",
+        hook: "Your friend's $800 phone on 'easy installments' — by the time they finish paying, it cost $950.",
         keyPoints: [
-          "Calculate total payout before agreeing: monthly EMI × total months",
+          "Calculate total payout before agreeing: monthly payment × total months",
           "Ask if there's a processing fee — it adds to the real cost on top of interest",
-          "The question isn't 'can I afford the EMI?' — it's 'do I need this enough to pay ₹15,000 extra?'"
+          "The question isn't 'can I afford the monthly payment?' — it's 'do I need this enough to pay $150 extra?'"
         ]
       },
       senior: {
         hook: "Debt for depreciating assets is a double loss — you pay interest AND the asset loses value simultaneously.",
         keyPoints: [
           "Electronics lose 30–40% of value in year one — you're paying interest on something worth less every month",
-          "EMIs on consumer goods reduce your investable income — the real cost is lost compounding",
-          "If you must use EMI: choose shortest tenure, pre-close when possible, and never on a credit card"
+          "Installment payments on consumer goods reduce your investable income — the real cost is lost compounding",
+          "If you must use installments: choose shortest tenure, pay off early when possible, and never on a credit card"
         ],
-        extraStat: "Indians who avoid consumer electronics EMIs and save instead accumulate ₹6–12 lakh more by age 35, purely from redirected EMI amounts invested in SIPs."
+        extraStat: "Consumers who avoid electronics installments and save instead accumulate $60,000–$120,000 more by age 35, purely from redirected payments invested in index funds."
       }
     },
     estimatedReadSeconds: 50,
@@ -937,17 +937,17 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
     hook: "A job loss, a medical bill, a sudden repair — financial shocks don't announce themselves. Your emergency fund is the announcement they never made.",
     keyPoints: [
       "3–6 months of essential expenses in liquid savings is the target — not total income, just what you need to survive",
-      "Liquid means accessible in 24 hours: savings account or liquid mutual fund, not FD, stocks, or real estate",
+      "Liquid means accessible in 24 hours: savings account or money market fund, not fixed deposits, stocks, or real estate",
       "In a crisis, cut non-essentials immediately and ruthlessly — survival mode is temporary, but debt is permanent"
     ],
-    realWorldStat: "Only 22% of Indian households could survive a ₹50,000 emergency without borrowing. Among millennials, it's under 15%.",
-    quickQuestion: "If your income stopped today, how many days could you cover your rent, food, and EMIs without help?",
+    realWorldStat: "Only 22% of households globally could survive a $5,000 emergency without borrowing. Among young adults, it's under 15%.",
+    quickQuestion: "If your income stopped today, how many days could you cover your rent, food, and installment payments without help?",
     ageAdapted: {
       junior: {
         hook: "What happens if something breaks and you need money fast? That's what a rainy day fund is for.",
         keyPoints: [
           "A rainy day fund is money saved for unexpected problems, not fun things",
-          "Start with ₹500, then grow it to ₹2,000 — a small safety net is better than none",
+          "Start with $50, then grow it to $200 — a small safety net is better than none",
           "Never spend it on things you want — only on things you genuinely need right now",
           "After using it, rebuild it before saving for anything else"
         ]
@@ -965,8 +965,8 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         hook: "Getting laid off feels like the floor dropped. An emergency fund is the new floor.",
         keyPoints: [
           "6 months of expenses if self-employed, 3 months minimum if salaried with stable employment",
-          "Liquid mutual funds offer slightly better returns than savings accounts with same-day redemption",
-          "In a layoff: cut discretionary spending before touching savings, negotiate notice pay, claim PF immediately"
+          "High-yield savings accounts offer better returns than regular savings with same-day access",
+          "In a layoff: cut discretionary spending before touching savings, negotiate severance, claim retirement benefits if available"
         ],
         extraStat: "Professionals with a 6-month emergency fund recover from job loss 2.4x faster and with 60% less debt than those without one."
       }
@@ -978,14 +978,14 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
   {
     id: 'first-credit-card',
     title: "Your first credit card — power tool or debt trap",
-    hook: "A credit card is the best financial tool ever created — for people who pay it in full every month. For everyone else, it's a 42% loan.",
+    hook: "A credit card is the best financial tool ever created — for people who pay it in full every month. For everyone else, it's a 20-30% loan.",
     keyPoints: [
-      "Grace period: pay your full statement balance by due date and you pay exactly 0% interest — not a rupee more",
-      "The minimum payment trap: paying just 5% of what you owe means the rest grows at 3–4% per MONTH",
-      "Credit utilisation: use under 30% of your credit limit to build a strong CIBIL score"
+      "Grace period: pay your full statement balance by due date and you pay exactly 0% interest — not a cent more",
+      "The minimum payment trap: paying just 5% of what you owe means the rest grows at 1.5–2.5% per MONTH",
+      "Credit utilization: use under 30% of your credit limit to build a strong credit score"
     ],
-    realWorldStat: "The average Indian credit card holder carries a balance of ₹38,000 at 3.5% monthly interest — paying ₹1,330 in interest every single month for nothing.",
-    quickQuestion: "If your credit card limit is ₹50,000 and you spend ₹40,000 and pay only the minimum, what do you think happens to the remaining ₹38,000?",
+    realWorldStat: "The average credit card holder carries a balance of $3,800 at 1.5-2% monthly interest — paying $133 in interest every single month for nothing.",
+    quickQuestion: "If your credit card limit is $5,000 and you spend $4,000 and pay only the minimum, what do you think happens to the remaining $3,800?",
     ageAdapted: {
       junior: {
         hook: "A credit card lets you buy things now and pay later — but if you wait too long, you pay a LOT more.",
@@ -1006,13 +1006,13 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
         ]
       },
       senior: {
-        hook: "Used right, a credit card gives you 45 days free credit, purchase protection, and reward points. Used wrong, it charges 42% annually.",
+        hook: "Used right, a credit card gives you 45 days free credit, purchase protection, and reward points. Used wrong, it charges 20-30% annually.",
         keyPoints: [
-          "Statement date vs due date: spend just after statement date to maximise interest-free window to ~45 days",
-          "Never close your oldest card — account age is 15% of your CIBIL score",
+          "Statement date vs due date: spend just after statement date to maximize interest-free window to ~45 days",
+          "Never close your oldest card — account age is 15% of your credit score",
           "Choose a card that matches your spending: travel card for flying, cashback card for daily expenses"
         ],
-        extraStat: "CIBIL scores above 750 — mostly built on consistent credit card payment history — save an average ₹8 lakh in lower interest over a home loan."
+        extraStat: "Credit scores above 750 — mostly built on consistent credit card payment history — save an average $80,000 in lower interest over a home loan."
       }
     },
     estimatedReadSeconds: 55,

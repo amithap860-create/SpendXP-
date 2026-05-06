@@ -97,7 +97,7 @@ export default function LearnHub() {
                     lesson.topic === 'budgeting' ? "bg-blue-500" :
                     lesson.topic === 'investing' ? "bg-primary" :
                     lesson.topic === 'saving' ? "bg-primary" :
-                    lesson.topic === 'credit' ? "bg-[#E8F5EE]0" :
+                    lesson.topic === 'credit' ? "bg-secondary" :
                     lesson.topic === 'taxes' ? "bg-rose-500" : "bg-slate-500"
                   )} />
                   <CardHeader>

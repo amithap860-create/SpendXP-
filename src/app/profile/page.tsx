@@ -82,7 +82,7 @@ const LEVEL_THRESHOLDS = [
   { name: 'Investor', min: 500, max: 1500, color: 'bg-blue-500' },
   { name: 'Banker', min: 1500, max: 3500, color: 'bg-primary' },
   { name: 'Finance Pro', min: 3500, max: 7500, color: 'bg-primary' },
-  { name: 'Money Master', min: 7500, max: 15000, color: 'bg-[#E8F5EE]0' },
+  { name: 'Money Master', min: 7500, max: 15000, color: 'bg-secondary' },
 ];
 
 const BADGE_META: Record<string, { label: string; icon: string; color: string }> = {

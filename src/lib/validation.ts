@@ -84,7 +84,6 @@ export const GAME_MAX_SCORES: Record<string, number> = {
   moneyMaze: 10000,
   stockMarketSim: 10000000,
   creditScoreBuilder: 850,
-  compoundClicker: 10000000,
 };
 
 export function validateScore(gameName: string, score: number): { valid: boolean; error?: string } {

@@ -39,11 +39,6 @@ export const GAME_XP = {
     xpPerCorrectAnswer: 0,
     comboBonus: 50,
   },
-  compoundClicker: {
-    xpPerWin: 100,
-    xpPerCorrectAnswer: 0,
-    comboBonus: 50,
-  },
 } as const;
 
 // ─── Lessons ──────────────────────────────────────────────────────────────────

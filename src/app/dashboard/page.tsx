@@ -221,7 +221,6 @@ export default function DashboardPage() {
       { id: 'moneyMaze', name: 'Money Maze', topic: 'spending' },
       { id: 'stockMarketSim', name: 'Stock Market Simulator', topic: 'investing' },
       { id: 'creditScoreBuilder', name: 'Credit Score Builder', topic: 'credit' },
-      { id: 'compoundClicker', name: 'Compound Clicker', topic: 'saving' },
     ];
 
     const scored = allGames.map(game => {

@@ -372,7 +372,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
                   <h4 className="font-black text-lg text-slate-900">Your Budget Report</h4>
                   {[
                     { label: 'Needs', pct: needPct, count: stats.NEED, color: 'bg-primary', text: 'text-primary' },
-                    { label: 'Wants', pct: wantPct, count: stats.WANT, color: 'bg-[#E8F5EE]0', text: 'text-[#2E7D5A]' },
+                    { label: 'Wants', pct: wantPct, count: stats.WANT, color: 'bg-secondary', text: 'text-[#2E7D5A]' },
                     { label: 'Savings', pct: savePct, count: stats.SAVE, color: 'bg-blue-500', text: 'text-blue-600' },
                   ].map(({ label, pct, count, color, text }) => (
                     <div key={label}>

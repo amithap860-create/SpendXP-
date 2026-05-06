@@ -17,7 +17,7 @@ import { fireConfettiPersonalBest } from '@/lib/confetti';
 export type GameStatus = 'IDLE' | 'COUNTDOWN' | 'PLAYING' | 'PAUSED' | 'GAME_OVER' | 'RESULTS';
 
 export interface GameConfig {
-  gameName: 'budgetBlitz' | 'finIQ' | 'moneyMaze' | 'stockMarketSim' | 'creditScoreBuilder' | 'compoundClicker';
+  gameName: 'budgetBlitz' | 'finIQ' | 'moneyMaze' | 'stockMarketSim' | 'creditScoreBuilder';
   totalRounds: number;
   timePerRound?: number;
   livesEnabled: boolean;

@@ -126,7 +126,7 @@ export default function SecurityDashboard() {
                     <Badge className={cn(
                       "font-black text-[10px]",
                       e.type === 'impossible_score' ? "bg-rose-500/20 text-rose-500" :
-                      e.type === 'rate_limit_exceeded' ? "bg-[#E8F5EE]0/20 text-[#2E7D5A]" :
+                      e.type === 'rate_limit_exceeded' ? "bg-primary/10 text-primary" :
                       "bg-slate-500/20 text-slate-400"
                     )}>
                       {e.type.replace(/_/g, ' ')}

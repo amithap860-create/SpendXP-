@@ -136,7 +136,7 @@ export default function LandingPage() {
       <section className="max-w-2xl mx-auto px-6 pb-20 text-center">
         <div className="bg-primary rounded-3xl p-10 shadow-2xl">
           <h2 className="text-3xl font-black text-white mb-3">Ready to level up?</h2>
-          <p className="text-primary-foreground/80 mb-8">Free to use. No ads. No in-app purchases. Built for India.</p>
+          <p className="text-primary-foreground/80 mb-8">Free to use. No ads. No in-app purchases. Built for everyone.</p>
           <Link href="/signup">
             <Button size="lg" variant="secondary" className="h-14 px-10 text-lg font-black">
               Start Earning XP Now

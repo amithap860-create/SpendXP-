@@ -33,10 +33,10 @@ interface SavingsGoal {
 const PRESET_SHAPES: { shape: GoalShape; color: string; label: string }[] = [
   { shape: 'circle', color: 'bg-primary', label: 'Emergency' },
   { shape: 'square', color: 'bg-blue-500', label: 'Tech' },
-  { shape: 'triangle', color: 'bg-[#E8F5EE]0', label: 'Travel' },
+  { shape: 'triangle', color: 'bg-secondary', label: 'Travel' },
   { shape: 'diamond', color: 'bg-rose-500', label: 'Big Purchase' },
   { shape: 'hexagon', color: 'bg-primary', label: 'Education' },
-  { shape: 'pentagon', color: 'bg-[#E8F5EE]0', label: 'Gifts' },
+  { shape: 'pentagon', color: 'bg-secondary', label: 'Gifts' },
   { shape: 'star', color: 'bg-yellow-500', label: 'Dream' },
   { shape: 'bolt', color: 'bg-primary', label: 'Investment' },
 ];

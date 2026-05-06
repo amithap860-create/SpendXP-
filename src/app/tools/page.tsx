@@ -115,7 +115,7 @@ export default function ToolsHub() {
       description: 'Set targets for big purchases and track your progress.',
       info: 'Set a savings goal — a phone, laptop, trip, or anything else — and track your progress. It calculates how much you need to save per month to hit your target on time, and shows you a visual progress bar as you go.',
       icon: Target,
-      color: 'bg-[#E8F5EE]0',
+      color: 'bg-secondary',
       component: <SavingsGoalTracker />,
     },
   ];

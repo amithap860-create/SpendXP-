@@ -44,7 +44,6 @@ export function useProgression() {
             moneyMaze: 0,
             stockMarketSim: 0,
             creditScoreBuilder: 0,
-            compoundClicker: 0,
           },
           badges: [],
           level: 'Saver',
