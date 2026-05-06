@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { GameLoadingSkeleton } from '@/components/games/GameLoadingSkeleton';
 import { useAgeAdapt } from '@/lib/ageAdaptProvider';
 import { ConceptBreakdown } from '@/components/ConceptBreakdown';
+import { usePremium } from '@/hooks/usePremium';
 
 const BudgetBlitz = dynamic(() => import('@/components/games/BudgetBlitz').then(mod => mod.BudgetBlitz), {
   loading: () => <GameLoadingSkeleton />,
@@ -39,6 +40,7 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
   const router = useRouter();
   const resolvedParams = use(searchParams);
   const { ageGroup } = useAgeAdapt();
+  const { canAccess } = usePremium();
   
   const [activeGame, setActiveGame] = useState<GameID | null>(null);
   const [isDaily, setIsDaily] = useState(false);
@@ -124,45 +126,68 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
           </header>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            <GameCard 
+            {/* FREE games */}
+            <GameCard
               id="budgetBlitz"
-              name="Budget Blitz" 
-              desc="Sort needs, wants and savings at speed." 
-              color="bg-primary" 
+              name="Budget Blitz"
+              desc="Sort needs, wants and savings at speed."
+              color="bg-primary"
+              emoji="⚡"
               isHighlighted={highlightedGame === 'budgetBlitz'}
-              onClick={() => setActiveGame('budgetBlitz')} 
+              onClick={() => setActiveGame('budgetBlitz')}
             />
-            <GameCard 
+            <GameCard
               id="finIQQuiz"
-              name="FinIQ Quiz" 
-              desc="Daily scenarios to test your financial IQ." 
-              color="bg-blue-500" 
+              name="FinIQ Quiz"
+              desc="Daily scenarios to test your financial IQ."
+              color="bg-blue-500"
+              emoji="🧠"
               isHighlighted={highlightedGame === 'finIQQuiz'}
-              onClick={() => setActiveGame('finIQQuiz')} 
-            />
-            <GameCard 
-              id="stockMarketSim"
-              name="Stock Market Sim" 
-              desc="Trade virtual stocks based on live news." 
-              color="bg-primary" 
-              isHighlighted={highlightedGame === 'stockMarketSim'}
-              onClick={() => setActiveGame('stockMarketSim')} 
-            />
-            <GameCard 
-              id="creditScoreBuilder"
-              name="Credit Builder" 
-              desc="Manage your score through lifecycle choices." 
-              color="bg-primary" 
-              isHighlighted={highlightedGame === 'creditScoreBuilder'}
-              onClick={() => setActiveGame('creditScoreBuilder')} 
+              onClick={() => setActiveGame('finIQQuiz')}
             />
             <GameCard
               id="moneyMaze"
-              name="Money Maze" 
-              desc="Solve puzzles to optimize your allocation." 
-              color="bg-rose-500" 
+              name="Money Maze"
+              desc="Solve puzzles to optimize your allocation."
+              color="bg-rose-500"
+              emoji="🌀"
               isHighlighted={highlightedGame === 'moneyMaze'}
-              onClick={() => setActiveGame('moneyMaze')} 
+              onClick={() => setActiveGame('moneyMaze')}
+            />
+
+            {/* PREMIUM games */}
+            <GameCard
+              id="stockMarketSim"
+              name="Stock Market Sim"
+              desc="Trade virtual stocks based on live news."
+              color="bg-amber-500"
+              emoji="📈"
+              isHighlighted={highlightedGame === 'stockMarketSim'}
+              locked={!canAccess('stock_market_sim')}
+              onClick={() => canAccess('stock_market_sim') ? setActiveGame('stockMarketSim') : router.push('/upgrade')}
+            />
+            <GameCard
+              id="creditScoreBuilder"
+              name="Credit Builder"
+              desc="Manage your score through lifecycle choices."
+              color="bg-violet-500"
+              emoji="💳"
+              isHighlighted={highlightedGame === 'creditScoreBuilder'}
+              locked={!canAccess('credit_score_builder')}
+              onClick={() => canAccess('credit_score_builder') ? setActiveGame('creditScoreBuilder') : router.push('/upgrade')}
+            />
+
+            {/* Group Play — coming soon (premium) */}
+            <GameCard
+              id="groupPlay"
+              name="Group Play"
+              desc="Challenge friends and compete on leaderboards."
+              color="bg-slate-400"
+              emoji="👥"
+              isHighlighted={false}
+              locked
+              comingSoon
+              onClick={() => router.push('/upgrade')}
             />
           </div>
         </main>
@@ -191,39 +216,71 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
   );
 }
 
-function GameCard({ 
-  id, 
-  name, 
-  desc, 
-  color, 
-  onClick, 
-  isHighlighted 
-}: { 
-  id: string; 
-  name: string; 
-  desc: string; 
-  color: string; 
+function GameCard({
+  id,
+  name,
+  desc,
+  color,
+  emoji,
+  onClick,
+  isHighlighted,
+  locked = false,
+  comingSoon = false,
+}: {
+  id: string;
+  name: string;
+  desc: string;
+  color: string;
+  emoji: string;
   onClick: () => void;
   isHighlighted: boolean;
+  locked?: boolean;
+  comingSoon?: boolean;
 }) {
   return (
-    <button 
+    <button
       id={`game-card-${id}`}
       onClick={onClick}
       className={cn(
-        "bg-white rounded-3xl border-[0.5px] border-slate-200 p-6 md:p-8 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all text-left group overflow-hidden relative",
+        "bg-white rounded-3xl border-[0.5px] border-slate-200 p-6 md:p-8 shadow-sm transition-all text-left group overflow-hidden relative",
         "ring-offset-2",
         isHighlighted ? "ring-2 ring-primary" : "ring-0 transition-all duration-1000",
-        "min-h-[160px] flex flex-col justify-between"
+        "min-h-[160px] flex flex-col justify-between",
+        locked ? "opacity-80 hover:opacity-100 cursor-pointer" : "hover:shadow-xl hover:-translate-y-1"
       )}
     >
-      <div className={cn("absolute top-0 left-0 w-2 h-full", color)} />
+      <div className={cn("absolute top-0 left-0 w-2 h-full", locked ? "bg-slate-300" : color)} />
+
+      {/* Lock / Coming Soon badges */}
+      {locked && (
+        <div className="absolute top-4 right-4 flex flex-col items-end gap-1">
+          {comingSoon ? (
+            <span className="text-[9px] font-black uppercase tracking-widest bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 rounded-full">Coming Soon</span>
+          ) : (
+            <span className="text-[9px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">✨ Premium</span>
+          )}
+        </div>
+      )}
+
       <div>
-        <h3 className="text-xl font-black text-slate-900 mb-2 group-hover:text-primary transition-colors">{name}</h3>
+        <div className="text-2xl mb-2">{emoji}</div>
+        <h3 className={cn(
+          "text-xl font-black mb-2 transition-colors",
+          locked ? "text-slate-400" : "text-slate-900 group-hover:text-primary"
+        )}>{name}</h3>
         <p className="text-sm text-slate-500 font-medium leading-snug">{desc}</p>
       </div>
+
       <div className="flex justify-end pt-4">
-        <span className="text-[10px] font-black text-slate-300 group-hover:text-primary transition-colors uppercase tracking-widest">PLAY NOW →</span>
+        {locked ? (
+          <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">
+            {comingSoon ? 'COMING SOON' : '🔒 UNLOCK →'}
+          </span>
+        ) : (
+          <span className="text-[10px] font-black text-slate-300 group-hover:text-primary transition-colors uppercase tracking-widest">
+            PLAY NOW →
+          </span>
+        )}
       </div>
     </button>
   );

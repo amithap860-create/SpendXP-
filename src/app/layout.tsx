@@ -181,8 +181,14 @@ function NavLink({ href, label, active, isSmallScreen }: { href: string; label: 
     : href === '/resources' ? 'open-book'
     : 'user';
 
+  // Tour anchor IDs for the tooltip walkthrough
+  const tourId = href === '/quests' ? 'tour-quests'
+    : href === '/games' ? 'tour-games'
+    : href === '/profile' ? 'tour-profile'
+    : undefined;
+
   return (
-    <Link href={href} className={cn(
+    <Link href={href} id={tourId} className={cn(
       "flex flex-col items-center justify-center gap-1 flex-1 min-w-0 py-2 transition-all duration-200 relative",
       active ? "text-primary" : "text-slate-300 hover:text-slate-400"
     )}>

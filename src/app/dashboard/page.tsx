@@ -39,6 +39,8 @@ import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import OnboardingOverlay from '@/components/onboarding/OnboardingOverlay';
+import { IntroSlides } from '@/components/onboarding/IntroSlides';
+import { TooltipTour } from '@/components/onboarding/TooltipTour';
 import { getRankForXP, getRankProgress, getNextRank, getFogEnemy, getCurrentSaga } from '@/config/narrative';
 import { getAvatar } from '@/config/avatars';
 import { HowToPlayModal } from '@/components/HowToPlayModal';
@@ -69,10 +71,17 @@ export default function DashboardPage() {
   const [timeLeft, setTimeLeft] = useState('');
   const [currentStreak, setCurrentStreak] = useState(0);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [showIntroSlides, setShowIntroSlides] = useState(false);
+  const [showTooltipTour, setShowTooltipTour] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     document.title = 'Dashboard | SpendXP';
+    // Show intro slides only on very first visit (before onboarding starts)
+    const hasSeenIntro = localStorage.getItem('spendxp_intro_done');
+    if (!hasSeenIntro) {
+      setShowIntroSlides(true);
+    }
   }, []);
 
   // Redirect unauthenticated users to login
@@ -266,6 +275,28 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen-safe bg-slate-50 pb-24 md:pb-8">
+      {/* First-run intro slides */}
+      {showIntroSlides && (
+        <IntroSlides
+          onComplete={() => {
+            localStorage.setItem('spendxp_intro_done', '1');
+            setShowIntroSlides(false);
+            // Start tooltip tour after slides
+            setTimeout(() => setShowTooltipTour(true), 600);
+          }}
+        />
+      )}
+
+      {/* In-app tooltip tour */}
+      {showTooltipTour && (
+        <TooltipTour
+          onComplete={() => {
+            localStorage.setItem('spendxp_tour_done', '1');
+            setShowTooltipTour(false);
+          }}
+        />
+      )}
+
       <HowToPlayModal forceOpen={showHowToPlay} onClose={() => setShowHowToPlay(false)} />
       {/* Help button */}
       <button
@@ -327,6 +358,7 @@ export default function DashboardPage() {
 
         {/* STORYLINE CARD — Order of the Golden Ledger */}
         {(() => {
+          // tour anchor — wrapping div gets id below
           const totalXP = progression?.totalXP ?? 0;
           const rank = getRankForXP(totalXP);
           const nextRank = getNextRank(totalXP);
@@ -335,7 +367,7 @@ export default function DashboardPage() {
           const saga = getCurrentSaga();
           const avatarCfg = getAvatar(profile?.avatarId ?? 'rocket');
           return (
-            <section className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+            <section id="tour-storyline" className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
               {/* Top accent bar */}
               <div className={cn('h-1 w-full bg-gradient-to-r', avatarCfg.bgGradient)} />
 
@@ -427,7 +459,7 @@ export default function DashboardPage() {
         })()}
 
         {/* STREAKS & STATS */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <section id="tour-stats" className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           {[
             { label: 'Day Streak', val: currentStreak, icon: true },
             { label: 'Games Played', val: progression?.totalGamesPlayed || 0 },
