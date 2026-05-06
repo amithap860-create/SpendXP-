@@ -325,7 +325,7 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        {/* ORDER RANK BANNER */}
+        {/* STORYLINE CARD — Order of the Golden Ledger */}
         {(() => {
           const totalXP = progression?.totalXP ?? 0;
           const rank = getRankForXP(totalXP);
@@ -335,59 +335,94 @@ export default function DashboardPage() {
           const saga = getCurrentSaga();
           const avatarCfg = getAvatar(profile?.avatarId ?? 'rocket');
           return (
-            <Link href="/quests" className="block group">
-              <section className="bg-slate-900 rounded-2xl overflow-hidden shadow-xl cursor-pointer hover:shadow-2xl transition-all duration-300">
-                <div className={cn('h-1 w-full bg-gradient-to-r', avatarCfg.bgGradient)} />
-                <div className="p-5 flex items-center gap-5">
-                  {/* Avatar */}
-                  <div className={cn('w-14 h-14 rounded-xl flex items-center justify-center text-2xl bg-gradient-to-br flex-shrink-0', avatarCfg.bgGradient)}>
+            <section className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+              {/* Top accent bar */}
+              <div className={cn('h-1 w-full bg-gradient-to-r', avatarCfg.bgGradient)} />
+
+              {/* Header row */}
+              <div className="px-5 pt-4 pb-3 flex items-center justify-between border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">⚖️</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-primary">Order of the Golden Ledger</span>
+                  {saga && (
+                    <span className="hidden md:inline text-[9px] font-bold text-slate-400 border border-slate-200 rounded-full px-2 py-0.5">
+                      {saga.emoji} {saga.name}
+                    </span>
+                  )}
+                </div>
+                <Link href="/story" className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline">
+                  Full Lore →
+                </Link>
+              </div>
+
+              <div className="p-5 space-y-4">
+                {/* Rank + district + avatar row */}
+                <div className="flex items-center gap-4">
+                  <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-gradient-to-br flex-shrink-0 shadow-sm', avatarCfg.bgGradient)}>
                     {avatarCfg.emoji}
                   </div>
-
-                  {/* Rank info */}
-                  <div className="flex-1 min-w-0 space-y-1.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[9px] font-black uppercase tracking-widest text-[#2E7D5A]">⚖️ Order of the Golden Ledger</span>
-                        <a href="/story" className="text-[9px] font-black uppercase tracking-widest text-[#4EA07A] hover:text-[#A8D5BC] transition-colors ml-2">The Lore →</a>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-baseline gap-2 flex-wrap">
+                      <span className="text-xl font-black text-slate-900">{rank.emoji} {rank.name}</span>
+                      <span className="text-xs font-bold text-slate-400 border border-slate-200 rounded-full px-2 py-0.5">{rank.district}</span>
+                    </div>
+                    {/* XP progress */}
+                    <div className="mt-1.5 space-y-1">
+                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-700" style={{ width: `${rankPct}%` }} />
                       </div>
-                      {saga && (
-                        <span className="text-[9px] font-black uppercase tracking-widest text-[#4EA07A]/70 hidden md:block">
-                          {saga.emoji} {saga.name}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-lg font-black text-white">{rank.emoji} {rank.name}</span>
-                      <span className="text-[10px] font-bold text-slate-500">{rank.district}</span>
-                    </div>
-                    {/* XP progress bar */}
-                    <div className="space-y-1">
-                      <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full" style={{ width: `${rankPct}%` }} />
+                      <div className="flex justify-between text-[9px] font-bold text-slate-400">
+                        <span>{totalXP.toLocaleString()} XP</span>
+                        {nextRank
+                          ? <span>{(nextRank.minXP - totalXP).toLocaleString()} XP to {nextRank.emoji} {nextRank.name}</span>
+                          : <span>Max Rank!</span>
+                        }
                       </div>
-                      {nextRank && (
-                        <p className="text-[9px] font-bold text-slate-600">{(nextRank.minXP - totalXP).toLocaleString()} XP to {nextRank.name}</p>
-                      )}
                     </div>
-                  </div>
-
-                  {/* Active fog threat */}
-                  <div className="flex-shrink-0 text-right hidden sm:block">
-                    <div className="text-[9px] font-black uppercase tracking-widest text-red-600 mb-1">Active Threat</div>
-                    <div className="text-2xl mb-0.5">{fog.emoji}</div>
-                    <div className="text-[10px] font-black text-red-400">{fog.name}</div>
-                  </div>
-
-                  {/* Arrow */}
-                  <div className="text-slate-600 group-hover:text-[#4EA07A] transition-colors flex-shrink-0">
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
                   </div>
                 </div>
-              </section>
-            </Link>
+
+                {/* Story brief */}
+                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-primary mb-1">📋 Mission Brief</p>
+                  <p className="text-sm font-medium text-slate-700 leading-relaxed italic">"{rank.storyLine}"</p>
+                </div>
+
+                {/* Active Fog enemy — description + weakness */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="bg-red-50 border border-red-100 rounded-2xl p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xl">{fog.emoji}</span>
+                      <div>
+                        <p className="text-[9px] font-black uppercase tracking-widest text-red-500">Active Threat</p>
+                        <p className="text-sm font-black text-red-700">{fog.name}</p>
+                      </div>
+                    </div>
+                    <p className="text-xs text-red-600 leading-relaxed">{fog.description}</p>
+                  </div>
+                  <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4">
+                    <p className="text-[9px] font-black uppercase tracking-widest text-primary mb-2">🛡️ Counter Move</p>
+                    <p className="text-xs text-slate-700 leading-relaxed font-medium">{fog.weakness}</p>
+                  </div>
+                </div>
+
+                {/* CTA row */}
+                <div className="flex gap-3 pt-1">
+                  <Link
+                    href="/quests"
+                    className="flex-1 h-10 bg-primary text-white text-xs font-black uppercase tracking-widest rounded-xl flex items-center justify-center gap-1 hover:bg-primary/90 transition-colors"
+                  >
+                    Open Case Files →
+                  </Link>
+                  <Link
+                    href="/story"
+                    className="h-10 px-4 border border-slate-200 text-slate-600 text-xs font-black uppercase tracking-widest rounded-xl flex items-center justify-center hover:bg-slate-50 transition-colors"
+                  >
+                    The Lore
+                  </Link>
+                </div>
+              </div>
+            </section>
           );
         })()}
 
