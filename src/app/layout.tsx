@@ -14,7 +14,6 @@ import { Toaster } from '@/components/ui/toaster';
 import { useEffect, useState } from 'react';
 import { OfflineBanner } from '@/components/OfflineBanner';
 import { BugReportButton } from '@/components/BugReportButton';
-import { metadata } from './metadata';
 
 const inter = Inter({ 
   subsets: ['latin'], 
