@@ -1,16 +1,14 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { Quest, QuestStep, QuestChoice } from '@/data/quests';
+import { Quest } from '@/data/quests';
 import { AgeGroup } from '@/lib/ageAdapt';
 import { useAuthContext } from '@/context/AuthContext';
-import { db, safeSetDoc } from '@/firebase';
-import { doc, serverTimestamp } from 'firebase/firestore';
-import { updateFinancialHealth, updateLeaderboardEntry } from '@/lib/progressionService';
+import { updateLeaderboardEntry } from '@/lib/progressionService';
 import { checkAndAwardQuestBadges } from '@/lib/badgeService';
 
 export type QuestState = {
-  status: 'INTRO' | 'IN_PROGRESS' | 'COMPLETE';
+  status: 'INTRO' | 'IN_PROGRESS' | 'COMPLETE' | 'LIMIT_REACHED';
   currentStepId: string;
   choiceHistory: Array<{
     stepId: string;
@@ -21,13 +19,21 @@ export type QuestState = {
   totalHealthDelta: number;
   totalWalletDelta: number;
   optimalChoiceCount: number;
+  /** Populated after completion — from the server response */
+  serverResult?: {
+    xpAwarded: number;
+    streak: number;
+    questsToday: number;
+    dailyLimitReached: boolean;
+    alreadyCompleted: boolean;
+  };
 };
 
 export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
   const { user } = useAuthContext();
-  
-  const filteredSteps = useMemo(() => 
-    quest.steps.filter(step => step.ageGroups.includes(ageGroup)), 
+
+  const filteredSteps = useMemo(
+    () => quest.steps.filter((step) => step.ageGroups.includes(ageGroup)),
     [quest.steps, ageGroup]
   );
 
@@ -38,23 +44,23 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
     totalXPEarned: 0,
     totalHealthDelta: 0,
     totalWalletDelta: 0,
-    optimalChoiceCount: 0
+    optimalChoiceCount: 0,
   });
 
-  const currentStep = useMemo(() => 
-    filteredSteps.find(s => s.id === state.currentStepId),
+  const currentStep = useMemo(
+    () => filteredSteps.find((s) => s.id === state.currentStepId),
     [filteredSteps, state.currentStepId]
   );
 
   const progress = useMemo(() => {
-    if (state.status === 'COMPLETE') return 100;
+    if (state.status === 'COMPLETE' || state.status === 'LIMIT_REACHED') return 100;
     if (state.status === 'INTRO') return 0;
-    const idx = filteredSteps.findIndex(s => s.id === state.currentStepId);
+    const idx = filteredSteps.findIndex((s) => s.id === state.currentStepId);
     return Math.round(((idx + 1) / filteredSteps.length) * 100);
   }, [state.status, state.currentStepId, filteredSteps]);
 
   const startQuest = useCallback(() => {
-    setState(prev => ({ ...prev, status: 'IN_PROGRESS' }));
+    setState((prev) => ({ ...prev, status: 'IN_PROGRESS' }));
   }, []);
 
   const resetQuest = useCallback(() => {
@@ -65,75 +71,102 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
       totalXPEarned: 0,
       totalHealthDelta: 0,
       totalWalletDelta: 0,
-      optimalChoiceCount: 0
+      optimalChoiceCount: 0,
     });
   }, [filteredSteps]);
 
-  const makeChoice = useCallback(async (choiceId: string) => {
-    if (!currentStep || state.status !== 'IN_PROGRESS') return;
-    
-    const choice = currentStep.choices.find(c => c.id === choiceId);
-    if (!choice) return;
+  const makeChoice = useCallback(
+    async (choiceId: string) => {
+      if (!currentStep || state.status !== 'IN_PROGRESS') return;
 
-    const newHistory = [...state.choiceHistory, {
-      stepId: currentStep.id,
-      choiceId: choice.id,
-      isOptimal: choice.isOptimal
-    }];
+      const choice = currentStep.choices.find((c) => c.id === choiceId);
+      if (!choice) return;
 
-    const nextState: QuestState = {
-      ...state,
-      choiceHistory: newHistory,
-      totalXPEarned: state.totalXPEarned + choice.xpDelta,
-      totalHealthDelta: state.totalHealthDelta + choice.healthDelta,
-      totalWalletDelta: state.totalWalletDelta + choice.walletDelta,
-      optimalChoiceCount: state.optimalChoiceCount + (choice.isOptimal ? 1 : 0),
-      currentStepId: choice.nextStepId === 'end' ? state.currentStepId : choice.nextStepId,
-      status: choice.nextStepId === 'end' ? 'COMPLETE' : 'IN_PROGRESS'
-    };
+      const newHistory = [
+        ...state.choiceHistory,
+        {
+          stepId: currentStep.id,
+          choiceId: choice.id,
+          isOptimal: choice.isOptimal,
+        },
+      ];
 
-    setState(nextState);
+      const isEnd = choice.nextStepId === 'end';
 
-    if (choice.nextStepId === 'end' && user) {
-      const uid = user.uid;
-      if (!uid || uid.trim() === '') return;
-      const xpToAward = Math.max(0, nextState.totalXPEarned + quest.xpReward);
-      const optimalRate = nextState.optimalChoiceCount / filteredSteps.length;
+      const nextState: QuestState = {
+        ...state,
+        choiceHistory: newHistory,
+        totalXPEarned: state.totalXPEarned + choice.xpDelta,
+        totalHealthDelta: state.totalHealthDelta + choice.healthDelta,
+        totalWalletDelta: state.totalWalletDelta + choice.walletDelta,
+        optimalChoiceCount: state.optimalChoiceCount + (choice.isOptimal ? 1 : 0),
+        currentStepId: isEnd ? state.currentStepId : choice.nextStepId,
+        status: isEnd ? 'COMPLETE' : 'IN_PROGRESS',
+      };
 
-      try {
-        // Submit Score
-        await fetch('/api/scores/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            gameName: `quest_${quest.id}`,
-            score: Math.round(optimalRate * 100),
-            xpEarned: xpToAward
-          })
-        });
+      setState(nextState);
 
-        // Update Financial Health
-        await updateFinancialHealth(uid, nextState.totalHealthDelta);
+      if (isEnd && user) {
+        const uid = user.uid;
+        if (!uid || uid.trim() === '') return;
 
-        // Record Progress
-        const progressRef = doc(db, 'users', uid, 'questProgress', quest.id);
-        await safeSetDoc(progressRef, {
-          completedAt: serverTimestamp(),
-          optimalChoiceRate: optimalRate,
-          xpEarned: xpToAward,
-          healthDelta: nextState.totalHealthDelta,
-          choiceHistory: newHistory,
-          endingBalance: quest.startingBalance + nextState.totalWalletDelta
-        });
+        const xpToAward = Math.max(0, nextState.totalXPEarned + quest.xpReward);
+        const optimalRate = nextState.optimalChoiceCount / Math.max(1, filteredSteps.length);
 
-        // Award Badges
-        await checkAndAwardQuestBadges(uid, quest.id, optimalRate);
-        await updateLeaderboardEntry(uid, user.displayName || 'Strategist');
-      } catch (err) {
-        console.error('[SpendXP Quest] Award Error:', err);
+        try {
+          // Get a fresh Firebase ID token for server verification
+          const token = await user.getIdToken();
+
+          const res = await fetch('/api/quests/complete', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              questId: quest.id,
+              xpEarned: xpToAward,
+              optimalRate,
+              healthDelta: nextState.totalHealthDelta,
+            }),
+          });
+
+          if (res.status === 403) {
+            // Daily limit reached — server didn't save (user is free tier)
+            const data = await res.json();
+            setState((prev) => ({
+              ...prev,
+              status: 'LIMIT_REACHED',
+              serverResult: {
+                xpAwarded: 0,
+                streak: 0,
+                questsToday: data.questsToday ?? 3,
+                dailyLimitReached: true,
+                alreadyCompleted: false,
+              },
+            }));
+            return;
+          }
+
+          if (res.ok) {
+            const data = await res.json();
+            setState((prev) => ({ ...prev, serverResult: data }));
+
+            // Award badges (client-side — non-critical)
+            await checkAndAwardQuestBadges(uid, quest.id, optimalRate).catch(
+              () => {}
+            );
+            await updateLeaderboardEntry(uid, user.displayName || 'Strategist').catch(
+              () => {}
+            );
+          }
+        } catch (err) {
+          console.error('[SpendXP Quest] Completion error:', err);
+        }
       }
-    }
-  }, [currentStep, state, quest, filteredSteps, user]);
+    },
+    [currentStep, state, quest, filteredSteps, user]
+  );
 
   return {
     state,
@@ -141,6 +174,6 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
     progress,
     startQuest,
     resetQuest,
-    makeChoice
+    makeChoice,
   };
 }

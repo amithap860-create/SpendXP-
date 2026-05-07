@@ -95,6 +95,14 @@ service cloud.firestore {
         allow read: if isOwner(uid) || isStudioPreview();
         allow write: if isOwner(uid) || isStudioPreview();
       }
+
+      // Daily quest/activity counters — written server-side via Admin SDK (bypasses rules)
+      // Client only reads (to show "X of 3 quests today")
+      match /dailyActivity/{dateKey} {
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
+        // Writes are done via Admin SDK in /api/quests/complete — no client write needed
+        allow write: if false;
+      }
     }
 
     // Leaderboard

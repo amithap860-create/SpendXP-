@@ -11,9 +11,10 @@ import { isFeatureAvailable, type PremiumFeature } from '@/config/premium';
 export function usePremium() {
   const { user } = useAuthContext();
 
-  // TODO: Replace with real Firestore subscription check when billing is live.
-  // For now, all users are on the free tier unless explicitly flagged.
-  const isPremium = false; // will read from Firestore profile later
+  // Reads isPremium from the Firestore user document (loaded in AuthContext).
+  // Set users.{uid}.isPremium = true in Firestore to grant premium access.
+  // When Stripe/billing is live, update this field via a Cloud Function webhook.
+  const isPremium = user?.isPremium ?? false;
   const tierId: 'free' | 'premium' = isPremium ? 'premium' : 'free';
 
   function canAccess(feature: PremiumFeature): boolean {

@@ -12,7 +12,7 @@ import { usePathname } from 'next/navigation';
 
 const SCREEN_OPTIONS = [
   'Dashboard', 'Games — Budget Blitz', 'Games — FinIQ Quiz', 'Games — Money Maze',
-  'Games — Stock Market Sim', 'Games — Credit Builder', 'Games — Compound Clicker',
+  'Games — Stock Market Sim', 'Games — Credit Builder',
   'Quests', 'Learn', 'Tools', 'Resources', 'Profile', 'Login / Signup',
   'Onboarding', 'Parent Dashboard', 'Other',
 ];

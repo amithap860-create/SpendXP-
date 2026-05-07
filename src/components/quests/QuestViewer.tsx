@@ -126,6 +126,40 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
     );
   }
 
+  // ── Daily limit reached — free user used 3 quests today ─────────────────────
+  if (state.status === 'LIMIT_REACHED') {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center min-h-screen-safe bg-slate-50">
+        <div className="max-w-md w-full space-y-6">
+          <div className="w-20 h-20 mx-auto rounded-full bg-amber-100 flex items-center justify-center">
+            <Trophy className="h-10 w-10 text-amber-600" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-black text-slate-900 mb-2">Daily Quest Limit Reached</h2>
+            <p className="text-slate-500 font-medium">
+              You've completed 3 quests today — great work, Strategist!
+              Come back tomorrow for more missions, or upgrade to Premium for unlimited quests.
+            </p>
+          </div>
+          <div className="flex flex-col gap-3">
+            <a
+              href="/upgrade"
+              className="h-12 px-6 rounded-xl bg-primary text-white font-black uppercase tracking-widest text-sm flex items-center justify-center hover:bg-primary/90 transition-colors"
+            >
+              Unlock Premium
+            </a>
+            <button
+              onClick={onComplete}
+              className="h-12 px-6 rounded-xl border border-slate-200 text-slate-600 font-black uppercase tracking-widest text-sm hover:bg-slate-50 transition-colors"
+            >
+              Back to Case Files
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (state.status === 'COMPLETE') {
     const starCount = state.optimalChoiceCount >= quest.steps.length * 0.8 ? 3 : state.optimalChoiceCount >= quest.steps.length * 0.5 ? 2 : 1;
 

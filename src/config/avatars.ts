@@ -1,17 +1,27 @@
 /**
  * @fileOverview Avatar character definitions for SpendXP.
- * Each avatar has a personality, a colour palette, and an emoji face.
- * Users pick their character during onboarding and can change it in Profile.
+ *
+ * Each avatar has:
+ * - `imagePath`: path to the image file under /public/avatars/
+ *   Place 200×200px PNG or SVG files there and they will be used automatically.
+ *   If the file does not exist yet, the `fallbackInitial` is rendered instead.
+ * - `fallbackInitial`: single letter shown in a coloured circle until real art arrives
+ *
+ * HOW TO GET PROFESSIONAL AVATARS:
+ * Use the prompts in HANDOFF.md to generate each character via Gemini, Midjourney,
+ * or a designer. Export as 200×200 PNG with transparent background and place in
+ * /public/avatars/{id}.png — the app will pick them up automatically.
  */
 
 export type AvatarConfig = {
   id: string;
-  emoji: string;           // Large display emoji
+  imagePath: string;       // Resolved from /public/avatars/{id}.png
+  fallbackInitial: string; // Shown if imagePath file is missing
   name: string;            // Character name
   tagline: string;         // Short personality line
-  bgGradient: string;      // Tailwind gradient classes for the avatar card bg
+  bgGradient: string;      // Tailwind gradient — used as card/circle background
   ringColor: string;       // Tailwind ring colour when selected
-  textColor: string;       // Tailwind text colour for name
+  textColor: string;       // Tailwind text colour for name on the card
   /** Which age groups this avatar is recommended for (all can use any) */
   recommended?: ('junior' | 'teen' | 'senior')[];
 };
@@ -19,122 +29,134 @@ export type AvatarConfig = {
 export const AVATARS: AvatarConfig[] = [
   {
     id: 'rocket',
-    emoji: '🚀',
+    imagePath: '/avatars/rocket.png',
+    fallbackInitial: 'R',
     name: 'Rocket',
     tagline: 'Shoots for the stars',
     bgGradient: 'from-indigo-500 to-purple-600',
     ringColor: 'ring-indigo-400',
-    textColor: 'text-[#1A1F2E]',
+    textColor: 'text-white',
     recommended: ['junior', 'teen'],
   },
   {
     id: 'fox',
-    emoji: '🦊',
+    imagePath: '/avatars/fox.png',
+    fallbackInitial: 'F',
     name: 'Fox',
     tagline: 'Clever with every coin',
     bgGradient: 'from-orange-400 to-red-500',
     ringColor: 'ring-orange-400',
-    textColor: 'text-[#2E7D5A]',
+    textColor: 'text-white',
     recommended: ['teen', 'senior'],
   },
   {
     id: 'owl',
-    emoji: '🦉',
+    imagePath: '/avatars/owl.png',
+    fallbackInitial: 'O',
     name: 'Owl',
     tagline: 'Wise investor',
     bgGradient: 'from-amber-500 to-yellow-600',
-    ringColor: 'ring-[#4EA07A]',
-    textColor: 'text-[#2E7D5A]',
+    ringColor: 'ring-amber-400',
+    textColor: 'text-white',
     recommended: ['senior'],
   },
   {
     id: 'panda',
-    emoji: '🐼',
+    imagePath: '/avatars/panda.png',
+    fallbackInitial: 'P',
     name: 'Panda',
     tagline: 'Calm, patient saver',
     bgGradient: 'from-slate-400 to-slate-600',
     ringColor: 'ring-slate-400',
-    textColor: 'text-slate-700',
+    textColor: 'text-white',
     recommended: ['junior'],
   },
   {
     id: 'dragon',
-    emoji: '🐲',
+    imagePath: '/avatars/dragon.png',
+    fallbackInitial: 'D',
     name: 'Dragon',
     tagline: 'Guards the gold',
     bgGradient: 'from-emerald-500 to-teal-600',
     ringColor: 'ring-emerald-400',
-    textColor: 'text-[#2E7D5A]',
+    textColor: 'text-white',
     recommended: ['teen', 'senior'],
   },
   {
     id: 'robot',
-    emoji: '🤖',
+    imagePath: '/avatars/robot.png',
+    fallbackInitial: 'R',
     name: 'Robo',
-    tagline: 'Calculates every rupee',
-    bgGradient: 'from-cyan-400 to-blue-500',
+    tagline: 'Calculates every dollar',
+    bgGradient: 'from-cyan-500 to-blue-600',
     ringColor: 'ring-cyan-400',
-    textColor: 'text-[#1A1F2E]',
+    textColor: 'text-white',
     recommended: ['teen', 'senior'],
   },
   {
     id: 'cat',
-    emoji: '😸',
+    imagePath: '/avatars/cat.png',
+    fallbackInitial: 'N',
     name: 'Neko',
     tagline: 'Curious about markets',
     bgGradient: 'from-pink-400 to-rose-500',
     ringColor: 'ring-pink-400',
-    textColor: 'text-pink-700',
+    textColor: 'text-white',
     recommended: ['junior', 'teen'],
   },
   {
     id: 'ninja',
-    emoji: '🥷',
+    imagePath: '/avatars/ninja.png',
+    fallbackInitial: 'N',
     name: 'Ninja',
     tagline: 'Silent but wealthy',
     bgGradient: 'from-gray-700 to-slate-900',
     ringColor: 'ring-gray-500',
-    textColor: 'text-gray-700',
+    textColor: 'text-white',
     recommended: ['teen', 'senior'],
   },
   {
     id: 'unicorn',
-    emoji: '🦄',
+    imagePath: '/avatars/unicorn.png',
+    fallbackInitial: 'U',
     name: 'Uni',
     tagline: 'Makes money magic',
     bgGradient: 'from-fuchsia-400 to-violet-600',
     ringColor: 'ring-fuchsia-400',
-    textColor: 'text-fuchsia-700',
+    textColor: 'text-white',
     recommended: ['junior'],
   },
   {
     id: 'bear',
-    emoji: '🐻',
+    imagePath: '/avatars/bear.png',
+    fallbackInitial: 'B',
     name: 'Bruno',
-    tagline: 'Steady & reliable',
+    tagline: 'Steady and reliable',
     bgGradient: 'from-yellow-600 to-amber-700',
     ringColor: 'ring-yellow-500',
-    textColor: 'text-[#1A1F2E]',
+    textColor: 'text-white',
     recommended: ['junior', 'teen'],
   },
   {
     id: 'lion',
-    emoji: '🦁',
+    imagePath: '/avatars/lion.png',
+    fallbackInitial: 'K',
     name: 'King',
     tagline: 'Leads with confidence',
     bgGradient: 'from-yellow-400 to-orange-500',
     ringColor: 'ring-yellow-400',
-    textColor: 'text-[#1A1F2E]',
+    textColor: 'text-white',
     recommended: ['senior'],
   },
   {
     id: 'shark',
-    emoji: '🦈',
+    imagePath: '/avatars/shark.png',
+    fallbackInitial: 'J',
     name: 'Jaws',
     tagline: 'Hunts the best deals',
     bgGradient: 'from-blue-500 to-indigo-600',
     ringColor: 'ring-blue-400',
-    textColor: 'text-blue-700',
+    textColor: 'text-white',
     recommended: ['teen', 'senior'],
   },
 ];

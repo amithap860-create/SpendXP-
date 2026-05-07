@@ -30,40 +30,166 @@ const CreditScoreBuilder = dynamic(() => import('@/components/games/CreditScoreB
   loading: () => <GameLoadingSkeleton />,
   ssr: false
 });
+
 type GameID = 'budgetBlitz' | 'finIQQuiz' | 'moneyMaze' | 'stockMarketSim' | 'creditScoreBuilder';
 
 interface GamesHubProps {
   searchParams: Promise<{ game?: string; mode?: string }>;
 }
 
+// ─── Game icons — SVG only, no emoji ─────────────────────────────────────────
+
+function IconBolt({ className }: { className?: string }) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M13 2L4.5 13.5H12L11 22L19.5 10.5H12L13 2Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+function IconBrain({ className }: { className?: string }) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M9.5 2C7 2 5 4 5 6.5c0 .8.2 1.5.6 2.1C4.2 9.4 3 11 3 13c0 2.5 1.8 4.5 4.2 5C8 19.6 9.2 21 11 21h2c1.8 0 3-1.4 3.8-3 2.4-.5 4.2-2.5 4.2-5 0-2-1.2-3.6-2.6-4.4.4-.6.6-1.3.6-2.1C19 4 17 2 14.5 2c-.9 0-1.7.3-2.5.7C11.2 2.3 10.4 2 9.5 2Z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+      <line x1="12" y1="7" x2="12" y2="13" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+    </svg>
+  );
+}
+function IconMaze({ className }: { className?: string }) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className}>
+      <rect x="2" y="2" width="20" height="20" rx="2" stroke="currentColor" strokeWidth="1.6"/>
+      <path d="M7 2v5M7 10v7M12 7v3M12 14v5M17 2v8M17 14v5M2 7h5M10 7h2M14 12h3M2 14h5M10 12h2M14 19h3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+    </svg>
+  );
+}
+function IconChart({ className }: { className?: string }) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className}>
+      <polyline points="3,17 9,11 13,15 21,7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+      <polyline points="17,7 21,7 21,11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+function IconCard({ className }: { className?: string }) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className}>
+      <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.6"/>
+      <line x1="2" y1="10" x2="22" y2="10" stroke="currentColor" strokeWidth="1.6"/>
+      <rect x="5" y="14" width="5" height="2" rx="0.5" fill="currentColor"/>
+    </svg>
+  );
+}
+function IconGroup({ className }: { className?: string }) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className={className}>
+      <circle cx="9" cy="7" r="3" stroke="currentColor" strokeWidth="1.6"/>
+      <circle cx="15" cy="7" r="3" stroke="currentColor" strokeWidth="1.6"/>
+      <path d="M3 19c0-3 2.7-5 6-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+      <path d="M21 19c0-3-2.7-5-6-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+      <path d="M9 19c0-2.8 2-5 5-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+    </svg>
+  );
+}
+function IconLock({ className }: { className?: string }) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 20 20" fill="none" className={className}>
+      <rect x="4" y="9" width="12" height="9" rx="2" stroke="currentColor" strokeWidth="1.6"/>
+      <path d="M7 9V7a3 3 0 0 1 6 0v2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+    </svg>
+  );
+}
+function IconStar({ className }: { className?: string }) {
+  return (
+    <svg width="8" height="8" viewBox="0 0 16 16" fill="currentColor" className={className}>
+      <path d="M8 1l1.8 5.4H15l-4.6 3.3 1.8 5.4L8 12.1l-4.2 3 1.8-5.4L1 6.4h5.2z"/>
+    </svg>
+  );
+}
+
+// ─── Game definitions ─────────────────────────────────────────────────────────
+
+interface GameDef {
+  id: string;
+  name: string;
+  desc: string;
+  accentColor: string; // left bar color
+  Icon: React.ComponentType<{ className?: string }>;
+  premium?: boolean;
+  comingSoon?: boolean;
+}
+
+const GAMES: GameDef[] = [
+  {
+    id: 'budgetBlitz',
+    name: 'Budget Blitz',
+    desc: 'Sort needs, wants and savings at speed.',
+    accentColor: 'bg-primary',
+    Icon: IconBolt,
+  },
+  {
+    id: 'finIQQuiz',
+    name: 'FinIQ Quiz',
+    desc: 'Daily scenarios to test your financial IQ.',
+    accentColor: 'bg-[#1A3A5F]',
+    Icon: IconBrain,
+  },
+  {
+    id: 'moneyMaze',
+    name: 'Money Maze',
+    desc: 'Solve puzzles to optimise your allocation.',
+    accentColor: 'bg-[#5F3A1A]',
+    Icon: IconMaze,
+  },
+  {
+    id: 'stockMarketSim',
+    name: 'Stock Market Sim',
+    desc: 'Trade virtual stocks based on live news.',
+    accentColor: 'bg-[#1A4A3A]',
+    Icon: IconChart,
+    premium: true,
+  },
+  {
+    id: 'creditScoreBuilder',
+    name: 'Credit Builder',
+    desc: 'Manage your score through lifecycle choices.',
+    accentColor: 'bg-[#3A1A5F]',
+    Icon: IconCard,
+    premium: true,
+  },
+  {
+    id: 'groupPlay',
+    name: 'Group Play',
+    desc: 'Challenge friends and compete on leaderboards.',
+    accentColor: 'bg-slate-400',
+    Icon: IconGroup,
+    premium: true,
+    comingSoon: true,
+  },
+];
+
 export default function GamesHub({ searchParams }: GamesHubProps) {
   const router = useRouter();
   const resolvedParams = use(searchParams);
   const { ageGroup } = useAgeAdapt();
   const { canAccess } = usePremium();
-  
+
   const [activeGame, setActiveGame] = useState<GameID | null>(null);
   const [isDaily, setIsDaily] = useState(false);
-
-  useEffect(() => {
-    document.title = 'Games | SpendXP';
-  }, []);
   const [highlightedGame, setHighlightedGame] = useState<string | null>(null);
   const [showDailyBreakdown, setShowDailyBreakdown] = useState(false);
 
   useEffect(() => {
+    document.title = 'Games | SpendXP';
+  }, []);
+
+  useEffect(() => {
     const gameParam = resolvedParams.game as GameID;
     const modeParam = resolvedParams.mode;
-    
+
     if (gameParam) {
       const validGames: GameID[] = [
-        'budgetBlitz',
-        'finIQQuiz',
-        'moneyMaze',
-        'stockMarketSim',
-        'creditScoreBuilder'
+        'budgetBlitz', 'finIQQuiz', 'moneyMaze', 'stockMarketSim', 'creditScoreBuilder'
       ];
-
       if (validGames.includes(gameParam)) {
         if (gameParam === 'finIQQuiz' && modeParam === 'daily') {
           setIsDaily(true);
@@ -72,24 +198,17 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
         } else {
           setHighlightedGame(gameParam);
           setTimeout(() => {
-            const element = document.getElementById(`game-card-${gameParam}`);
-            if (element) {
-              element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+            document.getElementById(`game-card-${gameParam}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }, 100);
-          setTimeout(() => {
-            setHighlightedGame(null);
-          }, 2000);
+          setTimeout(() => setHighlightedGame(null), 2000);
         }
       }
       router.replace('/games');
     }
   }, [resolvedParams, router]);
 
-  // Deterministic topic for daily challenge based on day of month
   const dailyTopics = ['budgeting-basics', 'investing-basics', 'credit-scores', 'taxes-india', 'spending-habits', 'emergency-fund', 'emi-and-debt'];
-  const todayIndex = new Date().getDate() % dailyTopics.length;
-  const todayBreakdownId = dailyTopics[todayIndex];
+  const todayBreakdownId = dailyTopics[new Date().getDate() % dailyTopics.length];
 
   const renderGame = () => {
     if (isDaily && showDailyBreakdown) {
@@ -103,21 +222,20 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
         />
       );
     }
-
     switch (activeGame) {
-      case 'budgetBlitz': return <BudgetBlitz onExit={() => setActiveGame(null)} />;
-      case 'finIQQuiz': return <FinIQQuiz onExit={() => setActiveGame(null)} isDailyChallenge={isDaily} />;
-      case 'moneyMaze': return <MoneyMaze onExit={() => setActiveGame(null)} />;
-      case 'stockMarketSim': return <StockMarketSim onExit={() => setActiveGame(null)} />;
-      case 'creditScoreBuilder': return <CreditScoreBuilder onExit={() => setActiveGame(null)} />;
-      default: return null;
+      case 'budgetBlitz':       return <BudgetBlitz onExit={() => setActiveGame(null)} />;
+      case 'finIQQuiz':         return <FinIQQuiz onExit={() => setActiveGame(null)} isDailyChallenge={isDaily} />;
+      case 'moneyMaze':         return <MoneyMaze onExit={() => setActiveGame(null)} />;
+      case 'stockMarketSim':    return <StockMarketSim onExit={() => setActiveGame(null)} />;
+      case 'creditScoreBuilder':return <CreditScoreBuilder onExit={() => setActiveGame(null)} />;
+      default:                  return null;
     }
   };
 
   return (
     <div className="min-h-screen-safe bg-slate-50 flex flex-col">
       <EmailVerificationBanner />
-      
+
       {!activeGame ? (
         <main className="max-w-5xl mx-auto px-4 py-8 w-full space-y-8">
           <header>
@@ -126,69 +244,25 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
           </header>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {/* FREE games */}
-            <GameCard
-              id="budgetBlitz"
-              name="Budget Blitz"
-              desc="Sort needs, wants and savings at speed."
-              color="bg-primary"
-              emoji="⚡"
-              isHighlighted={highlightedGame === 'budgetBlitz'}
-              onClick={() => setActiveGame('budgetBlitz')}
-            />
-            <GameCard
-              id="finIQQuiz"
-              name="FinIQ Quiz"
-              desc="Daily scenarios to test your financial IQ."
-              color="bg-blue-500"
-              emoji="🧠"
-              isHighlighted={highlightedGame === 'finIQQuiz'}
-              onClick={() => setActiveGame('finIQQuiz')}
-            />
-            <GameCard
-              id="moneyMaze"
-              name="Money Maze"
-              desc="Solve puzzles to optimize your allocation."
-              color="bg-rose-500"
-              emoji="🌀"
-              isHighlighted={highlightedGame === 'moneyMaze'}
-              onClick={() => setActiveGame('moneyMaze')}
-            />
-
-            {/* PREMIUM games */}
-            <GameCard
-              id="stockMarketSim"
-              name="Stock Market Sim"
-              desc="Trade virtual stocks based on live news."
-              color="bg-amber-500"
-              emoji="📈"
-              isHighlighted={highlightedGame === 'stockMarketSim'}
-              locked={!canAccess('stock_market_sim')}
-              onClick={() => canAccess('stock_market_sim') ? setActiveGame('stockMarketSim') : router.push('/upgrade')}
-            />
-            <GameCard
-              id="creditScoreBuilder"
-              name="Credit Builder"
-              desc="Manage your score through lifecycle choices."
-              color="bg-violet-500"
-              emoji="💳"
-              isHighlighted={highlightedGame === 'creditScoreBuilder'}
-              locked={!canAccess('credit_score_builder')}
-              onClick={() => canAccess('credit_score_builder') ? setActiveGame('creditScoreBuilder') : router.push('/upgrade')}
-            />
-
-            {/* Group Play — coming soon (premium) */}
-            <GameCard
-              id="groupPlay"
-              name="Group Play"
-              desc="Challenge friends and compete on leaderboards."
-              color="bg-slate-400"
-              emoji="👥"
-              isHighlighted={false}
-              locked
-              comingSoon
-              onClick={() => router.push('/upgrade')}
-            />
+            {GAMES.map(game => {
+              const isLocked = game.premium && !canAccess(game.id as any);
+              const handleClick = () => {
+                if (game.comingSoon || isLocked) {
+                  router.push('/upgrade');
+                } else {
+                  setActiveGame(game.id as GameID);
+                }
+              };
+              return (
+                <GameCard
+                  key={game.id}
+                  game={game}
+                  isHighlighted={highlightedGame === game.id}
+                  locked={!!isLocked}
+                  onClick={handleClick}
+                />
+              );
+            })}
           </div>
         </main>
       ) : (
@@ -198,14 +272,11 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
             (isDaily && showDailyBreakdown) ? "max-w-none" : "max-w-4xl p-4"
           )}>
             {!showDailyBreakdown && (
-              <button 
-                onClick={() => {
-                  setActiveGame(null);
-                  setIsDaily(false);
-                }}
+              <button
+                onClick={() => { setActiveGame(null); setIsDaily(false); }}
                 className="mb-4 text-xs font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest flex items-center gap-2 h-11 px-4 rounded-xl hover:bg-slate-100 transition-colors"
               >
-                ← Back to Arcade
+                Back to Arcade
               </button>
             )}
             {renderGame()}
@@ -217,68 +288,71 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
 }
 
 function GameCard({
-  id,
-  name,
-  desc,
-  color,
-  emoji,
-  onClick,
+  game,
   isHighlighted,
-  locked = false,
-  comingSoon = false,
+  locked,
+  onClick,
 }: {
-  id: string;
-  name: string;
-  desc: string;
-  color: string;
-  emoji: string;
-  onClick: () => void;
+  game: GameDef;
   isHighlighted: boolean;
-  locked?: boolean;
-  comingSoon?: boolean;
+  locked: boolean;
+  onClick: () => void;
 }) {
+  const { Icon } = game;
   return (
     <button
-      id={`game-card-${id}`}
+      id={`game-card-${game.id}`}
       onClick={onClick}
       className={cn(
         "bg-white rounded-3xl border-[0.5px] border-slate-200 p-6 md:p-8 shadow-sm transition-all text-left group overflow-hidden relative",
-        "ring-offset-2",
+        "ring-offset-2 min-h-[160px] flex flex-col justify-between",
         isHighlighted ? "ring-2 ring-primary" : "ring-0 transition-all duration-1000",
-        "min-h-[160px] flex flex-col justify-between",
         locked ? "opacity-80 hover:opacity-100 cursor-pointer" : "hover:shadow-xl hover:-translate-y-1"
       )}
     >
-      <div className={cn("absolute top-0 left-0 w-2 h-full", locked ? "bg-slate-300" : color)} />
+      {/* Left accent bar */}
+      <div className={cn("absolute top-0 left-0 w-2 h-full", locked ? "bg-slate-200" : game.accentColor)} />
 
-      {/* Lock / Coming Soon badges */}
+      {/* Premium / Coming Soon badge */}
       {locked && (
         <div className="absolute top-4 right-4 flex flex-col items-end gap-1">
-          {comingSoon ? (
-            <span className="text-[9px] font-black uppercase tracking-widest bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 rounded-full">Coming Soon</span>
+          {game.comingSoon ? (
+            <span className="text-[9px] font-black uppercase tracking-widest bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 rounded-full">
+              Coming Soon
+            </span>
           ) : (
-            <span className="text-[9px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">✨ Premium</span>
+            <span className="text-[9px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+              <IconStar />
+              Premium
+            </span>
           )}
         </div>
       )}
 
       <div>
-        <div className="text-2xl mb-2">{emoji}</div>
+        <div className={cn(
+          "w-10 h-10 rounded-xl flex items-center justify-center mb-3",
+          locked ? "bg-slate-100 text-slate-400" : "bg-primary/10 text-primary"
+        )}>
+          <Icon />
+        </div>
         <h3 className={cn(
           "text-xl font-black mb-2 transition-colors",
           locked ? "text-slate-400" : "text-slate-900 group-hover:text-primary"
-        )}>{name}</h3>
-        <p className="text-sm text-slate-500 font-medium leading-snug">{desc}</p>
+        )}>
+          {game.name}
+        </h3>
+        <p className="text-sm text-slate-500 font-medium leading-snug">{game.desc}</p>
       </div>
 
       <div className="flex justify-end pt-4">
         {locked ? (
-          <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">
-            {comingSoon ? 'COMING SOON' : '🔒 UNLOCK →'}
+          <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest flex items-center gap-1">
+            {game.comingSoon ? 'COMING SOON' : <><IconLock />UNLOCK</>}
           </span>
         ) : (
           <span className="text-[10px] font-black text-slate-300 group-hover:text-primary transition-colors uppercase tracking-widest">
-            PLAY NOW →
+            PLAY NOW
           </span>
         )}
       </div>

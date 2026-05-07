@@ -23,6 +23,7 @@ import { db } from '@/lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import dynamic from 'next/dynamic';
 import { getRankForXP, getRankProgress, getNextRank, getFogEnemy, getCaseFileId, getCurrentSaga } from '@/config/narrative';
+import { useDailyQuestStatus } from '@/hooks/useDailyQuestStatus';
 
 const QuestViewer = dynamic(() => import('@/components/quests/QuestViewer'), {
   ssr: false,
@@ -151,6 +152,7 @@ function CaseFileBriefing({ quest, index, onAccept, onDecline }: {
 export default function QuestsHub() {
   const { user, currentAgeGroup } = useAuthContext();
   const { data: progression } = useProgression();
+  const dailyStatus = useDailyQuestStatus();
   const [activeQuest, setActiveQuest] = useState<Quest | null>(null);
   const [briefingQuest, setBriefingQuest] = useState<{ quest: Quest; index: number } | null>(null);
   const [completedQuestIds, setCompletedQuestIds] = useState<string[]>([]);
@@ -322,6 +324,20 @@ export default function QuestsHub() {
           <div className="flex items-center gap-3 mb-5">
             <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">Open Case Files</div>
             <div className="flex-1 h-px bg-slate-200" />
+            {/* Daily quest counter for free users */}
+            {!dailyStatus.isLoading && (
+              <div className={cn(
+                "text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full",
+                dailyStatus.dailyLimitReached
+                  ? "bg-amber-100 text-amber-700"
+                  : "text-slate-400"
+              )}>
+                {dailyStatus.dailyLimitReached
+                  ? "Daily limit reached · Upgrade"
+                  : `${dailyStatus.questsToday}/${dailyStatus.limit === Infinity ? '∞' : dailyStatus.limit} today`
+                }
+              </div>
+            )}
             <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">
               {completedQuestIds.length}/{quests.length} Closed
             </div>

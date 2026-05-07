@@ -24,6 +24,9 @@ interface User {
   age: number;
   displayName?: string;
   providerData: { providerId: string }[];
+  isPremium?: boolean;
+  /** Returns a fresh Firebase ID token. Use in API calls that require Authorization: Bearer. */
+  getIdToken: (forceRefresh?: boolean) => Promise<string>;
 }
 
 interface AuthContextType {
@@ -65,6 +68,8 @@ function mapFirebaseUser(firebaseUser: FirebaseUser): User {
     providerData: firebaseUser.providerData.map((p) => ({
       providerId: p.providerId,
     })),
+    // Pass through Firebase's getIdToken so API routes can verify the user server-side.
+    getIdToken: (forceRefresh?: boolean) => firebaseUser.getIdToken(forceRefresh),
   };
 }
 
@@ -129,6 +134,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (userDoc.exists()) {
               const data = userDoc.data();
               if (data?.currencyCode) setCurrencyCode(data.currencyCode);
+              if (data?.isPremium) {
+                setUser(prev => prev ? { ...prev, isPremium: !!data.isPremium } : prev);
+              }
             }
           } catch (err) {
             console.warn('[SpendXP] Could not load currencyCode from Firestore:', err);

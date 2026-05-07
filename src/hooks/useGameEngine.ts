@@ -8,7 +8,6 @@ import { useUser, db, safeGetDoc, safeSetDoc } from '@/firebase';
 import { playCorrect, playWrong, playGameOver, playCombo } from '@/lib/sounds';
 import { validateScore, validateXP } from '@/lib/validation';
 import { rateLimiter, check } from '@/lib/rateLimiting';
-import { getRefreshedToken } from '@/lib/authHelpers';
 import { doc, writeBatch, serverTimestamp, increment } from 'firebase/firestore';
 import { updateLeaderboardEntry } from '@/lib/progressionService';
 import { waitForAuth } from '@/lib/waitForAuth';

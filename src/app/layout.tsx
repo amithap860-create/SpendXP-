@@ -32,7 +32,10 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('resize', checkSize);
   }, []);
 
-  const isAuthPage = ['/login', '/signup', '/verify-email', '/onboarding', '/consent'].includes(pathname);
+  const isAuthPage = [
+    '/login', '/signup', '/verify-email', '/onboarding', '/consent',
+    '/forgot-password', '/reset-password',
+  ].includes(pathname);
 
   const navLinks = [
     { label: 'Home', href: '/dashboard', icon: 'grid' },
@@ -55,7 +58,14 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
             <Link href="/dashboard" className="flex items-center gap-2 group">
               {/* Logo mark: navy foundation + amber scale accent */}
               <div className="w-8 h-8 bg-[#1A1F2E] rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform relative overflow-hidden">
-                <span className="text-[15px] leading-none select-none" style={{ color: '#4EA07A' }}>⚖</span>
+                {/* Scales of financial balance — SVG, no emoji */}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ color: '#4EA07A' }}>
+                  <line x1="12" y1="3" x2="12" y2="21" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+                  <line x1="6" y1="21" x2="18" y2="21" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+                  <line x1="6" y1="9" x2="18" y2="9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+                  <path d="M6 9 L3 15 Q6 17 9 15 Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" fill="none"/>
+                  <path d="M18 9 L15 15 Q18 17 21 15 Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" fill="none"/>
+                </svg>
               </div>
               <div className="flex items-baseline gap-0.5">
                 <span className="font-black text-xl tracking-tighter text-slate-900">Spend</span>
