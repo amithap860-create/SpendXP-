@@ -32,9 +32,13 @@ export type QuestState = {
 export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
   const { user } = useAuthContext();
 
+  // Use ALL quest steps — age-group filtering already happens at the quest LIST level.
+  // Filtering steps here causes a critical bug: when choice.nextStepId points to a step
+  // whose ageGroups doesn't include the user's group, currentStep becomes undefined
+  // and QuestViewer renders the empty string literal `""`.
   const filteredSteps = useMemo(
-    () => quest.steps.filter((step) => step.ageGroups.includes(ageGroup)),
-    [quest.steps, ageGroup]
+    () => quest.steps,
+    [quest.steps]
   );
 
   const [state, setState] = useState<QuestState>({

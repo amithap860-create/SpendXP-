@@ -258,6 +258,28 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
     );
   }
 
+  // Safety net: if currentStep is undefined (e.g. bad nextStepId in quest data),
+  // show a graceful error instead of rendering the literal string `""`.
+  if (!currentStep && state.status === 'IN_PROGRESS') {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center min-h-screen-safe bg-slate-50">
+        <div className="max-w-md w-full space-y-4">
+          <div className="w-16 h-16 mx-auto rounded-full bg-slate-100 flex items-center justify-center">
+            <Target className="h-8 w-8 text-slate-400" />
+          </div>
+          <h2 className="text-xl font-black text-slate-700">Quest step not found</h2>
+          <p className="text-slate-400 text-sm">This step could not be loaded. Please restart the quest.</p>
+          <button
+            onClick={resetQuest}
+            className="h-11 px-6 rounded-xl bg-primary text-white font-black uppercase tracking-widest text-sm hover:bg-primary/90 transition-colors"
+          >
+            Restart Quest
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 flex flex-col p-4 md:p-6 gap-6 md:gap-8 bg-slate-50 min-h-screen-safe overflow-y-auto">
       <div className="sticky top-4 z-50 animate-in slide-in-from-top-4 duration-500">

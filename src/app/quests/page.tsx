@@ -171,11 +171,21 @@ export default function QuestsHub() {
   }, []);
 
   useEffect(() => {
-    if (!user) return;
-    const fetchProgress = async () => {
-      const snap = await getDocs(collection(db, 'users', user.uid, 'questProgress'));
-      setCompletedQuestIds(snap.docs.map(d => d.id));
+    if (!user) {
+      // User is either loading or not signed in — stop the skeleton
       setIsLoading(false);
+      return;
+    }
+    setIsLoading(true);
+    const fetchProgress = async () => {
+      try {
+        const snap = await getDocs(collection(db, 'users', user.uid, 'questProgress'));
+        setCompletedQuestIds(snap.docs.map(d => d.id));
+      } catch (e) {
+        console.warn('[SpendXP] Could not load quest progress:', e);
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchProgress();
   }, [user, activeQuest]);
