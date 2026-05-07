@@ -150,7 +150,7 @@ function CaseFileBriefing({ quest, index, onAccept, onDecline }: {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function QuestsHub() {
-  const { user, currentAgeGroup } = useAuthContext();
+  const { user } = useAuthContext();
   const { data: progression } = useProgression();
   const dailyStatus = useDailyQuestStatus();
   const [activeQuest, setActiveQuest] = useState<Quest | null>(null);
@@ -356,7 +356,9 @@ export default function QuestsHub() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {quests.map((quest, i) => {
               const isCompleted = completedQuestIds.includes(quest.id);
-              const isAvailableForAge = quest.ageGroups.includes(currentAgeGroup);
+              // All quests are accessible to all users — age groups are for
+              // narrative adaptation, not access control.
+              const isAvailableForAge = true;
               const isLocked = quest.unlockRequirement?.completedQuestId &&
                 !completedQuestIds.includes(quest.unlockRequirement.completedQuestId);
               const caseId = getCaseFileId(i);

@@ -44,3 +44,10 @@ next-env.d.ts
 firebase-debug.log
 firestore-debug.log
 .vercel
+
+# deployment scripts (one-shot bat files, not part of source)
+*.bat
+
+# stale/temporary files
+*.bak
+s.ageGroups.includes*
