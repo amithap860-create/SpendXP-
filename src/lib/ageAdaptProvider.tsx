@@ -25,8 +25,8 @@ export const AgeGroupProvider = ({ children }: { children: ReactNode }) => {
   const isUserLoading = firebaseContext?.isUserLoading ?? true;
   const uid = user?.uid ?? null;
 
-  const [ageGroup, setAgeGroup] = useState<AgeGroup>('junior');
-  const [config, setConfig] = useState<DifficultyConfig>(getDifficultyConfig('junior'));
+  const [ageGroup, setAgeGroup] = useState<AgeGroup>('teen');
+  const [config, setConfig] = useState<DifficultyConfig>(getDifficultyConfig('teen'));
 
   // Memoize document reference for profile
   const profileRef = useMemoFirebase(() => {

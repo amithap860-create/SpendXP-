@@ -866,7 +866,7 @@ export const quests: Quest[] = [
         id: 'fp-2-balanced',
         title: 'The Tax Opportunity',
         narrative: "You have ₹22,800. PG and EMI paid. Now what? A colleague mentions that opening an NPS (National Pension System) account would save ₹15,600 in taxes this year under 80CCD(1B).",
-        ageGroups: ['senior'],
+        ageGroups: ['senior', 'teen'],
         choices: [
           {
             id: 'c4',
@@ -910,7 +910,7 @@ export const quests: Quest[] = [
         id: 'fp-2-saver',
         title: 'The Saver Advantage',
         narrative: "You have ₹10,000 in savings and ₹15,000 for the month after bills. You're ahead of 80% of people your age already. How do you optimize your taxes?",
-        ageGroups: ['senior'],
+        ageGroups: ['senior', 'teen'],
         choices: [
           {
             id: 'c7',
