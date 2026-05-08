@@ -43,6 +43,7 @@ import { IntroSlides } from '@/components/onboarding/IntroSlides';
 import { TooltipTour } from '@/components/onboarding/TooltipTour';
 import { getRankForXP, getRankProgress, getNextRank, getFogEnemy, getCurrentSaga } from '@/config/narrative';
 import { getAvatar } from '@/config/avatars';
+import AvatarIllustration from '@/components/AvatarIllustration';
 import { HowToPlayModal } from '@/components/HowToPlayModal';
 
 const RadarChart = dynamic(() => import('@/components/charts/RadarChart').then(mod => mod.RadarChart), {
@@ -365,7 +366,7 @@ export default function DashboardPage() {
           const rankPct = getRankProgress(totalXP) * 100;
           const fog = getFogEnemy(rank.activeFog.toLowerCase().replace(/ /g, '_').replace(/'/g, ''));
           const saga = getCurrentSaga();
-          const avatarCfg = getAvatar(profile?.avatarId ?? 'rocket');
+          const avatarCfg = getAvatar(profile?.avatarId ?? 'voss');
           return (
             <section id="tour-storyline" className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
               {/* Top accent bar */}
@@ -390,8 +391,8 @@ export default function DashboardPage() {
               <div className="p-5 space-y-4">
                 {/* Rank + district + avatar row */}
                 <div className="flex items-center gap-4">
-                  <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-gradient-to-br flex-shrink-0 shadow-sm', avatarCfg.bgGradient)}>
-                    {avatarCfg.fallbackInitial}
+                  <div className={cn('w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br flex-shrink-0 shadow-sm', avatarCfg.bgGradient)}>
+                    <AvatarIllustration id={avatarCfg.id} className="w-full h-full" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2 flex-wrap">

@@ -1,162 +1,181 @@
 /**
- * @fileOverview Avatar character definitions for SpendXP.
+ * @fileOverview SpendXP Avatar Archetypes — 12 Financial Personality Characters
  *
- * Each avatar has:
- * - `imagePath`: path to the image file under /public/avatars/
- *   Place 200×200px PNG or SVG files there and they will be used automatically.
- *   If the file does not exist yet, the `fallbackInitial` is rendered instead.
- * - `fallbackInitial`: single letter shown in a coloured circle until real art arrives
+ * Each character represents a distinct financial personality type (think MBTI for money).
+ * Portraits are rendered as inline SVGs via AvatarIllustration.tsx — no image files needed.
  *
- * HOW TO GET PROFESSIONAL AVATARS:
- * Use the prompts in HANDOFF.md to generate each character via Gemini, Midjourney,
- * or a designer. Export as 200×200 PNG with transparent background and place in
- * /public/avatars/{id}.png — the app will pick them up automatically.
+ * Characters are Order operatives with codenames, each with a distinct money mindset.
  */
 
 export type AvatarConfig = {
   id: string;
-  imagePath: string;       // Resolved from /public/avatars/{id}.png
-  fallbackInitial: string; // Shown if imagePath file is missing
-  name: string;            // Character name
-  tagline: string;         // Short personality line
-  bgGradient: string;      // Tailwind gradient — used as card/circle background
-  ringColor: string;       // Tailwind ring colour when selected
-  textColor: string;       // Tailwind text colour for name on the card
-  /** Which age groups this avatar is recommended for (all can use any) */
+  imagePath: string;        // Reserved for future hi-res art
+  fallbackInitial: string;  // Fallback if SVG component missing
+  name: string;             // Operative codename
+  tagline: string;          // Their financial philosophy in one line
+  archetype: string;        // MBTI-style label
+  bgGradient: string;       // Tailwind gradient — card background
+  bgFrom: string;           // Solid colour for small avatars (Tailwind bg-*)
+  ringColor: string;        // Tailwind ring when selected
+  textColor: string;        // Tailwind text colour for name on card
   recommended?: ('junior' | 'teen' | 'senior')[];
 };
 
 export const AVATARS: AvatarConfig[] = [
   {
-    id: 'rocket',
-    imagePath: '/avatars/rocket.png',
-    fallbackInitial: 'R',
-    name: 'Rocket',
-    tagline: 'Shoots for the stars',
-    bgGradient: 'from-indigo-500 to-purple-600',
-    ringColor: 'ring-indigo-400',
-    textColor: 'text-white',
-    recommended: ['junior', 'teen'],
-  },
-  {
-    id: 'fox',
-    imagePath: '/avatars/fox.png',
-    fallbackInitial: 'F',
-    name: 'Fox',
-    tagline: 'Clever with every coin',
-    bgGradient: 'from-orange-400 to-red-500',
-    ringColor: 'ring-orange-400',
-    textColor: 'text-white',
-    recommended: ['teen', 'senior'],
-  },
-  {
-    id: 'owl',
-    imagePath: '/avatars/owl.png',
-    fallbackInitial: 'O',
-    name: 'Owl',
-    tagline: 'Wise investor',
-    bgGradient: 'from-amber-500 to-yellow-600',
-    ringColor: 'ring-amber-400',
-    textColor: 'text-white',
-    recommended: ['senior'],
-  },
-  {
-    id: 'panda',
-    imagePath: '/avatars/panda.png',
-    fallbackInitial: 'P',
-    name: 'Panda',
-    tagline: 'Calm, patient saver',
-    bgGradient: 'from-slate-400 to-slate-600',
+    id: 'voss',
+    imagePath: '/avatars/voss.png',
+    fallbackInitial: 'V',
+    name: 'Voss',
+    tagline: 'Three moves ahead of the market',
+    archetype: 'The Strategist',
+    bgGradient: 'from-slate-800 to-slate-950',
+    bgFrom: 'bg-slate-800',
     ringColor: 'ring-slate-400',
-    textColor: 'text-white',
-    recommended: ['junior'],
-  },
-  {
-    id: 'dragon',
-    imagePath: '/avatars/dragon.png',
-    fallbackInitial: 'D',
-    name: 'Dragon',
-    tagline: 'Guards the gold',
-    bgGradient: 'from-emerald-500 to-teal-600',
-    ringColor: 'ring-emerald-400',
-    textColor: 'text-white',
-    recommended: ['teen', 'senior'],
-  },
-  {
-    id: 'robot',
-    imagePath: '/avatars/robot.png',
-    fallbackInitial: 'R',
-    name: 'Robo',
-    tagline: 'Calculates every dollar',
-    bgGradient: 'from-cyan-500 to-blue-600',
-    ringColor: 'ring-cyan-400',
-    textColor: 'text-white',
-    recommended: ['teen', 'senior'],
-  },
-  {
-    id: 'cat',
-    imagePath: '/avatars/cat.png',
-    fallbackInitial: 'N',
-    name: 'Neko',
-    tagline: 'Curious about markets',
-    bgGradient: 'from-pink-400 to-rose-500',
-    ringColor: 'ring-pink-400',
-    textColor: 'text-white',
-    recommended: ['junior', 'teen'],
-  },
-  {
-    id: 'ninja',
-    imagePath: '/avatars/ninja.png',
-    fallbackInitial: 'N',
-    name: 'Ninja',
-    tagline: 'Silent but wealthy',
-    bgGradient: 'from-gray-700 to-slate-900',
-    ringColor: 'ring-gray-500',
-    textColor: 'text-white',
-    recommended: ['teen', 'senior'],
-  },
-  {
-    id: 'unicorn',
-    imagePath: '/avatars/unicorn.png',
-    fallbackInitial: 'U',
-    name: 'Uni',
-    tagline: 'Makes money magic',
-    bgGradient: 'from-fuchsia-400 to-violet-600',
-    ringColor: 'ring-fuchsia-400',
-    textColor: 'text-white',
-    recommended: ['junior'],
-  },
-  {
-    id: 'bear',
-    imagePath: '/avatars/bear.png',
-    fallbackInitial: 'B',
-    name: 'Bruno',
-    tagline: 'Steady and reliable',
-    bgGradient: 'from-yellow-600 to-amber-700',
-    ringColor: 'ring-yellow-500',
-    textColor: 'text-white',
-    recommended: ['junior', 'teen'],
-  },
-  {
-    id: 'lion',
-    imagePath: '/avatars/lion.png',
-    fallbackInitial: 'K',
-    name: 'King',
-    tagline: 'Leads with confidence',
-    bgGradient: 'from-yellow-400 to-orange-500',
-    ringColor: 'ring-yellow-400',
-    textColor: 'text-white',
+    textColor: 'text-slate-200',
     recommended: ['senior'],
   },
   {
-    id: 'shark',
-    imagePath: '/avatars/shark.png',
-    fallbackInitial: 'J',
-    name: 'Jaws',
-    tagline: 'Hunts the best deals',
-    bgGradient: 'from-blue-500 to-indigo-600',
+    id: 'luna',
+    imagePath: '/avatars/luna.png',
+    fallbackInitial: 'L',
+    name: 'Luna',
+    tagline: 'Never just one stream of income',
+    archetype: 'The Hustler',
+    bgGradient: 'from-amber-600 to-orange-700',
+    bgFrom: 'bg-amber-600',
+    ringColor: 'ring-amber-400',
+    textColor: 'text-amber-100',
+    recommended: ['teen', 'senior'],
+  },
+  {
+    id: 'rei',
+    imagePath: '/avatars/rei.png',
+    fallbackInitial: 'R',
+    name: 'Rei',
+    tagline: 'Maximum life on minimum spend',
+    archetype: 'The Minimalist',
+    bgGradient: 'from-emerald-800 to-green-950',
+    bgFrom: 'bg-emerald-800',
+    ringColor: 'ring-emerald-400',
+    textColor: 'text-emerald-100',
+    recommended: ['teen', 'senior'],
+  },
+  {
+    id: 'cipher',
+    imagePath: '/avatars/cipher.png',
+    fallbackInitial: 'C',
+    name: 'Cipher',
+    tagline: 'Anonymous wealth, maximum power',
+    archetype: 'The Phantom',
+    bgGradient: 'from-slate-900 to-black',
+    bgFrom: 'bg-slate-950',
+    ringColor: 'ring-teal-400',
+    textColor: 'text-teal-300',
+    recommended: ['teen', 'senior'],
+  },
+  {
+    id: 'atlas',
+    imagePath: '/avatars/atlas.png',
+    fallbackInitial: 'A',
+    name: 'Atlas',
+    tagline: 'Every number has its place',
+    archetype: 'The Architect',
+    bgGradient: 'from-blue-900 to-indigo-950',
+    bgFrom: 'bg-blue-900',
     ringColor: 'ring-blue-400',
-    textColor: 'text-white',
+    textColor: 'text-blue-100',
+    recommended: ['teen', 'senior'],
+  },
+  {
+    id: 'nova',
+    imagePath: '/avatars/nova.png',
+    fallbackInitial: 'N',
+    name: 'Nova',
+    tagline: 'The market speaks. She listens.',
+    archetype: 'The Oracle',
+    bgGradient: 'from-violet-900 to-purple-950',
+    bgFrom: 'bg-violet-900',
+    ringColor: 'ring-violet-400',
+    textColor: 'text-violet-200',
+    recommended: ['senior'],
+  },
+  {
+    id: 'jade',
+    imagePath: '/avatars/jade.png',
+    fallbackInitial: 'J',
+    name: 'Jade',
+    tagline: 'Your future self says thank you',
+    archetype: 'The Guardian',
+    bgGradient: 'from-green-900 to-emerald-950',
+    bgFrom: 'bg-green-900',
+    ringColor: 'ring-green-400',
+    textColor: 'text-green-100',
+    recommended: ['junior', 'teen', 'senior'],
+  },
+  {
+    id: 'storm',
+    imagePath: '/avatars/storm.png',
+    fallbackInitial: 'S',
+    name: 'Storm',
+    tagline: 'Disrupting the system, one move at a time',
+    archetype: 'The Rebel',
+    bgGradient: 'from-cyan-700 to-blue-800',
+    bgFrom: 'bg-cyan-700',
+    ringColor: 'ring-cyan-300',
+    textColor: 'text-cyan-100',
+    recommended: ['teen'],
+  },
+  {
+    id: 'finn',
+    imagePath: '/avatars/finn.png',
+    fallbackInitial: 'F',
+    name: 'Finn',
+    tagline: 'Research is the best investment',
+    archetype: 'The Scholar',
+    bgGradient: 'from-amber-800 to-yellow-950',
+    bgFrom: 'bg-amber-800',
+    ringColor: 'ring-yellow-400',
+    textColor: 'text-yellow-100',
+    recommended: ['junior', 'teen'],
+  },
+  {
+    id: 'zen',
+    imagePath: '/avatars/zen.png',
+    fallbackInitial: 'Z',
+    name: 'Zen',
+    tagline: 'Light wallet, rich in experiences',
+    archetype: 'The Nomad',
+    bgGradient: 'from-lime-800 to-green-900',
+    bgFrom: 'bg-lime-800',
+    ringColor: 'ring-lime-400',
+    textColor: 'text-lime-100',
+    recommended: ['junior', 'teen'],
+  },
+  {
+    id: 'echo',
+    imagePath: '/avatars/echo.png',
+    fallbackInitial: 'E',
+    name: 'Echo',
+    tagline: 'Money flows through connections',
+    archetype: 'The Connector',
+    bgGradient: 'from-rose-700 to-pink-900',
+    bgFrom: 'bg-rose-700',
+    ringColor: 'ring-rose-400',
+    textColor: 'text-rose-100',
+    recommended: ['junior', 'teen'],
+  },
+  {
+    id: 'blaze',
+    imagePath: '/avatars/blaze.png',
+    fallbackInitial: 'B',
+    name: 'Blaze',
+    tagline: 'Turns small habits into gold',
+    archetype: 'The Alchemist',
+    bgGradient: 'from-orange-800 to-red-950',
+    bgFrom: 'bg-orange-800',
+    ringColor: 'ring-orange-400',
+    textColor: 'text-orange-100',
     recommended: ['teen', 'senior'],
   },
 ];

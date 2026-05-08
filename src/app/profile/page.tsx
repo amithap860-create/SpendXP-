@@ -48,6 +48,7 @@ import {
   ToggleRight,
 } from 'lucide-react';
 import { getAvatar } from '@/config/avatars';
+import AvatarIllustration from '@/components/AvatarIllustration';
 import { COUNTRIES, getCountryConfig } from '@/config/currency';
 import { cn } from '@/lib/utils';
 import { getRankForXP, getRankProgress, getNextRank, getFogEnemy, getCurrentSaga } from '@/config/narrative';
@@ -226,7 +227,7 @@ export default function ProfilePage() {
           birthYear: userSnap?.birthYear ?? null,
           currencyCode: userSnap?.currencyCode ?? 'INR',
           countryCode: userSnap?.countryCode ?? 'IN',
-          avatarId: userSnap?.avatarId ?? 'rocket',
+          avatarId: userSnap?.avatarId ?? 'voss',
           isParent: userSnap?.isParent ?? false,
           parentLinked: userSnap?.parentLinked ?? false,
         });
@@ -260,7 +261,7 @@ export default function ProfilePage() {
           ageGroup: currentAgeGroup ?? 'teen',
           birthYear: null,
           countryCode: 'IN',
-          avatarId: 'rocket',
+          avatarId: 'voss',
           currencyCode: 'INR',
           isParent: false,
           parentLinked: false,
@@ -405,7 +406,7 @@ export default function ProfilePage() {
   const xpForLevel = (nextLevel?.min ?? levelInfo.max) - levelInfo.min;
   const progressPct = Math.min(100, (xpIntoLevel / xpForLevel) * 100);
   const ageLabel = profile.ageGroup === 'junior' ? 'Junior (8–12)' : profile.ageGroup === 'teen' ? 'Teen (13–16)' : 'Senior (17–20)';
-  const avatarCfg = getAvatar(profile.avatarId ?? 'rocket');
+  const avatarCfg = getAvatar(profile.avatarId ?? 'voss');
   const countryCfg = getCountryConfig(profile.countryCode ?? 'IN');
 
   return (
@@ -420,10 +421,10 @@ export default function ProfilePage() {
             <div className="flex items-end gap-4 -mt-10">
               {/* Avatar emoji bubble */}
               <div className={cn(
-                'h-20 w-20 rounded-2xl flex items-center justify-center text-4xl shadow-xl border-4 border-white bg-gradient-to-br shrink-0',
+                'h-20 w-20 rounded-2xl overflow-hidden shadow-xl border-4 border-white bg-gradient-to-br shrink-0',
                 avatarCfg.bgGradient
               )}>
-                {avatarCfg.fallbackInitial}
+                <AvatarIllustration id={avatarCfg.id} className="w-full h-full" />
               </div>
               <div className="mb-1 flex-1 min-w-0">
                 {editingName ? (
@@ -457,7 +458,7 @@ export default function ProfilePage() {
                     {countryCfg.flag} {countryCfg.name} · {profile.currencyCode}
                   </span>
                 </div>
-                <p className="text-xs text-slate-400 mt-0.5 italic">{avatarCfg.name} — {avatarCfg.tagline}</p>
+                <p className="text-xs text-slate-400 mt-0.5 italic">{avatarCfg.archetype} · &ldquo;{avatarCfg.tagline}&rdquo;</p>
               </div>
             </div>
             <div className="mt-3 flex items-center gap-2 text-sm text-slate-500">
@@ -513,7 +514,7 @@ export default function ProfilePage() {
           const rankPct = getRankProgress(totalXP) * 100;
           const fog = getFogEnemy(rank.activeFog.toLowerCase().replace(/ /g, '_').replace(/'/g, ''));
           const saga = getCurrentSaga();
-          const avatarCfg = getAvatar(profile?.avatarId ?? 'rocket');
+          const avatarCfg = getAvatar(profile?.avatarId ?? 'voss');
           return (
             <Card className="border-none shadow-sm overflow-hidden">
               <div className={cn('h-1 w-full bg-gradient-to-r', avatarCfg.bgGradient)} />
@@ -530,8 +531,8 @@ export default function ProfilePage() {
 
                 {/* Rank + progress */}
                 <div className="flex items-center gap-3">
-                  <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center text-lg bg-gradient-to-br flex-shrink-0', avatarCfg.bgGradient)}>
-                    {avatarCfg.fallbackInitial}
+                  <div className={cn('w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-br flex-shrink-0', avatarCfg.bgGradient)}>
+                    <AvatarIllustration id={avatarCfg.id} className="w-full h-full" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2 mb-1">
