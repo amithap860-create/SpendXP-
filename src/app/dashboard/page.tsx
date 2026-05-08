@@ -391,7 +391,7 @@ export default function DashboardPage() {
                 {/* Rank + district + avatar row */}
                 <div className="flex items-center gap-4">
                   <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-gradient-to-br flex-shrink-0 shadow-sm', avatarCfg.bgGradient)}>
-                    {avatarCfg.emoji}
+                    {avatarCfg.fallbackInitial}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2 flex-wrap">

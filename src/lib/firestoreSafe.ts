@@ -87,7 +87,9 @@ export function safeOnSnapshotDoc(
   });
 }
 
-export async function safeGetDoc<T>(
+// Default to Record<string,any> so callers can access Firestore fields without
+// needing explicit type parameters. Strongly-typed callers can still pass T.
+export async function safeGetDoc<T = Record<string, any>>(
   ref: DocumentReference<T>
 ): Promise<T | null> {
   try {

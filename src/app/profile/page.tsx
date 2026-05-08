@@ -423,7 +423,7 @@ export default function ProfilePage() {
                 'h-20 w-20 rounded-2xl flex items-center justify-center text-4xl shadow-xl border-4 border-white bg-gradient-to-br shrink-0',
                 avatarCfg.bgGradient
               )}>
-                {avatarCfg.emoji}
+                {avatarCfg.fallbackInitial}
               </div>
               <div className="mb-1 flex-1 min-w-0">
                 {editingName ? (
@@ -531,7 +531,7 @@ export default function ProfilePage() {
                 {/* Rank + progress */}
                 <div className="flex items-center gap-3">
                   <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center text-lg bg-gradient-to-br flex-shrink-0', avatarCfg.bgGradient)}>
-                    {avatarCfg.emoji}
+                    {avatarCfg.fallbackInitial}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2 mb-1">

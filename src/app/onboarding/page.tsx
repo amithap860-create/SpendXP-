@@ -180,7 +180,7 @@ export default function OnboardingPage() {
           {step === 2 && (
             <div className="space-y-6 text-center">
               <div className="space-y-2">
-                <div className="text-5xl">{selectedAvatar.emoji}</div>
+                <div className={cn('w-20 h-20 mx-auto rounded-2xl flex items-center justify-center text-4xl font-black text-white bg-gradient-to-br shadow-lg', selectedAvatar.bgGradient)}>{selectedAvatar.fallbackInitial}</div>
                 <h2 className="text-4xl font-black text-slate-900 tracking-tight">Pick your character</h2>
                 <p className="text-slate-500 font-medium">Your financial alter-ego awaits.</p>
               </div>
@@ -202,7 +202,7 @@ export default function OnboardingPage() {
                       'w-12 h-12 rounded-xl flex items-center justify-center text-2xl bg-gradient-to-br',
                       avatar.bgGradient
                     )}>
-                      {avatar.emoji}
+                      {avatar.fallbackInitial}
                     </div>
                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 truncate w-full text-center">
                       {avatar.name}
@@ -221,7 +221,7 @@ export default function OnboardingPage() {
                 'p-4 rounded-2xl border-2 border-primary/20 bg-gradient-to-r text-white text-left flex items-center gap-4',
                 selectedAvatar.bgGradient
               )}>
-                <div className="text-4xl">{selectedAvatar.emoji}</div>
+                <div className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl font-black text-white bg-white/20">{selectedAvatar.fallbackInitial}</div>
                 <div>
                   <p className="font-black text-lg">{selectedAvatar.name}</p>
                   <p className="text-white/80 text-sm font-medium">{selectedAvatar.tagline}</p>
@@ -371,7 +371,7 @@ export default function OnboardingPage() {
                   'w-36 h-36 rounded-3xl flex items-center justify-center text-6xl bg-gradient-to-br shadow-2xl',
                   selectedAvatar.bgGradient
                 )}>
-                  {selectedAvatar.emoji}
+                  {selectedAvatar.fallbackInitial}
                 </div>
                 {/* Seal badge */}
                 <div className="absolute -top-3 -right-3 w-10 h-10 bg-[#4EA07A] rounded-full flex items-center justify-center text-lg shadow-lg border-2 border-white">
@@ -402,7 +402,7 @@ export default function OnboardingPage() {
                 <div className="border-t border-slate-700 pt-4 space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Detective Persona</span>
-                    <span className="text-sm font-black text-white">{selectedAvatar.emoji} {selectedAvatar.name}</span>
+                    <span className="text-sm font-black text-white">{selectedAvatar.fallbackInitial} {selectedAvatar.name}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Starting Rank</span>

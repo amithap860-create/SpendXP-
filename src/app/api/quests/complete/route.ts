@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
       const isPremium: boolean = Boolean(userData.isPremium);
 
       // ── Idempotency: quest already completed ──────────────────────────────
-      if (questSnap.exists()) {
+      if (questSnap.exists) {
         const existing = questSnap.data()!;
         return {
           success: true,
