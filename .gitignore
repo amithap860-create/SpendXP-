@@ -51,3 +51,4 @@ firestore-debug.log
 # stale/temporary files
 *.bak
 s.ageGroups.includes*
+avatar.fallbackInitial
