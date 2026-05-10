@@ -43,7 +43,7 @@ import { IntroSlides } from '@/components/onboarding/IntroSlides';
 import { TooltipTour } from '@/components/onboarding/TooltipTour';
 import { getRankForXP, getRankProgress, getNextRank, getFogEnemy, getCurrentSaga } from '@/config/narrative';
 import { getAvatar } from '@/config/avatars';
-import AvatarIllustration from '@/components/AvatarIllustration';
+import Image from 'next/image';
 import { HowToPlayModal } from '@/components/HowToPlayModal';
 
 const RadarChart = dynamic(() => import('@/components/charts/RadarChart').then(mod => mod.RadarChart), {
@@ -391,8 +391,8 @@ export default function DashboardPage() {
               <div className="p-5 space-y-4">
                 {/* Rank + district + avatar row */}
                 <div className="flex items-center gap-4">
-                  <div className={cn('w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br flex-shrink-0 shadow-sm', avatarCfg.bgGradient)}>
-                    <AvatarIllustration id={avatarCfg.id} className="w-full h-full" />
+                  <div className={cn('w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br flex-shrink-0 shadow-sm', avatarCfg.bgGradient)}>
+                    <Image src={avatarCfg.imagePath} alt={avatarCfg.name} width={64} height={64} className="w-full h-full object-cover object-top" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2 flex-wrap">

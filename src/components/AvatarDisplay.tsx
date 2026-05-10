@@ -1,20 +1,16 @@
 'use client';
 
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { type AvatarConfig } from '@/config/avatars';
-import AvatarIllustration from '@/components/AvatarIllustration';
 
 interface AvatarDisplayProps {
   avatar: AvatarConfig;
-  size?: number;            // px — applied to width & height
+  size?: number;
   className?: string;
-  showRing?: boolean;       // apply ringColor when selected
+  showRing?: boolean;
 }
 
-/**
- * Renders an avatar character using the inline SVG illustration system.
- * The gradient background is derived from the avatar's bgGradient config.
- */
 export function AvatarDisplay({ avatar, size = 64, className, showRing }: AvatarDisplayProps) {
   const ringClass = showRing ? avatar.ringColor : '';
 
@@ -28,14 +24,18 @@ export function AvatarDisplay({ avatar, size = 64, className, showRing }: Avatar
       style={{ width: size, height: size }}
       aria-label={avatar.name}
     >
-      <AvatarIllustration id={avatar.id} className="w-full h-full" />
+      <Image
+        src={avatar.imagePath}
+        alt={avatar.name}
+        width={size}
+        height={size}
+        className="w-full h-full object-cover object-top"
+        priority={false}
+      />
     </div>
   );
 }
 
-/**
- * Compact avatar selector card — used in onboarding / profile avatar picker.
- */
 export function AvatarPickerCard({
   avatar,
   selected,

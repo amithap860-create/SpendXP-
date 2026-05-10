@@ -24,7 +24,7 @@ export type AvatarConfig = {
 export const AVATARS: AvatarConfig[] = [
   {
     id: 'voss',
-    imagePath: '/avatars/voss.png',
+    imagePath: '/avatars/voss.png',   // lowercase on disk
     fallbackInitial: 'V',
     name: 'Voss',
     tagline: 'Three moves ahead of the market',
@@ -37,7 +37,7 @@ export const AVATARS: AvatarConfig[] = [
   },
   {
     id: 'luna',
-    imagePath: '/avatars/luna.png',
+    imagePath: '/avatars/Luna.png',
     fallbackInitial: 'L',
     name: 'Luna',
     tagline: 'Never just one stream of income',
@@ -50,7 +50,7 @@ export const AVATARS: AvatarConfig[] = [
   },
   {
     id: 'rei',
-    imagePath: '/avatars/rei.png',
+    imagePath: '/avatars/Rei.png',
     fallbackInitial: 'R',
     name: 'Rei',
     tagline: 'Maximum life on minimum spend',
@@ -63,7 +63,7 @@ export const AVATARS: AvatarConfig[] = [
   },
   {
     id: 'cipher',
-    imagePath: '/avatars/cipher.png',
+    imagePath: '/avatars/Cipher.png',
     fallbackInitial: 'C',
     name: 'Cipher',
     tagline: 'Anonymous wealth, maximum power',
@@ -76,7 +76,7 @@ export const AVATARS: AvatarConfig[] = [
   },
   {
     id: 'atlas',
-    imagePath: '/avatars/atlas.png',
+    imagePath: '/avatars/Atlas.png',
     fallbackInitial: 'A',
     name: 'Atlas',
     tagline: 'Every number has its place',
@@ -89,7 +89,7 @@ export const AVATARS: AvatarConfig[] = [
   },
   {
     id: 'nova',
-    imagePath: '/avatars/nova.png',
+    imagePath: '/avatars/Nova.png',
     fallbackInitial: 'N',
     name: 'Nova',
     tagline: 'The market speaks. She listens.',
@@ -102,7 +102,7 @@ export const AVATARS: AvatarConfig[] = [
   },
   {
     id: 'jade',
-    imagePath: '/avatars/jade.png',
+    imagePath: '/avatars/Jade.png',
     fallbackInitial: 'J',
     name: 'Jade',
     tagline: 'Your future self says thank you',
@@ -115,7 +115,7 @@ export const AVATARS: AvatarConfig[] = [
   },
   {
     id: 'storm',
-    imagePath: '/avatars/storm.png',
+    imagePath: '/avatars/Storm.png',
     fallbackInitial: 'S',
     name: 'Storm',
     tagline: 'Disrupting the system, one move at a time',
@@ -128,7 +128,7 @@ export const AVATARS: AvatarConfig[] = [
   },
   {
     id: 'finn',
-    imagePath: '/avatars/finn.png',
+    imagePath: '/avatars/Finn.png',
     fallbackInitial: 'F',
     name: 'Finn',
     tagline: 'Research is the best investment',
@@ -141,7 +141,7 @@ export const AVATARS: AvatarConfig[] = [
   },
   {
     id: 'zen',
-    imagePath: '/avatars/zen.png',
+    imagePath: '/avatars/Zen.png',
     fallbackInitial: 'Z',
     name: 'Zen',
     tagline: 'Light wallet, rich in experiences',
@@ -154,7 +154,7 @@ export const AVATARS: AvatarConfig[] = [
   },
   {
     id: 'echo',
-    imagePath: '/avatars/echo.png',
+    imagePath: '/avatars/Echo.png',
     fallbackInitial: 'E',
     name: 'Echo',
     tagline: 'Money flows through connections',
@@ -167,7 +167,7 @@ export const AVATARS: AvatarConfig[] = [
   },
   {
     id: 'blaze',
-    imagePath: '/avatars/blaze.png',
+    imagePath: '/avatars/Blaze.png',
     fallbackInitial: 'B',
     name: 'Blaze',
     tagline: 'Turns small habits into gold',

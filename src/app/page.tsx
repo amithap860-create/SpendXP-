@@ -6,6 +6,8 @@ import { useAuthContext } from '@/context/AuthContext';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sparkles, TrendingUp, Shield, GamepadIcon, BookOpen, Trophy } from 'lucide-react';
+import Image from 'next/image';
+import { AVATARS } from '@/config/avatars';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -85,6 +87,25 @@ export default function LandingPage() {
               Sign In
             </Button>
           </Link>
+        </div>
+      </section>
+
+      {/* Character showcase */}
+      <section className="max-w-6xl mx-auto px-6 pb-16">
+        <div className="text-center mb-8">
+          <p className="text-xs font-black uppercase tracking-widest text-primary/60 mb-2">Pick your operative</p>
+          <h2 className="text-2xl md:text-3xl font-black text-primary">12 financial archetypes. Which one are you?</h2>
+        </div>
+        <div className="flex overflow-x-auto gap-4 pb-4 no-scrollbar md:grid md:grid-cols-6 md:overflow-visible">
+          {AVATARS.map(avatar => (
+            <Link href="/signup" key={avatar.id} className="flex-shrink-0 flex flex-col items-center gap-2 group cursor-pointer">
+              <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden bg-gradient-to-br ${avatar.bgGradient} shadow-lg group-hover:scale-110 group-hover:shadow-xl transition-all duration-200`}>
+                <Image src={avatar.imagePath} alt={avatar.name} width={80} height={80} className="w-full h-full object-cover object-top" />
+              </div>
+              <span className="text-[10px] font-black text-slate-700 truncate">{avatar.name}</span>
+              <span className="text-[9px] text-slate-400 truncate text-center">{avatar.archetype}</span>
+            </Link>
+          ))}
         </div>
       </section>
 

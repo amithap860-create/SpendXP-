@@ -48,7 +48,7 @@ import {
   ToggleRight,
 } from 'lucide-react';
 import { getAvatar } from '@/config/avatars';
-import AvatarIllustration from '@/components/AvatarIllustration';
+import Image from 'next/image';
 import { COUNTRIES, getCountryConfig } from '@/config/currency';
 import { cn } from '@/lib/utils';
 import { getRankForXP, getRankProgress, getNextRank, getFogEnemy, getCurrentSaga } from '@/config/narrative';
@@ -424,7 +424,7 @@ export default function ProfilePage() {
                 'h-20 w-20 rounded-2xl overflow-hidden shadow-xl border-4 border-white bg-gradient-to-br shrink-0',
                 avatarCfg.bgGradient
               )}>
-                <AvatarIllustration id={avatarCfg.id} className="w-full h-full" />
+                <Image src={avatarCfg.imagePath} alt={avatarCfg.name} width={120} height={120} className="w-full h-full object-cover object-top" />
               </div>
               <div className="mb-1 flex-1 min-w-0">
                 {editingName ? (
@@ -532,7 +532,7 @@ export default function ProfilePage() {
                 {/* Rank + progress */}
                 <div className="flex items-center gap-3">
                   <div className={cn('w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-br flex-shrink-0', avatarCfg.bgGradient)}>
-                    <AvatarIllustration id={avatarCfg.id} className="w-full h-full" />
+                    <Image src={avatarCfg.imagePath} alt={avatarCfg.name} width={120} height={120} className="w-full h-full object-cover object-top" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2 mb-1">
