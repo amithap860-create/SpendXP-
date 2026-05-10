@@ -182,7 +182,7 @@ export default function OnboardingPage() {
             <div className="space-y-6 text-center">
               <div className="space-y-2">
                 <div className={cn('w-20 h-20 mx-auto rounded-2xl overflow-hidden bg-gradient-to-br shadow-lg', selectedAvatar.bgGradient)}>
-                  <Image src={selectedAvatar.imagePath} alt={selectedAvatar.name} width={144} height={144} className="w-full h-full object-cover object-top" />
+                  <Image src={selectedAvatar.imagePath} alt={selectedAvatar.name} width={144} height={144} className="w-full h-full object-contain" />
                 </div>
                 <h2 className="text-4xl font-black text-slate-900 tracking-tight">Pick your character</h2>
                 <p className="text-slate-500 font-medium">Your financial alter-ego awaits.</p>
@@ -205,7 +205,7 @@ export default function OnboardingPage() {
                       'w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br',
                       avatar.bgGradient
                     )}>
-                      <Image src={avatar.imagePath} alt={avatar.name} width={48} height={48} className="w-full h-full object-cover object-top" />
+                      <Image src={avatar.imagePath} alt={avatar.name} width={48} height={48} className="w-full h-full object-contain" />
                     </div>
                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 truncate w-full text-center">
                       {avatar.name}
@@ -225,7 +225,7 @@ export default function OnboardingPage() {
                 selectedAvatar.bgGradient
               )}>
                 <div className="w-14 h-14 rounded-xl overflow-hidden bg-white/20 flex-shrink-0">
-                  <Image src={selectedAvatar.imagePath} alt={selectedAvatar.name} width={144} height={144} className="w-full h-full object-cover object-top" />
+                  <Image src={selectedAvatar.imagePath} alt={selectedAvatar.name} width={144} height={144} className="w-full h-full object-contain" />
                 </div>
                 <div>
                   <p className="font-black text-xs uppercase tracking-widest text-white/60 mb-0.5">{selectedAvatar.archetype}</p>
@@ -377,7 +377,7 @@ export default function OnboardingPage() {
                   'w-36 h-36 rounded-3xl overflow-hidden bg-gradient-to-br shadow-2xl',
                   selectedAvatar.bgGradient
                 )}>
-                  <Image src={selectedAvatar.imagePath} alt={selectedAvatar.name} width={144} height={144} className="w-full h-full object-cover object-top" />
+                  <Image src={selectedAvatar.imagePath} alt={selectedAvatar.name} width={144} height={144} className="w-full h-full object-contain" />
                 </div>
                 {/* Seal badge */}
                 <div className="absolute -top-3 -right-3 w-10 h-10 bg-[#4EA07A] rounded-full flex items-center justify-center text-lg shadow-lg border-2 border-white">

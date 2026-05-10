@@ -47,7 +47,7 @@ import {
   ToggleLeft,
   ToggleRight,
 } from 'lucide-react';
-import { getAvatar } from '@/config/avatars';
+import { getAvatar, AVATARS } from '@/config/avatars';
 import Image from 'next/image';
 import { COUNTRIES, getCountryConfig } from '@/config/currency';
 import { cn } from '@/lib/utils';
@@ -198,6 +198,10 @@ export default function ProfilePage() {
   // Logout confirm
   const [logoutConfirm, setLogoutConfirm] = useState(false);
 
+  // Avatar picker
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+  const [avatarSaving, setAvatarSaving] = useState(false);
+
   useEffect(() => {
     document.title = 'Profile | SpendXP';
   }, []);
@@ -274,6 +278,21 @@ export default function ProfilePage() {
 
     load();
   }, [user, authLoading, currentAgeGroup]);
+
+  const handleSaveAvatar = async (avatarId: string) => {
+    if (!user?.uid) return;
+    setAvatarSaving(true);
+    try {
+      await safeUpdateDoc(doc(db, 'users', user.uid), { avatarId });
+      setProfile(p => p ? { ...p, avatarId } : p);
+      setShowAvatarPicker(false);
+      toast({ title: 'Operative updated!' });
+    } catch {
+      toast({ title: 'Failed to update avatar', variant: 'destructive' });
+    } finally {
+      setAvatarSaving(false);
+    }
+  };
 
   const handleSaveName = async () => {
     if (!user?.uid || !nameInput.trim()) return;
@@ -419,13 +438,22 @@ export default function ProfilePage() {
           <div className={cn('h-20 w-full bg-gradient-to-r', avatarCfg.bgGradient)} />
           <CardContent className="pt-0 px-5 pb-5">
             <div className="flex items-end gap-4 -mt-10">
-              {/* Avatar emoji bubble */}
-              <div className={cn(
-                'h-20 w-20 rounded-2xl overflow-hidden shadow-xl border-4 border-white bg-gradient-to-br shrink-0',
-                avatarCfg.bgGradient
-              )}>
-                <Image src={avatarCfg.imagePath} alt={avatarCfg.name} width={120} height={120} className="w-full h-full object-cover object-top" />
-              </div>
+              {/* Avatar — click to change */}
+              <button
+                onClick={() => setShowAvatarPicker(true)}
+                className="relative group shrink-0"
+                suppressHydrationWarning
+              >
+                <div className={cn(
+                  'h-20 w-20 rounded-2xl overflow-hidden shadow-xl border-4 border-white bg-gradient-to-br',
+                  avatarCfg.bgGradient
+                )}>
+                  <Image src={avatarCfg.imagePath} alt={avatarCfg.name} width={80} height={80} className="w-full h-full object-contain" />
+                </div>
+                <div className="absolute inset-0 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Pencil className="h-5 w-5 text-white" />
+                </div>
+              </button>
               <div className="mb-1 flex-1 min-w-0">
                 {editingName ? (
                   <div className="flex items-center gap-2 mt-2">
@@ -532,7 +560,7 @@ export default function ProfilePage() {
                 {/* Rank + progress */}
                 <div className="flex items-center gap-3">
                   <div className={cn('w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-br flex-shrink-0', avatarCfg.bgGradient)}>
-                    <Image src={avatarCfg.imagePath} alt={avatarCfg.name} width={120} height={120} className="w-full h-full object-cover object-top" />
+                    <Image src={avatarCfg.imagePath} alt={avatarCfg.name} width={120} height={120} className="w-full h-full object-contain" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2 mb-1">
@@ -887,6 +915,54 @@ export default function ProfilePage() {
         </Section>
 
       </main>
+
+      {/* ── Avatar Picker Modal ── */}
+      {showAvatarPicker && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-0 sm:p-4"
+          onClick={() => setShowAvatarPicker(false)}
+        >
+          <div
+            className="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl p-6 space-y-5 max-h-[85vh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-black text-slate-900">Change Operative</h2>
+                <p className="text-xs text-slate-400 font-medium">Pick your financial alter-ego</p>
+              </div>
+              <button onClick={() => setShowAvatarPicker(false)} className="text-slate-400 hover:text-slate-600" suppressHydrationWarning>
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="grid grid-cols-4 gap-3">
+              {AVATARS.map(avatar => (
+                <button
+                  key={avatar.id}
+                  onClick={() => handleSaveAvatar(avatar.id)}
+                  disabled={avatarSaving}
+                  suppressHydrationWarning
+                  className={cn(
+                    'flex flex-col items-center gap-1.5 p-2 rounded-2xl border-2 transition-all duration-200',
+                    avatarCfg.id === avatar.id
+                      ? `border-primary bg-primary/5 scale-105 shadow-md`
+                      : 'border-slate-100 bg-white hover:border-slate-300'
+                  )}
+                >
+                  <div className={cn('w-14 h-14 rounded-xl overflow-hidden bg-gradient-to-br', avatar.bgGradient)}>
+                    <Image src={avatar.imagePath} alt={avatar.name} width={56} height={56} className="w-full h-full object-contain" />
+                  </div>
+                  <span className="text-[10px] font-black text-slate-600 truncate w-full text-center">{avatar.name}</span>
+                  <span className="text-[8px] text-slate-400 truncate w-full text-center">{avatar.archetype}</span>
+                  {avatarCfg.id === avatar.id && (
+                    <span className="text-[8px] font-black uppercase tracking-wider text-primary">Active</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

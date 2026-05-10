@@ -392,7 +392,7 @@ export default function DashboardPage() {
                 {/* Rank + district + avatar row */}
                 <div className="flex items-center gap-4">
                   <div className={cn('w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br flex-shrink-0 shadow-sm', avatarCfg.bgGradient)}>
-                    <Image src={avatarCfg.imagePath} alt={avatarCfg.name} width={64} height={64} className="w-full h-full object-cover object-top" />
+                    <Image src={avatarCfg.imagePath} alt={avatarCfg.name} width={64} height={64} className="w-full h-full object-contain" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2 flex-wrap">
