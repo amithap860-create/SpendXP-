@@ -100,7 +100,7 @@ export default function LandingPage() {
           {AVATARS.map(avatar => (
             <Link href="/signup" key={avatar.id} className="flex-shrink-0 flex flex-col items-center gap-2 group cursor-pointer">
               <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden bg-gradient-to-br ${avatar.bgGradient} shadow-lg group-hover:scale-110 group-hover:shadow-xl transition-all duration-200`}>
-                <Image src={avatar.imagePath} alt={avatar.name} width={80} height={80} className="w-full h-full object-contain" />
+                <Image src={avatar.imagePath} alt={avatar.name} width={80} height={80} className="w-full h-full object-cover object-top scale-110" />
               </div>
               <span className="text-[10px] font-black text-slate-700 truncate">{avatar.name}</span>
               <span className="text-[9px] text-slate-400 truncate text-center">{avatar.archetype}</span>

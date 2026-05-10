@@ -448,7 +448,7 @@ export default function ProfilePage() {
                   'h-20 w-20 rounded-2xl overflow-hidden shadow-xl border-4 border-white bg-gradient-to-br',
                   avatarCfg.bgGradient
                 )}>
-                  <Image src={avatarCfg.imagePath} alt={avatarCfg.name} width={80} height={80} className="w-full h-full object-contain" />
+                  <Image src={avatarCfg.imagePath} alt={avatarCfg.name} width={80} height={80} className="w-full h-full object-cover object-top scale-110" />
                 </div>
                 <div className="absolute inset-0 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <Pencil className="h-5 w-5 text-white" />
@@ -560,7 +560,7 @@ export default function ProfilePage() {
                 {/* Rank + progress */}
                 <div className="flex items-center gap-3">
                   <div className={cn('w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-br flex-shrink-0', avatarCfg.bgGradient)}>
-                    <Image src={avatarCfg.imagePath} alt={avatarCfg.name} width={120} height={120} className="w-full h-full object-contain" />
+                    <Image src={avatarCfg.imagePath} alt={avatarCfg.name} width={120} height={120} className="w-full h-full object-cover object-top scale-110" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2 mb-1">
@@ -950,7 +950,7 @@ export default function ProfilePage() {
                   )}
                 >
                   <div className={cn('w-14 h-14 rounded-xl overflow-hidden bg-gradient-to-br', avatar.bgGradient)}>
-                    <Image src={avatar.imagePath} alt={avatar.name} width={56} height={56} className="w-full h-full object-contain" />
+                    <Image src={avatar.imagePath} alt={avatar.name} width={56} height={56} className="w-full h-full object-cover object-top scale-110" />
                   </div>
                   <span className="text-[10px] font-black text-slate-600 truncate w-full text-center">{avatar.name}</span>
                   <span className="text-[8px] text-slate-400 truncate w-full text-center">{avatar.archetype}</span>

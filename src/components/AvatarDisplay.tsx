@@ -29,7 +29,7 @@ export function AvatarDisplay({ avatar, size = 64, className, showRing }: Avatar
         alt={avatar.name}
         width={size}
         height={size}
-        className="w-full h-full object-contain"
+        className="w-full h-full object-cover object-top scale-110"
         priority={false}
       />
     </div>
