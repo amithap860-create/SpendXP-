@@ -27,7 +27,6 @@ import {
   Play,
   Calculator,
   BookOpen,
-  CheckCircle2,
 } from 'lucide-react';
 import { useUser } from '@/lib/store';
 import { doc, setDoc } from 'firebase/firestore';
@@ -121,6 +120,8 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
     timeLeft,
     countdown,
     startGame,
+    pauseGame,
+    resumeGame,
     correctAnswer,
     wrongAnswer,
     endGame
@@ -132,8 +133,6 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
-  // Pause state
-  const [paused, setPaused] = useState(false);
   const [pauseTab, setPauseTab] = useState<'glossary' | 'calculator'>('glossary');
 
   // Trial mode state
@@ -146,17 +145,29 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
   // Info shown by default on first load
   const [showInfo, setShowInfo] = useState(true);
 
+  // 5 progressive speed tiers — starts very slow, ramps up gradually
   useEffect(() => {
     if (gameState !== 'PLAYING') return;
     const elapsed = 90 - timeLeft;
-    if (elapsed > 60) setSpeedTier(3);
-    else if (elapsed > 30) setSpeedTier(2);
+    if (elapsed > 72) setSpeedTier(5);
+    else if (elapsed > 54) setSpeedTier(4);
+    else if (elapsed > 36) setSpeedTier(3);
+    else if (elapsed > 18) setSpeedTier(2);
     else setSpeedTier(1);
   }, [timeLeft, gameState]);
 
+  // Spawn rates and fall speeds per tier (T1 = very gentle warmup, T5 = intense)
+  const TIER_CONFIG = [
+    { spawnRate: 3500, fallSpeed: 0.35 }, // T1: 0–18s
+    { spawnRate: 2800, fallSpeed: 0.55 }, // T2: 18–36s
+    { spawnRate: 2100, fallSpeed: 0.80 }, // T3: 36–54s
+    { spawnRate: 1500, fallSpeed: 1.15 }, // T4: 54–72s
+    { spawnRate: 1000, fallSpeed: 1.60 }, // T5: 72–90s
+  ];
+
   useEffect(() => {
-    if (gameState !== 'PLAYING' || paused) return;
-    const spawnRate = speedTier === 1 ? 2000 : speedTier === 2 ? 1500 : 1000;
+    if (gameState !== 'PLAYING') return;
+    const { spawnRate } = TIER_CONFIG[speedTier - 1];
     const spawnInterval = setInterval(() => {
       const randomItem = budgetBlitzItems[Math.floor(Math.random() * budgetBlitzItems.length)];
       const xPos = Math.random() * 75 + 10;
@@ -168,11 +179,11 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
       }]);
     }, spawnRate);
     return () => clearInterval(spawnInterval);
-  }, [gameState, speedTier, paused]);
+  }, [gameState, speedTier]);
 
   useEffect(() => {
-    if (gameState !== 'PLAYING' || paused) return;
-    const fallSpeed = speedTier === 1 ? 0.8 : speedTier === 2 ? 1.2 : 1.8;
+    if (gameState !== 'PLAYING') return;
+    const { fallSpeed } = TIER_CONFIG[speedTier - 1];
     const loop = setInterval(() => {
       setCards(prev => {
         const next = prev.map(c => ({ ...c, y: c.y + fallSpeed }));
@@ -185,7 +196,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
       });
     }, 16);
     return () => clearInterval(loop);
-  }, [gameState, speedTier, paused, wrongAnswer]);
+  }, [gameState, speedTier, wrongAnswer]);
 
   useEffect(() => {
     if (gameState === 'PLAYING' && timeLeft <= 0) handleFinish();
@@ -334,15 +345,23 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
     const needPct = stats.total > 0 ? Math.round((stats.NEED / stats.total) * 100) : 0;
     const wantPct = stats.total > 0 ? Math.round((stats.WANT / stats.total) * 100) : 0;
     const savePct = stats.total > 0 ? Math.round((stats.SAVE / stats.total) * 100) : 0;
-    const accuracy = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
 
-    const budgetFeedback = () => {
-      if (savePct >= 20 && needPct <= 60) return { msg: 'Excellent budget split! You followed the 50/30/20 rule.', color: 'text-primary', bg: 'bg-[#E8F5EE] border-[#A8D5BC]' };
-      if (savePct < 10) return { msg: 'Try to save more! Aim for at least 20% of your income in savings.', color: 'text-[#2E7D5A]', bg: 'bg-[#E8F5EE] border-[#A8D5BC]' };
-      if (wantPct > 50) return { msg: 'Too many wants! Keeping wants under 30% leaves more for savings.', color: 'text-rose-700', bg: 'bg-rose-50 border-rose-200' };
-      return { msg: 'Good start! Keep practising to master the 50/30/20 split.', color: 'text-blue-700', bg: 'bg-blue-50 border-blue-200' };
+    // Simple verdict based on how close they are to 50/30/20
+    const getVerdict = () => {
+      if (stats.total === 0) return { emoji: '🎯', label: 'Keep going!', msg: 'Sort more items to see your budget split.', ok: false };
+      if (savePct >= 20 && needPct <= 55 && wantPct <= 35) return { emoji: '🏆', label: 'Perfect split!', msg: 'You nailed the 50/30/20 rule. Great budgeting habits!', ok: true };
+      if (savePct >= 15 && wantPct <= 40) return { emoji: '✅', label: 'Pretty good!', msg: 'You\'re close to the ideal split. Try saving a bit more next round.', ok: true };
+      if (wantPct > 50) return { emoji: '⚠️', label: 'Too many wants!', msg: 'More than half your spend went on wants. Try keeping it under 30%.', ok: false };
+      if (savePct < 10) return { emoji: '⚠️', label: 'Save more!', msg: 'You saved very little. Aim for at least 20% into savings each time.', ok: false };
+      return { emoji: '👍', label: 'Good effort!', msg: 'Keep practising — aim for 50% Needs, 30% Wants, 20% Savings.', ok: true };
     };
-    const fb = budgetFeedback();
+    const verdict = getVerdict();
+
+    const buckets = [
+      { label: 'NEED', emoji: '🛒', pct: needPct, count: stats.NEED, ideal: '≤ 50%', idealOk: needPct <= 55, color: 'bg-primary', ring: 'ring-primary' },
+      { label: 'WANT', emoji: '🎮', pct: wantPct, count: stats.WANT, ideal: '≤ 30%', idealOk: wantPct <= 35, color: 'bg-amber-400', ring: 'ring-amber-400' },
+      { label: 'SAVE', emoji: '🐷', pct: savePct, count: stats.SAVE, ideal: '≥ 20%', idealOk: savePct >= 18, color: 'bg-blue-500', ring: 'ring-blue-500' },
+    ];
 
     return (
       <div className="grid lg:grid-cols-12 gap-6 max-w-6xl mx-auto">
@@ -350,62 +369,62 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
           <Card className="border-none shadow-2xl bg-white overflow-hidden">
             <div className="bg-primary p-6 md:p-8 text-white text-center">
               <Trophy className="h-10 w-10 mx-auto mb-3 opacity-90" />
-              <CardTitle className="text-3xl md:text-4xl font-black mb-2">Game Over!</CardTitle>
-              <p className="text-[#C8E8D8] text-sm">You earned <span className="font-black text-white">{xpEarned} XP</span> · Score: <span className="font-black text-white">{score}</span> · Accuracy: <span className="font-black text-white">{accuracy}%</span></p>
+              <CardTitle className="text-3xl md:text-4xl font-black mb-1">
+                {gameState === 'GAME_OVER' ? 'Out of lives!' : 'Time\'s up!'}
+              </CardTitle>
+              <p className="text-[#C8E8D8] text-sm mt-1">
+                {stats.total} items sorted · <span className="font-black text-white">{xpEarned} XP earned</span>
+              </p>
             </div>
-            <CardContent className="p-5 md:p-8 space-y-6">
-              {/* Pie chart + split */}
-              <div className="grid md:grid-cols-2 gap-6 items-center">
-                <div className="relative flex justify-center">
-                  <svg viewBox="0 0 32 32" className="w-36 h-36 rotate-[-90deg]">
-                    <circle r="16" cx="16" cy="16" fill="#e2e8f0" />
-                    <circle r="16" cx="16" cy="16" fill="transparent" stroke="#10b981" strokeWidth="32" strokeDasharray={`${needPct} 100`} />
-                    <circle r="16" cx="16" cy="16" fill="transparent" stroke="#f59e0b" strokeWidth="32" strokeDasharray={`${wantPct} 100`} strokeDashoffset={`-${needPct}`} />
-                    <circle r="16" cx="16" cy="16" fill="transparent" stroke="#3b82f6" strokeWidth="32" strokeDasharray={`${savePct} 100`} strokeDashoffset={`-${needPct + wantPct}`} />
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <div className="text-xl font-black text-slate-900">{stats.total}</div>
-                    <div className="text-[9px] font-bold uppercase text-slate-400">items</div>
+
+            <CardContent className="p-5 md:p-8 space-y-5">
+
+              {/* 3 big bucket cards */}
+              <div className="grid grid-cols-3 gap-3">
+                {buckets.map(({ label, emoji, pct, count, ideal, idealOk, color, ring }) => (
+                  <div key={label} className={cn('rounded-2xl border-2 p-3 text-center flex flex-col items-center gap-1', idealOk ? 'border-slate-200 bg-slate-50' : 'border-rose-200 bg-rose-50')}>
+                    <span className="text-2xl">{emoji}</span>
+                    <div className={cn('text-2xl md:text-3xl font-black', idealOk ? 'text-slate-800' : 'text-rose-600')}>{pct}%</div>
+                    <div className="text-[10px] font-black uppercase text-slate-500">{label}</div>
+                    <div className="text-[9px] text-slate-400">{count} items</div>
+                    <div className={cn('text-[9px] font-bold mt-0.5', idealOk ? 'text-primary' : 'text-rose-500')}>
+                      {idealOk ? '✓ ' : '✗ '}{ideal}
+                    </div>
                   </div>
-                </div>
-                <div className="space-y-3">
-                  <h4 className="font-black text-lg text-slate-900">Your Budget Report</h4>
-                  {[
-                    { label: 'Needs', pct: needPct, count: stats.NEED, color: 'bg-primary', text: 'text-primary' },
-                    { label: 'Wants', pct: wantPct, count: stats.WANT, color: 'bg-secondary', text: 'text-[#2E7D5A]' },
-                    { label: 'Savings', pct: savePct, count: stats.SAVE, color: 'bg-blue-500', text: 'text-blue-600' },
-                  ].map(({ label, pct, count, color, text }) => (
-                    <div key={label}>
+                ))}
+              </div>
+
+              {/* Verdict */}
+              <div className={cn('rounded-xl p-4 text-center', verdict.ok ? 'bg-[#E8F5EE] border border-[#A8D5BC]' : 'bg-rose-50 border border-rose-200')}>
+                <div className="text-3xl mb-1">{verdict.emoji}</div>
+                <div className={cn('font-black text-lg mb-1', verdict.ok ? 'text-primary' : 'text-rose-700')}>{verdict.label}</div>
+                <div className={cn('text-sm', verdict.ok ? 'text-[#2E7D5A]' : 'text-rose-600')}>{verdict.msg}</div>
+              </div>
+
+              {/* Simple ideal comparison */}
+              <div className="bg-slate-50 rounded-xl border p-4 space-y-2">
+                <div className="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">The 50 / 30 / 20 Rule</div>
+                {buckets.map(({ label, emoji, pct, ideal, idealOk, color }) => (
+                  <div key={label} className="flex items-center gap-3">
+                    <span className="text-base w-6 shrink-0">{emoji}</span>
+                    <div className="flex-1">
                       <div className="flex justify-between text-xs font-bold mb-1">
-                        <span className="flex items-center gap-1.5"><span className={cn('h-2 w-2 rounded-full', color)} />{label}</span>
-                        <span className={text}>{pct}% ({count} items)</span>
+                        <span>{label}</span>
+                        <span className={idealOk ? 'text-primary' : 'text-rose-500'}>{pct}% <span className="text-slate-400 font-normal">(ideal {ideal})</span></span>
                       </div>
-                      <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                        <div className={cn('h-full rounded-full', color)} style={{ width: `${pct}%` }} />
+                      <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+                        <div className={cn('h-full rounded-full transition-all', color)} style={{ width: `${Math.min(pct, 100)}%` }} />
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Budget feedback */}
-              <div className={cn('rounded-xl border p-3 text-sm font-medium flex items-start gap-2', fb.bg, fb.color)}>
-                <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" />
-                {fb.msg}
-              </div>
-
-              {/* Tip about 50/30/20 */}
-              <div className="bg-slate-50 rounded-xl p-3 border text-xs text-slate-600 space-y-1">
-                <div className="font-black text-slate-800 text-sm mb-1">50 / 30 / 20 Rule</div>
-                <div>Ideal: <span className="font-bold text-primary">50% Needs</span> · <span className="font-bold text-[#2E7D5A]">30% Wants</span> · <span className="font-bold text-blue-600">20% Savings</span></div>
-                <div>Your split: <span className="font-bold">{needPct}% / {wantPct}% / {savePct}%</span></div>
+                  </div>
+                ))}
               </div>
 
               <div className="flex gap-3">
                 <Button variant="outline" onClick={() => { setStats({ NEED: 0, WANT: 0, SAVE: 0, total: 0, correct: 0 }); startGame(); }} className="flex-1 gap-2 h-12 min-h-[44px] text-sm">
-                  <RefreshCcw className="h-4 w-4" /> Replay
+                  <RefreshCcw className="h-4 w-4" /> Play Again
                 </Button>
-                <Button onClick={onExit} className="flex-1 h-12 min-h-[44px] text-sm">Hub</Button>
+                <Button onClick={onExit} className="flex-1 h-12 min-h-[44px] text-sm font-bold">Back to Hub</Button>
               </div>
             </CardContent>
           </Card>
@@ -460,11 +479,11 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
   return (
     <div className="relative w-full" ref={containerRef}>
       {/* Pause overlay */}
-      {paused && (
+      {gameState === 'PAUSED' && (
         <div className="absolute inset-0 z-50 bg-slate-900/95 rounded-3xl flex flex-col overflow-hidden">
           <div className="flex items-center justify-between p-4 border-b border-white/10">
             <h2 className="text-white font-black text-lg">Game Paused</h2>
-            <button onClick={() => setPaused(false)} className="h-9 w-9 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors" suppressHydrationWarning>
+            <button onClick={resumeGame} className="h-9 w-9 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors" suppressHydrationWarning>
               <Play className="h-5 w-5 text-white" />
             </button>
           </div>
@@ -505,7 +524,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
           </div>
 
           <div className="p-4 border-t border-white/10">
-            <Button onClick={() => setPaused(false)} className="w-full min-h-[44px] bg-primary font-black" suppressHydrationWarning>
+            <Button onClick={resumeGame} className="w-full min-h-[44px] bg-primary font-black" suppressHydrationWarning>
               <Play className="h-4 w-4 mr-2" /> Resume Game
             </Button>
           </div>
@@ -531,10 +550,12 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
             <div className="flex items-center gap-1 px-3 py-1 bg-slate-900 text-white rounded-full font-mono font-bold text-xs"><Timer className="h-3 w-3 text-accent" />{timeLeft}s</div>
             {trialMode
               ? <Badge className="bg-primary/10 text-primary text-[9px] border-0">TRIAL</Badge>
-              : <Badge variant="outline" className="border-primary text-primary text-[9px]">T{speedTier}</Badge>
+              : <Badge variant="outline" className={cn('text-[9px]', speedTier <= 2 ? 'border-primary text-primary' : speedTier <= 4 ? 'border-amber-400 text-amber-600' : 'border-rose-400 text-rose-600')}>
+                  {['🐢','🚶','🏃','⚡','🔥'][speedTier - 1]} T{speedTier}
+                </Badge>
             }
             <button
-              onClick={() => setPaused(true)}
+              onClick={pauseGame}
               className="h-8 w-8 bg-slate-200 hover:bg-slate-300 rounded-full flex items-center justify-center transition-colors"
               suppressHydrationWarning
             >

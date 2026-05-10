@@ -12,7 +12,7 @@ export interface BudgetItem {
 }
 
 export const budgetBlitzItems: BudgetItem[] = [
-  // NEEDS
+  // NEEDS (15 items)
   { name: 'Monthly Rent', category: 'NEED', basePrice: 'large' },
   { name: 'Weekly Groceries', category: 'NEED', basePrice: 'medium' },
   { name: 'Bus Pass', category: 'NEED', basePrice: 'small' },
@@ -26,8 +26,10 @@ export const budgetBlitzItems: BudgetItem[] = [
   { name: 'Car Insurance', category: 'NEED', basePrice: 'medium' },
   { name: 'Emergency Repairs', category: 'NEED', basePrice: 'large' },
   { name: 'Heating Bill', category: 'NEED', basePrice: 'medium' },
-  
-  // WANTS
+  { name: 'Doctor Visit', category: 'NEED', basePrice: 'small' },
+  { name: 'Prescription Medicine', category: 'NEED', basePrice: 'small' },
+
+  // WANTS (16 items)
   { name: 'New Sneakers', category: 'WANT', basePrice: 'medium' },
   { name: 'Concert Ticket', category: 'WANT', basePrice: 'medium' },
   { name: 'Video Game Console', category: 'WANT', basePrice: 'large' },
@@ -41,8 +43,11 @@ export const budgetBlitzItems: BudgetItem[] = [
   { name: 'Skateboard', category: 'WANT', basePrice: 'medium' },
   { name: 'VR Headset', category: 'WANT', basePrice: 'large' },
   { name: 'Holiday Gift', category: 'WANT', basePrice: 'medium' },
+  { name: 'Bubble Tea', category: 'WANT', basePrice: 'small' },
+  { name: 'New Headphones', category: 'WANT', basePrice: 'medium' },
+  { name: 'Amusement Park', category: 'WANT', basePrice: 'medium' },
 
-  // SAVE
+  // SAVE (16 items)
   { name: 'Emergency Fund', category: 'SAVE', basePrice: 'large' },
   { name: 'Retirement Fund', category: 'SAVE', basePrice: 'large' },
   { name: 'College Savings', category: 'SAVE', basePrice: 'large' },
@@ -56,4 +61,7 @@ export const budgetBlitzItems: BudgetItem[] = [
   { name: 'Crypto Wallet', category: 'SAVE', basePrice: 'small' },
   { name: 'Passive Income', category: 'SAVE', basePrice: 'medium' },
   { name: 'Goal Completion', category: 'SAVE', basePrice: 'large' },
+  { name: 'Fixed Deposit', category: 'SAVE', basePrice: 'medium' },
+  { name: 'Gold Savings', category: 'SAVE', basePrice: 'medium' },
+  { name: 'SIP Investment', category: 'SAVE', basePrice: 'small' },
 ];

@@ -201,7 +201,6 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
   const [showExplanation, setShowExplanation] = useState(false);
   const [roundQuestions, setRoundQuestions] = useState<ShuffledQuestion[]>([]);
   const [showBreakdown, setShowBreakdown] = useState(true);
-  const [paused, setPaused] = useState(false);
   const [pauseTab, setPauseTab] = useState<'glossary' | 'calculator'>('glossary');
   const [showQuestionInfo, setShowQuestionInfo] = useState(false);
   const [categoryStats, setCategoryStats] = useState<Record<Category, { correct: number; total: number }>>({
@@ -238,6 +237,8 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
     comboActive,
     countdown,
     startGame,
+    pauseGame,
+    resumeGame,
     correctAnswer,
     wrongAnswer,
     nextRound,
@@ -271,7 +272,8 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
     : 15;
 
   const handleSelect = (idx: number) => {
-    if (selectedOption !== null || gameState !== 'PLAYING') return;
+    if (selectedOption !== null || (gameState !== 'PLAYING' && gameState !== 'PAUSED')) return;
+    if (gameState === 'PAUSED') return;
     setSelectedOption(idx);
     const isCorrect = idx === currentQuestion.shuffledCorrectIndex;
     setCategoryStats(prev => ({
@@ -400,11 +402,11 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
     <div className="relative max-w-3xl mx-auto">
 
       {/* ── Pause overlay ── */}
-      {paused && (
+      {gameState === 'PAUSED' && (
         <div className="absolute inset-0 z-50 bg-slate-900/97 rounded-2xl flex flex-col overflow-hidden min-h-[500px]">
           <div className="flex items-center justify-between p-4 border-b border-white/10 shrink-0">
             <h2 className="text-white font-black text-lg">Paused</h2>
-            <button onClick={() => setPaused(false)} className="h-9 w-9 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center" suppressHydrationWarning>
+            <button onClick={resumeGame} className="h-9 w-9 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center" suppressHydrationWarning>
               <Play className="h-4 w-4 text-white" />
             </button>
           </div>
@@ -434,7 +436,7 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
             )}
           </div>
           <div className="p-4 border-t border-white/10 shrink-0">
-            <Button onClick={() => setPaused(false)} className="w-full min-h-[44px] font-black" suppressHydrationWarning>
+            <Button onClick={resumeGame} className="w-full min-h-[44px] font-black" suppressHydrationWarning>
               <Play className="h-4 w-4 mr-2" /> Resume Quiz
             </Button>
           </div>
@@ -451,7 +453,7 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
           <div className="flex items-center gap-2">
             {comboActive && <Badge className="bg-accent animate-bounce font-black text-[10px] md:text-xs">+50 XP COMBO!</Badge>}
             <span className="text-[10px] text-slate-400 font-mono">{questionTimerSeconds}s</span>
-            <button onClick={() => { setPaused(true); setPauseTab('glossary'); }}
+            <button onClick={() => { pauseGame(); setPauseTab('glossary'); }}
               className="h-8 w-8 bg-slate-200 hover:bg-slate-300 rounded-full flex items-center justify-center transition-colors"
               suppressHydrationWarning>
               <Pause className="h-3.5 w-3.5 text-slate-700" />
