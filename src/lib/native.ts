@@ -1,0 +1,249 @@
+'use client';
+
+/**
+ * SpendXP Native Bridge
+ *
+ * Thin abstraction over Capacitor plugins.
+ * Every function is safe to call in a browser — it no-ops silently
+ * when Capacitor is not available (web preview, Vercel).
+ *
+ * Import from here rather than importing Capacitor plugins directly
+ * so that tree-shaking removes all native code from non-mobile builds.
+ */
+
+// ─── Platform detection ────────────────────────────────────────────────────
+
+let _isNative: boolean | null = null;
+
+/** True when running inside a Capacitor native shell (iOS or Android). */
+export function isNative(): boolean {
+  if (_isNative !== null) return _isNative;
+  if (typeof window === 'undefined') return (_isNative = false);
+  _isNative = !!(window as any).Capacitor?.isNativePlatform?.();
+  return _isNative;
+}
+
+export function getPlatform(): 'ios' | 'android' | 'web' {
+  if (typeof window === 'undefined') return 'web';
+  const cap = (window as any).Capacitor;
+  if (!cap?.isNativePlatform?.()) return 'web';
+  return cap.getPlatform?.() ?? 'web';
+}
+
+// ─── Haptics ───────────────────────────────────────────────────────────────
+
+export type HapticStyle = 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error';
+
+/**
+ * Trigger haptic feedback. No-ops on web.
+ * Pair with every correct/wrong answer in games.
+ */
+export async function haptic(style: HapticStyle = 'light'): Promise<void> {
+  if (!isNative()) return;
+  try {
+    const { Haptics, ImpactStyle, NotificationType } = await import('@capacitor/haptics');
+    switch (style) {
+      case 'light':   await Haptics.impact({ style: ImpactStyle.Light }); break;
+      case 'medium':  await Haptics.impact({ style: ImpactStyle.Medium }); break;
+      case 'heavy':   await Haptics.impact({ style: ImpactStyle.Heavy }); break;
+      case 'success': await Haptics.notification({ type: NotificationType.Success }); break;
+      case 'warning': await Haptics.notification({ type: NotificationType.Warning }); break;
+      case 'error':   await Haptics.notification({ type: NotificationType.Error }); break;
+    }
+  } catch {
+    // Plugin not installed — safe to ignore
+  }
+}
+
+// ─── Status bar ────────────────────────────────────────────────────────────
+
+/** Set status bar to match SpendXP's dark primary colour. */
+export async function initStatusBar(): Promise<void> {
+  if (!isNative()) return;
+  try {
+    const { StatusBar, Style } = await import('@capacitor/status-bar');
+    await StatusBar.setStyle({ style: Style.Dark });
+    await StatusBar.setBackgroundColor({ color: '#1A1F2E' });
+    await StatusBar.show();
+  } catch { /* ignore */ }
+}
+
+// ─── Splash screen ─────────────────────────────────────────────────────────
+
+/** Call once the app is fully loaded and hydrated. */
+export async function hideSplash(): Promise<void> {
+  if (!isNative()) return;
+  try {
+    const { SplashScreen } = await import('@capacitor/splash-screen');
+    await SplashScreen.hide({ fadeOutDuration: 300 });
+  } catch { /* ignore */ }
+}
+
+// ─── Push notifications ────────────────────────────────────────────────────
+
+export interface PushSetupResult {
+  token: string | null;
+  permission: 'granted' | 'denied' | 'prompt';
+}
+
+/**
+ * Request push notification permission and return the FCM token.
+ * Call this after the user is signed in, not on app launch.
+ */
+export async function setupPushNotifications(
+  onMessage: (data: Record<string, string>) => void
+): Promise<PushSetupResult> {
+  if (!isNative()) return { token: null, permission: 'prompt' };
+
+  try {
+    const { PushNotifications } = await import('@capacitor/push-notifications');
+
+    // Check current permission
+    const { receive } = await PushNotifications.checkPermissions();
+    let permission: 'granted' | 'denied' | 'prompt' = receive as any;
+
+    if (receive !== 'granted') {
+      const result = await PushNotifications.requestPermissions();
+      permission = result.receive as any;
+      if (result.receive !== 'granted') {
+        return { token: null, permission: 'denied' };
+      }
+    }
+
+    await PushNotifications.register();
+
+    return new Promise((resolve) => {
+      let resolved = false;
+
+      PushNotifications.addListener('registration', (token) => {
+        if (!resolved) {
+          resolved = true;
+          resolve({ token: token.value, permission: 'granted' });
+        }
+      });
+
+      PushNotifications.addListener('registrationError', () => {
+        if (!resolved) {
+          resolved = true;
+          resolve({ token: null, permission: 'granted' });
+        }
+      });
+
+      PushNotifications.addListener('pushNotificationReceived', (notification) => {
+        onMessage(notification.data ?? {});
+      });
+
+      PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
+        onMessage(action.notification.data ?? {});
+      });
+
+      // Timeout fallback
+      setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          resolve({ token: null, permission: 'granted' });
+        }
+      }, 8000);
+    });
+  } catch {
+    return { token: null, permission: 'prompt' };
+  }
+}
+
+// ─── Native share ──────────────────────────────────────────────────────────
+
+export interface ShareOptions {
+  title: string;
+  text: string;
+  url?: string;
+}
+
+/** Share via native OS share sheet. Falls back to Web Share API on browsers. */
+export async function nativeShare(opts: ShareOptions): Promise<void> {
+  if (isNative()) {
+    try {
+      const { Share } = await import('@capacitor/share');
+      await Share.share({ title: opts.title, text: opts.text, url: opts.url, dialogTitle: opts.title });
+      return;
+    } catch { /* fall through to web */ }
+  }
+  // Web Share API fallback
+  if (typeof navigator !== 'undefined' && navigator.share) {
+    try {
+      await navigator.share({ title: opts.title, text: opts.text, url: opts.url });
+      return;
+    } catch { /* user cancelled */ }
+  }
+  // Last resort: copy to clipboard
+  if (typeof navigator !== 'undefined' && navigator.clipboard) {
+    await navigator.clipboard.writeText(`${opts.text} ${opts.url ?? ''}`);
+  }
+}
+
+// ─── Network ───────────────────────────────────────────────────────────────
+
+export async function isOnline(): Promise<boolean> {
+  if (!isNative()) return typeof navigator !== 'undefined' ? navigator.onLine : true;
+  try {
+    const { Network } = await import('@capacitor/network');
+    const status = await Network.getStatus();
+    return status.connected;
+  } catch {
+    return navigator.onLine;
+  }
+}
+
+export async function onNetworkChange(
+  callback: (connected: boolean) => void
+): Promise<() => void> {
+  if (!isNative()) {
+    const online = () => callback(true);
+    const offline = () => callback(false);
+    window.addEventListener('online', online);
+    window.addEventListener('offline', offline);
+    return () => {
+      window.removeEventListener('online', online);
+      window.removeEventListener('offline', offline);
+    };
+  }
+  try {
+    const { Network } = await import('@capacitor/network');
+    const handle = await Network.addListener('networkStatusChange', (s) => callback(s.connected));
+    return () => handle.remove();
+  } catch {
+    return () => {};
+  }
+}
+
+// ─── App lifecycle ─────────────────────────────────────────────────────────
+
+/** Listen for the app coming back to foreground (e.g. after push tap). */
+export async function onAppResume(callback: () => void): Promise<() => void> {
+  if (!isNative()) return () => {};
+  try {
+    const { App } = await import('@capacitor/app');
+    const handle = await App.addListener('appStateChange', (state) => {
+      if (state.isActive) callback();
+    });
+    return () => handle.remove();
+  } catch {
+    return () => {};
+  }
+}
+
+/** Handle Android hardware back button. Return true to prevent default (exit). */
+export async function onAndroidBack(callback: () => boolean): Promise<() => void> {
+  if (getPlatform() !== 'android') return () => {};
+  try {
+    const { App } = await import('@capacitor/app');
+    const handle = await App.addListener('backButton', ({ canGoBack }) => {
+      if (!callback()) {
+        if (canGoBack) history.back();
+        else App.exitApp();
+      }
+    });
+    return () => handle.remove();
+  } catch {
+    return () => {};
+  }
+}

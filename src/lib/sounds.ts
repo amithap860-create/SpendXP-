@@ -1,9 +1,12 @@
 'use client';
 
 /**
- * Procedural Sound Engine for SpendXP
- * Uses Web Audio API to generate tones without external assets.
+ * SpendXP Sound + Haptic Engine
+ * Sound: Web Audio API procedural tones (no external assets)
+ * Haptics: Capacitor native feedback, no-ops on web
  */
+
+import { haptic } from '@/lib/native';
 
 let audioCtx: AudioContext | null = null;
 
@@ -43,13 +46,34 @@ function playTone(freqs: number[], duration: number, type: OscillatorType = 'sin
   });
 }
 
-export const playCorrect = () => playTone([523.25, 659.25], 0.4, 'sine', 0.1);
-export const playWrong = () => playTone([220, 180], 0.3, 'sawtooth', 0.05);
-export const playLevelUp = () => playTone([261.63, 329.63, 392.00, 523.25], 0.8, 'square', 0.05);
+export const playCorrect = () => {
+  playTone([523.25, 659.25], 0.4, 'sine', 0.1);
+  haptic('success');
+};
+
+export const playWrong = () => {
+  playTone([220, 180], 0.3, 'sawtooth', 0.05);
+  haptic('error');
+};
+
+export const playLevelUp = () => {
+  playTone([261.63, 329.63, 392.00, 523.25], 0.8, 'square', 0.05);
+  haptic('heavy');
+};
+
 export const playCombo = () => {
   playTone([880], 0.1, 'sine', 0.1);
   setTimeout(() => playTone([987.77], 0.1, 'sine', 0.1), 100);
   setTimeout(() => playTone([1046.50], 0.1, 'sine', 0.1), 200);
+  haptic('medium');
 };
-export const playCoinEarn = () => playTone([1046.50], 0.2, 'sine', 0.1);
-export const playGameOver = () => playTone([392.00, 329.63, 261.63], 0.6, 'sine', 0.1);
+
+export const playCoinEarn = () => {
+  playTone([1046.50], 0.2, 'sine', 0.1);
+  haptic('light');
+};
+
+export const playGameOver = () => {
+  playTone([392.00, 329.63, 261.63], 0.6, 'sine', 0.1);
+  haptic('warning');
+};

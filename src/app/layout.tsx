@@ -14,6 +14,8 @@ import { Toaster } from '@/components/ui/toaster';
 import { useEffect, useState } from 'react';
 import { OfflineBanner } from '@/components/OfflineBanner';
 import { BugReportButton } from '@/components/BugReportButton';
+import { useNativeInit } from '@/hooks/useNativeInit';
+import { useAuthContext } from '@/context/AuthContext';
 
 const inter = Inter({ 
   subsets: ['latin'], 
@@ -24,6 +26,10 @@ const inter = Inter({
 function RootLayoutContent({ children }: { children: React.ReactNode }) {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const pathname = usePathname();
+  const { user } = useAuthContext();
+
+  // Initialise all Capacitor native features (no-ops on web)
+  useNativeInit({ uid: user?.uid ?? null });
 
   useEffect(() => {
     const checkSize = () => setIsSmallScreen(window.innerWidth < 360);
