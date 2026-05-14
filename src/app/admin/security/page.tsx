@@ -22,15 +22,19 @@ export default function SecurityDashboard() {
     activeSessions: 0
   });
 
-  // Verify Admin Status
+  // Verify Admin Status — read isAdmin field from the user's own doc
   useEffect(() => {
-    if (!user) return;
+    if (!user?.uid) return;
     const check = async () => {
-      const snap = await getDocs(query(collectionGroup(db, 'profile'), where('uid', '==', user.uid), where('isAdmin', '==', true)));
-      setIsAdmin(!snap.empty);
+      try {
+        const { getDoc, doc: fsDoc } = await import('firebase/firestore');
+        const snap = await getDoc(fsDoc(db, 'users', user.uid));
+        setIsAdmin(snap.exists() && snap.data()?.isAdmin === true);
+      } catch {
+        setIsAdmin(false);
+      }
     };
-    // check(); // Simulating logic
-    setIsAdmin(true); // For prototype visibility
+    check();
   }, [user, db]);
 
   // Fetch Events — only after user is confirmed to be admin.

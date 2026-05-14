@@ -247,3 +247,76 @@ export async function onAndroidBack(callback: () => boolean): Promise<() => void
     return () => {};
   }
 }
+
+// ─── Local notifications (streak reminder) ─────────────────────────────────
+
+const STREAK_NOTIF_ID = 1001;
+
+/**
+ * Schedules a daily local notification at 7 PM local time to remind the user
+ * to maintain their streak. Safe to call on every app open — cancels the
+ * previous schedule first so we don't stack duplicates.
+ *
+ * Pass streak=0 to cancel notifications (e.g. after the user completes a quest).
+ */
+export async function scheduleStreakReminder(streak: number): Promise<void> {
+  if (!isNative()) return;
+  try {
+    const { LocalNotifications } = await import('@capacitor/local-notifications');
+
+    // Always cancel the existing schedule first to avoid duplicates
+    await LocalNotifications.cancel({ notifications: [{ id: STREAK_NOTIF_ID }] });
+
+    if (streak < 0) return; // Caller explicitly opted out
+
+    // Request permission if not already granted
+    const { display } = await LocalNotifications.checkPermissions();
+    if (display !== 'granted') {
+      const { display: granted } = await LocalNotifications.requestPermissions();
+      if (granted !== 'granted') return;
+    }
+
+    // Schedule at 7 PM today; if it's already past 7 PM, schedule for tomorrow
+    const now = new Date();
+    const target = new Date(now);
+    target.setHours(19, 0, 0, 0);
+    if (target <= now) {
+      target.setDate(target.getDate() + 1); // Tomorrow 7 PM
+    }
+
+    const title = streak > 1
+      ? `🔥 ${streak}-day streak at risk!`
+      : '⚡ Start your streak today';
+    const body = streak > 1
+      ? 'Complete a quest or game before midnight to keep your streak alive.'
+      : 'Jump in for 5 minutes — your first streak day is waiting.';
+
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: STREAK_NOTIF_ID,
+          title,
+          body,
+          schedule: { at: target, repeats: false },
+          sound: 'default',
+          smallIcon: 'ic_stat_icon',
+          actionTypeId: 'OPEN_APP',
+          extra: { screen: '/dashboard', type: 'streak_reminder' },
+        },
+      ],
+    });
+  } catch {
+    // Plugin not installed or permissions unavailable — fail silently
+  }
+}
+
+/**
+ * Cancels the streak reminder (call after the user completes their daily activity).
+ */
+export async function cancelStreakReminder(): Promise<void> {
+  if (!isNative()) return;
+  try {
+    const { LocalNotifications } = await import('@capacitor/local-notifications');
+    await LocalNotifications.cancel({ notifications: [{ id: STREAK_NOTIF_ID }] });
+  } catch { /* ignore */ }
+}

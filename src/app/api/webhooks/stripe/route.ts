@@ -11,7 +11,7 @@
  *
  * Setup steps (do this once in Stripe Dashboard):
  *   1. Create a product: Stripe Dashboard → Products → + Add product
- *      Name: "SpendXP Premium"   Price: $4.99/month (recurring)
+ *      Name: "SpendXP Premium"   Price: set your price (TBD)
  *   2. Go to Stripe Dashboard → Developers → Webhooks → + Add endpoint
  *      URL: https://spendxp.vercel.app/api/webhooks/stripe
  *      Events to listen for:
@@ -59,7 +59,6 @@ async function verifyStripeSignature(
   // Stripe signs with HMAC-SHA256
   const encoder = new TextEncoder();
   const keyData = encoder.encode(secret);
-  const msgData = encoder.encode(rawBody);
 
   const cryptoKey = await crypto.subtle.importKey(
     'raw',
@@ -70,13 +69,23 @@ async function verifyStripeSignature(
   );
 
   // Parse the Stripe-Signature header: t=...,v1=...
-  const parts = Object.fromEntries(
-    signature.split(',').map((p) => p.split('=') as [string, string])
-  );
+  const parts: Record<string, string> = {};
+  for (const part of signature.split(',')) {
+    const idx = part.indexOf('=');
+    if (idx !== -1) parts[part.slice(0, idx)] = part.slice(idx + 1);
+  }
   const timestamp = parts['t'];
   const expectedSig = parts['v1'];
 
   if (!timestamp || !expectedSig) return false;
+
+  // ── Replay attack prevention: reject events older than 5 minutes ──────────
+  const eventTime = parseInt(timestamp, 10);
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  if (Math.abs(nowSeconds - eventTime) > 300) {
+    console.warn('[Stripe Webhook] Rejected: timestamp too old or too far in future');
+    return false;
+  }
 
   const payload = `${timestamp}.${rawBody}`;
   const signed = await crypto.subtle.sign('HMAC', cryptoKey, encoder.encode(payload));
@@ -84,8 +93,13 @@ async function verifyStripeSignature(
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
 
-  // Constant-time comparison
-  return hex === expectedSig;
+  // Constant-time comparison via XOR (avoids short-circuit timing leaks)
+  if (hex.length !== expectedSig.length) return false;
+  let diff = 0;
+  for (let i = 0; i < hex.length; i++) {
+    diff |= hex.charCodeAt(i) ^ expectedSig.charCodeAt(i);
+  }
+  return diff === 0;
 }
 
 // ── Set isPremium on a Firestore user doc ────────────────────────────────────
@@ -175,8 +189,8 @@ export async function POST(request: NextRequest) {
       case 'checkout.session.completed': {
         const uid = extractUid(obj);
         const mode: string = obj?.mode || '';
-        // Only grant premium for subscription-mode checkouts (not one-off payments)
-        if (uid && (mode === 'subscription' || mode === 'payment')) {
+        // Only grant premium for subscription-mode checkouts
+        if (uid && mode === 'subscription') {
           await setPremium(uid, true, adminDb);
         }
         break;

@@ -105,8 +105,8 @@ export const FREE_TIER: PremiumTier = {
 export const PREMIUM_TIER: PremiumTier = {
   id: 'premium',
   name: 'Agent',
-  price: '$4.99',
-  billingPeriod: 'month',
+  price: 'Coming Soon',
+  billingPeriod: 'TBD',
   features: [
     'Everything in Explorer',
     'Unlimited quests',

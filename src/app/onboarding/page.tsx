@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { db } from '@/firebase';
 import { doc, serverTimestamp } from 'firebase/firestore';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { XPWallet } from '@/components/XPWallet';
@@ -47,13 +47,18 @@ function StepDots({ step }: { step: number }) {
   );
 }
 
-export default function OnboardingPage() {
+function OnboardingContent() {
   const { user } = useAuthContext();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Pre-populate birthYear from signup age gate if provided
+  const prefillYear = searchParams.get('birthYear');
+  const initialYear = prefillYear ? parseInt(prefillYear, 10) : null;
 
   const [step, setStep] = useState(1);
   const [nickname, setNickname] = useState(user?.displayName || '');
-  const [birthYear, setBirthYear] = useState<number | null>(null);
+  const [birthYear, setBirthYear] = useState<number | null>(initialYear);
   const [interests, setInterests] = useState<string[]>([]);
   const [selectedAvatar, setSelectedAvatar] = useState<AvatarConfig>(AVATARS[0]);
   const [selectedCountry, setSelectedCountry] = useState<CountryConfig>(COUNTRIES[0]); // India default
@@ -461,5 +466,13 @@ export default function OnboardingPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" /></div>}>
+      <OnboardingContent />
+    </Suspense>
   );
 }

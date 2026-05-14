@@ -227,7 +227,7 @@ Firebase Console → Firestore → users → {uid} → Edit → isPremium: true
 ```
 
 ### To Wire Real Billing (Stripe)
-1. Create a Stripe product + price for $4.99/month
+1. Create a Stripe product + price (TBD — set once pricing is confirmed)
 2. Build a Stripe webhook endpoint (`/api/webhooks/stripe`)
 3. On `customer.subscription.created` / `updated`: set `isPremium: true` in Firestore
 4. On `customer.subscription.deleted`: set `isPremium: false`
@@ -256,14 +256,16 @@ Firebase Console → Firestore → users → {uid} → Edit → isPremium: true
 
 ## Known TODOs Before App Store Launch
 
-1. **Stripe billing** — wire `/api/webhooks/stripe` to set `isPremium` in Firestore
+1. **Stripe billing** — all API routes built; set STRIPE_SECRET_KEY + STRIPE_PRICE_ID + STRIPE_WEBHOOK_SECRET in Vercel env vars once pricing is confirmed. See STRIPE_SETUP.md.
 2. **Real avatar images** — place PNG files in `/public/avatars/` (see AI prompts above)
-3. **Push notifications** — Firebase Cloud Messaging for daily streak reminders
-4. **Daily quest limit** — enforce 3/day limit for free users in quest submission logic
-5. **Streak backend logic** — validate and reset streaks server-side
-6. **Group Play** — currently "Coming Soon"; needs multiplayer implementation
-7. **App Store assets** — icon (1024×1024), screenshots, app description
-8. **React Native / Capacitor** — wrap in native shell for App Store submission
+3. **Push notifications** ✅ Built — `/api/notify/streak` fires via Vercel Cron daily at 7 PM IST. Add `NOTIFY_CRON_SECRET` env var in Vercel.
+4. **Daily quest limit** ✅ Built — enforced server-side in `/api/quests/complete`
+5. **Streak backend logic** ✅ Built — server-side IST calendar-day comparison in `/api/quests/complete`
+6. **Group Play** — currently "Coming Soon" / waitlist; needs multiplayer implementation
+7. **App Store assets** — icon (1024×1024), screenshots, app description → see APP_STORE_METADATA.md
+8. **Capacitor** ✅ Configured — see MOBILE_SETUP.md for step-by-step build guide
+9. **Password reset** ✅ Fixed — `/reset-password` now uses Firebase `confirmPasswordReset()`. Set custom action URL in Firebase Console → Auth → Templates → Password Reset → `https://spendxp.vercel.app/reset-password`
+10. **App Store metadata** ✅ Written — see APP_STORE_METADATA.md for full copy, keywords, screenshot guide, and pre-launch checklist
 
 ---
 

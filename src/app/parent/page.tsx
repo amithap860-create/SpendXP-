@@ -76,15 +76,28 @@ export default function ParentDashboard() {
   if (!children || children.length === 0) {
     return (
       <div className="flex min-h-screen bg-background items-center justify-center p-4">
-        <Card className="max-w-md w-full text-center p-8 border-none shadow-xl">
-          <div className="h-20 w-20 bg-slate-100 rounded-3xl flex items-center justify-center mx-auto mb-6 text-slate-400">
-            <Users className="h-10 w-10" />
+        <Card className="max-w-md w-full text-center border-none shadow-xl">
+          <div className="p-8 space-y-4">
+            <div className="h-20 w-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto text-primary">
+              <Users className="h-10 w-10" />
+            </div>
+            <CardTitle className="text-2xl font-black">Connect Your Child</CardTitle>
+            <p className="text-slate-500 text-sm leading-relaxed">
+              Link your child&apos;s SpendXP account to start tracking their learning progress, badges, and achievements.
+            </p>
           </div>
-          <CardTitle className="text-2xl font-black mb-2">No Linked Accounts</CardTitle>
-          <p className="text-slate-500 mb-8">You haven't added any children to your dashboard yet.</p>
-          <Button onClick={() => window.location.href = '/parent/setup'} className="w-full h-14 text-lg font-black" suppressHydrationWarning>
-            Add a Child
-          </Button>
+          <div className="px-8 pb-8 space-y-3">
+            <Button
+              onClick={() => window.location.href = '/parent/setup'}
+              className="w-full h-12 font-black"
+              suppressHydrationWarning
+            >
+              <UserPlus className="h-4 w-4 mr-2" /> Generate Invite Link
+            </Button>
+            <p className="text-xs text-slate-400 text-center">
+              Generate a link or send an email — your child clicks it and you&apos;re connected.
+            </p>
+          </div>
         </Card>
       </div>
     );

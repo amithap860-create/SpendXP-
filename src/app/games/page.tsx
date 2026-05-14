@@ -247,7 +247,10 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
             {GAMES.map(game => {
               const isLocked = game.premium && !canAccess(game.id as any);
               const handleClick = () => {
-                if (game.comingSoon || isLocked) {
+                if (game.comingSoon) {
+                  // Coming-soon features → join the waitlist on the upgrade page
+                  router.push('/upgrade');
+                } else if (isLocked) {
                   router.push('/upgrade');
                 } else {
                   setActiveGame(game.id as GameID);
@@ -317,8 +320,8 @@ function GameCard({
       {locked && (
         <div className="absolute top-4 right-4 flex flex-col items-end gap-1">
           {game.comingSoon ? (
-            <span className="text-[9px] font-black uppercase tracking-widest bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 rounded-full">
-              Coming Soon
+            <span className="text-[9px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">
+              Waitlist
             </span>
           ) : (
             <span className="text-[9px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -348,7 +351,7 @@ function GameCard({
       <div className="flex justify-end pt-4">
         {locked ? (
           <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest flex items-center gap-1">
-            {game.comingSoon ? 'COMING SOON' : <><IconLock />UNLOCK</>}
+            {game.comingSoon ? 'JOIN WAITLIST →' : <><IconLock />UNLOCK</>}
           </span>
         ) : (
           <span className="text-[10px] font-black text-slate-300 group-hover:text-primary transition-colors uppercase tracking-widest">

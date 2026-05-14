@@ -61,7 +61,7 @@ function FeatureCell({ value }: { value: string | boolean }) {
  *  2. Create a Stripe Checkout Session endpoint:
  *       src/app/api/stripe/create-checkout/route.ts
  *     It should create a session with:
- *       - price: your $4.99/month price ID
+ *       - price: your price ID (set in Stripe Dashboard)
  *       - metadata: { firebaseUid: uid }
  *       - success_url: https://spendxp.vercel.app/upgrade?success=true
  *       - cancel_url:  https://spendxp.vercel.app/upgrade
@@ -70,7 +70,7 @@ function FeatureCell({ value }: { value: string | boolean }) {
  *     automatically set isPremium=true in Firestore when checkout completes.
  *
  *  4. Replace the waitlist form below with:
- *       <button onClick={handleStripeCheckout}>Subscribe — $4.99/month</button>
+ *       <button onClick={handleStripeCheckout}>Subscribe to Premium</button>
  *     where handleStripeCheckout calls your create-checkout endpoint and redirects.
  */
 
@@ -152,8 +152,8 @@ export default function UpgradePage() {
 
           {/* Price badge */}
           <div className="inline-flex flex-col items-center bg-white/5 border border-white/10 rounded-2xl px-8 py-5">
-            <div className="text-5xl font-black text-white mb-1">$4.99</div>
-            <div className="text-slate-400 text-sm font-bold uppercase tracking-widest">per month</div>
+            <div className="text-3xl font-black text-white mb-1">Pricing Coming Soon</div>
+            <div className="text-slate-400 text-sm font-bold uppercase tracking-widest">join the waitlist below</div>
             <div className="mt-2 text-xs text-slate-500">Cancel anytime · No contracts</div>
           </div>
         </div>
@@ -214,7 +214,7 @@ export default function UpgradePage() {
             /* ── Stripe is wired: show Subscribe button ── */
             <div className="space-y-4">
               <div className="text-amber-400 text-xs font-black uppercase tracking-widest mb-1">SpendXP Agent</div>
-              <h3 className="text-xl font-black text-white">$4.99 / month</h3>
+              <h3 className="text-xl font-black text-white">SpendXP Premium</h3>
               <p className="text-slate-400 text-sm max-w-xs mx-auto">
                 Unlock all games, unlimited quests, streak shields, and more.
               </p>
@@ -224,7 +224,7 @@ export default function UpgradePage() {
                 className="w-full mt-2 h-12 rounded-xl text-sm font-black uppercase tracking-widest text-white transition-all"
                 style={{ background: checkoutLoading ? '#1a3d2b' : '#2E7D5A' }}
               >
-                {checkoutLoading ? 'Loading...' : 'Subscribe — $4.99 / month'}
+                {checkoutLoading ? 'Loading...' : 'Subscribe to Premium'}
               </button>
               <p className="text-slate-600 text-[10px]">Powered by Stripe · Cancel anytime · No contracts</p>
             </div>

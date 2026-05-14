@@ -1,90 +1,131 @@
 /**
  * POST /api/stripe/create-checkout
  *
- * Creates a Stripe Checkout Session for SpendXP Premium ($4.99/month).
- * Requires the user to be authenticated with Firebase.
+ * Creates a Stripe Checkout Session for SpendXP Premium (price TBD).
+ * Uses the Stripe REST API directly — no npm package needed.
+ * Returns: { url: string } — client redirects to this Stripe-hosted page.
  *
- * Returns: { url: string }  — redirect the browser to this URL.
+ * ENV VARS (add to Vercel Dashboard → Settings → Environment Variables):
+ *   STRIPE_SECRET_KEY           — sk_live_... or sk_test_... from Stripe → API Keys
+ *   STRIPE_PRICE_ID             — price_... from Stripe → Products → SpendXP Premium
+ *   NEXT_PUBLIC_APP_URL         — https://spendxp.vercel.app
+ *   FIREBASE_ADMIN_SDK_KEY      — full JSON service account from Firebase console
  *
- * ENV VARS NEEDED (add to Vercel Dashboard → Settings → Environment Variables):
- *   STRIPE_SECRET_KEY           — from Stripe Dashboard → API Keys → Secret key
- *   NEXT_PUBLIC_APP_URL         — your production URL, e.g. https://spendxp.vercel.app
- *   STRIPE_PREMIUM_PRICE_ID     — Price ID from Stripe Dashboard → Products → SpendXP Premium
- *   FIREBASE_ADMIN_SDK_KEY      — full JSON service account key from Firebase console
- *
- * HOW TO GET STRIPE_PREMIUM_PRICE_ID:
- *   1. Go to https://dashboard.stripe.com/products
- *   2. Click "+ Add product"
- *   3. Name: "SpendXP Agent"  |  Pricing: $4.99 recurring, monthly
- *   4. Save — then copy the Price ID (starts with price_...)
+ * ONE-TIME STRIPE SETUP:
+ *   1. stripe.com/dashboard → Products → + Add product
+ *      Name: "SpendXP Premium"  |  Price: set your price (TBD — confirm with team)
+ *      Copy the Price ID (price_xxx) → add as STRIPE_PRICE_ID
+ *   2. Developers → Webhooks → + Add endpoint
+ *      URL: https://spendxp.vercel.app/api/webhooks/stripe
+ *      Events: checkout.session.completed, customer.subscription.created,
+ *              customer.subscription.updated, customer.subscription.deleted
+ *      Copy the signing secret → add as STRIPE_WEBHOOK_SECRET
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { initializeApp, cert, getApps } from 'firebase-admin/app';
-import { getAuth } from 'firebase-admin/auth';
+import { getFirebaseAdmin } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
-function initAdmin() {
-  const serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_SDK_KEY || '{}');
-  if (!serviceAccount.project_id) return null;
-  const existing = getApps().find((a) => a.name === 'admin');
-  if (existing) return existing;
-  return initializeApp({ credential: cert(serviceAccount) }, 'admin');
-}
-
 export async function POST(request: NextRequest) {
-  // Check env vars
   const stripeKey = process.env.STRIPE_SECRET_KEY;
-  const priceId = process.env.STRIPE_PREMIUM_PRICE_ID;
+  const priceId = process.env.STRIPE_PRICE_ID;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://spendxp.vercel.app';
 
   if (!stripeKey || !priceId) {
     return NextResponse.json(
-      { error: 'Stripe is not configured. Add STRIPE_SECRET_KEY and STRIPE_PREMIUM_PRICE_ID to env vars.' },
+      { error: 'Stripe is not configured. Add STRIPE_SECRET_KEY and STRIPE_PRICE_ID to Vercel env vars.' },
       { status: 503 }
     );
   }
 
-  // Authenticate the user
-  const adminApp = initAdmin();
-  if (!adminApp) {
-    return NextResponse.json({ error: 'Firebase Admin not configured' }, { status: 503 });
-  }
-  const adminAuth = getAuth(adminApp);
-
-  const authHeader = request.headers.get('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) {
+  // ── Authenticate via Firebase ID token ────────────────────────────────────
+  const authHeader = request.headers.get('Authorization') || '';
+  if (!authHeader.startsWith('Bearer ')) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   let uid: string;
-  let email: string | undefined;
+  let userEmail: string | undefined;
+
   try {
-    const decoded = await adminAuth.verifyIdToken(authHeader.split(' ')[1]);
+    const { auth } = await getFirebaseAdmin();
+    const decoded = await auth.verifyIdToken(authHeader.slice(7));
     uid = decoded.uid;
-    email = decoded.email;
+    userEmail = decoded.email;
   } catch {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
   }
 
-  // Create a Stripe Checkout Session using the REST API directly
-  // (avoids installing the stripe npm package)
+  // ── Reuse existing Stripe customer if we have one ─────────────────────────
+  const { db } = await getFirebaseAdmin();
+  const userSnap = await db.collection('users').doc(uid).get();
+  const userData = userSnap.data() || {};
+  let customerId: string | undefined = userData.stripeCustomerId;
+
+  if (!customerId && userEmail) {
+    // Search for an existing customer by email first
+    const searchRes = await fetch(
+      `https://api.stripe.com/v1/customers/search?query=email%3A%22${encodeURIComponent(userEmail)}%22&limit=1`,
+      { headers: { Authorization: `Bearer ${stripeKey}` } }
+    );
+    if (searchRes.ok) {
+      const searchData = await searchRes.json();
+      if (searchData.data?.length > 0) {
+        customerId = searchData.data[0].id;
+      }
+    }
+  }
+
+  if (!customerId) {
+    // Create a new Stripe customer
+    const createBody = new URLSearchParams({
+      'metadata[firebaseUid]': uid,
+    });
+    if (userEmail) createBody.append('email', userEmail);
+
+    const createRes = await fetch('https://api.stripe.com/v1/customers', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${stripeKey}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: createBody.toString(),
+    });
+
+    if (createRes.ok) {
+      const customer = await createRes.json();
+      customerId = customer.id;
+    }
+  }
+
+  // Save customer ID to Firestore for future checkouts
+  if (customerId && !userData.stripeCustomerId) {
+    await db.collection('users').doc(uid).update({ stripeCustomerId: customerId }).catch(() => {});
+  }
+
+  // ── Build Checkout Session params ─────────────────────────────────────────
   const params = new URLSearchParams({
-    'mode': 'subscription',
+    mode: 'subscription',
     'line_items[0][price]': priceId,
     'line_items[0][quantity]': '1',
-    'success_url': `${appUrl}/upgrade?success=true`,
-    'cancel_url': `${appUrl}/upgrade`,
+    'success_url': `${appUrl}/upgrade/success?session_id={CHECKOUT_SESSION_ID}`,
+    'cancel_url': `${appUrl}/upgrade/cancel`,
+    // metadata on the session (read by webhook via checkout.session.completed)
     'metadata[firebaseUid]': uid,
-    'allow_promotion_codes': 'true',
-    'billing_address_collection': 'auto',
+    // metadata on the subscription itself (read by subscription events)
+    'subscription_data[metadata][firebaseUid]': uid,
+    allow_promotion_codes: 'true',
+    billing_address_collection: 'auto',
   });
 
-  if (email) {
-    params.append('customer_email', email);
+  if (customerId) {
+    params.append('customer', customerId);
+  } else if (userEmail) {
+    params.append('customer_email', userEmail);
   }
 
+  // ── Create the session ────────────────────────────────────────────────────
   try {
     const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
@@ -97,14 +138,17 @@ export async function POST(request: NextRequest) {
 
     if (!res.ok) {
       const err = await res.json();
-      console.error('[Stripe] Checkout session creation failed:', err);
-      return NextResponse.json({ error: err?.error?.message || 'Stripe error' }, { status: 500 });
+      console.error('[create-checkout] Stripe error:', err);
+      return NextResponse.json(
+        { error: err?.error?.message || 'Stripe error' },
+        { status: 500 }
+      );
     }
 
     const session = await res.json();
     return NextResponse.json({ url: session.url });
-  } catch (err: any) {
-    console.error('[Stripe] Network error:', err);
-    return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
+  } catch (err) {
+    console.error('[create-checkout] Network error:', err);
+    return NextResponse.json({ error: 'Failed to reach Stripe' }, { status: 500 });
   }
 }

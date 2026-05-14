@@ -46,6 +46,10 @@ import {
   Key,
   ToggleLeft,
   ToggleRight,
+  CheckCircle2,
+  Copy,
+  Share2,
+  RefreshCw,
 } from 'lucide-react';
 import { getAvatar, AVATARS } from '@/config/avatars';
 import Image from 'next/image';
@@ -64,6 +68,8 @@ interface ProfileData {
   avatarId: string;
   isParent: boolean;
   parentLinked: boolean;
+  isPremium?: boolean;
+  stripeCustomerId?: string;
 }
 
 interface ProgressionData {
@@ -127,6 +133,137 @@ function ProfileSkeleton() {
         </div>
         <Skeleton className="h-48 rounded-2xl" />
       </main>
+    </div>
+  );
+}
+
+// ── Invite Parent Card ─────────────────────────────────────────────────────
+function InviteParentCard({ uid, idToken }: { uid: string; idToken: (() => Promise<string>) | null }) {
+  const [state, setState] = useState<'idle' | 'generating' | 'ready' | 'copied' | 'error'>('idle');
+  const [inviteUrl, setInviteUrl] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
+  const [expiresAt, setExpiresAt] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const { toast } = useToast();
+
+  const generate = async () => {
+    if (!idToken) return;
+    setState('generating');
+    try {
+      const token = await idToken();
+      const res = await fetch('/api/parent/generate-invite', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.inviteUrl) {
+        setInviteUrl(data.inviteUrl);
+        setInviteCode(data.inviteCode);
+        setExpiresAt(new Date(data.expiresAt).toLocaleDateString(undefined, { dateStyle: 'medium' }));
+        setState('ready');
+      } else {
+        setErrorMsg(data.error || 'Could not generate invite.');
+        setState('error');
+      }
+    } catch {
+      setErrorMsg('Network error. Please try again.');
+      setState('error');
+    }
+  };
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(inviteUrl);
+      setState('copied');
+      setTimeout(() => setState('ready'), 2000);
+    } catch {
+      toast({ title: 'Could not copy — please copy the link manually.' });
+    }
+  };
+
+  const shareLink = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Connect on SpendXP',
+          text: 'I\'d like you to be my parent on SpendXP so you can track my learning progress!',
+          url: inviteUrl,
+        });
+      } catch { /* user cancelled */ }
+    } else {
+      copyLink();
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-2">
+        <div className="flex items-center gap-2">
+          <Users className="h-4 w-4 text-blue-600 shrink-0" />
+          <p className="text-sm font-black text-blue-800">Link your parent or guardian</p>
+        </div>
+        <p className="text-xs text-blue-600 leading-relaxed">
+          Generate a personal invite link and send it to your parent. They'll be able to see your progress and support your learning.
+        </p>
+      </div>
+
+      {state === 'idle' && (
+        <Button onClick={generate} className="w-full h-11 font-black gap-2" suppressHydrationWarning>
+          <Users className="h-4 w-4" />
+          Generate Invite Link for My Parent
+        </Button>
+      )}
+
+      {state === 'generating' && (
+        <Button disabled className="w-full h-11 font-black gap-2" suppressHydrationWarning>
+          <RefreshCw className="h-4 w-4 animate-spin" />
+          Generating…
+        </Button>
+      )}
+
+      {(state === 'ready' || state === 'copied') && (
+        <div className="space-y-3">
+          <div className="bg-slate-900 rounded-xl p-3 flex items-center gap-2">
+            <p className="text-xs text-slate-300 font-mono flex-1 truncate">{inviteUrl}</p>
+            <span className="bg-primary/20 text-primary font-black text-xs px-2 py-0.5 rounded-lg shrink-0">{inviteCode}</span>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              onClick={copyLink}
+              variant="outline"
+              className="flex-1 h-11 font-bold gap-2"
+              suppressHydrationWarning
+            >
+              {state === 'copied'
+                ? <><CheckCircle2 className="h-4 w-4 text-green-600" /> Copied!</>
+                : <><Copy className="h-4 w-4" /> Copy Link</>
+              }
+            </Button>
+            <Button
+              onClick={shareLink}
+              className="flex-1 h-11 font-bold gap-2"
+              suppressHydrationWarning
+            >
+              <Share2 className="h-4 w-4" /> Share
+            </Button>
+          </div>
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-slate-400">Link expires {expiresAt}</p>
+            <button onClick={generate} className="text-xs text-primary font-black hover:underline" suppressHydrationWarning>
+              Generate new
+            </button>
+          </div>
+        </div>
+      )}
+
+      {state === 'error' && (
+        <div className="space-y-2">
+          <p className="text-xs text-destructive font-bold bg-destructive/10 p-3 rounded-lg">{errorMsg}</p>
+          <Button onClick={() => setState('idle')} variant="outline" className="w-full h-10 font-bold" suppressHydrationWarning>
+            Try Again
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
@@ -198,6 +335,32 @@ export default function ProfilePage() {
   // Logout confirm
   const [logoutConfirm, setLogoutConfirm] = useState(false);
 
+  // Premium / subscription management
+  const [portalLoading, setPortalLoading] = useState(false);
+  const isPremium = profile?.isPremium === true;
+
+  const handleManageSubscription = async () => {
+    if (!user) return;
+    setPortalLoading(true);
+    try {
+      const token = await user.getIdToken();
+      const res = await fetch('/api/stripe/portal', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast({ title: 'Could not open subscription portal', variant: 'destructive' });
+      }
+    } catch {
+      toast({ title: 'Network error. Please try again.', variant: 'destructive' });
+    } finally {
+      setPortalLoading(false);
+    }
+  };
+
   // Avatar picker
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [avatarSaving, setAvatarSaving] = useState(false);
@@ -234,6 +397,8 @@ export default function ProfilePage() {
           avatarId: userSnap?.avatarId ?? 'voss',
           isParent: userSnap?.isParent ?? false,
           parentLinked: userSnap?.parentLinked ?? false,
+          isPremium: userSnap?.isPremium ?? false,
+          stripeCustomerId: userSnap?.stripeCustomerId,
         });
 
         setProgression({
@@ -269,6 +434,8 @@ export default function ProfilePage() {
           currencyCode: 'INR',
           isParent: false,
           parentLinked: false,
+          isPremium: false,
+          stripeCustomerId: undefined,
         });
         setProgression({ totalXP: 0, totalGamesPlayed: 0, badges: [], level: 'Saver' });
       } finally {
@@ -809,13 +976,19 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {/* Child: show linked parent status */}
+            {/* Child: invite parent or show linked status */}
             {!profile.isParent && (
-              <div className="text-sm text-slate-500 bg-slate-50 rounded-xl p-3 border">
-                {profile.parentLinked
-                  ? '✓ Your account is linked to a parent account.'
-                  : 'Your account is not linked to any parent. Ask your parent to send you a link invitation from their profile.'}
-              </div>
+              profile.parentLinked ? (
+                <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl p-4">
+                  <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
+                  <div>
+                    <p className="text-sm font-black text-green-800">Parent account linked ✓</p>
+                    <p className="text-xs text-green-600">Your parent can see your progress and support your learning.</p>
+                  </div>
+                </div>
+              ) : (
+                <InviteParentCard uid={user?.uid ?? ''} idToken={user ? () => user.getIdToken() : null} />
+              )
             )}
           </div>
         </Section>
@@ -845,6 +1018,34 @@ export default function ProfilePage() {
             </div>
           </button>
         </div>
+
+        {/* ── Subscription management ── */}
+        {isPremium ? (
+          <Card className="border-primary/20 bg-primary/5">
+            <CardContent className="p-4 flex items-center justify-between gap-3">
+              <div>
+                <div className="font-black text-sm text-primary">SpendXP Premium ✦</div>
+                <div className="text-xs text-slate-500">Manage billing, cancel, or update payment</div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-primary/30 text-primary hover:bg-primary/10 font-bold shrink-0"
+                onClick={handleManageSubscription}
+                disabled={portalLoading}
+                suppressHydrationWarning
+              >
+                {portalLoading ? 'Opening…' : 'Manage'}
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <Link href="/upgrade">
+            <Button className="w-full min-h-[44px] bg-primary font-black gap-2" suppressHydrationWarning>
+              ✦ Upgrade to Premium
+            </Button>
+          </Link>
+        )}
 
         {/* ── Log out ── */}
         {!logoutConfirm ? (

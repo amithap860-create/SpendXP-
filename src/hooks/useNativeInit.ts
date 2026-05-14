@@ -7,6 +7,7 @@ import {
   initStatusBar,
   hideSplash,
   setupPushNotifications,
+  scheduleStreakReminder,
   onNetworkChange,
   onAppResume,
   onAndroidBack,
@@ -15,6 +16,8 @@ import {
 interface UseNativeInitOptions {
   /** Firebase uid — needed to save push token. Pass null if not signed in. */
   uid: string | null;
+  /** Current streak count — used to personalise the local reminder message. */
+  streak?: number;
   /** Called when network connectivity changes. */
   onNetworkChange?: (connected: boolean) => void;
   /** Called when user taps a push notification. */
@@ -29,6 +32,7 @@ interface UseNativeInitOptions {
  */
 export function useNativeInit({
   uid,
+  streak = 0,
   onNetworkChange: onNetChange,
   onPushMessage,
   onResume,
@@ -42,7 +46,7 @@ export function useNativeInit({
     return () => clearTimeout(t);
   }, []);
 
-  // ── Push notifications ─────────────────────────────────────────────────
+  // ── FCM push notifications (server-to-device) ──────────────────────────
   useEffect(() => {
     if (!uid || !isNative()) return;
 
@@ -63,6 +67,15 @@ export function useNativeInit({
       }
     });
   }, [uid]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Local streak reminder (device-scheduled, no server needed) ────────
+  // Reschedules every time the user opens the app so the streak count
+  // and timing stay fresh. Fires at 7 PM local time if they haven't
+  // completed anything today.
+  useEffect(() => {
+    if (!uid || !isNative()) return;
+    scheduleStreakReminder(streak);
+  }, [uid, streak]);
 
   // ── Network status ─────────────────────────────────────────────────────
   useEffect(() => {

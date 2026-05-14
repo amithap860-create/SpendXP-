@@ -68,7 +68,7 @@ export function PremiumGate({ feature, children, variant = 'blur', className }: 
             className="h-10 px-6 bg-primary text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-primary/90 transition-colors flex items-center gap-2"
           >
             <IconLock size={14} />
-            Unlock — $4.99/mo
+            Unlock Premium
           </button>
         </div>
       </div>
