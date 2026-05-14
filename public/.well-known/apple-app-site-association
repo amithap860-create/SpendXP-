@@ -1,0 +1,28 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "TEAM_ID_HERE.com.spendxp.app",
+        "paths": [
+          "/dashboard",
+          "/quests",
+          "/quests/*",
+          "/games",
+          "/games/*",
+          "/profile",
+          "/join",
+          "/join/*",
+          "/consent/*",
+          "/reset-password",
+          "/verify-email"
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "TEAM_ID_HERE.com.spendxp.app"
+    ]
+  }
+}

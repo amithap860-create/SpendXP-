@@ -12,6 +12,7 @@ import { doc, writeBatch, serverTimestamp, increment } from 'firebase/firestore'
 import { updateLeaderboardEntry } from '@/lib/progressionService';
 import { waitForAuth } from '@/lib/waitForAuth';
 import { fireConfettiPersonalBest } from '@/lib/confetti';
+import { cancelStreakReminder } from '@/lib/native';
 
 export type GameStatus = 'IDLE' | 'COUNTDOWN' | 'PLAYING' | 'PAUSED' | 'GAME_OVER' | 'RESULTS';
 
@@ -272,6 +273,9 @@ export function useGameEngine(config: GameConfig) {
 
       await batch.commit();
       if (DEBUG_XP) console.log(`[XP] Firestore write committed. xpDelta=${xpDelta}`);
+
+      // User has played today — dismiss the local streak reminder
+      cancelStreakReminder().catch(() => {});
 
       await updateLeaderboardEntry(user.uid, user.displayName || 'Strategist');
 

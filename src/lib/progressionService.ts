@@ -22,6 +22,10 @@ export interface UserProgression {
     stockMarketSim: number;
     creditScoreBuilder: number;
   };
+  /** Current daily activity streak (days in a row with at least one quest/game). */
+  currentStreak?: number;
+  longestStreak?: number;
+  questsCompleted?: number;
 }
 
 export interface GameScoreData {
@@ -61,7 +65,10 @@ export const DEFAULT_PROGRESSION: UserProgression = {
     moneyMaze: 0,
     stockMarketSim: 0,
     creditScoreBuilder: 0
-  }
+  },
+  currentStreak: 0,
+  longestStreak: 0,
+  questsCompleted: 0,
 };
 
 /**

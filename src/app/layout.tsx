@@ -16,6 +16,7 @@ import { OfflineBanner } from '@/components/OfflineBanner';
 import { BugReportButton } from '@/components/BugReportButton';
 import { useNativeInit } from '@/hooks/useNativeInit';
 import { useAuthContext } from '@/context/AuthContext';
+import { useProgression } from '@/hooks/useProgression';
 
 const inter = Inter({ 
   subsets: ['latin'], 
@@ -27,9 +28,14 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const pathname = usePathname();
   const { user } = useAuthContext();
+  // Pull live streak from Firestore so local notifications stay accurate
+  const { data: progression } = useProgression();
 
   // Initialise all Capacitor native features (no-ops on web)
-  useNativeInit({ uid: user?.uid ?? null });
+  useNativeInit({
+    uid: user?.uid ?? null,
+    streak: progression.currentStreak ?? 0,
+  });
 
   useEffect(() => {
     const checkSize = () => setIsSmallScreen(window.innerWidth < 360);

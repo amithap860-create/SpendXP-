@@ -6,6 +6,7 @@ import { AgeGroup } from '@/lib/ageAdapt';
 import { useAuthContext } from '@/context/AuthContext';
 import { updateLeaderboardEntry } from '@/lib/progressionService';
 import { checkAndAwardQuestBadges } from '@/lib/badgeService';
+import { cancelStreakReminder } from '@/lib/native';
 
 export type QuestState = {
   status: 'INTRO' | 'IN_PROGRESS' | 'COMPLETE' | 'LIMIT_REACHED';
@@ -155,6 +156,9 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
           if (res.ok) {
             const data = await res.json();
             setState((prev) => ({ ...prev, serverResult: data }));
+
+            // User has completed activity today — dismiss the streak reminder
+            cancelStreakReminder().catch(() => {});
 
             // Award badges (client-side — non-critical)
             await checkAndAwardQuestBadges(uid, quest.id, optimalRate).catch(

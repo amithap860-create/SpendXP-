@@ -262,10 +262,13 @@ Firebase Console → Firestore → users → {uid} → Edit → isPremium: true
 4. **Daily quest limit** ✅ Built — enforced server-side in `/api/quests/complete`
 5. **Streak backend logic** ✅ Built — server-side IST calendar-day comparison in `/api/quests/complete`
 6. **Group Play** — currently "Coming Soon" / waitlist; needs multiplayer implementation
-7. **App Store assets** — icon (1024×1024), screenshots, app description → see APP_STORE_METADATA.md
-8. **Capacitor** ✅ Configured — see MOBILE_SETUP.md for step-by-step build guide
+7. **App Store assets** — `resources/icon.png` and `resources/splash.png` are placeholder. Replace with final 1024×1024 PNG art. Run `npx @capacitor/assets generate` to auto-generate all iOS/Android sizes. See APP_STORE_METADATA.md for full screenshot guide.
+8. **Capacitor** ✅ Configured — see MOBILE_SETUP.md for step-by-step build guide. `resources/icon.png` and `resources/splash.png` are ready for `npx @capacitor/assets generate`.
 9. **Password reset** ✅ Fixed — `/reset-password` now uses Firebase `confirmPasswordReset()`. Set custom action URL in Firebase Console → Auth → Templates → Password Reset → `https://spendxp.vercel.app/reset-password`
 10. **App Store metadata** ✅ Written — see APP_STORE_METADATA.md for full copy, keywords, screenshot guide, and pre-launch checklist
+11. **Universal Links (iOS)** ✅ File at `public/.well-known/apple-app-site-association`. Replace `TEAM_ID_HERE` with your Apple Developer Team ID (found in Apple Developer Portal → Membership). Vercel serves this automatically.
+12. **Android Deep Links** ✅ File at `public/.well-known/assetlinks.json`. Replace `REPLACE_WITH_YOUR_KEYSTORE_SHA256_FINGERPRINT` with your upload keystore SHA-256 (from Google Play Console → Setup → App integrity).
+13. **Local streak reminder** ✅ Built — fires at 7 PM device-local time; auto-cancelled when user completes a quest or game. Requires `@capacitor/local-notifications` (already in package.json).
 
 ---
 

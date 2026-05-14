@@ -109,6 +109,14 @@ const nextConfig: NextConfig = {
         source: '/(.*)',
         headers: securityHeaders,
       },
+      // Apple App Site Association — must be served as application/json
+      // even though the file has no extension. Required for Universal Links.
+      {
+        source: '/.well-known/apple-app-site-association',
+        headers: [
+          { key: 'Content-Type', value: 'application/json' },
+        ],
+      },
     ];
   },
 };
