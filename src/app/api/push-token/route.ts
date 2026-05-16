@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFirebaseAdmin } from '@/lib/firebaseAdmin';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * POST /api/push-token
  * Saves an FCM push token to the user's Firestore document.

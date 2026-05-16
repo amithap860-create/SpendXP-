@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getFirebaseAdmin } from '@/lib/firebaseAdmin';
 import { emailService } from '@/lib/email';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * POST /api/consent-verify
  *

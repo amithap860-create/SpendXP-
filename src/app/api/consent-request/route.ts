@@ -3,6 +3,8 @@ import { getFirebaseAdmin } from '@/lib/firebaseAdmin';
 import { emailService } from '@/lib/email';
 import crypto from 'crypto';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * POST /api/consent-request
  *

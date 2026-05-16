@@ -1,6 +1,8 @@
 import { NextRequest } from 'next/server';
 import AuthController from '@/controllers/authController';
 
+export const dynamic = 'force-dynamic';
+
 // Simple middleware to extract user from token
 function extractUser(request: NextRequest): any {
   const authHeader = request.headers.get('authorization');

@@ -26,10 +26,45 @@
   "screenshots": [
     {
       "src": "/screenshots/dashboard.png",
-      "sizes": "390x844",
+      "sizes": "1290x2796",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "SpendXP Dashboard"
+    },
+    {
+      "src": "/screenshots/quests.png",
+      "sizes": "1290x2796",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Case Files — Financial Quests"
+    },
+    {
+      "src": "/screenshots/games.png",
+      "sizes": "1290x2796",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Games — Learn by Playing"
+    },
+    {
+      "src": "/screenshots/profile.png",
+      "sizes": "1290x2796",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Profile — Rank & Progression"
+    },
+    {
+      "src": "/screenshots/parent.png",
+      "sizes": "1290x2796",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Parent Dashboard — Monitor Activity"
+    },
+    {
+      "src": "/screenshots/leaderboard.png",
+      "sizes": "1290x2796",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Daily Leaderboard"
     }
   ],
   "related_applications": [],
