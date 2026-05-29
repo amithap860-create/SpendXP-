@@ -45,6 +45,7 @@ import { getRankForXP, getRankProgress, getNextRank, getFogEnemy, getCurrentSaga
 import { getAvatar } from '@/config/avatars';
 import Image from 'next/image';
 import { HowToPlayModal } from '@/components/HowToPlayModal';
+import { trackRankUp } from '@/lib/analytics';
 
 const RadarChart = dynamic(() => import('@/components/charts/RadarChart').then(mod => mod.RadarChart), {
   ssr: false,
@@ -207,6 +208,18 @@ export default function DashboardPage() {
       clearInterval(timer);
     };
   }, [user]);
+
+  // Track rank-up events — compare stored rank to current rank
+  useEffect(() => {
+    if (!progression) return;
+    const totalXP = progression.totalXP ?? 0;
+    const currentRank = getRankForXP(totalXP);
+    const storedRankName = localStorage.getItem('spendxp_last_rank');
+    if (storedRankName && storedRankName !== currentRank.name) {
+      trackRankUp({ newRank: currentRank.name, totalXP });
+    }
+    localStorage.setItem('spendxp_last_rank', currentRank.name);
+  }, [progression]);
 
   const greeting = useMemo(() => {
     const hour = new Date().getHours();

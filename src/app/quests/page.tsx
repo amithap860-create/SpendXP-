@@ -24,6 +24,7 @@ import { collection, getDocs } from 'firebase/firestore';
 import dynamic from 'next/dynamic';
 import { getRankForXP, getRankProgress, getNextRank, getFogEnemy, getCaseFileId, getCurrentSaga } from '@/config/narrative';
 import { useDailyQuestStatus } from '@/hooks/useDailyQuestStatus';
+import { trackQuestStarted } from '@/lib/analytics';
 
 const QuestViewer = dynamic(() => import('@/components/quests/QuestViewer'), {
   ssr: false,
@@ -222,6 +223,11 @@ export default function QuestsHub() {
         quest={briefingQuest.quest}
         index={briefingQuest.index}
         onAccept={() => {
+          trackQuestStarted({
+            questId: briefingQuest.quest.id,
+            questTitle: briefingQuest.quest.title,
+            difficulty: briefingQuest.quest.difficulty,
+          });
           setActiveQuest(briefingQuest.quest);
           setBriefingQuest(null);
         }}

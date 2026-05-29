@@ -13,6 +13,7 @@ import { updateLeaderboardEntry } from '@/lib/progressionService';
 import { waitForAuth } from '@/lib/waitForAuth';
 import { fireConfettiPersonalBest } from '@/lib/confetti';
 import { cancelStreakReminder } from '@/lib/native';
+import { trackGamePlayed } from '@/lib/analytics';
 
 export type GameStatus = 'IDLE' | 'COUNTDOWN' | 'PLAYING' | 'PAUSED' | 'GAME_OVER' | 'RESULTS';
 
@@ -276,6 +277,9 @@ export function useGameEngine(config: GameConfig) {
 
       // User has played today — dismiss the local streak reminder
       cancelStreakReminder().catch(() => {});
+
+      // Analytics
+      trackGamePlayed({ gameId: config.gameName, score: safeScore, xpEarned: safeXP });
 
       await updateLeaderboardEntry(user.uid, user.displayName || 'Strategist');
 
