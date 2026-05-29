@@ -202,10 +202,10 @@ export default function SupportPage() {
                     <div key={key} className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
                       <button
                         onClick={() => toggle(key)}
-                        className="w-full px-6 py-4 text-left flex items-center justify-between gap-4 hover:bg-slate-50 transition-colors"
+                        className="w-full px-6 py-4 text-left flex items-start justify-between gap-4 hover:bg-slate-50 transition-colors"
                       >
                         <span className="text-sm font-bold text-slate-800">{item.q}</span>
-                        <span className={`text-slate-400 flex-shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-45' : ''}`}>
+                        <span className={`text-slate-400 flex-shrink-0 transition-transform duration-200 mt-0.5 ${isOpen ? 'rotate-45' : ''}`}>
                           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                             <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                           </svg>

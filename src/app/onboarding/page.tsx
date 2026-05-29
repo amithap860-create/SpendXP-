@@ -407,7 +407,7 @@ function OnboardingContent() {
 
               {/* Dossier card — dark themed */}
               <div className="bg-slate-900 rounded-2xl p-5 text-left space-y-4">
-                <div className="text-[9px] font-black uppercase tracking-widest text-[#2E7D5A]">
+                <div className="text-[10px] font-black uppercase tracking-widest text-primary">
                   ⚖️ Order Intelligence File · {selectedCountry.flag} {selectedCountry.name}
                 </div>
                 <div className="border-t border-slate-700 pt-4 space-y-3">
@@ -439,7 +439,7 @@ function OnboardingContent() {
 
               {/* First fog warning */}
               <div className="bg-red-950/40 border border-red-900/40 rounded-xl p-4 text-left">
-                <div className="text-[9px] font-black uppercase tracking-widest text-red-500 mb-2">⚠️ Intelligence Report</div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-2">⚠️ Intelligence Report</div>
                 <p className="text-xs text-red-300 leading-relaxed">
                   The <span className="font-black">Impulse Storm</span> is already moving through The Neighbourhood. Your first Case File is open. SpendCity needs you — now.
                 </p>

@@ -363,9 +363,9 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
             </div>
             <CardContent className="p-6 md:p-10 space-y-10">
               <div className="grid grid-cols-3 gap-3 md:gap-6">
-                <div className="p-4 md:p-6 rounded-2xl bg-slate-50 border text-center"><div className="text-xl md:text-3xl font-black text-primary mb-1">{score}/10</div><div className="text-[8px] md:text-[10px] font-bold uppercase text-muted-foreground">Score</div></div>
-                <div className="p-4 md:p-6 rounded-2xl bg-slate-50 border text-center"><div className="text-xl md:text-3xl font-black text-accent mb-1">{bestStreak}</div><div className="text-[8px] md:text-[10px] font-bold uppercase text-muted-foreground">Streak</div></div>
-                <div className="p-4 md:p-6 rounded-2xl bg-slate-50 border text-center"><div className="text-xl md:text-3xl font-black text-primary mb-1">{Math.round((score/10)*100)}%</div><div className="text-[8px] md:text-[10px] font-bold uppercase text-muted-foreground">Acc.</div></div>
+                <div className="p-4 md:p-6 rounded-2xl bg-slate-50 border text-center"><div className="text-xl md:text-3xl font-black text-primary mb-1">{score}/10</div><div className="text-[10px] md:text-xs font-bold uppercase text-muted-foreground">Score</div></div>
+                <div className="p-4 md:p-6 rounded-2xl bg-slate-50 border text-center"><div className="text-xl md:text-3xl font-black text-accent mb-1">{bestStreak}</div><div className="text-[10px] md:text-xs font-bold uppercase text-muted-foreground">Streak</div></div>
+                <div className="p-4 md:p-6 rounded-2xl bg-slate-50 border text-center"><div className="text-xl md:text-3xl font-black text-primary mb-1">{Math.round((score/10)*100)}%</div><div className="text-[10px] md:text-xs font-bold uppercase text-muted-foreground">Acc.</div></div>
               </div>
               <div className="space-y-6">
                 <h3 className="font-black text-xl md:text-2xl flex items-center gap-2"><BarChart2 className="h-6 w-6 text-primary" /> Category Breakdown</h3>

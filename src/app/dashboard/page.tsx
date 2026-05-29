@@ -430,7 +430,7 @@ export default function DashboardPage() {
 
                 {/* Story brief */}
                 <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-primary mb-1">📋 Mission Brief</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-1">📋 Mission Brief</p>
                   <p className="text-sm font-medium text-slate-700 leading-relaxed italic">"{rank.storyLine}"</p>
                 </div>
 
@@ -440,7 +440,7 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-xl">{fog.emoji}</span>
                       <div>
-                        <p className="text-[9px] font-black uppercase tracking-widest text-red-500">Active Threat</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-red-500">Active Threat</p>
                         <p className="text-sm font-black text-red-700">{fog.name}</p>
                       </div>
                     </div>
@@ -490,7 +490,7 @@ export default function DashboardPage() {
                   </div>
                 )}
               </div>
-              <p className="text-[8px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
+              <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
             </div>
           ))}
         </section>
@@ -510,7 +510,7 @@ export default function DashboardPage() {
               >
                 <div>
                   <h3 className="font-bold text-slate-900 text-xs md:text-sm group-hover:text-primary transition-colors line-clamp-1">{game.name}</h3>
-                  <p className="text-[9px] md:text-[10px] text-slate-400 font-medium">
+                  <p className="text-[10px] md:text-xs text-slate-400 font-medium">
                     Best: {gameScores?.[game.id as keyof GameScores]?.highScore || 'Not played'}
                   </p>
                 </div>
@@ -536,14 +536,14 @@ export default function DashboardPage() {
                 <RadarChart scores={strengths} size={radarSize} />
                 <div className="w-full mt-6 md:mt-8 grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <p className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase">Strongest</p>
-                    <span className="px-2 py-1 bg-primary/5 text-primary rounded-lg text-[9px] md:text-[10px] font-black uppercase">
+                    <p className="text-[10px] md:text-xs font-black text-slate-400 uppercase">Strongest</p>
+                    <span className="px-2 py-1 bg-primary/5 text-primary rounded-lg text-[10px] md:text-xs font-black uppercase">
                       {Object.entries(strengths).sort((a,b) => b[1]-a[1])[0][0]}
                     </span>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase">Focus next</p>
-                    <span className="px-2 py-1 bg-rose-50 text-rose-600 rounded-lg text-[9px] md:text-[10px] font-black uppercase">
+                    <p className="text-[10px] md:text-xs font-black text-slate-400 uppercase">Focus next</p>
+                    <span className="px-2 py-1 bg-rose-50 text-rose-600 rounded-lg text-[10px] md:text-xs font-black uppercase">
                       {Object.entries(strengths).sort((a,b) => a[1]-b[1])[0][0]}
                     </span>
                   </div>

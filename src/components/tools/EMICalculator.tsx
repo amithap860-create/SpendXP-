@@ -151,29 +151,29 @@ export function EMICalculator() {
 
           <div className="grid grid-cols-2 gap-3 md:gap-4">
             <div className="p-4 bg-white rounded-2xl shadow-sm border border-slate-100 text-center">
-              <div className="text-[8px] md:text-[10px] font-black uppercase text-slate-400 mb-1">Total Interest</div>
+              <div className="text-[10px] md:text-xs font-black uppercase text-slate-400 mb-1">Total Interest</div>
               <div className="text-base md:text-lg font-black text-rose-500">{formatValue(stats.totalInterest)}</div>
             </div>
             <div className="p-4 bg-white rounded-2xl shadow-sm border border-slate-100 text-center">
-              <div className="text-[8px] md:text-[10px] font-black uppercase text-slate-400 mb-1">Total Payable</div>
+              <div className="text-[10px] md:text-xs font-black uppercase text-slate-400 mb-1">Total Payable</div>
               <div className="text-base md:text-lg font-black text-slate-900">{formatValue(stats.totalPayable)}</div>
             </div>
           </div>
 
           <div className="space-y-3">
-            <div className="flex justify-between text-[9px] md:text-[10px] font-black uppercase text-slate-400">
+            <div className="flex justify-between text-[10px] md:text-xs font-black uppercase text-slate-400">
               <span>Principal ({Math.round(100 - stats.interestPercent)}%)</span>
               <span>Interest ({Math.round(stats.interestPercent)}%)</span>
             </div>
             <div className="h-8 md:h-10 w-full bg-slate-200 rounded-xl overflow-hidden flex">
               <div 
-                className="h-full bg-primary transition-all duration-500 flex items-center justify-center text-[9px] md:text-[10px] font-black text-white" 
+                className="h-full bg-primary transition-all duration-500 flex items-center justify-center text-[10px] md:text-xs font-black text-white" 
                 style={{ width: `${100 - stats.interestPercent}%` }}
               >
                 {100 - stats.interestPercent > 25 && 'PRINCIPAL'}
               </div>
               <div 
-                className="h-full bg-rose-500 transition-all duration-500 flex items-center justify-center text-[9px] md:text-[10px] font-black text-white" 
+                className="h-full bg-rose-500 transition-all duration-500 flex items-center justify-center text-[10px] md:text-xs font-black text-white" 
                 style={{ width: `${stats.interestPercent}%` }}
               >
                 {stats.interestPercent > 25 && 'INTEREST'}

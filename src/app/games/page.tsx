@@ -269,7 +269,7 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
           </div>
         </main>
       ) : (
-        <main className="flex-1 p-0 md:p-4 flex items-center justify-center">
+        <main className="flex-1 p-3 md:p-4 flex items-center justify-center">
           <div className={cn(
             "w-full animate-in zoom-in duration-300",
             (isDaily && showDailyBreakdown) ? "max-w-none" : "max-w-4xl p-4"
@@ -320,11 +320,11 @@ function GameCard({
       {locked && (
         <div className="absolute top-4 right-4 flex flex-col items-end gap-1">
           {game.comingSoon ? (
-            <span className="text-[9px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">
+            <span className="text-[11px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">
               Waitlist
             </span>
           ) : (
-            <span className="text-[9px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+            <span className="text-[11px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full flex items-center gap-1">
               <IconStar />
               Premium
             </span>
@@ -350,12 +350,12 @@ function GameCard({
 
       <div className="flex justify-end pt-4">
         {locked ? (
-          <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest flex items-center gap-1">
+          <span className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
             {game.comingSoon ? 'JOIN WAITLIST →' : <><IconLock />UNLOCK</>}
           </span>
         ) : (
-          <span className="text-[10px] font-black text-slate-300 group-hover:text-primary transition-colors uppercase tracking-widest">
-            PLAY NOW
+          <span className="text-xs font-black text-slate-400 group-hover:text-primary transition-colors uppercase tracking-widest">
+            PLAY NOW →
           </span>
         )}
       </div>

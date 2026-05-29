@@ -279,7 +279,7 @@ function LoginContent() {
                   onClick={handleGoogleSignIn}
                   variant="outline"
                   type="button"
-                  className="w-full h-12 gap-3 font-bold border-2 min-h-[44px]"
+                  className="w-full h-14 gap-3 font-bold border-2 min-h-[44px]"
                   disabled={loading}
                   suppressHydrationWarning
                 >

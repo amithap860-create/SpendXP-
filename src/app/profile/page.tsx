@@ -668,17 +668,17 @@ export default function ProfilePage() {
           <Card className="border-none shadow-sm text-center p-4">
             <Zap className="h-5 w-5 text-[#2E7D5A] mx-auto mb-1" />
             <div className="text-2xl font-black text-slate-900">{progression.totalXP.toLocaleString('en-IN')}</div>
-            <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Total XP</div>
+            <div className="text-xs font-black uppercase text-slate-400 tracking-widest">Total XP</div>
           </Card>
           <Card className="border-none shadow-sm text-center p-4">
             <BarChart3 className="h-5 w-5 text-primary mx-auto mb-1" />
             <div className="text-2xl font-black text-slate-900">{progression.totalGamesPlayed}</div>
-            <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Games</div>
+            <div className="text-xs font-black uppercase text-slate-400 tracking-widest">Games</div>
           </Card>
           <Card className="border-none shadow-sm text-center p-4">
             <Award className="h-5 w-5 text-primary mx-auto mb-1" />
             <div className="text-2xl font-black text-slate-900">{progression.badges.length}</div>
-            <div className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Badges</div>
+            <div className="text-xs font-black uppercase text-slate-400 tracking-widest">Badges</div>
           </Card>
         </div>
 
@@ -718,10 +718,10 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span>⚖️</span>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-primary">Order of the Golden Ledger</span>
-                    {saga && <span className="hidden sm:inline text-[9px] text-slate-400 border border-slate-200 rounded-full px-2 py-0.5 font-bold">{saga.emoji} {saga.name}</span>}
+                    <span className="text-xs font-black uppercase tracking-widest text-primary">Order of the Golden Ledger</span>
+                    {saga && <span className="hidden sm:inline text-[10px] text-slate-400 border border-slate-200 rounded-full px-2 py-0.5 font-bold">{saga.emoji} {saga.name}</span>}
                   </div>
-                  <Link href="/story" className="text-[10px] font-black text-primary hover:underline uppercase tracking-widest">Lore →</Link>
+                  <Link href="/story" className="text-xs font-black text-primary hover:underline uppercase tracking-widest">Lore →</Link>
                 </div>
 
                 {/* Rank + progress */}
@@ -732,12 +732,12 @@ export default function ProfilePage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2 mb-1">
                       <span className="text-base font-black text-slate-900">{rank.emoji} {rank.name}</span>
-                      <span className="text-[9px] font-bold text-slate-400">{rank.district}</span>
+                      <span className="text-[11px] font-bold text-slate-400">{rank.district}</span>
                     </div>
                     <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden mb-1">
                       <div className="h-full bg-gradient-to-r from-primary to-primary/60 rounded-full" style={{ width: `${rankPct}%` }} />
                     </div>
-                    <p className="text-[9px] font-bold text-slate-400">
+                    <p className="text-[11px] font-bold text-slate-400">
                       {nextRank ? `${(nextRank.minXP - totalXP).toLocaleString()} XP to ${nextRank.emoji} ${nextRank.name}` : 'Max Rank!'}
                     </p>
                   </div>
@@ -745,19 +745,19 @@ export default function ProfilePage() {
 
                 {/* Mission brief */}
                 <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-primary mb-1">📋 Current Mission</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-primary mb-1">📋 Current Mission</p>
                   <p className="text-xs font-medium text-slate-600 italic">"{rank.storyLine}"</p>
                 </div>
 
                 {/* Fog threat compact */}
                 <div className="flex gap-3">
                   <div className="flex-1 bg-red-50 border border-red-100 rounded-xl p-3">
-                    <p className="text-[9px] font-black uppercase tracking-widest text-red-500 mb-1">⚠️ Active Threat</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-1">⚠️ Active Threat</p>
                     <p className="text-xs font-black text-red-700">{fog.emoji} {fog.name}</p>
                     <p className="text-[10px] text-red-500 mt-0.5 leading-tight">{fog.description.slice(0, 60)}…</p>
                   </div>
                   <div className="flex-1 bg-primary/5 border border-primary/10 rounded-xl p-3">
-                    <p className="text-[9px] font-black uppercase tracking-widest text-primary mb-1">🛡️ Counter</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-primary mb-1">🛡️ Counter</p>
                     <p className="text-[10px] text-slate-700 leading-tight font-medium">{fog.weakness.slice(0, 70)}…</p>
                   </div>
                 </div>
@@ -1154,9 +1154,9 @@ export default function ProfilePage() {
                     <Image src={avatar.imagePath} alt={avatar.name} width={56} height={56} className="w-full h-full object-cover object-top scale-110" />
                   </div>
                   <span className="text-[10px] font-black text-slate-600 truncate w-full text-center">{avatar.name}</span>
-                  <span className="text-[8px] text-slate-400 truncate w-full text-center">{avatar.archetype}</span>
+                  <span className="text-[10px] text-slate-400 truncate w-full text-center">{avatar.archetype}</span>
                   {avatarCfg.id === avatar.id && (
-                    <span className="text-[8px] font-black uppercase tracking-wider text-primary">Active</span>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-primary">Active</span>
                   )}
                 </button>
               ))}

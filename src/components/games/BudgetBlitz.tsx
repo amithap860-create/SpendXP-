@@ -582,15 +582,15 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
         <div className="p-3 md:p-4 grid grid-cols-3 gap-3 z-10 bg-white/80 backdrop-blur-sm border-t">
           <Button className="h-16 md:h-20 min-h-[44px] flex-col gap-1 bg-primary hover:bg-primary rounded-2xl shadow-lg w-full"
             onClick={() => cards.length > 0 && handleSort([...cards].sort((a, b) => b.y - a.y)[0].id, 'NEED')}>
-            <ChevronLeft className="h-3 w-3 text-white/50" /><ShoppingBag className="h-5 w-5" /><span className="text-[8px] font-black uppercase">NEED</span>
+            <ChevronLeft className="h-3 w-3 text-white/50" /><ShoppingBag className="h-5 w-5" /><span className="text-[10px] font-black uppercase">NEED</span>
           </Button>
           <Button className="h-16 md:h-20 min-h-[44px] flex-col gap-1 bg-primary hover:bg-[#3A9068] rounded-2xl shadow-lg w-full"
             onClick={() => cards.length > 0 && handleSort([...cards].sort((a, b) => b.y - a.y)[0].id, 'WANT')}>
-            <Wallet className="h-5 w-5" /><span className="text-[8px] font-black uppercase">WANT</span>
+            <Wallet className="h-5 w-5" /><span className="text-[10px] font-black uppercase">WANT</span>
           </Button>
           <Button className="h-16 md:h-20 min-h-[44px] flex-col gap-1 bg-blue-500 hover:bg-blue-600 rounded-2xl shadow-lg w-full"
             onClick={() => cards.length > 0 && handleSort([...cards].sort((a, b) => b.y - a.y)[0].id, 'SAVE')}>
-            <ChevronRight className="h-3 w-3 text-white/50" /><PiggyBank className="h-5 w-5" /><span className="text-[8px] font-black uppercase">SAVE</span>
+            <ChevronRight className="h-3 w-3 text-white/50" /><PiggyBank className="h-5 w-5" /><span className="text-[10px] font-black uppercase">SAVE</span>
           </Button>
         </div>
       </div>

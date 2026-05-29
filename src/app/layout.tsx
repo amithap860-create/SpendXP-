@@ -226,7 +226,7 @@ function NavLink({ href, label, active, isSmallScreen }: { href: string; label: 
       </div>
       {!isSmallScreen && (
         <span className={cn(
-          "text-[9px] font-black uppercase tracking-wider truncate w-full text-center px-0.5 transition-colors",
+          "text-[10px] font-black uppercase tracking-wider truncate w-full text-center px-0.5 transition-colors",
           active ? "text-primary" : "text-slate-400"
         )}>
           {label}
@@ -242,10 +242,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="SpendXP" />
         <meta name="theme-color" content="#1A1F2E" />
         <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+        <link rel="apple-touch-startup-image" href="/icons/icon-512.png" />
       </head>
       <body 
         className={cn(inter.variable, "font-sans antialiased bg-slate-50 text-slate-900")}

@@ -323,19 +323,19 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
     <div className="max-w-5xl mx-auto space-y-4 md:space-y-6">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         <Card className="p-3 md:p-4 flex flex-col items-center border-none shadow-sm">
-          <div className="text-[9px] md:text-[10px] font-black uppercase text-slate-400">Cash</div>
+          <div className="text-[10px] md:text-xs font-black uppercase text-slate-400">Cash</div>
           <div className="text-lg md:text-xl font-black text-primary">${cash.toFixed(2)}</div>
         </Card>
         <Card className="p-3 md:p-4 flex flex-col items-center border-none shadow-sm bg-primary text-white">
-          <div className="text-[9px] md:text-[10px] font-black uppercase text-white/60">Day</div>
+          <div className="text-[10px] md:text-xs font-black uppercase text-white/60">Day</div>
           <div className="text-lg md:text-xl font-black">{currentRound} / 5</div>
         </Card>
         <Card className="p-3 md:p-4 flex flex-col items-center border-none shadow-sm">
-          <div className="text-[9px] md:text-[10px] font-black uppercase text-slate-400">Portfolio</div>
+          <div className="text-[10px] md:text-xs font-black uppercase text-slate-400">Portfolio</div>
           <div className="text-lg md:text-xl font-black text-primary">${portfolioValue.toFixed(2)}</div>
         </Card>
         <Card className={cn("p-3 md:p-4 flex flex-col items-center border-none shadow-sm", totalWealth >= startingCash ? 'bg-[#E8F5EE]' : 'bg-rose-50')}>
-          <div className="text-[9px] md:text-[10px] font-black uppercase text-slate-400">Total</div>
+          <div className="text-[10px] md:text-xs font-black uppercase text-slate-400">Total</div>
           <div className={cn("text-lg md:text-xl font-black", totalWealth >= startingCash ? 'text-primary' : 'text-rose-700')}>${totalWealth.toFixed(2)}</div>
         </Card>
       </div>

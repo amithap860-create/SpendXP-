@@ -326,7 +326,7 @@ export default function QuestsHub() {
               {/* Seasonal saga pill */}
               {activeSaga && (
                 <div className="bg-[#1A1F2E]/20 border border-[#2E7D5A]/30 rounded-xl px-4 py-3 space-y-1">
-                  <div className="text-[9px] font-black uppercase tracking-widest text-[#4EA07A]">Active Saga</div>
+                  <div className="text-[10px] font-black uppercase tracking-widest text-primary">Active Saga</div>
                   <div className="text-sm font-black text-[#A8D5BC]">{activeSaga.emoji} {activeSaga.name}</div>
                   <p className="text-[10px] text-[#4EA07A]/60">{activeSaga.tagline}</p>
                 </div>
