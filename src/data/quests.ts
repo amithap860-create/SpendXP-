@@ -92,15 +92,15 @@ export const quests: Quest[] = [
           },
           {
             id: 'bl-c3',
-            text: 'Save all ₹500',
-            consequence: "Smart! You have ₹500. The toy is ₹350 — you can buy it AND still have ₹150 left over!",
-            xpDelta: 50,
-            healthDelta: 10,
-            walletDelta: 0,
+            text: 'Buy your ice cream, put the rest away',
+            consequence: "You enjoy a ₹40 treat, save ₹460, and can easily buy the ₹350 toy AND still have ₹110 left. Best of all three options!",
+            xpDelta: 55,
+            healthDelta: 12,
+            walletDelta: -40,
             nextStepId: 'bl-2b',
             isOptimal: true,
-            explanation: "Saving everything gives you the most choices later.",
-            realLifeTip: "Money you save today buys you more options tomorrow."
+            explanation: "Balance means enjoying the moment AND being smart with the rest. You don't have to choose between fun and good decisions — you can have both when you plan.",
+            realLifeTip: "The goal isn't to save every single rupee — it's to enjoy life while keeping your future self happy. A small treat today doesn't hurt. A big, unplanned splurge does."
           }
         ]
       },
@@ -996,45 +996,45 @@ export const quests: Quest[] = [
       },
       {
         id: 'fp-3',
-        title: 'Pattern Recognition',
-        narrative: "Month 3. Looking at your statement: Swiggy ₹3,200, Zomato ₹1,800, Uber ₹4,100, Amazon ₹2,900. Total lifestyle spend: ₹12,000/month.",
+        title: 'Design Your Financial Life',
+        narrative: "Month 3. You've tracked your spending: Swiggy ₹3,200, Zomato ₹1,800, Uber ₹4,100, Amazon ₹2,900. Total lifestyle spend: ₹12,000/month. Now the real question — is this the life you actually want? Or are these just defaults you drifted into?",
         ageGroups: ['senior', 'teen'],
         choices: [
           {
             id: 'c13',
-            text: 'Set hard limits: ₹5,500 total',
-            consequence: "Saves ₹6,500/month. Over a year: ₹78,000 more in savings. Invested at 12%: ₹82,000.",
-            xpDelta: 65,
-            healthDelta: 10,
+            text: 'Design intentional spending: keep what matters, cut what doesn\'t',
+            consequence: "You decide: Uber stays (2 hours of commute saved = real productivity). Swiggy cut to ₹1,200 (2 nice meals a week, not daily laziness). Amazon reduced to planned purchases only. Net saving: ₹4,500/month — without feeling deprived.",
+            xpDelta: 80,
+            healthDelta: 15,
             walletDelta: 0,
             nextStepId: 'end',
             isOptimal: true,
-            explanation: "Setting category-wise limits is the most effective way to control impulse spending.",
-            realLifeTip: "Delete delivery apps for 1 week every month to reset your habits."
+            explanation: "Intentional spending means you consciously choose what brings real value versus what's just a default habit. The goal isn't to spend as little as possible — it's to spend on what genuinely improves your life, and cut what doesn't.",
+            realLifeTip: "Go through last month's transactions and mark each as: 'worth it', 'habit', or 'mistake'. You'll immediately see where to cut — and what to keep guilt-free. Money spent on things that genuinely matter to you is never wasted."
           },
           {
             id: 'c14',
-            text: 'Cut only Swiggy/Zomato',
-            consequence: "Realistic and sustainable. Saves ₹1,800/month. ₹21,600/year extra.",
-            xpDelta: 40,
-            healthDelta: 5,
-            walletDelta: 0,
+            text: 'Focus on earning more instead of cutting more',
+            consequence: "You ask your manager for a 15% raise and start a ₹8,000/month design freelance project on weekends. Suddenly the ₹12,000 lifestyle spend is just 20% of income, not 34%. The lifestyle doesn't change — the income does.",
+            xpDelta: 75,
+            healthDelta: 12,
+            walletDelta: 8000,
             nextStepId: 'end',
-            isOptimal: false,
-            explanation: "Consistent small changes are good, but larger leaks like Uber often need attention too.",
-            realLifeTip: "The 24-hour rule: Wait one day before clicking 'Order' on non-essentials."
+            isOptimal: true,
+            explanation: "Cutting spending has a hard floor — you can only cut so much before life becomes unpleasant. But income growth has no ceiling. After covering basics and saving a healthy %, growing income is often the highest-leverage financial move available.",
+            realLifeTip: "Every ₹1,000/month raise, compounded over 10 years at 12%, produces ₹23 lakh in additional wealth. A salary negotiation that takes 20 minutes has more financial impact than years of skipping coffee."
           },
           {
             id: 'c15',
-            text: 'Track for one more month',
-            consequence: "Another month of data costs you ₹6,500 in potential savings. Tracking without acting is idle.",
-            xpDelta: 15,
-            healthDelta: 1,
+            text: 'Cut everything — ₹5,500 hard cap on lifestyle',
+            consequence: "You save ₹6,500/month, but by month 5 you're burned out and resentful. Extreme restriction causes a 'rebound spend' in month 6 — ₹22,000 in one weekend. Net result: worse than starting.",
+            xpDelta: 25,
+            healthDelta: -8,
             walletDelta: 0,
             nextStepId: 'end',
             isOptimal: false,
-            explanation: "More data rarely fixes a spending problem; decisive action does.",
-            realLifeTip: "Knowledge without discipline equals zero wealth."
+            explanation: "Overly aggressive expense cutting often leads to rebound spending. Financial plans that feel like punishment don't last. Sustainability beats optimisation every time.",
+            realLifeTip: "The best financial plan is one you can actually stick to. Give yourself a guilt-free 'fun fund' each month — even if it's small. Restriction without release builds pressure that eventually explodes."
           }
         ]
       }
@@ -1302,7 +1302,7 @@ export const quests: Quest[] = [
   {
     id: 'vacation-planning',
     title: 'Bali Dream vs. Gokarna Reality',
-    description: 'You want a break. Bali costs ₹80,000. Gokarna costs ₹15,000. You have ₹45,000 saved.',
+    description: "You've been working hard for months and you need a real break. Bali costs ₹80,000. Gokarna costs ₹15,000. You have ₹45,000 saved in your travel fund. Both trips are valid — the question is how you fund them.",
     category: 'lifestyle',
     difficulty: 'beginner',
     ageGroups: ['teen', 'senior'],
@@ -1312,45 +1312,77 @@ export const quests: Quest[] = [
     steps: [
       {
         id: 'vp-1',
-        title: 'Destination Dilemma',
-        narrative: "Instagram is full of Bali photos. It costs ₹80,000. You have ₹45,000.",
+        title: 'You Deserve a Break',
+        narrative: "You have been grinding for months. Rest isn't optional — it's part of performing well long-term. Bali is your dream trip (₹80,000). Gokarna is achievable right now (₹15,000). You have ₹45,000 saved. What's the smart play?",
         ageGroups: ['senior', 'teen'],
         choices: [
           {
             id: 'vp-c1',
             text: 'Go to Gokarna now (₹15,000)',
-            consequence: 'Amazing trip! You still have ₹30,000 in your fund for the next one.',
-            xpDelta: 50,
-            healthDelta: 10,
+            consequence: "An incredible trip — sunsets, beaches, real rest. You return recharged with ₹30,000 still in your fund. The Bali trip is still coming.",
+            xpDelta: 60,
+            healthDelta: 15,
             walletDelta: -15000,
-            nextStepId: 'end',
+            nextStepId: 'vp-2',
             isOptimal: true,
-            explanation: "Choosing experiences within your means prevents lifestyle debt.",
-            realLifeTip: "Lesser-known spots often provide 90% of the joy for 20% of the cost."
+            explanation: "Taking a real break fuels better performance at work. Rest is productive. Gokarna gives you a genuine reset without touching your financial safety net.",
+            realLifeTip: "Lesser-known destinations often deliver 90% of the experience for 20% of the cost — and far less crowds. The goal isn't the destination, it's the restoration."
           },
           {
             id: 'vp-c2',
-            text: 'Save 4 more months for Bali',
-            consequence: 'Patience pays. You will enjoy Bali more knowing it is fully paid for.',
+            text: 'Keep saving specifically for Bali',
+            consequence: "You map out a plan: save ₹9,000/month, reach Bali in 4 months. You book it, and it's everything you imagined — because you planned it, not because you panicked into it.",
             xpDelta: 60,
+            healthDelta: 10,
+            walletDelta: 0,
+            nextStepId: 'vp-2',
+            isOptimal: true,
+            explanation: "Intentional saving for a specific experience you genuinely want is exactly how balanced financial planning works. You didn't cut the dream — you funded it properly.",
+            realLifeTip: "A 'Sinking Fund' is a dedicated savings bucket for planned big expenses — travel, gadgets, courses. Set one up and automate ₹X/month into it so your dream trips never feel guilty."
+          },
+          {
+            id: 'vp-c3',
+            text: 'Book Bali on Credit Card (worry later)',
+            consequence: "Bali was incredible — but the ₹35,000 shortfall on a 36% APR card turns into ₹47,000 after six months. The trip is over but the debt hangs around.",
+            xpDelta: 10,
+            healthDelta: -15,
+            walletDelta: -35000,
+            nextStepId: 'vp-2',
+            isOptimal: false,
+            explanation: "The problem isn't wanting Bali — it's funding Bali with debt you can't quickly clear. Credit card interest at 36% APR is the most expensive money you'll ever spend.",
+            realLifeTip: "If the trip requires high-interest debt to fund, the trip hasn't been earned yet. That's not a value judgment — it's math. Save first, enjoy second."
+          }
+        ]
+      },
+      {
+        id: 'vp-2',
+        title: 'The Bigger Question',
+        narrative: "After the trip (or your planning session), you realise something: the travel fund only exists because you set it up. Most people don't. How do you make sure you can always afford the life you want?",
+        ageGroups: ['senior', 'teen'],
+        choices: [
+          {
+            id: 'vp-c4',
+            text: 'Design a "lifestyle budget" — allocate for travel, fun AND savings',
+            consequence: "You create three buckets: 50% essentials, 20% savings/investing, 30% life (travel, food, clothes, experiences). Every rupee has a job. The guilt disappears because the plan is intentional.",
+            xpDelta: 80,
+            healthDelta: 15,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: true,
+            explanation: "The 50/20/30 framework works because it treats 'life' as a legitimate budget category — not a guilty afterthought. Financial health isn't about spending as little as possible. It's about spending intentionally.",
+            realLifeTip: "Budgets fail when they're too restrictive. Build your fun into the plan, or the plan breaks. A sustainable financial life includes vacations, dinners out, and hobbies — funded deliberately."
+          },
+          {
+            id: 'vp-c5',
+            text: 'Focus on earning more so travel is never a dilemma',
+            consequence: "You start upskilling, negotiate a raise, or begin a side income. When your monthly savings rate rises from 10% to 25%, Bali stops being a stretch — it becomes a quarterly option.",
+            xpDelta: 80,
             healthDelta: 12,
             walletDelta: 0,
             nextStepId: 'end',
             isOptimal: true,
-            explanation: "Delayed gratification is the ultimate financial skill.",
-            realLifeTip: "Create a dedicated 'Sinking Fund' for travel to avoid accidental spending."
-          },
-          {
-            id: 'vp-c3',
-            text: 'Book Bali on Credit Card',
-            consequence: "Bali was great, but the 42% APR interest on ₹35,000 will haunt you for a year.",
-            xpDelta: 10,
-            healthDelta: -15,
-            walletDelta: -35000,
-            nextStepId: 'end',
-            isOptimal: false,
-            explanation: "Financing memories with high-interest debt is a recipe for long-term stress.",
-            realLifeTip: "If a vacation costs interest, it's not a break, it's a burden."
+            explanation: "Cutting spending has a floor. Increasing income has no ceiling. The best financial move beyond basic savings is growing the income side — skills, raises, side work, or smart career moves.",
+            realLifeTip: "A ₹5,000/month raise compounding over 10 years does more for your wealth than ₹5,000/month of cutting. Invest in your career and skills with the same seriousness you invest in mutual funds."
           }
         ]
       }
@@ -1641,6 +1673,236 @@ export const quests: Quest[] = [
             isOptimal: false,
             explanation: "The high APR makes minimum payments nearly useless.",
             realLifeTip: "Transfer high-rate card debt to a personal loan if you can't pay in full."
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────────────────
+  // LIFESTYLE DESIGN QUEST — Build the life you want, then fund it
+  // ─────────────────────────────────────────────────────────
+  {
+    id: 'lifestyle-design',
+    title: 'Design Your Ideal Life First',
+    description: "Most people build their lifestyle around their income. The wealthy do the opposite — they design the life they want, then engineer the income to fund it. This quest teaches you how.",
+    category: 'income',
+    difficulty: 'intermediate',
+    ageGroups: ['teen', 'senior'],
+    estimatedMinutes: 8,
+    xpReward: 320,
+    startingBalance: 0,
+    steps: [
+      {
+        id: 'ld-1',
+        title: 'Start With the Life, Not the Budget',
+        narrative: "You're 24. Someone asks: 'What does your ideal month look like in 5 years?' Most people say 'I don't know — I'll figure out what I can afford.' But there's a more powerful starting point. What do you actually want?",
+        ageGroups: ['teen', 'senior'],
+        choices: [
+          {
+            id: 'ld-c1',
+            text: 'Define the life: apartment, travel once a quarter, good food, investing ₹15,000/month',
+            consequence: "You map it out: rent ₹20,000, food ₹8,000, travel fund ₹10,000/month, investing ₹15,000, miscellaneous ₹7,000. Total needed: ₹60,000/month take-home. Now you have a target income — not a vague hope.",
+            xpDelta: 80,
+            healthDelta: 15,
+            walletDelta: 0,
+            nextStepId: 'ld-2',
+            isOptimal: true,
+            explanation: "Working backwards from your ideal life to the income required is called 'Lifestyle Design'. It turns a fuzzy feeling into a concrete financial goal. You stop asking 'can I afford this?' and start asking 'what income makes this automatic?'",
+            realLifeTip: "Write out your ideal month in detail — not a fantasy, a genuine good life. Add up the costs. That number is your Target Monthly Income (TMI). Everything you do financially — salary negotiation, side hustles, investments — should aim at closing the gap to that number."
+          },
+          {
+            id: 'ld-c2',
+            text: 'Figure out what I can save from my current salary first',
+            consequence: "You save ₹5,000/month from a ₹35,000 salary. It feels responsible, but you've built your life around scarcity rather than possibility. In 5 years you have ₹3 lakh saved — but still feel stuck at the same level.",
+            xpDelta: 30,
+            healthDelta: 5,
+            walletDelta: 0,
+            nextStepId: 'ld-2',
+            isOptimal: false,
+            explanation: "Optimising around what you already earn keeps you anchored to your current ceiling. There's nothing wrong with saving ₹5,000 — but if your life requires ₹60,000/month and you're earning ₹35,000, you need an income plan, not just a savings plan.",
+            realLifeTip: "Savings rate matters, but so does the base. 20% of ₹35,000 is ₹7,000. 20% of ₹80,000 is ₹16,000. Growing your income is not greed — it's the most effective financial lever you have."
+          }
+        ]
+      },
+      {
+        id: 'ld-2',
+        title: 'The Gap Analysis',
+        narrative: "You need ₹60,000/month (take-home) to fund the life you designed. You currently earn ₹38,000 (take-home). The gap is ₹22,000/month. How do you close it?",
+        ageGroups: ['teen', 'senior'],
+        choices: [
+          {
+            id: 'ld-c3',
+            text: 'Negotiate a raise — you\'re worth more than you\'re being paid',
+            consequence: "You research market salaries on Glassdoor. You're 18% below market. You request a meeting, present your contributions, and ask for 20% more. You get 12% — ₹4,560/month more. Not the full gap, but a real start.",
+            xpDelta: 75,
+            healthDelta: 12,
+            walletDelta: 4560,
+            nextStepId: 'ld-3',
+            isOptimal: true,
+            explanation: "The average raise without negotiating is 3-5%. The average raise after negotiating is 10-20%. The ask takes 20 minutes and feels terrifying — but it compounds for the rest of your career. Every rupee of raise you get now means more raises on a higher base forever.",
+            realLifeTip: "Before any salary conversation: research your market rate (Glassdoor, LinkedIn), list 3-5 specific contributions you've made, and anchor high — ask for 20% knowing you might land at 12%. Never accept the first offer without at least one counter."
+          },
+          {
+            id: 'ld-c4',
+            text: 'Start a weekend side income using your existing skills',
+            consequence: "You teach online (₹4,000/month), do freelance design work (₹6,000/month), or tutor students (₹5,000/month). In 3 months your side income is ₹8,000/month, covering a third of the gap.",
+            xpDelta: 80,
+            healthDelta: 10,
+            walletDelta: 8000,
+            nextStepId: 'ld-3',
+            isOptimal: true,
+            explanation: "A side income built on existing skills has near-zero startup cost and near-infinite upside. The first month is hard. By month 6, it often feels like a natural extension of your week. Most people have at least one skill others will pay for — design, writing, teaching, coding, even organising.",
+            realLifeTip: "Sell before you build. Before creating a course or product, find 3 people who will pay for your help directly. Proven demand first, then scale. Platforms: Toppr, Unacademy, Fiverr, local Facebook groups, or just WhatsApp contacts."
+          },
+          {
+            id: 'ld-c5',
+            text: 'Cut spending aggressively to match the gap',
+            consequence: "You cut food, transport, and everything 'nice'. You save ₹8,000 more — but life feels joyless. After 4 months, you're burning out and resenting the process.",
+            xpDelta: 20,
+            healthDelta: -8,
+            walletDelta: 0,
+            nextStepId: 'ld-3',
+            isOptimal: false,
+            explanation: "Cutting spending has a floor — you can only cut so far before it affects your quality of life and performance at work. For a ₹22,000/month gap, you need income growth, not expense elimination. The two aren't enemies — but one is far more powerful.",
+            realLifeTip: "Cut wasteful spending, absolutely. But don't cut the things that fuel your energy, focus, and wellbeing. A gym membership that keeps you healthy and sharp is not a luxury — it's an investment in your earning capacity."
+          }
+        ]
+      },
+      {
+        id: 'ld-3',
+        title: 'Invest in Your Biggest Asset',
+        narrative: "You've started closing the income gap. Now: your salary will only grow as fast as your skills grow. You have ₹8,000 to invest this month. Where does it go?",
+        ageGroups: ['teen', 'senior'],
+        choices: [
+          {
+            id: 'ld-c6',
+            text: 'Upskill: online course in your field (₹4,000) + industry book (₹800)',
+            consequence: "Six months later, you have a new skill on your resume. You use it to deliver a project your company needed. Your manager notices. In your next review, you're in line for a senior role — ₹15,000/month higher.",
+            xpDelta: 90,
+            healthDelta: 15,
+            walletDelta: -4800,
+            nextStepId: 'end',
+            isOptimal: true,
+            explanation: "The return on skill investment is the highest of any asset class for a young professional. A ₹4,800 course that leads to a ₹15,000/month raise is a 300x annual return. No index fund comes close. Your brain is your most valuable asset — it compounds too.",
+            realLifeTip: "Identify the one skill that, if you developed it over the next 6 months, would most increase your market value. Focus everything there. Depth beats breadth early in a career. Platforms: Coursera, Udemy, YouTube (free), or just reading the 3 best books in your field."
+          },
+          {
+            id: 'ld-c7',
+            text: 'Put all ₹8,000 in a mutual fund',
+            consequence: "₹8,000 invested at 12% annually grows to ₹8,960 in a year. Solid. But meanwhile your salary didn't change — the income gap remains. The best portfolio is your own skills and career, backed by financial investments.",
+            xpDelta: 50,
+            healthDelta: 5,
+            walletDelta: -8000,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Index funds are excellent — after your income is growing. Early in your career, a ₹1,000 skill investment can produce ₹15,000/month more income indefinitely. A ₹1,000 investment in the Nifty 50 produces ₹120/year. Both matter — but the order matters.",
+            realLifeTip: "A good financial strategy at 22–30: invest 60% of your growth energy in skills/career, 40% in financial assets. After 35, shift more to financial assets as your income ceiling rises and your time becomes more limited."
+          },
+          {
+            id: 'ld-c8',
+            text: 'Enjoy it — you earned it',
+            consequence: "You spend ₹8,000 on a great weekend and experiences with friends. Real life enjoyment, genuine connection. Not a financial error — but you didn't grow your income either. The gap remains at ₹22,000.",
+            xpDelta: 35,
+            healthDelta: 10,
+            walletDelta: -8000,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Enjoying your earnings is legitimate and healthy — that's the point of earning. But if you're working towards a specific life goal, consistent redirection of resources towards that goal is what gets you there. Balance both.",
+            realLifeTip: "Build a 'fun fund' in your monthly budget — money you spend guilt-free on experiences, food, and joy. When that bucket is empty, you stop. When it's full, you enjoy freely. This structure gives you both freedom and progress."
+          }
+        ]
+      }
+    ]
+  },
+
+  // ─────────────────────────────────────────────────────────
+  // BALANCE QUEST — The 50/20/30 life
+  // ─────────────────────────────────────────────────────────
+  {
+    id: 'balanced-budget',
+    title: 'The Art of the Balanced Budget',
+    description: "A budget isn't a restriction — it's a plan that lets you spend guilt-free. Learn the 50/20/30 framework: half for needs, a fifth for your future, and 30% for actually living your life.",
+    category: 'lifestyle',
+    difficulty: 'beginner',
+    ageGroups: ['teen', 'senior'],
+    estimatedMinutes: 6,
+    xpReward: 200,
+    startingBalance: 40000,
+    steps: [
+      {
+        id: 'bb-1',
+        title: 'What Is Money Actually For?',
+        narrative: "You just got paid ₹40,000. Three people in your life give you advice:\n\n💬 Uncle: 'Save 80%, live on the rest.'\n💬 Friend: 'You're young, enjoy it all — YOLO.'\n💬 Your smarter friend: 'Make a plan that covers needs, savings, AND wants — then spend guilt-free.'\n\nWho do you listen to?",
+        ageGroups: ['teen', 'senior'],
+        choices: [
+          {
+            id: 'bb-c1',
+            text: 'The smarter friend — make a plan that includes living',
+            consequence: "You allocate: ₹20,000 (50%) for rent, food, bills. ₹8,000 (20%) into investments and emergency fund. ₹12,000 (30%) for dining out, travel fund, clothes, entertainment. Every rupee has a job. You spend the ₹12,000 with zero guilt because it's planned.",
+            xpDelta: 80,
+            healthDelta: 15,
+            walletDelta: 0,
+            nextStepId: 'bb-2',
+            isOptimal: true,
+            explanation: "The 50/20/30 rule (or any variation you customise) works because it treats enjoyment as a legitimate budget category — not a failure of discipline. A plan that includes your wants is one you can actually follow for years.",
+            realLifeTip: "Adjust the percentages to your life: in a high-rent city, your essentials bucket might be 60%. That's fine — just keep some allocation for both future savings and present enjoyment. Zero in either category is unsustainable."
+          },
+          {
+            id: 'bb-c2',
+            text: 'Uncle is right — save 80%, live on ₹8,000',
+            consequence: "Month 1: you feel disciplined. Month 3: you're miserable and start secretly spending. Month 5: you've 'fallen off' and stopped tracking entirely. Saved total: ₹0, because extreme restriction led to rebound.",
+            xpDelta: 20,
+            healthDelta: -5,
+            walletDelta: 0,
+            nextStepId: 'bb-2',
+            isOptimal: false,
+            explanation: "80% savings on ₹40,000 means living on ₹8,000 in a city. That's not discipline — it's self-denial that backfires. Financial plans that feel like punishment rarely last beyond 90 days. Sustainable beats optimal every time.",
+            realLifeTip: "The secret to long-term financial success isn't saving the most — it's building a system you can maintain for 10+ years. That system must include genuine enjoyment, or it won't survive contact with real life."
+          },
+          {
+            id: 'bb-c3',
+            text: 'Friend is right — earn it, enjoy it, figure out savings later',
+            consequence: "You enjoy a great month. Month 12 arrives and you have ₹0 saved, no emergency fund, and rising anxiety. When an unexpected ₹15,000 expense hits, you go into debt.",
+            xpDelta: 10,
+            healthDelta: -10,
+            walletDelta: 0,
+            nextStepId: 'bb-2',
+            isOptimal: false,
+            explanation: "Spending everything today transfers all financial risk to your future self. YOLO has real costs: no emergency cushion means any unexpected expense becomes a crisis.",
+            realLifeTip: "Even ₹2,000/month saved consistently for 10 years at 12% grows to ₹4.6 lakh. The amount is less important than the habit. Start small, start now, and automate it so it happens before you can spend it."
+          }
+        ]
+      },
+      {
+        id: 'bb-2',
+        title: 'The 30% Is Not Waste',
+        narrative: "A colleague sees your 'wants' budget of ₹12,000 and says: 'That's irresponsible. That money should all go to savings.' You disagree. How do you explain why a fun budget is actually smart?",
+        ageGroups: ['teen', 'senior'],
+        choices: [
+          {
+            id: 'bb-c4',
+            text: '"Spending on what matters to me keeps me motivated to earn more and stick to my plan."',
+            consequence: "Your colleague thinks about it. You explain: a person who enjoys their financial life performs better, negotiates harder, and lasts longer than one who feels perpetually deprived. The ₹12,000 in experiences fuels the next ₹8,000 in savings.",
+            xpDelta: 80,
+            healthDelta: 12,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: true,
+            explanation: "Rest, experiences, relationships, and enjoyment aren't financial mistakes — they're what fuels the sustained effort that creates wealth. The person who burns out saving 80% achieves less than the person who saves 20% for 30 years.",
+            realLifeTip: "Research shows people with a positive relationship with money — who enjoy it without guilt — make better long-term financial decisions than those who treat money as purely functional. Budget for joy. It's not indulgent; it's strategic."
+          },
+          {
+            id: 'bb-c5',
+            text: 'Maybe they\'re right — cut the fun budget further',
+            consequence: "You cut to ₹5,000 for wants. Two months later you've spent ₹18,000 in one weekend — classic rebound effect. The colleague's advice, applied without nuance, made things worse.",
+            xpDelta: 20,
+            healthDelta: -5,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Extreme frugality applied without a sustainable foundation creates pressure that releases in bursts. Consistent moderation always outperforms oscillating between strict and binge.",
+            realLifeTip: "If you catch yourself in a spending rebound, don't shame-spiral. Reset the budget, forgive the month, and start again. The habit is what matters — not perfection."
           }
         ]
       }
