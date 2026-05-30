@@ -251,25 +251,37 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
     const isAvalanche = debts.every((d, i) => i === 0 || debts[i - 1].rate >= d.rate);
     const isSnowball = debts.every((d, i) => i === 0 || debts[i - 1].balance <= d.balance);
     const method: 'AVALANCHE' | 'SNOWBALL' | 'NONE' = isAvalanche ? 'AVALANCHE' : isSnowball ? 'SNOWBALL' : 'NONE';
-    const topRate = Math.max(...debts.map(d => d.rate));
     const savedEst = method === 'AVALANCHE'
       ? `₹${Math.round(debts.reduce((a, d) => a + d.balance * (d.rate / 100), 0) * 0.15).toLocaleString('en-IN')} in interest`
       : method === 'SNOWBALL'
       ? `${debts.length - 1} debts cleared faster (momentum method)`
-      : '₹0 extra saved — try Avalanche for highest interest first';
+      : '₹0 extra saved — try Avalanche or Snowball order for real results';
     setDebtResult({ method, saved: savedEst });
-    await endGame();
+    // Only award bonus XP for a correct strategy — 'NONE' gets base end-game XP only
+    const bonusXp = method === 'AVALANCHE' ? 250 : method === 'SNOWBALL' ? 200 : 0;
+    await endGame(bonusXp);
   };
 
   const updateAllocation = (key: keyof Allocation, value: number) => {
     const others = (Object.keys(allocation) as (keyof Allocation)[]).filter(k => k !== key);
     const currentSumOfOthers = others.reduce((acc, k) => acc + allocation[k], 0);
-    const diff = 100 - (value + currentSumOfOthers);
+    const remaining = 100 - value;
     const newAllocation = { ...allocation, [key]: value };
-    others.forEach(k => {
-      newAllocation[k] = Math.max(0, Math.round(allocation[k] + diff * (allocation[k] / (currentSumOfOthers || 1))));
-    });
-    // Ensure total = 100
+
+    if (currentSumOfOthers === 0) {
+      // All other sliders are at 0 — distribute remaining evenly
+      const share = Math.floor(remaining / others.length);
+      others.forEach((k, i) => {
+        newAllocation[k] = i === others.length - 1 ? remaining - share * (others.length - 1) : share;
+      });
+    } else {
+      // Proportionally redistribute remaining across other sliders
+      others.forEach(k => {
+        newAllocation[k] = Math.max(0, Math.round((allocation[k] / currentSumOfOthers) * remaining));
+      });
+    }
+
+    // Clamp and ensure exact total = 100 (fix rounding drift on cash as anchor)
     const sum = Object.values(newAllocation).reduce((a, b) => a + b, 0);
     if (sum !== 100) newAllocation.cash = Math.max(0, newAllocation.cash + (100 - sum));
     setAllocation(newAllocation);
@@ -426,7 +438,16 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
                 </div>
               )}
               <div className="flex gap-4">
-                <Button variant="outline" onClick={() => { setSelectedMode(null); setRiskStep(null); setRiskAnswers([]); setRiskProfile(null); setPortfolioScore(null); startGame(); }} className="flex-1 h-14 font-bold">
+                <Button variant="outline" onClick={() => {
+                  setSelectedMode(null);
+                  setRiskStep(null);
+                  setRiskAnswers([]);
+                  setRiskProfile(null);
+                  setPortfolioScore(null);
+                  setPortfolioFeedback('');
+                  setDebtResult(null);  // clear stale debt result so it doesn't bleed into next session
+                  startGame();
+                }} className="flex-1 h-14 font-bold">
                   Try Another
                 </Button>
                 <Button onClick={onExit} className="flex-1 h-14 font-bold text-lg">Back to Hub</Button>

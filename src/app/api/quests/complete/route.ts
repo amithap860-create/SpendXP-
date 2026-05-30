@@ -104,13 +104,15 @@ export async function POST(request: NextRequest) {
       // ── Idempotency: quest already completed ──────────────────────────────
       if (questSnap.exists) {
         const existing = questSnap.data()!;
+        const questsToday: number = dailySnap.data()?.questsCompleted ?? 0;
         return {
           success: true,
           alreadyCompleted: true,
           xpAwarded: existing.xpEarned ?? 0,
           streak: statsData.currentStreak ?? 0,
-          questsToday: dailySnap.data()?.questsCompleted ?? 0,
-          dailyLimitReached: false,
+          questsToday,
+          // Correctly reflect limit state even on idempotency path
+          dailyLimitReached: !isPremium && questsToday >= FREE_DAILY_QUEST_LIMIT,
         };
       }
 
@@ -266,7 +268,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       questsToday,
       limit: FREE_DAILY_QUEST_LIMIT,
-      remaining: isPremium ? Infinity : Math.max(0, FREE_DAILY_QUEST_LIMIT - questsToday),
+      remaining: isPremium ? null : Math.max(0, FREE_DAILY_QUEST_LIMIT - questsToday),
       isPremium,
       dailyLimitReached: !isPremium && questsToday >= FREE_DAILY_QUEST_LIMIT,
     });

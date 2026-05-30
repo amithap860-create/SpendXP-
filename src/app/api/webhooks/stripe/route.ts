@@ -163,9 +163,13 @@ export async function POST(request: NextRequest) {
   try {
     switch (type) {
       // ── New subscription created ────────────────────────────────────────────
+      // IMPORTANT: Check status — a new subscription can be 'incomplete' or
+      // 'past_due' if the first payment fails. Only grant premium for active/trialing.
       case 'customer.subscription.created': {
         const uid = extractUid(obj);
-        if (uid) await setPremium(uid, true, adminDb);
+        const status: string = obj?.status || '';
+        const isActive = status === 'active' || status === 'trialing';
+        if (uid && isActive) await setPremium(uid, true, adminDb);
         break;
       }
 

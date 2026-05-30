@@ -27,14 +27,23 @@ import { getFirebaseAdmin } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 
+// Map currency codes to their Stripe Price ID env vars
+const CURRENCY_PRICE_ENV: Record<string, string> = {
+  INR: 'STRIPE_PRICE_ID_INR',
+  USD: 'STRIPE_PRICE_ID_USD',
+  GBP: 'STRIPE_PRICE_ID_GBP',
+  EUR: 'STRIPE_PRICE_ID_EUR',
+  AUD: 'STRIPE_PRICE_ID_AUD',
+  SGD: 'STRIPE_PRICE_ID_SGD',
+};
+
 export async function POST(request: NextRequest) {
   const stripeKey = process.env.STRIPE_SECRET_KEY;
-  const priceId = process.env.STRIPE_PRICE_ID;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://spendxp.vercel.app';
 
-  if (!stripeKey || !priceId) {
+  if (!stripeKey) {
     return NextResponse.json(
-      { error: 'Stripe is not configured. Add STRIPE_SECRET_KEY and STRIPE_PRICE_ID to Vercel env vars.' },
+      { error: 'Stripe is not configured. Add STRIPE_SECRET_KEY to Vercel env vars.' },
       { status: 503 }
     );
   }
@@ -63,16 +72,21 @@ export async function POST(request: NextRequest) {
   const userData = userSnap.data() || {};
   let customerId: string | undefined = userData.stripeCustomerId;
 
-  if (!customerId && userEmail) {
-    // Search for an existing customer by email first
+  if (!customerId) {
+    // Search by Firebase UID in metadata — safer than email (emails can be shared
+    // across re-created accounts). Email search is intentionally avoided here.
     const searchRes = await fetch(
-      `https://api.stripe.com/v1/customers/search?query=email%3A%22${encodeURIComponent(userEmail)}%22&limit=1`,
+      `https://api.stripe.com/v1/customers/search?query=metadata%5B%22firebaseUid%22%5D%3A%22${encodeURIComponent(uid)}%22&limit=1`,
       { headers: { Authorization: `Bearer ${stripeKey}` } }
     );
     if (searchRes.ok) {
       const searchData = await searchRes.json();
       if (searchData.data?.length > 0) {
         customerId = searchData.data[0].id;
+        // Persist to Firestore if missing
+        if (!userData.stripeCustomerId) {
+          await db.collection('users').doc(uid).update({ stripeCustomerId: customerId }).catch(() => {});
+        }
       }
     }
   }
@@ -102,6 +116,22 @@ export async function POST(request: NextRequest) {
   // Save customer ID to Firestore for future checkouts
   if (customerId && !userData.stripeCustomerId) {
     await db.collection('users').doc(uid).update({ stripeCustomerId: customerId }).catch(() => {});
+  }
+
+  // ── Resolve currency-specific price ID ───────────────────────────────────
+  // User's currency is stored in their Firestore profile (set during onboarding/profile)
+  const userCurrency: string = (userData.currencyCode || 'USD').toUpperCase();
+  const currencyEnvVar = CURRENCY_PRICE_ENV[userCurrency];
+  const priceId =
+    (currencyEnvVar ? process.env[currencyEnvVar] : null) ||
+    process.env.STRIPE_PRICE_ID || // fallback to default
+    null;
+
+  if (!priceId) {
+    return NextResponse.json(
+      { error: 'Stripe pricing is not configured yet. Check back soon!' },
+      { status: 503 }
+    );
   }
 
   // ── Build Checkout Session params ─────────────────────────────────────────

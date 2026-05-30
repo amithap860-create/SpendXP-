@@ -102,11 +102,33 @@ export const FREE_TIER: PremiumTier = {
   ],
 };
 
+/**
+ * Stripe Price IDs per market.
+ *
+ * HOW TO SET UP:
+ *  1. Go to stripe.com/dashboard → Products → + Add product
+ *     Name: "SpendXP Premium"
+ *  2. Add a price for each currency below:
+ *     INR ₹149/month, USD $2.99/month, GBP £1.99/month, EUR €1.99/month, AUD A$3.99/month
+ *  3. Copy each Price ID (price_xxx) and add them to Vercel env vars:
+ *     STRIPE_PRICE_ID_INR, STRIPE_PRICE_ID_USD, STRIPE_PRICE_ID_GBP,
+ *     STRIPE_PRICE_ID_EUR, STRIPE_PRICE_ID_AUD
+ *  4. Set STRIPE_PRICE_ID as the fallback (USD price).
+ */
+export const PRICING_BY_CURRENCY: Record<string, { symbol: string; monthly: string; quarterly: string; envVar: string }> = {
+  INR: { symbol: '₹', monthly: '149',  quarterly: '349',  envVar: 'STRIPE_PRICE_ID_INR' },
+  USD: { symbol: '$', monthly: '2.99', quarterly: '6.99', envVar: 'STRIPE_PRICE_ID_USD' },
+  GBP: { symbol: '£', monthly: '1.99', quarterly: '4.99', envVar: 'STRIPE_PRICE_ID_GBP' },
+  EUR: { symbol: '€', monthly: '1.99', quarterly: '4.99', envVar: 'STRIPE_PRICE_ID_EUR' },
+  AUD: { symbol: 'A$', monthly: '3.99', quarterly: '9.99', envVar: 'STRIPE_PRICE_ID_AUD' },
+  SGD: { symbol: 'S$', monthly: '2.99', quarterly: '6.99', envVar: 'STRIPE_PRICE_ID_SGD' },
+};
+
 export const PREMIUM_TIER: PremiumTier = {
   id: 'premium',
   name: 'Agent',
-  price: 'Coming Soon',
-  billingPeriod: 'TBD',
+  price: '₹149/mo',
+  billingPeriod: 'monthly',
   features: [
     'Everything in Explorer',
     'Unlimited quests',

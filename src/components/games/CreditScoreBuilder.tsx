@@ -39,9 +39,10 @@ export function CreditScoreBuilder({ onExit }: { onExit: () => void }) {
       setCurrentScore(calculateScore(INITIAL_FACTORS));
 
       const ageFiltered = creditChoices.filter(c => {
-        if (ageGroup === 'junior') return c.id.startsWith('j') || c.options.length === 2;
-        if (ageGroup === 'teen') return !c.id.startsWith('s');
-        return true;
+        // Use explicit age-group prefix tags instead of options.length (which is ambiguous)
+        if (ageGroup === 'junior') return c.id.startsWith('j');
+        if (ageGroup === 'teen') return c.id.startsWith('j') || c.id.startsWith('t');
+        return true; // senior sees all
       });
 
       // Shuffle the full pool.
@@ -97,13 +98,22 @@ export function CreditScoreBuilder({ onExit }: { onExit: () => void }) {
 
   if (gameState === 'RESULTS') {
     const band = ageGroup === 'junior' ? getJuniorBand(currentScore) : getScoreBand(currentScore);
-    const feedback = currentScore >= 750
-      ? 'Excellent! You\'re in the top tier. Lenders will offer you the best rates.'
+    // Use age-appropriate feedback thresholds
+    const feedback = ageGroup === 'junior'
+      ? currentScore >= 80
+        ? '⭐ Amazing! You made really smart money choices. You\'re a budgeting superstar!'
+        : currentScore >= 60
+        ? '👍 Good job! You made mostly smart choices. Try again to get an even higher score!'
+        : currentScore >= 40
+        ? '🤔 Not bad! Some of your choices had tricky consequences. See if you can improve next time!'
+        : '💪 Keep going! Money decisions can be tricky — try again and see what you learn!'
+      : currentScore >= 750
+      ? 'Excellent! You\'re in the top tier. Lenders will offer you the best rates and highest limits.'
       : currentScore >= 650
       ? 'Good score! A few more months of on-time payments will push you into the excellent range.'
       : currentScore >= 550
-      ? 'Fair — focus on paying on time and keeping utilisation below 30%.'
-      : 'Needs work. Prioritise clearing outstanding balances and never miss a payment.';
+      ? 'Fair — focus on paying on time and keeping credit utilisation below 30%.'
+      : 'Needs work. Prioritise clearing outstanding balances, avoid new credit, and never miss a payment.';
     return (
       <div className="grid lg:grid-cols-12 gap-8 max-w-6xl mx-auto">
         <div className="lg:col-span-7">

@@ -152,9 +152,21 @@ export default function UpgradePage() {
 
           {/* Price badge */}
           <div className="inline-flex flex-col items-center bg-white/5 border border-white/10 rounded-2xl px-8 py-5">
-            <div className="text-3xl font-black text-white mb-1">Pricing Coming Soon</div>
-            <div className="text-slate-400 text-sm font-bold uppercase tracking-widest">join the waitlist below</div>
-            <div className="mt-2 text-xs text-slate-500">Cancel anytime · No contracts</div>
+            <div className="flex items-baseline gap-2 mb-1">
+              <span className="text-4xl font-black text-white">₹149</span>
+              <span className="text-slate-400 text-base font-bold">/month</span>
+            </div>
+            <div className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-3">or ₹349 / 3 months · save 22%</div>
+            <div className="flex flex-wrap gap-2 justify-center text-xs text-slate-500 font-medium">
+              <span>🇺🇸 $2.99/mo</span>
+              <span>·</span>
+              <span>🇬🇧 £1.99/mo</span>
+              <span>·</span>
+              <span>🇪🇺 €1.99/mo</span>
+              <span>·</span>
+              <span>🇦🇺 A$3.99/mo</span>
+            </div>
+            <div className="mt-3 text-xs text-slate-600">Cancel anytime · No contracts · Priced locally</div>
           </div>
         </div>
       </div>
