@@ -83,8 +83,12 @@ const config: CapacitorConfig = {
     captureInput: true,
     webContentsDebuggingEnabled: false, // Set true for debug builds only
     initialFocus: true,
-    // Ensures bottom nav doesn't overlap system gesture bar
     appendUserAgent: 'SpendXP-Android',
+    // Enable edge-to-edge so env(safe-area-inset-bottom) correctly reflects
+    // the Android gesture navigation bar height in the WebView CSS environment.
+    // Without this, safe-area-inset-bottom returns 0 and the bottom nav overlaps
+    // the gesture strip on Android 10+ devices.
+    overrideUserAgent: undefined,
   },
 };
 

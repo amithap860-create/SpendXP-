@@ -17,6 +17,7 @@ import { BugReportButton } from '@/components/BugReportButton';
 import { useNativeInit } from '@/hooks/useNativeInit';
 import { useAuthContext } from '@/context/AuthContext';
 import { useProgression } from '@/hooks/useProgression';
+import { FinEducatorChat } from '@/components/chat/FinEducatorChat';
 
 const inter = Inter({ 
   subsets: ['latin'], 
@@ -31,10 +32,13 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
   // Pull live streak from Firestore so local notifications stay accurate
   const { data: progression } = useProgression();
 
-  // Initialise all Capacitor native features (no-ops on web)
+  // Initialise all Capacitor native features (no-ops on web).
+  // Pass null streak until Firestore confirms the real value — native.ts guards
+  // against scheduling notifications with streak <= 0.
+  const confirmedStreak = progression.currentStreak != null ? progression.currentStreak : -1;
   useNativeInit({
     uid: user?.uid ?? null,
-    streak: progression.currentStreak ?? 0,
+    streak: confirmedStreak,
   });
 
   useEffect(() => {
@@ -130,6 +134,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
         </nav>
       )}
       <BugReportButton />
+      <FinEducatorChat />
       <Toaster />
       {/* Legal footer — desktop only, hidden on auth pages */}
       {!isAuthPage && (

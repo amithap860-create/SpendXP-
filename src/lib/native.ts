@@ -15,12 +15,20 @@
 
 let _isNative: boolean | null = null;
 
-/** True when running inside a Capacitor native shell (iOS or Android). */
+/**
+ * True when running inside a Capacitor native shell (iOS or Android).
+ *
+ * IMPORTANT: Do NOT cache on web until Capacitor bridge has fully initialised.
+ * window.Capacitor may not be set during the first React render, so we only
+ * cache a `true` result — a `false` result is re-evaluated on every call until
+ * Capacitor confirms native context or SSR rules it out permanently.
+ */
 export function isNative(): boolean {
-  if (_isNative !== null) return _isNative;
-  if (typeof window === 'undefined') return (_isNative = false);
-  _isNative = !!(window as any).Capacitor?.isNativePlatform?.();
-  return _isNative;
+  if (_isNative === true) return true; // once native, always native — safe to cache
+  if (typeof window === 'undefined') return false; // SSR: never native, don't cache
+  const native = !!(window as any).Capacitor?.isNativePlatform?.();
+  if (native) _isNative = true; // only cache the affirmative
+  return native;
 }
 
 export function getPlatform(): 'ios' | 'android' | 'web' {
@@ -267,7 +275,7 @@ export async function scheduleStreakReminder(streak: number): Promise<void> {
     // Always cancel the existing schedule first to avoid duplicates
     await LocalNotifications.cancel({ notifications: [{ id: STREAK_NOTIF_ID }] });
 
-    if (streak < 0) return; // Caller explicitly opted out
+    if (streak <= 0) return; // No active streak or not yet loaded — don't schedule
 
     // Request permission if not already granted
     const { display } = await LocalNotifications.checkPermissions();

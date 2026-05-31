@@ -30,9 +30,9 @@ const withPWA = withPWAInit({
           expiration: { maxEntries: 32, maxAgeSeconds: 24 * 60 * 60 },
         },
       },
-      // App pages — NetworkFirst with offline fallback
+      // App pages — NetworkFirst with offline fallback (domain-agnostic)
       {
-        urlPattern: /^https:\/\/spendxp\.vercel\.app\/(?!api\/).*/i,
+        urlPattern: ({ url }: { url: URL }) => url.pathname.startsWith('/') && !url.pathname.startsWith('/api/'),
         handler: 'NetworkFirst',
         options: {
           cacheName: 'pages',

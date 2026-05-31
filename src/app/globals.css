@@ -185,6 +185,18 @@
   .min-h-screen-safe {
     min-height: calc(100vh - env(safe-area-inset-bottom, 0px));
   }
+
+  /* Android Capacitor: force WebView to honour safe area env vars.
+     Without this, env(safe-area-inset-bottom) returns 0 on Android
+     even when gesture navigation is active. */
+  @supports (padding: max(0px)) {
+    .pb-safe {
+      padding-bottom: max(env(safe-area-inset-bottom, 0px), 0px);
+    }
+    .pb-safe-nav {
+      padding-bottom: max(calc(env(safe-area-inset-bottom, 0px) + 4rem), 4rem);
+    }
+  }
 }
 
 @keyframes page-enter {
