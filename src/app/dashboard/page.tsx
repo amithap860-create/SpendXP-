@@ -326,7 +326,11 @@ export default function DashboardPage() {
             </div>
             <div className="flex justify-center md:justify-start gap-2">
               <span className="px-3 py-1 bg-primary text-white rounded-full text-[10px] font-black uppercase tracking-widest">
-                {progression?.level === 1 ? 'Starter' : progression?.level === 2 ? 'Saver' : 'Investor'}
+                {progression?.level === 1 ? 'Starter' :
+               progression?.level === 2 ? 'Saver' :
+               progression?.level === 3 ? 'Investor' :
+               progression?.level === 4 ? 'Builder' :
+               progression?.level === 5 ? 'Strategist' : 'Master'}
               </span>
               <span className="px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-[10px] font-black uppercase tracking-widest">
                 {profile?.ageGroup ?? 'Student'} • {profile?.birthYear != null ? (new Date().getFullYear() - profile.birthYear) : '8-20'}

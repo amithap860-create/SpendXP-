@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { PREMIUM_FEATURES } from '@/config/premium';
 import { useAuthContext } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const FEATURE_ROWS: Array<{
   label: string;
@@ -83,14 +85,23 @@ export default function UpgradePage() {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   // ── Waitlist (pre-Stripe) ────────────────────────────────────────────────────
-  function handleJoinWaitlist(e: React.FormEvent) {
+  async function handleJoinWaitlist(e: React.FormEvent) {
     e.preventDefault();
     if (!email.trim()) return;
     setSubmitting(true);
-    setTimeout(() => {
+    try {
+      await addDoc(collection(db, 'waitlist'), {
+        email: email.trim().toLowerCase(),
+        uid: user?.uid ?? null,
+        createdAt: serverTimestamp(),
+      });
+    } catch (err) {
+      console.warn('[Waitlist] Firestore write failed:', err);
+      // Still show success — don't block user on a network hiccup
+    } finally {
       setSubmitting(false);
       setEmailSent(true);
-    }, 800);
+    }
   }
 
   // ── Stripe Checkout (activate this when Stripe is wired up) ─────────────────
@@ -126,15 +137,15 @@ export default function UpgradePage() {
       <div className="bg-[#1A1F2E] text-white">
         <div className="max-w-2xl mx-auto px-4 pt-14 pb-12 text-center">
           {/* Back link */}
-          <Link
-            href="/games"
+          <button
+            onClick={() => router.back()}
             className="inline-flex items-center gap-1.5 text-slate-400 hover:text-slate-200 text-xs font-black uppercase tracking-widest mb-8 transition-colors"
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            Back to Games
-          </Link>
+            Go Back
+          </button>
 
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-500/30 rounded-full px-4 py-1.5 mb-6">

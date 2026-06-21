@@ -38,8 +38,10 @@ export default function LearnHub() {
   const overallProgress = (completedCount / lessons.length) * 100;
 
   const handleLessonFinish = async (lessonId: string) => {
+    const wasAlreadyComplete = !!tasks.find(t => t.id === `lesson-${lessonId}`)?.completed;
     setActiveLesson(null);
-    if (user && completedCount + 1 === lessons.length) {
+    // Only award Scholar when this was the final *new* lesson completed
+    if (user && !wasAlreadyComplete && completedCount + 1 === lessons.length) {
       await awardBadge(user.uid, 'scholar');
     }
   };

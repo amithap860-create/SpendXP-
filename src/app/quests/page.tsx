@@ -32,20 +32,14 @@ const QuestViewer = dynamic(() => import('@/components/quests/QuestViewer'), {
 });
 
 // ── Case File dossier intro ───────────────────────────────────────────────────
-function CaseFileBriefing({ quest, index, onAccept, onDecline }: {
+function CaseFileBriefing({ quest, index, fogEnemy, onAccept, onDecline }: {
   quest: Quest;
   index: number;
+  fogEnemy: ReturnType<typeof getFogEnemy>;
   onAccept: () => void;
   onDecline: () => void;
 }) {
   const caseId = getCaseFileId(index);
-  const fogEnemy = getFogEnemy(
-    quest.category === 'lifestyle' ? 'impulse_storm' :
-    quest.category === 'debt' ? 'debt_web' :
-    quest.category === 'investing' ? 'market_madness' :
-    quest.category === 'income' ? 'the_procrastinator' :
-    quest.category === 'emergency' ? 'inflation_spiral' : 'the_scammer'
-  );
 
   return (
     <div className="fixed inset-0 z-[9999] bg-slate-50 flex flex-col overflow-y-auto">
@@ -222,6 +216,7 @@ export default function QuestsHub() {
       <CaseFileBriefing
         quest={briefingQuest.quest}
         index={briefingQuest.index}
+        fogEnemy={fogEnemy}
         onAccept={() => {
           trackQuestStarted({
             questId: briefingQuest.quest.id,
@@ -362,9 +357,7 @@ export default function QuestsHub() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {quests.map((quest, i) => {
               const isCompleted = completedQuestIds.includes(quest.id);
-              // All quests are accessible to all users — age groups are for
-              // narrative adaptation, not access control.
-              const isAvailableForAge = true;
+              // All quests are accessible to all ages — age groups adapt narrative only
               const isLocked = quest.unlockRequirement?.completedQuestId &&
                 !completedQuestIds.includes(quest.unlockRequirement.completedQuestId);
               const caseId = getCaseFileId(i);
@@ -375,7 +368,7 @@ export default function QuestsHub() {
                   className={cn(
                     "group transition-all duration-300 border border-slate-200 bg-white shadow-sm hover:shadow-xl overflow-hidden flex flex-col",
                     isCompleted && "border-[#A8D5BC] bg-[#E8F5EE]/30",
-                    (isLocked || !isAvailableForAge) && "opacity-60"
+                    isLocked && "opacity-60"
                   )}
                 >
                   {/* Top accent bar */}
