@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { XCircle, ArrowLeft, Star } from 'lucide-react';
 
 export default function UpgradeCancelPage() {
+  const router = useRouter();
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full text-center space-y-8">
@@ -52,12 +54,10 @@ export default function UpgradeCancelPage() {
               View Premium Plans
             </Button>
           </Link>
-          <Link href="/games">
-            <Button variant="outline" className="w-full h-12 font-bold gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Games
-            </Button>
-          </Link>
+          <Button variant="outline" className="w-full h-12 font-bold gap-2" onClick={() => router.back()}>
+            <ArrowLeft className="h-4 w-4" />
+            Go Back
+          </Button>
         </div>
       </div>
     </div>

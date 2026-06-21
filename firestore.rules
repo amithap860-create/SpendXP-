@@ -157,5 +157,11 @@ service cloud.firestore {
       allow create: if request.auth != null || isStudioPreview();
       allow read, update: if isAdmin() || isStudioPreview();
     }
+
+    // Waitlist — any signed-in user can add their own entry; only admins can read
+    match /waitlist/{id} {
+      allow create: if request.auth != null || isStudioPreview();
+      allow read, update, delete: if isAdmin() || isStudioPreview();
+    }
   }
 }

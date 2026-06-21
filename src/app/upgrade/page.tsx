@@ -8,6 +8,7 @@ import { useAuthContext } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
 
 const FEATURE_ROWS: Array<{
   label: string;
@@ -79,6 +80,7 @@ function FeatureCell({ value }: { value: string | boolean }) {
 export default function UpgradePage() {
   const { user } = useAuthContext();
   const router = useRouter();
+  const { toast } = useToast();
   const [emailSent, setEmailSent] = useState(false);
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -122,7 +124,7 @@ export default function UpgradePage() {
       if (url) window.location.href = url;
     } catch (err) {
       console.error('[Upgrade] Stripe checkout error:', err);
-      alert('Could not start checkout. Please try again.');
+      toast({ title: 'Checkout failed', description: 'Could not start payment. Please try again.', variant: 'destructive' });
     } finally {
       setCheckoutLoading(false);
     }

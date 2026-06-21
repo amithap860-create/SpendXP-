@@ -60,7 +60,14 @@ export default function MarketSimulation() {
       });
       updateStocks?.(updatedStocks);
     } catch (error) {
-      console.error(error);
+      console.error('[Market] News generation error:', error);
+      // Fallback static headline so the page isn't broken
+      setNews({
+        headline: 'Markets mixed as investors weigh global growth concerns.',
+        explanation: 'When market news is unavailable, remember: long-term index investing consistently outperforms trying to time individual news events.',
+        impactedCompany: null,
+        impactDirection: 'neutral',
+      });
     } finally {
       setIsLoadingNews(false);
     }

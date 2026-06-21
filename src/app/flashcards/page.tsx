@@ -22,7 +22,15 @@ export default function Flashcards() {
       setCurrentIndex(0);
       setIsFlipped(false);
     } catch (error) {
-      console.error(error);
+      console.error('[Flashcards] Generation error:', error);
+      // Fallback static cards so the page isn't blank
+      setFlashcards([
+        { term: 'Compound Interest', definition: 'Earning interest on your interest — money that grows on top of itself over time.' },
+        { term: 'Emergency Fund', definition: 'Savings set aside only for unexpected expenses. Aim for 3–6 months of living costs.' },
+        { term: 'Budget', definition: 'A plan for how you will spend your money each month, before you spend it.' },
+        { term: 'Inflation', definition: 'When prices rise over time, making money worth less than it was before.' },
+        { term: 'Net Worth', definition: 'What you own (assets) minus what you owe (debts). A snapshot of your financial health.' },
+      ]);
     } finally {
       setIsLoading(false);
     }
