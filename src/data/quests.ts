@@ -52,7 +52,7 @@ export const quests: Quest[] = [
   {
     id: 'birthday-loot',
     title: 'The Birthday Loot',
-    description: "You just got ₹500 as a birthday gift! Friends want ice cream and a toy shop is calling your name. What do you do?",
+    description: "You got ₹500 as a birthday gift! Treating friends to ice cream is totally expected on your birthday — AND you've been eyeing a ₹300 toy. The maths works if you plan. Can you be generous AND smart?",
     category: 'lifestyle',
     difficulty: 'beginner',
     ageGroups: ['junior'],
@@ -62,109 +62,129 @@ export const quests: Quest[] = [
     steps: [
       {
         id: 'bl-1',
-        title: 'Ice Cream Time!',
-        narrative: "Your 4 friends shout: 'Birthday treat! Buy us ice cream!' That will cost ₹160 total. You have ₹500 and really want a ₹350 toy.",
+        title: 'Plan Your Birthday Money',
+        narrative: "You have ₹500. Your 4 friends are expecting a birthday treat — that's just what birthdays are! Ice cream for all 5 of you costs ₹150 (₹30 per cup). The toy you want is ₹300. Add it up: ₹150 + ₹300 = ₹450. You have ₹500. You CAN do both — but only if you plan first. What do you do?",
         ageGroups: ['junior'],
         choices: [
           {
             id: 'bl-c1',
-            text: 'Buy ice cream for everyone (₹160)',
-            consequence: "Everyone's happy! You have ₹340 left. The toy costs ₹350. You're ₹10 short!",
-            xpDelta: 25,
-            healthDelta: 5,
-            walletDelta: -160,
-            nextStepId: 'bl-2a',
-            isOptimal: false,
-            explanation: "Treating friends is kind, but spending before checking if you can still reach your goal can leave you short.",
-            realLifeTip: "Before spending, always ask: 'Will I still have enough for what I really want?'"
+            text: 'Quick check first: ice cream ₹150 + toy ₹300 = ₹450. I have ₹500. Let\'s go!',
+            consequence: "Smart! You know the maths works. You treat your friends to ice cream — they love it! Now you head to the toy shop with ₹350 left. Time to pick your toy.",
+            xpDelta: 80,
+            healthDelta: 15,
+            walletDelta: -150,
+            nextStepId: 'bl-2-deluxe',
+            isOptimal: true,
+            explanation: "Planning for 30 seconds before spending means you can say YES to everything you want — treating friends AND buying your toy. When you know the numbers work, you can be generous AND smart at the same time.",
+            realLifeTip: "Before spending, do a quick mental maths check: 'Can I do everything I want today?' If yes — enjoy fully! That's exactly what money is for."
           },
           {
             id: 'bl-c2',
-            text: 'Buy only your own ice cream (₹40)',
-            consequence: "You enjoy your treat! You have ₹460 left — more than enough for the toy.",
-            xpDelta: 40,
-            healthDelta: 8,
-            walletDelta: -40,
-            nextStepId: 'bl-2b',
-            isOptimal: true,
-            explanation: "It's okay to enjoy something for yourself. You can be kind and still reach your goals.",
-            realLifeTip: "You don't have to pay for everyone every time. Real friends understand."
+            text: 'Treat friends first (₹150), then figure out the toy',
+            consequence: "Friends are happy and treated! You have ₹350 left. Now to the toy shop — you got lucky that it works out, but you didn't check first.",
+            xpDelta: 50,
+            healthDelta: 10,
+            walletDelta: -150,
+            nextStepId: 'bl-2-toy',
+            isOptimal: false,
+            explanation: "It worked out this time! But spending without a quick check first can sometimes leave you short of something you really wanted. A 30-second maths check saves stress and regret.",
+            realLifeTip: "Treating friends on your birthday is absolutely the right thing to do. Just do a quick check first: 'Do I have enough for everything?' If yes — treat freely!"
           },
           {
             id: 'bl-c3',
-            text: 'Buy your ice cream, put the rest away',
-            consequence: "You enjoy a ₹40 treat, save ₹460, and can easily buy the ₹350 toy AND still have ₹110 left. Best of all three options!",
+            text: 'Buy the toy first (₹300), then check if I can treat friends',
+            consequence: "Toy secured! You have ₹200 left. Ice cream for 5 at ₹30 = ₹150 — you can still treat everyone AND have ₹50 left. You did it! Just in a different order.",
             xpDelta: 55,
-            healthDelta: 12,
-            walletDelta: -40,
-            nextStepId: 'bl-2b',
-            isOptimal: true,
-            explanation: "Balance means enjoying the moment AND being smart with the rest. You don't have to choose between fun and good decisions — you can have both when you plan.",
-            realLifeTip: "The goal isn't to save every single rupee — it's to enjoy life while keeping your future self happy. A small treat today doesn't hurt. A big, unplanned splurge does."
+            healthDelta: 10,
+            walletDelta: -300,
+            nextStepId: 'bl-2-icecream',
+            isOptimal: false,
+            explanation: "Securing your goal first and then being generous also works. But planning everything upfront gives you confidence and no stress — you know it works before you even start spending.",
+            realLifeTip: "The order you spend in matters less than knowing the total adds up first. Check the full picture before you start."
           }
         ]
       },
       {
-        id: 'bl-2a',
-        title: 'So Close!',
-        narrative: "You have ₹340 and the toy is ₹350. You are ₹10 short. Your little sibling offers to lend you ₹10.",
+        id: 'bl-2-deluxe',
+        title: 'Toy Shop Surprise!',
+        narrative: "You're at the toy shop with ₹350 left (₹500 - ₹150 ice cream). The toy is ₹300 — you can afford it easily. But you notice a ₹500 deluxe version right next to it. The shopkeeper says it goes on sale next month for ₹350. What do you do?",
         ageGroups: ['junior'],
         choices: [
           {
             id: 'bl-c4',
-            text: 'Borrow ₹10 and buy the toy',
-            consequence: "You got the toy! But now you owe your sibling ₹10. Remember to pay it back.",
-            xpDelta: 20,
-            healthDelta: 3,
-            walletDelta: -350,
+            text: 'Buy the ₹300 toy now — I planned for this',
+            consequence: "You buy it and have ₹50 left. You ended the day having treated your friends, bought your toy, and still have money. That's a perfect birthday!",
+            xpDelta: 50,
+            healthDelta: 10,
+            walletDelta: -300,
             nextStepId: 'end',
-            isOptimal: false,
-            explanation: "Borrowing is okay for small amounts, but always remember to pay it back. Your reputation matters.",
-            realLifeTip: "If you borrow, pay back as soon as you can. It builds trust."
+            isOptimal: true,
+            explanation: "Sticking to your plan when you've already thought it through is smart. You already decided this toy was worth it — no need to second-guess yourself.",
+            realLifeTip: "A good plan gives you the confidence to enjoy spending without guilt. You planned it, so enjoy it fully!"
           },
           {
             id: 'bl-c5',
-            text: 'Wait and save ₹10 more from next pocket money',
-            consequence: "You wait one week. Next pocket money arrives and you buy the toy with your own money — no debt!",
-            xpDelta: 55,
+            text: 'Wait one month for the deluxe version (₹500 → ₹350 on sale)',
+            consequence: "A month later: you get the ₹500 deluxe toy for ₹350! Same price, way better toy. Patience + information = getting more for your money.",
+            xpDelta: 70,
             healthDelta: 12,
             walletDelta: -350,
             nextStepId: 'end',
             isOptimal: true,
-            explanation: "Waiting a little is much better than owing someone money.",
-            realLifeTip: "Patience is a superpower with money."
+            explanation: "If you already know a sale is coming soon, waiting a few weeks gets you something much better for the same price. That's not missing out — that's smart timing.",
+            realLifeTip: "Sales are real and predictable. Knowing when to wait vs. when to buy is a real skill that saves you thousands over your lifetime."
           }
         ]
       },
       {
-        id: 'bl-2b',
-        title: 'Toy Shop Decision',
-        narrative: "You have enough for the ₹350 toy! But you also notice a ₹500 deluxe version. The shop says it goes on sale next month for ₹350.",
+        id: 'bl-2-toy',
+        title: 'At the Toy Shop!',
+        narrative: "You're at the toy shop with ₹350 left. The toy is ₹300. But there's also a ₹500 deluxe version going on sale next month for ₹350. What do you do?",
         ageGroups: ['junior'],
         choices: [
           {
             id: 'bl-c6',
-            text: 'Buy the ₹350 toy now',
-            consequence: "You got the toy and still have money left. Happy days!",
-            xpDelta: 40,
+            text: 'Buy the ₹300 toy — this is what I wanted',
+            consequence: "You get the toy and still have ₹50 left. Full birthday achieved: friends treated, toy bought, money to spare!",
+            xpDelta: 45,
             healthDelta: 8,
-            walletDelta: -350,
+            walletDelta: -300,
             nextStepId: 'end',
             isOptimal: true,
-            explanation: "Getting what you planned for and staying within budget is a win.",
-            realLifeTip: "Stick to your plan — impulse upgrades are sneaky!"
+            explanation: "You achieved everything you wanted on your birthday. That's a win! Next time, do the check first to avoid any stress.",
+            realLifeTip: "Sometimes the simplest choice — getting exactly what you planned for — is the best one."
           },
           {
             id: 'bl-c7',
-            text: 'Wait for the deluxe version to go on sale',
-            consequence: "Wow — you wait one month and get the ₹500 toy for ₹350! Patience = better stuff for same price.",
+            text: 'Wait a month for the ₹500 deluxe version on sale at ₹350',
+            consequence: "Next month you get the better toy for the same price you would have paid! Patience paid off.",
             xpDelta: 65,
             healthDelta: 12,
             walletDelta: -350,
             nextStepId: 'end',
             isOptimal: true,
-            explanation: "Patience + timing = more value for your money. Brilliant!",
-            realLifeTip: "Sales are real. Waiting for the right moment can get you more."
+            explanation: "Using information about upcoming sales to time your purchase is excellent financial thinking.",
+            realLifeTip: "If you know something is going on sale soon, waiting a few weeks can get you something much better for the same money."
+          }
+        ]
+      },
+      {
+        id: 'bl-2-icecream',
+        title: 'Ice Cream Time!',
+        narrative: "Toy is safe! You head to the ice cream shop with ₹200 left. Your 4 friends are waiting. Ice cream for all 5 (₹30 each = ₹150 total). You have more than enough.",
+        ageGroups: ['junior'],
+        choices: [
+          {
+            id: 'bl-c8',
+            text: 'Treat everyone — ₹150 for 5 cups of ice cream',
+            consequence: "Friends are thrilled, the toy is safe at home, and you still have ₹50 left. Best. Birthday. Ever. 🎂",
+            xpDelta: 60,
+            healthDelta: 12,
+            walletDelta: -150,
+            nextStepId: 'end',
+            isOptimal: true,
+            explanation: "You secured your goal AND still had room to be generous. When you plan ahead, you never have to choose between what you want and being kind to the people around you.",
+            realLifeTip: "When you plan ahead, you can enjoy spending on people you care about with zero guilt. Generosity and smart money habits go together perfectly."
           }
         ]
       }
@@ -429,7 +449,7 @@ export const quests: Quest[] = [
   {
     id: 'group-chat-dilemma',
     title: 'The Group Chat Pressure',
-    description: "The squad wants to order pizza — ₹450 each. Your monthly allowance is ₹1,500 and you have already spent ₹800 this month. What do you do?",
+    description: "The squad wants pizza at a new place — ₹450 each. You have ₹700 left this month and your best friend's birthday is coming up. Social life AND smart spending? Let's figure it out.",
     category: 'lifestyle',
     difficulty: 'beginner',
     ageGroups: ['teen'],
@@ -440,120 +460,120 @@ export const quests: Quest[] = [
       {
         id: 'gcd-1',
         title: 'Friday Night Pizza',
-        narrative: "Group chat explodes: 'Pizza Friday! ₹450 each at that new place.' You have ₹700 left this month. Your friend's birthday is next week and you need ₹300 for a gift.",
+        narrative: "Group chat explodes: 'Pizza Friday at Smoky's! ₹450 each.' You check your wallet — ₹700 left this month. Your best friend Meera's birthday is next Friday and you've been planning to get her that ₹300 book she keeps talking about. The pizza sounds genuinely fun. What do you do?",
         ageGroups: ['teen'],
         choices: [
           {
             id: 'gcd-c1',
-            text: 'Join in for the full pizza (₹450)',
-            consequence: "Fun night! But you have only ₹250 left — not enough for the birthday gift.",
-            xpDelta: 15,
-            healthDelta: -8,
+            text: 'Go for the full pizza (₹450) — it\'s Friday, we deserve it',
+            consequence: "Great night out! You eat well, have a solid time with the group. You get home and check your wallet: ₹250 left. The book for Meera costs ₹300. You're ₹50 short with no income until next month.",
+            xpDelta: 20,
+            healthDelta: -5,
             walletDelta: -450,
             nextStepId: 'gcd-2a',
             isOptimal: false,
-            explanation: "Peer pressure spending often leads to regret when you miss the things that actually matter.",
-            realLifeTip: "Before any social spend, ask: 'What am I giving up to do this?'"
+            explanation: "The pizza was real and the evening was worth it — that's the honest truth. But you didn't check if it left room for a commitment you'd already made. The issue isn't that you went out; it's that you didn't run the numbers first.",
+            realLifeTip: "Before any social spend, do a 10-second check: 'Do I have anything important coming up this month that needs this money?' If yes, you can still join — just at a different price point."
           },
           {
             id: 'gcd-c2',
-            text: "Suggest a cheaper place — ₹200 each",
-            consequence: "Two friends agree! You eat well, spend ₹200, and still have ₹500 for the gift and some left over.",
-            xpDelta: 65,
-            healthDelta: 10,
-            walletDelta: -200,
+            text: "Suggest a cheaper spot — 'Guys, what about Amigo's? Way better value'",
+            consequence: "Priya and Rohan agree immediately. Two others shrug and say 'sure.' You end up at a perfectly good place for ₹180 each. Solid food, same crew, same energy. You spend ₹180 and still have ₹520 left — plenty for Meera's gift and some to spare.",
+            xpDelta: 70,
+            healthDelta: 12,
+            walletDelta: -180,
             nextStepId: 'gcd-2b',
             isOptimal: true,
-            explanation: "Suggesting alternatives shows leadership and keeps your budget healthy.",
-            realLifeTip: "You don't have to say no — just offer a smarter option."
+            explanation: "This is the actually underrated move — you're not saying no, you're redirecting. Most groups genuinely don't mind where they eat; they care about being together. Proposing an alternative is social confidence, not cheapness.",
+            realLifeTip: "When you suggest an alternative rather than just declining, you stay in the plan, you set the terms, and you usually find most people are flexible. This skill scales well — it works in your 20s at restaurants, and in your 30s negotiating vendors."
           },
           {
             id: 'gcd-c3',
-            text: 'Skip the pizza, eat at home',
-            consequence: "You save ₹450. You have ₹700 for the gift and some extra. Your real friends understand.",
-            xpDelta: 50,
-            healthDelta: 8,
+            text: "Skip this one — 'Can't make it tonight, saving for something'",
+            consequence: "You sit this one out. It's a bit quiet at home while the chat fills with photos. You feel the pull, but you also wake up Saturday with your full ₹700 still intact — Meera's gift covered with room to spare. Most good friends genuinely get it when you're upfront about it.",
+            xpDelta: 45,
+            healthDelta: 5,
             walletDelta: 0,
             nextStepId: 'gcd-2b',
-            isOptimal: true,
-            explanation: "Skipping once to protect a priority is a mature financial decision.",
-            realLifeTip: "FOMO (Fear Of Missing Out) is the most expensive feeling a teenager can have."
+            isOptimal: false,
+            explanation: "Skipping is a valid call and sometimes it's the right one. But it does have a mild social cost — especially if it becomes a habit. Done occasionally with a clear reason given, it's totally fine. Done every time, people stop inviting. The best long-term habit is building a social budget so you can say yes most of the time.",
+            realLifeTip: "If you find yourself always skipping social plans for money reasons, the fix isn't to always say no — it's to build a monthly 'social fund' (even ₹200–300) that you can spend without guilt. Say yes to things within that budget; save the bigger splurges for special occasions."
           }
         ]
       },
       {
         id: 'gcd-2a',
-        title: 'Birthday Gift Crisis',
-        narrative: "You have ₹250. The gift you planned costs ₹300. You are ₹50 short. Your options are limited.",
+        title: 'Meera\'s Birthday Problem',
+        narrative: "You have ₹250 left. Meera's birthday is in 3 days. The book she's been wanting is ₹300. You're ₹50 short. You have a few options — some more creative than others.",
         ageGroups: ['teen'],
         choices: [
           {
             id: 'gcd-c4',
-            text: 'Give a heartfelt homemade gift instead',
-            consequence: "Your friend loved the personal gift more than anything from a shop. Zero spent, maximum love.",
-            xpDelta: 70,
+            text: 'Make her something personal — a playlist, a card with your actual memories together, something only you could give',
+            consequence: "You spend an hour putting together something genuinely thoughtful — her favourite songs annotated with your shared memories, a handwritten note that actually says something. She tears up a little. 'This is better than any gift,' she says. Zero spent. Hard to replicate.",
+            xpDelta: 65,
             healthDelta: 12,
             walletDelta: 0,
             nextStepId: 'end',
             isOptimal: true,
-            explanation: "Creativity solves money problems — and often creates better outcomes.",
-            realLifeTip: "The most memorable gifts are personal, not expensive."
+            explanation: "A personal gift can land harder than any purchase — but only when it's genuinely thoughtful, not just cheap. The difference is effort and specificity. A vague card is awkward. A detailed, personal one is memorable. You knew Meera well enough to pull this off.",
+            realLifeTip: "The best gifts are the ones that show you paid attention — not the ones that cost the most. If you know someone well, a personal, crafted gift often means more than something bought last-minute. But if you don't know them that well, a thoughtful small purchase is usually safer."
           },
           {
             id: 'gcd-c5',
-            text: 'Buy a ₹200 gift instead',
-            consequence: "You find something nice for ₹200. Your friend is happy. You have ₹50 left as a tiny buffer.",
-            xpDelta: 40,
-            healthDelta: 5,
+            text: 'Get a ₹200 thing she\'d genuinely like — adjust the plan',
+            consequence: "You find a small thing she actually likes for ₹200. It's not the book you planned, but it's something you know she'd enjoy. She's happy. You have ₹50 left as a micro-buffer.",
+            xpDelta: 45,
+            healthDelta: 6,
             walletDelta: -200,
             nextStepId: 'end',
             isOptimal: false,
-            explanation: "Adjusting your plan based on reality is a good skill to have.",
-            realLifeTip: "A budget isn't a failure — it's a decision tool."
+            explanation: "Adapting your plan based on what you actually have is a genuine life skill. A well-chosen ₹200 gift that fits someone is better than a ₹300 gift chosen because of a number. The thought put into it matters more than the amount.",
+            realLifeTip: "If your budget changes, don't just buy a random cheaper thing — take 10 minutes to think about what your actual budget CAN get them that they'd appreciate. The consideration is the gift."
           },
           {
             id: 'gcd-c6',
-            text: 'Borrow ₹50 from a family member',
-            consequence: "Gift given! But you owe ₹50. Make sure you pay it back first thing next month.",
-            xpDelta: 20,
-            healthDelta: -2,
+            text: 'Borrow ₹50 from home and get the original book',
+            consequence: "Gift sorted! Meera gets the book. You owe ₹50 at home — remember to pay it back first thing next month before you spend anything else.",
+            xpDelta: 25,
+            healthDelta: 0,
             walletDelta: 50,
             nextStepId: 'end',
             isOptimal: false,
-            explanation: "Small loans from family are fine in emergencies — but always pay back.",
-            realLifeTip: "Owing money, even to family, creates stress. Avoid it whenever you can."
+            explanation: "Small family loans in a pinch are fine — but they should be the last resort, not the first. And always pay back before your next social spend. The habit of borrowing casually and paying back slowly is how small debts become annoying ones.",
+            realLifeTip: "If you do borrow ₹50, set a reminder right now to pay it back. The 'I'll remember to do it' approach usually turns ₹50 into a months-long awkward thing."
           }
         ]
       },
       {
         id: 'gcd-2b',
-        title: 'Money Left Over',
-        narrative: "You handled the pizza situation smartly and still have ₹300–₹500 left this month. What do you do with the extra?",
+        title: 'The Gift Is Sorted — What Now?',
+        narrative: "You navigated the pizza situation well. Meera's gift is covered and you have ₹300–₹500 left this month. A few days left to go. What do you do with what's remaining?",
         ageGroups: ['teen'],
         choices: [
           {
             id: 'gcd-c7',
-            text: 'Save it for next month',
-            consequence: "Next month starts with a buffer! That means no stress from the first day. This is how adults build stability.",
+            text: 'Roll it forward — start next month with a head start',
+            consequence: "Next month opens with ₹300–₹500 already saved. Suddenly you're not starting from zero. When the next pizza Friday or birthday gift situation comes up, you already have room. This is how a buffer is built.",
             xpDelta: 70,
             healthDelta: 12,
             walletDelta: 0,
             nextStepId: 'end',
             isOptimal: true,
-            explanation: "Rolling savings forward creates a growing cushion. This is how wealth starts.",
-            realLifeTip: "Start next month ahead, not at zero."
+            explanation: "Starting each month from zero is stressful. Starting each month with a cushion means social plans, unexpected costs, and gifts don't become emergencies. Rolling forward even ₹200 consistently creates real financial stability over time.",
+            realLifeTip: "The best version of this habit: once you start earning, set up an auto-transfer on payday that moves a fixed amount out before you can see it. You spend what's left, and the savings grow without you thinking about it."
           },
           {
             id: 'gcd-c8',
-            text: 'Spend it on something fun',
-            consequence: "Great fun! And that is okay — you earned it by making smart choices earlier. Balance is real.",
-            xpDelta: 40,
-            healthDelta: 6,
+            text: 'Use it for something you\'ve been wanting — you made smart calls this month',
+            consequence: "You spend it on something you've actually been wanting. Zero guilt, because you planned well, covered your commitment, and the rest was genuinely yours to use. That's what a working budget feels like.",
+            xpDelta: 45,
+            healthDelta: 8,
             walletDelta: -300,
             nextStepId: 'end',
             isOptimal: false,
-            explanation: "Reward yourself sometimes — but only after you have covered your priorities.",
-            realLifeTip: "Saving first, spending the remainder is the golden formula."
+            explanation: "Spending what's left after your priorities are covered is not a mistake — it's the reward for having priorities at all. The goal isn't maximum saving; it's intentional spending where your choices reflect what you actually value.",
+            realLifeTip: "A budget that never lets you enjoy money isn't a good budget — it's just delayed stress. Cover your essentials and commitments first, then spend what's left with zero guilt."
           }
         ]
       }
@@ -850,15 +870,15 @@ export const quests: Quest[] = [
           },
           {
             id: 'c3',
-            text: 'Book a ₹6,000 trip with friends now',
-            consequence: 'Trip booked! But you still owe ₹12,200 in bills. Only ₹16,800 remains for food and travel.',
+            text: 'Book a ₹6,000 trip with friends now — celebrate the first salary!',
+            consequence: "Trip booked! The excitement is real and the celebration is valid. But you still owe ₹12,200 in bills. Only ₹16,800 remains for food and a full month of expenses — it's going to be tight.",
             xpDelta: 20,
             healthDelta: -5,
             walletDelta: -6000,
             nextStepId: 'fp-2-tight',
             isOptimal: false,
-            explanation: "Impulse spending on lifestyle before bills is the #1 cause of month-end debt.",
-            realLifeTip: "Use a 'Sinking Fund' for trips. Save ₹1,500/month for 4 months instead of one big hit."
+            explanation: "Celebrating your first salary is completely natural — the timing is the issue, not the trip itself. Spending on experiences before covering fixed obligations can leave you scrambling. Cover bills first, then plan the celebration with what's genuinely left over.",
+            realLifeTip: "Build a 'Sinking Fund' for trips: save ₹1,500/month for 4 months, then book with money that's already set aside rather than taking it from your main salary. You still get the trip — without the month-end stress."
           }
         ]
       },
