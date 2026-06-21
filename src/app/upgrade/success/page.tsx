@@ -92,7 +92,7 @@ function SuccessContent() {
             </div>
             <div className="space-y-2">
               <h1 className="text-2xl font-black text-white">Activating Premium{dots}</h1>
-              <p className="text-slate-400 text-sm">Confirming your payment with Stripe — just a moment.</p>
+              <p className="text-slate-400 text-sm">Confirming your payment — just a moment.</p>
             </div>
           </div>
         ) : (

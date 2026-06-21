@@ -42,7 +42,7 @@ export default function UpgradeCancelPage() {
             ))}
           </ul>
           <p className="text-xs text-slate-400 text-center pt-1">
-            Pricing coming soon · Cancel anytime
+            From ₹149/mo · Cancel anytime · No contracts
           </p>
         </div>
 

@@ -87,14 +87,14 @@ export default function LearnHub() {
                   key={lesson.id} 
                   className={cn(
                     "group hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden flex flex-col",
-                    isCompleted && "ring-2 ring-emerald-500/20",
+                    isCompleted && "ring-2 ring-primary/20",
                     !isAgeAppropriate && "opacity-50 grayscale"
                   )}
                   onClick={() => isAgeAppropriate && setActiveLesson(lesson)}
                 >
                   <div className={cn(
                     "h-2",
-                    lesson.topic === 'budgeting' ? "bg-blue-500" :
+                    lesson.topic === 'budgeting' ? "bg-[#1A3A5F]" :
                     lesson.topic === 'investing' ? "bg-primary" :
                     lesson.topic === 'saving' ? "bg-primary" :
                     lesson.topic === 'credit' ? "bg-secondary" :

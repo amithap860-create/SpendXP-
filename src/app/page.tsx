@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/context/AuthContext';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Sparkles, TrendingUp, Shield, GamepadIcon, BookOpen, Trophy } from 'lucide-react';
+import { TrendingUp, Shield, GamepadIcon, BookOpen, Trophy, Star } from 'lucide-react';
 import Image from 'next/image';
 import { AVATARS } from '@/config/avatars';
 
@@ -43,14 +43,23 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-100 via-blue-50 to-white">
+    <div className="min-h-screen bg-[#F2F7F4]">
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
         <div className="flex items-center gap-2">
-          <div className="h-9 w-9 bg-primary rounded-xl flex items-center justify-center">
-            <Sparkles className="h-5 w-5 text-white" />
+          <div className="w-9 h-9 bg-[#1A1F2E] rounded-xl flex items-center justify-center shadow-md">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ color: '#4EA07A' }}>
+              <line x1="12" y1="3" x2="12" y2="21" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+              <line x1="6" y1="21" x2="18" y2="21" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+              <line x1="6" y1="9" x2="18" y2="9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+              <path d="M6 9 L3 15 Q6 17 9 15 Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" fill="none"/>
+              <path d="M18 9 L15 15 Q18 17 21 15 Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" fill="none"/>
+            </svg>
           </div>
-          <span className="text-2xl font-black text-primary tracking-tighter">SpendXP</span>
+          <div className="flex items-baseline gap-0.5">
+            <span className="font-black text-xl tracking-tighter text-slate-900">Spend</span>
+            <span className="font-black text-xl tracking-tighter" style={{ color: '#2E7D5A' }}>XP</span>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <Link href="/login">
@@ -64,13 +73,13 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-6 pt-16 pb-20 text-center">
-        <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border mb-6 animate-bounce">
-          <Sparkles className="h-4 w-4 text-accent" />
+        <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border mb-6">
+          <Star className="h-4 w-4 text-primary fill-primary" />
           <span className="text-sm font-semibold text-primary">Built for ages 8 to 20 · India-first</span>
         </div>
-        <h1 className="text-5xl md:text-7xl font-extrabold text-primary leading-tight mb-6">
+        <h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 leading-tight mb-6">
           Master your money<br />
-          <span className="text-accent">with SpendXP</span>
+          <span style={{ color: '#2E7D5A' }}>with SpendXP</span>
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
           Learn budgeting, investing, saving, and credit through games, quests, and real-life scenarios.
@@ -114,12 +123,12 @@ export default function LandingPage() {
         {[
           {
             icon: <GamepadIcon className="h-7 w-7 text-primary" />,
-            title: '6 Learning Games',
+            title: '5 Learning Games',
             desc: 'Budget Blitz, Stock Market Simulator, Credit Score Builder, and more — real skills disguised as fun.'
           },
           {
             icon: <BookOpen className="h-7 w-7 text-primary" />,
-            title: '7 Real-Life Quests',
+            title: 'Real-Life Case Files',
             desc: 'Make decisions about your first paycheck, renting, EMIs, emergencies, and credit cards.'
           },
           {
@@ -138,7 +147,7 @@ export default function LandingPage() {
             desc: 'Parents can monitor progress, set time limits, and receive weekly reports.'
           },
           {
-            icon: <Sparkles className="h-7 w-7 text-primary" />,
+            icon: <Star className="h-7 w-7 text-primary" />,
             title: 'Age-Adapted Content',
             desc: 'Juniors (8–12) learn with pocket money. Teens (13–16) tackle allowances. Seniors (17–20) handle salaries.'
           }
@@ -157,7 +166,7 @@ export default function LandingPage() {
       <section className="max-w-2xl mx-auto px-6 pb-20 text-center">
         <div className="bg-primary rounded-3xl p-10 shadow-2xl">
           <h2 className="text-3xl font-black text-white mb-3">Ready to level up?</h2>
-          <p className="text-primary-foreground/80 mb-8">Free to use. No ads. No in-app purchases. Built for everyone.</p>
+          <p className="text-primary-foreground/80 mb-8">Free to use. No ads. No tracking. Built for everyone.</p>
           <Link href="/signup">
             <Button size="lg" variant="secondary" className="h-14 px-10 text-lg font-black">
               Start Earning XP Now
@@ -167,7 +176,7 @@ export default function LandingPage() {
       </section>
 
       <footer className="text-center text-sm text-muted-foreground pb-8">
-        © 2025 SpendXP · <Link href="/login" className="hover:underline">Sign In</Link>
+        © 2026 SpendXP · <Link href="/privacy" className="hover:underline">Privacy</Link> · <Link href="/terms" className="hover:underline">Terms</Link> · <Link href="/login" className="hover:underline">Sign In</Link>
       </footer>
     </div>
   );

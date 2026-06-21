@@ -2,17 +2,16 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
-import { 
-  db, 
-  safeGetDoc, 
-  safeOnSnapshot, 
+import {
+  db,
+  safeGetDoc,
 } from '@/firebase';
-import { 
-  doc, 
-  collection, 
-  query, 
-  orderBy, 
-  limit, 
+import {
+  doc,
+  collection,
+  query,
+  orderBy,
+  limit,
   getDocs,
   type QueryDocumentSnapshot,
   type DocumentData,
@@ -69,8 +68,18 @@ export default function DashboardPage() {
   const [activityLog, setActivityLog] = useState<any[]>([]);
   const [dailyParticipantCount, setDailyParticipantCount] = useState(0);
   const [dailyRank, setDailyRank] = useState<{ score: number; rank: number } | null>(null);
+  const [activityLog, setActivityLog] = useState<any[]>([]); // reserved for future Recent Activity section
   const [nudgeDismissed, setNudgeDismissed] = useState(false);
-  const [timeLeft, setTimeLeft] = useState('');
+
+  // Initialise timeLeft immediately so it shows on first render
+  const calcTimeLeft = () => {
+    const next = getNextISTMidnight();
+    const diff = next.getTime() - Date.now();
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const mins = Math.floor((diff / (1000 * 60)) % 60);
+    return `${hours}h ${mins}m`;
+  };
+  const [timeLeft, setTimeLeft] = useState(calcTimeLeft);
   const [currentStreak, setCurrentStreak] = useState(0);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showIntroSlides, setShowIntroSlides] = useState(false);
@@ -184,27 +193,11 @@ export default function DashboardPage() {
 
     loadData();
 
-    const activityQuery = query(
-      collection(db, 'users', uid, 'activityLog'),
-      orderBy('playedAt', 'desc'),
-      limit(10)
-    );
-    const unsubActivity = safeOnSnapshot(activityQuery, (snap) => {
-      setActivityLog(
-        snap.docs.map((d: QueryDocumentSnapshot<DocumentData>) => ({ id: d.id, ...d.data() }))
-      );
-    });
-
     const timer = setInterval(() => {
-      const next = getNextISTMidnight();
-      const diff = next.getTime() - Date.now();
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const mins = Math.floor((diff / (1000 * 60)) % 60);
-      setTimeLeft(`${hours}h ${mins}m`);
+      setTimeLeft(calcTimeLeft());
     }, 60000);
 
     return () => {
-      unsubActivity();
       clearInterval(timer);
     };
   }, [user]);

@@ -88,7 +88,7 @@ export default function ToolsHub() {
       description: 'See how small amounts grow into massive wealth.',
       info: 'Visualise the magic of compound interest. Enter any starting amount and watch how it multiplies over time. This shows you why starting to invest even small amounts early makes a huge difference by the time you retire.',
       icon: TrendingUp,
-      color: 'bg-primary/10',
+      color: 'bg-[#1A4A3A]',
       component: <CompoundVisualiser />,
     },
     {

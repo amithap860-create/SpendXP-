@@ -57,7 +57,12 @@ export function FinEducatorChat() {
       const data = await res.json();
 
       if (!res.ok || data.error) {
-        setError(data.error || 'Something went wrong. Please try again.');
+        // Graceful message when the AI feature isn't activated yet
+        if (res.status === 503 || (data.error && data.error.includes('not configured'))) {
+          setError('The Fin Educator AI is coming soon! In the meantime, explore quests and games to learn.');
+        } else {
+          setError(data.error || 'Something went wrong. Please try again.');
+        }
         return;
       }
 
