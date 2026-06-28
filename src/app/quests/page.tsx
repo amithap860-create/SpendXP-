@@ -17,6 +17,12 @@ import {
   Shield,
   Zap,
   AlertTriangle,
+  MapPin,
+  Award,
+  Activity,
+  TrendingUp,
+  Flame,
+  Scale,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { db } from '@/lib/firebase';
@@ -236,94 +242,113 @@ export default function QuestsHub() {
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
 
         {/* ── ORDER HQ HERO ─────────────────────────────────────── */}
-        <section className="bg-slate-900 rounded-3xl overflow-hidden shadow-2xl">
+        <section className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
           <div className="grid md:grid-cols-12 gap-0">
+
             {/* Left — Rank & Status */}
             <div className="md:col-span-7 p-6 md:p-10 space-y-6">
 
               {/* Order badge */}
-              <div className="inline-flex items-center gap-2 bg-primary/10 border border-[#4EA07A]/30 rounded-full px-4 py-1.5">
-                <span className="text-[#4EA07A] text-sm">⚖️</span>
-                <span className="text-[10px] font-black uppercase tracking-widest text-[#4EA07A]">
+              <div className="inline-flex items-center gap-2 bg-[#E8F5EE] border border-[#A8D5BC] rounded-full px-4 py-1.5">
+                <Scale className="h-3.5 w-3.5 text-[#2E7D5A]" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#2E7D5A]">
                   Order of the Golden Ledger
                 </span>
               </div>
 
-              <div className="space-y-1">
-                <div className="text-[10px] font-black uppercase tracking-widest text-slate-500">Your Rank</div>
-                <div className="flex items-baseline gap-3">
-                  <span className="text-4xl font-black text-white">{rank.emoji} {rank.name}</span>
+              {/* Rank */}
+              <div className="space-y-1.5">
+                <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">Your Rank</div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-[#E8F5EE] flex items-center justify-center shrink-0">
+                    <Award className="h-5 w-5 text-[#2E7D5A]" />
+                  </div>
+                  <span className="text-3xl font-black text-slate-900">{rank.name}</span>
                 </div>
-                <p className="text-slate-400 text-sm font-medium">{rank.storyLine}</p>
+                <p className="text-slate-500 text-sm font-medium leading-relaxed">{rank.storyLine}</p>
               </div>
 
               {/* XP bar */}
               <div className="space-y-2">
                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
-                  <span className="text-slate-500">Ledger Points</span>
-                  <span className="text-[#4EA07A]">{totalXP.toLocaleString()} XP</span>
+                  <span className="text-slate-400">Ledger Points</span>
+                  <span className="text-[#2E7D5A]">{totalXP.toLocaleString()} XP</span>
                 </div>
-                <div className="h-3 bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-1000"
+                    className="h-full bg-gradient-to-r from-[#2E7D5A] to-[#4EA07A] rounded-full transition-all duration-1000"
                     style={{ width: `${rankProgress * 100}%` }}
                   />
                 </div>
                 {nextRank && (
-                  <p className="text-[10px] text-slate-600 font-bold">
-                    {(nextRank.minXP - totalXP).toLocaleString()} XP to {nextRank.emoji} {nextRank.name}
+                  <p className="text-[10px] text-slate-400 font-bold">
+                    {(nextRank.minXP - totalXP).toLocaleString()} XP to {nextRank.name}
                   </p>
                 )}
               </div>
 
               {/* District */}
-              <div className="flex items-center gap-2 text-sm font-bold text-slate-400">
-                <span className="text-base">🏙️</span>
-                Defending: <span className="text-white">{rank.district}</span>
+              <div className="flex items-center gap-2 text-sm font-bold text-slate-500">
+                <MapPin className="h-4 w-4 text-[#4EA07A]" />
+                Defending: <span className="text-slate-800">{rank.district}</span>
               </div>
             </div>
 
-            {/* Right — Active Threat */}
-            <div className="md:col-span-5 bg-red-950/30 border-t md:border-t-0 md:border-l border-red-900/30 p-6 md:p-10 space-y-5">
-              <div className="text-[10px] font-black uppercase tracking-widest text-red-500 flex items-center gap-2">
-                <AlertTriangle className="h-3.5 w-3.5" /> Active Threat
+            {/* Right — Active Threat + City Stability */}
+            <div className="md:col-span-5 bg-[#F6FBF8] border-t md:border-t-0 md:border-l border-slate-100 p-6 md:p-10 space-y-5">
+
+              {/* Threat header */}
+              <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                <Flame className="h-3.5 w-3.5 text-amber-500" /> Active Threat
               </div>
 
-              <div className="space-y-2">
-                <div className="text-3xl">{fogEnemy.emoji}</div>
-                <div className="text-xl font-black text-red-300">{fogEnemy.name}</div>
-                <p className="text-red-400/70 text-xs leading-relaxed">{fogEnemy.description}</p>
+              {/* Threat card */}
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 space-y-2 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
+                    <AlertTriangle className="h-4.5 w-4.5 text-amber-500" />
+                  </div>
+                  <div>
+                    <div className="font-black text-slate-900 text-base leading-tight">{fogEnemy.name}</div>
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Gray Fog</div>
+                  </div>
+                </div>
+                <p className="text-slate-500 text-xs leading-relaxed">{fogEnemy.description}</p>
               </div>
 
               {/* City Stability */}
-              <div className="space-y-2 pt-2 border-t border-red-900/30">
+              <div className="space-y-2">
                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
-                  <span className="text-slate-600">City Stability</span>
+                  <div className="flex items-center gap-1.5 text-slate-400">
+                    <Activity className="h-3 w-3" /> City Stability
+                  </div>
                   <span className={cn(
-                    health.color === 'green' ? 'text-[#4EA07A]' :
-                    health.color === 'teal' ? 'text-[#4EA07A]' :
-                    health.color === 'amber' ? 'text-[#4EA07A]' : 'text-rose-400'
+                    'font-black',
+                    health.color === 'green' || health.color === 'teal' ? 'text-[#2E7D5A]' :
+                    health.color === 'amber' ? 'text-amber-600' : 'text-rose-500'
                   )}>{progression?.financialHealth || 50}/100</span>
                 </div>
-                <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                   <div
                     className={cn('h-full rounded-full transition-all duration-1000',
-                      health.color === 'green' ? 'bg-primary' :
-                      health.color === 'teal' ? 'bg-primary' :
+                      health.color === 'green' || health.color === 'teal' ? 'bg-[#4EA07A]' :
                       health.color === 'amber' ? 'bg-amber-400' : 'bg-rose-500'
                     )}
                     style={{ width: `${progression?.financialHealth || 50}%` }}
                   />
                 </div>
-                <p className="text-[10px] text-slate-600 font-medium">{health.description}</p>
+                <p className="text-[10px] text-slate-400 font-medium">{health.description}</p>
               </div>
 
-              {/* Seasonal saga pill */}
+              {/* Seasonal saga */}
               {activeSaga && (
-                <div className="bg-[#1A1F2E]/20 border border-[#2E7D5A]/30 rounded-xl px-4 py-3 space-y-1">
-                  <div className="text-[10px] font-black uppercase tracking-widest text-primary">Active Saga</div>
-                  <div className="text-sm font-black text-[#A8D5BC]">{activeSaga.emoji} {activeSaga.name}</div>
-                  <p className="text-[10px] text-[#4EA07A]/60">{activeSaga.tagline}</p>
+                <div className="bg-white border border-[#A8D5BC] rounded-xl px-4 py-3 space-y-1">
+                  <div className="flex items-center gap-1.5">
+                    <TrendingUp className="h-3 w-3 text-[#2E7D5A]" />
+                    <div className="text-[10px] font-black uppercase tracking-widest text-[#2E7D5A]">Active Saga</div>
+                  </div>
+                  <div className="text-sm font-black text-slate-800">{activeSaga.name}</div>
+                  <p className="text-[10px] text-slate-400">{activeSaga.tagline}</p>
                 </div>
               )}
             </div>
