@@ -33,6 +33,7 @@ import {
 import { getCurrentStreak } from '@/lib/dailyChallenge';
 import { lessons } from '@/data/lessons';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Scale, Award, BookOpen, ShieldCheck, AlertTriangle, Flame } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -384,11 +385,11 @@ export default function DashboardPage() {
               {/* Header row */}
               <div className="px-5 pt-4 pb-3 flex items-center justify-between border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <span className="text-base">⚖️</span>
+                  <Scale className="h-3.5 w-3.5 text-primary" />
                   <span className="text-[10px] font-black uppercase tracking-widest text-primary">Order of the Golden Ledger</span>
                   {saga && (
-                    <span className="hidden md:inline text-[9px] font-bold text-slate-400 border border-slate-200 rounded-full px-2 py-0.5">
-                      {saga.emoji} {saga.name}
+                    <span className="hidden md:inline text-[9px] font-bold text-slate-400 border border-slate-200 rounded-full px-2 py-0.5 flex items-center gap-1">
+                      <Flame className="h-2.5 w-2.5 text-amber-500 inline" /> {saga.name}
                     </span>
                   )}
                 </div>
@@ -404,8 +405,11 @@ export default function DashboardPage() {
                     <Image src={avatarCfg.imagePath} alt={avatarCfg.name} width={64} height={64} className="w-full h-full object-cover object-top scale-110" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-baseline gap-2 flex-wrap">
-                      <span className="text-xl font-black text-slate-900">{rank.emoji} {rank.name}</span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <div className="w-6 h-6 rounded-lg bg-[#E8F5EE] flex items-center justify-center shrink-0">
+                        <Award className="h-3.5 w-3.5 text-[#2E7D5A]" />
+                      </div>
+                      <span className="text-xl font-black text-slate-900">{rank.name}</span>
                       <span className="text-xs font-bold text-slate-400 border border-slate-200 rounded-full px-2 py-0.5">{rank.district}</span>
                     </div>
                     {/* XP progress */}
@@ -416,7 +420,7 @@ export default function DashboardPage() {
                       <div className="flex justify-between text-[9px] font-bold text-slate-400">
                         <span>{totalXP.toLocaleString()} XP</span>
                         {nextRank
-                          ? <span>{(nextRank.minXP - totalXP).toLocaleString()} XP to {nextRank.emoji} {nextRank.name}</span>
+                          ? <span>{(nextRank.minXP - totalXP).toLocaleString()} XP to {nextRank.name}</span>
                           : <span>Max Rank!</span>
                         }
                       </div>
@@ -426,24 +430,32 @@ export default function DashboardPage() {
 
                 {/* Story brief */}
                 <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-1">📋 Mission Brief</p>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <BookOpen className="h-3 w-3 text-primary" />
+                    <p className="text-[10px] font-black uppercase tracking-widest text-primary">Mission Brief</p>
+                  </div>
                   <p className="text-sm font-medium text-slate-700 leading-relaxed italic">"{rank.storyLine}"</p>
                 </div>
 
                 {/* Active Fog enemy — description + weakness */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="bg-red-50 border border-red-100 rounded-2xl p-4">
+                  <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xl">{fog.emoji}</span>
+                      <div className="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+                        <AlertTriangle className="h-4 w-4 text-amber-600" />
+                      </div>
                       <div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-red-500">Active Threat</p>
-                        <p className="text-sm font-black text-red-700">{fog.name}</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-amber-600">Active Threat</p>
+                        <p className="text-sm font-black text-slate-800">{fog.name}</p>
                       </div>
                     </div>
-                    <p className="text-xs text-red-600 leading-relaxed">{fog.description}</p>
+                    <p className="text-xs text-slate-600 leading-relaxed">{fog.description}</p>
                   </div>
-                  <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4">
-                    <p className="text-[9px] font-black uppercase tracking-widest text-primary mb-2">🛡️ Counter Move</p>
+                  <div className="bg-[#F0FAF5] border border-[#A8D5BC] rounded-2xl p-4">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <ShieldCheck className="h-3 w-3 text-primary" />
+                      <p className="text-[9px] font-black uppercase tracking-widest text-primary">Counter</p>
+                    </div>
                     <p className="text-xs text-slate-700 leading-relaxed font-medium">{fog.weakness}</p>
                   </div>
                 </div>

@@ -90,35 +90,35 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
 
   if (state.status === 'INTRO') {
     return (
-      <div className="flex-1 flex flex-col p-4 md:p-8 animate-in fade-in zoom-in duration-500 bg-slate-50 min-h-screen-safe">
-        <Card className="max-w-2xl w-full mx-auto border-none shadow-2xl overflow-hidden">
-          <div className="bg-primary p-8 md:p-12 text-white text-center relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12">
-              <History className="h-32 w-32" />
+      <div className="flex-1 flex flex-col p-4 md:p-6 animate-in fade-in zoom-in duration-500 bg-slate-50 min-h-screen-safe">
+        <Card className="max-w-xl w-full mx-auto border-none shadow-xl overflow-hidden">
+          <div className="bg-primary p-6 md:p-8 text-white text-center relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-6 opacity-10 rotate-12">
+              <History className="h-24 w-24" />
             </div>
-            <Badge className="bg-white/20 hover:bg-white/30 text-white border-none mb-4">MISSION START</Badge>
-            <CardTitle className="text-3xl md:text-5xl font-black mb-4 leading-tight">{quest.title}</CardTitle>
-            <p className="text-primary-foreground/90 text-lg md:text-xl font-medium max-w-lg mx-auto leading-relaxed">{quest.description}</p>
+            <Badge className="bg-white/20 hover:bg-white/30 text-white border-none mb-3 text-[10px]">MISSION START</Badge>
+            <CardTitle className="text-2xl md:text-3xl font-black mb-3 leading-tight">{quest.title}</CardTitle>
+            <p className="text-primary-foreground/90 text-sm md:text-base font-medium max-w-lg mx-auto leading-relaxed">{quest.description}</p>
           </div>
-          <CardContent className="p-8 md:p-12 space-y-10">
-            <div className="grid grid-cols-3 gap-4">
+          <CardContent className="p-5 md:p-7 space-y-5">
+            <div className="grid grid-cols-3 gap-3">
               <StatPill label="Starting" val={formatINR(quest.startingBalance)} />
               <StatPill label="Difficulty" val={quest.difficulty} />
               <StatPill label="XP Reward" val={`+${quest.xpReward}`} />
             </div>
-            
-            <div className="p-6 md:p-8 bg-[#E8F5EE] rounded-3xl border-2 border-[#A8D5BC] flex items-start gap-5">
-              <Info className="h-8 w-8 text-[#2E7D5A] shrink-0 mt-1" />
-              <div className="space-y-1">
-                <h4 className="font-black text-[#1A1F2E]">Mission Intel</h4>
-                <p className="text-sm font-medium text-[#1A4035] leading-relaxed">
+
+            <div className="p-4 bg-[#E8F5EE] rounded-2xl border border-[#A8D5BC] flex items-start gap-4">
+              <Info className="h-5 w-5 text-[#2E7D5A] shrink-0 mt-0.5" />
+              <div className="space-y-0.5">
+                <h4 className="font-black text-[#1A1F2E] text-sm">Mission Intel</h4>
+                <p className="text-xs font-medium text-[#1A4035] leading-relaxed">
                   Every decision impacts your <strong>Real-Time Balance</strong>. Depleting your cash too early will lock out optimal choices in the final stages.
                 </p>
               </div>
             </div>
 
-            <Button onClick={startQuest} className="w-full h-16 md:h-20 text-xl md:text-2xl font-black rounded-3xl shadow-2xl shadow-primary/20 gap-3 group" suppressHydrationWarning>
-              Accept Mission <ArrowRight className="h-6 w-6 group-hover:translate-x-2 transition-transform" />
+            <Button onClick={startQuest} className="w-full h-12 md:h-14 text-base md:text-lg font-black rounded-2xl shadow-lg shadow-primary/20 gap-2 group" suppressHydrationWarning>
+              Accept Mission <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </CardContent>
         </Card>
@@ -170,28 +170,28 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
       : (state.serverResult?.xpAwarded ?? state.totalXPEarned + quest.xpReward);
 
     return (
-      <div className="flex-1 flex flex-col p-4 md:p-8 animate-in slide-in-from-bottom-8 duration-700 bg-slate-50 min-h-screen-safe overflow-y-auto">
-        <Card className="max-w-4xl w-full mx-auto border-none shadow-2xl overflow-hidden mb-8">
-          <div className={cn("p-8 md:p-12 text-white text-center", isReplay ? "bg-slate-700" : "bg-primary")}>
-            <Trophy className="h-16 w-16 mx-auto mb-6 animate-bounce" />
-            <h2 className="text-4xl md:text-6xl font-black mb-6">
+      <div className="flex-1 flex flex-col p-4 md:p-6 animate-in slide-in-from-bottom-8 duration-700 bg-slate-50 min-h-screen-safe overflow-y-auto">
+        <Card className="max-w-3xl w-full mx-auto border-none shadow-xl overflow-hidden mb-6">
+          <div className={cn("p-6 md:p-8 text-white text-center", isReplay ? "bg-slate-700" : "bg-primary")}>
+            <Trophy className="h-10 w-10 mx-auto mb-4 animate-bounce" />
+            <h2 className="text-2xl md:text-3xl font-black mb-4">
               {isReplay ? 'Replay Complete' : 'Mission Success'}
             </h2>
             {isReplay ? (
-              <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-5 py-2 text-sm font-bold">
+              <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-xs font-bold">
                 ✓ XP already earned on first completion — replays are practice only
               </div>
             ) : (
-              <div className="flex justify-center gap-3">
+              <div className="flex justify-center gap-2">
                 {[1, 2, 3].map(i => (
-                  <Star key={i} className={cn("h-10 w-10 md:h-14 md:w-14 fill-current", i <= starCount ? "text-[#C8E8D8]" : "text-[#4EA07A]")} />
+                  <Star key={i} className={cn("h-8 w-8 md:h-10 md:w-10 fill-current", i <= starCount ? "text-[#C8E8D8]" : "text-[#4EA07A]")} />
                 ))}
               </div>
             )}
           </div>
 
-          <CardContent className="p-8 md:p-12 space-y-12">
-            <div className="grid md:grid-cols-3 gap-6">
+          <CardContent className="p-5 md:p-7 space-y-7">
+            <div className="grid md:grid-cols-3 gap-4">
               <ResultCard label="Starting Cash" val={formatINR(quest.startingBalance)} />
               <ResultCard label="Ending Cash" val={formatINR(currentBalance)} color={getBalanceColor()} icon={ArrowUpRight} />
               <ResultCard
@@ -201,37 +201,37 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
               />
             </div>
 
-            <div className="space-y-6">
-              <h3 className="text-2xl font-black flex items-center gap-3">
-                <History className="h-7 w-7 text-primary" /> Decision Replay
+            <div className="space-y-4">
+              <h3 className="text-base font-black flex items-center gap-2">
+                <History className="h-5 w-5 text-primary" /> Decision Replay
               </h3>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {state.choiceHistory.map((entry, i) => {
                   const step = quest.steps.find(s => s.id === entry.stepId);
                   const choice = step?.choices.find(c => c.id === entry.choiceId);
                   const optimal = step?.choices.find(c => c.isOptimal);
-                  
+
                   return (entry && step && choice && optimal) ? (
-                    <div key={i} className="p-6 rounded-3xl border-2 border-slate-100 space-y-4">
+                    <div key={i} className="p-4 rounded-2xl border border-slate-100 bg-white space-y-3">
                       <div className="flex justify-between items-start gap-4">
-                        <div className="font-bold text-slate-900 leading-tight">Step {i+1}: {step.title}</div>
-                        <Badge className={choice.isOptimal ? "bg-[#C8E8D8] text-primary" : "bg-[#C8E8D8] text-[#2E7D5A]"}>
+                        <div className="font-bold text-slate-900 text-sm leading-tight">Step {i+1}: {step.title}</div>
+                        <Badge className={choice.isOptimal ? "bg-[#C8E8D8] text-primary text-[10px]" : "bg-amber-100 text-amber-700 text-[10px]"}>
                           {choice.isOptimal ? 'Optimal' : 'Sub-optimal'}
                         </Badge>
                       </div>
-                      <div className="grid md:grid-cols-2 gap-6 text-sm">
+                      <div className="grid md:grid-cols-2 gap-4 text-xs">
                         <div className="space-y-1">
-                          <p className="text-slate-400 font-bold uppercase text-[10px]">Your Choice</p>
+                          <p className="text-slate-400 font-bold uppercase text-[9px]">Your Choice</p>
                           <p className="font-medium text-slate-700">{choice.text}</p>
                         </div>
                         {!choice.isOptimal && (
                           <div className="space-y-1">
-                            <p className="text-primary font-bold uppercase text-[10px]">Better Move</p>
+                            <p className="text-primary font-bold uppercase text-[9px]">Better Move</p>
                             <p className="font-medium text-primary">{optimal.text}</p>
                           </div>
                         )}
                       </div>
-                      <div className="p-4 bg-slate-50 rounded-2xl text-[13px] font-medium text-slate-600 border border-slate-100">
+                      <div className="p-3 bg-slate-50 rounded-xl text-xs font-medium text-slate-600 border border-slate-100">
                         {choice.explanation}
                       </div>
                     </div>
@@ -240,33 +240,33 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
               </div>
             </div>
 
-            <div className="bg-slate-900 p-8 md:p-10 rounded-[2.5rem] text-white space-y-8 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-10 opacity-10"><Lightbulb className="h-40 w-40" /></div>
-              <div className="space-y-2 relative z-10">
-                <Badge className="bg-primary text-white border-none">STRATEGY INTELLIGENCE</Badge>
-                <h3 className="text-3xl font-black">Apply this in real life</h3>
+            <div className="bg-slate-900 p-5 md:p-7 rounded-3xl text-white space-y-5 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-6 opacity-10"><Lightbulb className="h-28 w-28" /></div>
+              <div className="space-y-1.5 relative z-10">
+                <Badge className="bg-primary text-white border-none text-[10px]">STRATEGY INTELLIGENCE</Badge>
+                <h3 className="text-xl font-black">Apply this in real life</h3>
               </div>
-              <div className="grid gap-6 relative z-10">
+              <div className="grid gap-4 relative z-10">
                 {state.choiceHistory.filter(e => !e.isOptimal).slice(0, 3).map((e, i) => {
                   const choice = quest.steps.find(s => s.id === e.stepId)?.choices.find(c => c.id === e.choiceId);
                   return choice?.realLifeTip ? (
-                    <div key={i} className="flex gap-4 items-start">
-                      <div className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center shrink-0 font-black text-primary">{i+1}</div>
-                      <p className="text-slate-300 font-medium leading-relaxed">{choice.realLifeTip}</p>
+                    <div key={i} className="flex gap-3 items-start">
+                      <div className="h-7 w-7 rounded-full bg-white/10 flex items-center justify-center shrink-0 font-black text-sm text-primary">{i+1}</div>
+                      <p className="text-slate-300 text-sm font-medium leading-relaxed">{choice.realLifeTip}</p>
                     </div>
                   ) : null;
                 })}
                 {state.optimalChoiceCount === quest.steps.length && (
-                  <p className="text-[#4EA07A] font-black text-xl italic">Flawless performance! You are ready to manage crores. Continue building your portfolio.</p>
+                  <p className="text-[#4EA07A] font-black text-base italic">Flawless performance! You are ready to manage crores. Continue building your portfolio.</p>
                 )}
               </div>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-4">
-              <Button variant="outline" onClick={resetQuest} className="h-16 px-10 rounded-2xl font-black text-slate-500 border-2" suppressHydrationWarning>
-                <RotateCcw className="h-5 w-5 mr-2" /> Replay Simulation
+            <div className="flex flex-col md:flex-row gap-3">
+              <Button variant="outline" onClick={resetQuest} className="h-12 px-8 rounded-xl font-black text-slate-500 border-2 text-sm" suppressHydrationWarning>
+                <RotateCcw className="h-4 w-4 mr-2" /> Replay Simulation
               </Button>
-              <Button onClick={onComplete} className="flex-1 h-16 text-xl font-black rounded-2xl shadow-xl" suppressHydrationWarning>
+              <Button onClick={onComplete} className="flex-1 h-12 text-base font-black rounded-xl shadow-lg" suppressHydrationWarning>
                 Return to Arcade Hub
               </Button>
             </div>
@@ -326,65 +326,65 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
         )}
       </div>
 
-      <Card className="max-w-3xl w-full mx-auto border-none shadow-2xl overflow-hidden flex flex-col flex-1">
-        <div className="p-8 md:p-12 space-y-8 flex-1 flex flex-col">
-          <div className="space-y-6 shrink-0">
+      <Card className="max-w-3xl w-full mx-auto border-none shadow-xl overflow-hidden flex flex-col flex-1">
+        <div className="p-5 md:p-7 space-y-5 flex-1 flex flex-col">
+          <div className="space-y-4 shrink-0">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                <Target className="h-6 w-6" />
+              <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                <Target className="h-4 w-4" />
               </div>
-              <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">{currentStep?.title}</h2>
+              <h2 className="text-lg md:text-xl font-black text-slate-900 tracking-tight">{currentStep?.title}</h2>
             </div>
-            <div className="p-6 md:p-8 bg-slate-50 rounded-[2rem] border-l-8 border-primary italic text-lg md:text-2xl text-slate-700 leading-relaxed font-medium">
-              "{currentStep?.narrative}"
+            <div className="p-4 md:p-5 bg-slate-50 rounded-2xl border-l-4 border-primary italic text-sm md:text-base text-slate-700 leading-relaxed font-medium">
+              &ldquo;{currentStep?.narrative}&rdquo;
             </div>
           </div>
 
-          <div className="grid gap-4">
+          <div className="grid gap-3">
             {currentStep?.choices.map((choice) => (
               <button
                 key={choice.id}
                 disabled={!!selectedChoiceId}
                 onClick={() => handleChoiceSelect(choice.id)}
                 className={cn(
-                  "w-full min-h-[80px] p-6 md:p-8 text-left rounded-3xl border-2 transition-all duration-300 flex items-center justify-between group",
-                  !selectedChoiceId 
-                    ? "hover:border-primary hover:bg-primary/5 border-slate-100" 
+                  "w-full min-h-[60px] p-4 md:p-5 text-left rounded-2xl border-2 transition-all duration-300 flex items-center justify-between group",
+                  !selectedChoiceId
+                    ? "hover:border-primary hover:bg-primary/5 border-slate-100"
                     : choice.id === selectedChoiceId
-                      ? choice.isOptimal 
-                        ? "bg-[#E8F5EE] border-[#2E7D5A] text-[#1A1F2E] scale-[1.02] shadow-xl"
-                        : "bg-[#E8F5EE] border-[#4A556B] text-[#1A1F2E] scale-[1.02] shadow-xl"
+                      ? choice.isOptimal
+                        ? "bg-[#E8F5EE] border-[#2E7D5A] text-[#1A1F2E] scale-[1.01] shadow-lg"
+                        : "bg-[#E8F5EE] border-[#4A556B] text-[#1A1F2E] scale-[1.01] shadow-lg"
                       : "opacity-40 grayscale"
                 )}
               >
-                <span className="text-lg md:text-xl font-bold pr-6">{choice.text}</span>
+                <span className="text-sm md:text-base font-bold pr-4">{choice.text}</span>
                 {selectedChoiceId === choice.id && (
-                  choice.isOptimal ? <CheckCircle2 className="h-8 w-8 text-primary shrink-0" /> : <XCircle className="h-8 w-8 text-[#2E7D5A] shrink-0" />
+                  choice.isOptimal ? <CheckCircle2 className="h-6 w-6 text-primary shrink-0" /> : <XCircle className="h-6 w-6 text-[#2E7D5A] shrink-0" />
                 )}
               </button>
             ))}
           </div>
 
           {selectedChoiceId && activeChoice && (
-            <div className="animate-in slide-in-from-top-4 duration-500 space-y-8 mt-6">
-              <div className="space-y-6">
-                <div className="p-6 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
-                  <p className="font-bold text-slate-800 text-lg md:text-xl leading-relaxed">"{activeChoice.consequence}"</p>
+            <div className="animate-in slide-in-from-top-4 duration-500 space-y-5 mt-4">
+              <div className="space-y-4">
+                <div className="p-4 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                  <p className="font-bold text-slate-800 text-sm md:text-base leading-relaxed">&ldquo;{activeChoice.consequence}&rdquo;</p>
                 </div>
-                
-                <div className="p-8 bg-primary/5 rounded-[2rem] border-2 border-primary/10 space-y-3">
-                  <div className="flex items-center gap-3 text-xs font-black uppercase text-primary tracking-widest">
-                    <TrendingUp className="h-5 w-5" /> Intelligence Report
+
+                <div className="p-5 bg-primary/5 rounded-2xl border border-primary/10 space-y-2">
+                  <div className="flex items-center gap-2 text-[10px] font-black uppercase text-primary tracking-widest">
+                    <TrendingUp className="h-4 w-4" /> Intelligence Report
                   </div>
-                  <p className="text-base md:text-lg font-medium text-slate-600 leading-relaxed italic">
+                  <p className="text-sm font-medium text-slate-600 leading-relaxed italic">
                     {activeChoice.explanation}
                   </p>
                 </div>
               </div>
 
-              <Button onClick={handleNext} className="w-full h-16 md:h-20 text-xl font-black rounded-3xl gap-3 group" suppressHydrationWarning>
-                {activeChoice.nextStepId === 'end' ? 'Complete Mission' : 'Continue Simulation'} 
-                <ChevronRight className="h-6 w-6 group-hover:translate-x-2 transition-transform" />
+              <Button onClick={handleNext} className="w-full h-12 md:h-14 text-base font-black rounded-2xl gap-2 group" suppressHydrationWarning>
+                {activeChoice.nextStepId === 'end' ? 'Complete Mission' : 'Continue Simulation'}
+                <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </div>
           )}
@@ -405,10 +405,10 @@ function StatPill({ label, val }: { label: string; val: string }) {
 
 function ResultCard({ label, val, color = 'text-slate-900', icon: Icon }: { label: string; val: string; color?: string; icon?: any }) {
   return (
-    <div className="p-6 rounded-3xl bg-slate-50 border-2 border-slate-100 flex flex-col items-center justify-center text-center">
-      <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{label}</div>
-      <div className={cn("text-2xl md:text-3xl font-black flex items-center gap-2", color)}>
-        {Icon && <Icon className="h-6 w-6" />} {val}
+    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center text-center">
+      <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</div>
+      <div className={cn("text-lg md:text-xl font-black flex items-center gap-1.5", color)}>
+        {Icon && <Icon className="h-4 w-4" />} {val}
       </div>
     </div>
   );

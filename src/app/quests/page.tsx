@@ -100,7 +100,9 @@ function CaseFileBriefing({ quest, index, fogEnemy, onAccept, onDecline }: {
             <div className="text-[10px] font-black uppercase tracking-widest text-red-600">Active Threat</div>
           </div>
           <div className="flex items-start gap-3">
-            <span className="text-2xl">{fogEnemy.emoji}</span>
+            <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center shrink-0 mt-0.5">
+              <AlertTriangle className="h-4 w-4 text-red-500" />
+            </div>
             <div>
               <p className="font-black text-red-700 text-sm">{fogEnemy.name}</p>
               <p className="text-red-500 text-xs mt-1 leading-relaxed">{fogEnemy.description}</p>
