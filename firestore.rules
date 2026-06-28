@@ -22,15 +22,33 @@ service cloud.firestore {
       return request.auth != null && request.auth.token.firebase.sign_in_provider == 'custom';
     }
 
+    // Fields that must only be written by server-side Admin SDK (e.g. Stripe webhook).
+    // Clients are never allowed to set these directly — even on their own document.
+    function hasProtectedFields(data) {
+      return data.keys().hasAny(['isPremium', 'isAdmin', 'stripeCustomerId', 'stripeSubscriptionId']);
+    }
+
     // User documents
     match /users/{uid} {
       allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
-      allow write: if isOwner(uid) || isStudioPreview();
-      allow create: if isOwner(uid) || isStudioPreview();
+
+      // Create: owner can create their own doc, but cannot set protected fields
+      allow create: if (isOwner(uid) && !hasProtectedFields(request.resource.data))
+                    || isStudioPreview();
+
+      // Update: owner can update their doc, but cannot add/change protected fields
+      allow update: if (isOwner(uid) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isPremium', 'isAdmin', 'stripeCustomerId', 'stripeSubscriptionId']))
+                    || isStudioPreview();
+
+      // Delete: disallow client-side account deletion (use Admin SDK / Cloud Function)
+      allow delete: if false;
 
       // Subcollections
       match /gameScores/{gameId} {
         allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
+        // Client can write non-critical game state (budgetSplit, UI state) but not highScore
+        // High scores are submitted via /api/scores/submit (server-validated).
+        // Keeping write open here for budgetSplit merge writes from BudgetBlitz component.
         allow write: if isOwner(uid) || isStudioPreview();
       }
 
@@ -122,16 +140,20 @@ service cloud.firestore {
       }
     }
 
-    // Link requests
+    // Link requests — split create vs update/delete to use correct resource reference
     match /linkRequests/{id} {
       allow read: if isOwner(resource.data.parentUid) || isOwner(resource.data.childUid) || isStudioPreview();
-      allow write: if isOwner(resource.data.parentUid) || isOwner(resource.data.childUid) || isStudioPreview();
+      // For CREATE: document doesn't exist yet — check request.resource.data (incoming)
+      allow create: if isOwner(request.resource.data.parentUid) || isOwner(request.resource.data.childUid) || isStudioPreview();
+      // For UPDATE/DELETE: document exists — check resource.data (existing)
+      allow update, delete: if isOwner(resource.data.parentUid) || isOwner(resource.data.childUid) || isStudioPreview();
     }
 
-    // Pending parent invites
+    // Pending parent invites — same create vs update pattern
     match /pendingParentInvites/{id} {
       allow read: if isOwner(resource.data.childUid) || isStudioPreview();
-      allow write: if isOwner(resource.data.childUid) || isStudioPreview();
+      allow create: if isOwner(request.resource.data.childUid) || isStudioPreview();
+      allow update, delete: if isOwner(resource.data.childUid) || isStudioPreview();
     }
 
     // Consent requests

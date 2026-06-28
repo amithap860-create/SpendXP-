@@ -1,61 +1,73 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { initializeApp, cert, getApps } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 
 export const dynamic = 'force-dynamic';
 
-interface BugReport {
-  title: string;
-  description: string;
-  email?: string;
-  timestamp: Date;
+function initAdmin() {
+  const serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_SDK_KEY || '{}');
+  if (!serviceAccount.project_id) return null;
+  const existing = getApps().find((a) => a.name === 'admin');
+  if (existing) return existing;
+  return initializeApp({ credential: cert(serviceAccount) }, 'admin');
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const bugReport: BugReport = await request.json();
+    const adminApp = initAdmin();
 
-    // Validate required fields
-    if (!bugReport.title?.trim() || !bugReport.description?.trim()) {
-      return NextResponse.json(
-        { error: 'Title and description are required' },
-        { status: 400 }
-      );
+    // ── Auth: try to identify the reporter (optional — still accept anon) ────
+    let uid: string | null = null;
+    if (adminApp) {
+      const adminAuth = getAuth(adminApp);
+      const authHeader = request.headers.get('Authorization');
+      if (authHeader?.startsWith('Bearer ')) {
+        try {
+          const decoded = await adminAuth.verifyIdToken(authHeader.split(' ')[1]);
+          uid = decoded.uid;
+        } catch {
+          // Invalid token — treat as anonymous
+        }
+      }
     }
 
-    // Log the bug report (in production, you'd send this to a bug tracking system)
-    const logEntry = {
-      timestamp: new Date().toISOString(),
-      title: bugReport.title.trim(),
-      description: bugReport.description.trim(),
-      email: bugReport.email?.trim() || 'not provided',
-      userAgent: request.headers.get('user-agent') || 'unknown',
-      ip: request.headers.get('x-forwarded-for')?.split(',')[0] || 
-           request.headers.get('x-real-ip') || 
-           'unknown',
-      url: request.headers.get('referer') || 'unknown'
-    };
+    // ── Parse + sanitise body ────────────────────────────────────────────────
+    const body = await request.json();
+    const title = String(body.title || '').trim().slice(0, 200);
+    const description = String(body.description || '').trim().slice(0, 2000);
+    const email = String(body.email || '').trim().slice(0, 200);
 
-    console.error('🐛 BUG REPORT:', JSON.stringify(logEntry, null, 2));
+    if (!title || !description) {
+      return NextResponse.json({ error: 'Title and description are required' }, { status: 400 });
+    }
 
-    // In production, you would:
-    // 1. Send to Jira, GitHub Issues, or Linear
-    // 2. Send email notification to developers
-    // 3. Store in database for tracking
-    // 4. Create Slack/Discord notification
-
-    // For now, we'll just log it and return success
-    // You can add email notification here if needed
+    // ── Persist to Firestore ─────────────────────────────────────────────────
+    const reportId = crypto.randomUUID();
+    if (adminApp) {
+      const db = getFirestore(adminApp);
+      await db.collection('bugReports').doc(reportId).set({
+        title,
+        description,
+        email: email || null,
+        uid: uid || null,
+        userAgent: request.headers.get('user-agent') || null,
+        // IP address deliberately NOT stored — PII with no explicit user consent
+        createdAt: FieldValue.serverTimestamp(),
+        status: 'open',
+      });
+    } else {
+      // Admin SDK not configured (missing env var) — log title only, no PII
+      console.error('[BugReport] Admin SDK not available. Report title:', title);
+    }
 
     return NextResponse.json({
       success: true,
-      message: 'Bug report received. Thank you for helping us improve SpendXP!',
-      id: Math.random().toString(36).substr(2, 9) // Generate a simple ID
+      message: 'Bug report received. Thank you for helping improve SpendXP!',
+      id: reportId,
     });
-
   } catch (error) {
-    console.error('Bug report submission error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    console.error('[BugReport] Error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

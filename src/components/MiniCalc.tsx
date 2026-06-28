@@ -4,6 +4,68 @@ import React, { useState, useCallback } from 'react';
 import { Calculator, X, Delete } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+/**
+ * Safe recursive-descent math evaluator.
+ * Supports: +  -  *  /  and parentheses. No eval, no Function().
+ * Grammar:
+ *   expr   = term   (('+' | '-') term)*
+ *   term   = factor (('*' | '/') factor)*
+ *   factor = '-' factor | '(' expr ')' | number
+ */
+function safeMathEval(expr: string): number {
+  let pos = 0;
+  const peek = () => expr[pos];
+  const consume = () => expr[pos++];
+  const skipWs = () => { while (expr[pos] === ' ') pos++; };
+
+  function parseExpr(): number {
+    skipWs();
+    let val = parseTerm();
+    skipWs();
+    while (peek() === '+' || peek() === '-') {
+      const op = consume(); skipWs();
+      const right = parseTerm();
+      val = op === '+' ? val + right : val - right;
+      skipWs();
+    }
+    return val;
+  }
+
+  function parseTerm(): number {
+    skipWs();
+    let val = parseFactor();
+    skipWs();
+    while (peek() === '*' || peek() === '/') {
+      const op = consume(); skipWs();
+      const right = parseFactor();
+      if (op === '/' && right === 0) throw new Error('Division by zero');
+      val = op === '*' ? val * right : val / right;
+      skipWs();
+    }
+    return val;
+  }
+
+  function parseFactor(): number {
+    skipWs();
+    if (peek() === '-') { consume(); return -parseFactor(); }
+    if (peek() === '(') {
+      consume();
+      const val = parseExpr();
+      skipWs();
+      if (peek() === ')') consume();
+      return val;
+    }
+    // Parse number
+    let num = '';
+    while (pos < expr.length && /[0-9.]/.test(expr[pos])) num += consume();
+    if (!num) throw new Error('Expected number');
+    return parseFloat(num);
+  }
+
+  const result = parseExpr();
+  return result;
+}
+
 interface MiniCalcProps {
   onInsert?: (value: string) => void;
   className?: string;
@@ -35,11 +97,10 @@ export function MiniCalc({ onInsert, className }: MiniCalcProps) {
 
     if (key === '=') {
       try {
-        // Replace × and ÷ for eval
+        // Safe recursive-descent math parser — no eval, no Function()
         const safe = expression.replace(/×/g, '*').replace(/÷/g, '/').replace(/[^0-9+\-*/().]/g, '');
-        // eslint-disable-next-line no-eval
-        const result = Function('"use strict"; return (' + safe + ')')();
-        const formatted = isFinite(result)
+        const result = safeMathEval(safe);
+        const formatted = isFinite(result) && !isNaN(result)
           ? (Math.round(result * 1000000) / 1000000).toString()
           : 'Error';
         setDisplay(formatted);
