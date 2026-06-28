@@ -335,31 +335,24 @@ export default function ProfilePage() {
   // Logout confirm
   const [logoutConfirm, setLogoutConfirm] = useState(false);
 
-  // Premium / subscription management
-  const [portalLoading, setPortalLoading] = useState(false);
+  // Premium / subscription management (Razorpay — no portal, just renew)
   const isPremium = profile?.isPremium === true;
+  const subscriptionEndAt: string | null = (user as any)?.subscriptionEndAt ?? null;
+  const premiumPlan: string | null = (user as any)?.premiumPlan ?? null;
 
-  const handleManageSubscription = async () => {
-    if (!user) return;
-    setPortalLoading(true);
+  // Format expiry for display
+  const expiryLabel = (() => {
+    if (!subscriptionEndAt) return null;
     try {
-      const token = await user.getIdToken();
-      const res = await fetch('/api/stripe/portal', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        toast({ title: 'Could not open subscription portal', variant: 'destructive' });
-      }
-    } catch {
-      toast({ title: 'Network error. Please try again.', variant: 'destructive' });
-    } finally {
-      setPortalLoading(false);
-    }
-  };
+      const d = new Date(subscriptionEndAt);
+      const now = new Date();
+      const daysLeft = Math.ceil((d.getTime() - now.getTime()) / 86400000);
+      if (daysLeft < 0) return 'Expired';
+      if (daysLeft === 0) return 'Expires today';
+      if (daysLeft === 1) return 'Expires tomorrow';
+      return `Expires ${d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+    } catch { return null; }
+  })();
 
   // Avatar picker
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
@@ -1025,18 +1018,22 @@ export default function ProfilePage() {
             <CardContent className="p-4 flex items-center justify-between gap-3">
               <div>
                 <div className="font-black text-sm text-primary">SpendXP Premium ✦</div>
-                <div className="text-xs text-slate-500">Manage billing, cancel, or update payment</div>
+                <div className="text-xs text-slate-500">
+                  {expiryLabel
+                    ? expiryLabel
+                    : premiumPlan === 'quarterly' ? '3-Month Plan' : 'Monthly Plan'}
+                </div>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-primary/30 text-primary hover:bg-primary/10 font-bold shrink-0"
-                onClick={handleManageSubscription}
-                disabled={portalLoading}
-                suppressHydrationWarning
-              >
-                {portalLoading ? 'Opening…' : 'Manage'}
-              </Button>
+              <Link href="/upgrade">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-primary/30 text-primary hover:bg-primary/10 font-bold shrink-0"
+                  suppressHydrationWarning
+                >
+                  Renew
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         ) : (

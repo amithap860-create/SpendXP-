@@ -5,17 +5,37 @@ import { isFeatureAvailable, type PremiumFeature } from '@/config/premium';
 
 /**
  * Hook to check the current user's premium status.
- * For now, premium status is stored in the user's Firestore profile under `isPremium`.
- * Replace with a real subscription check (Stripe, RevenueCat, etc.) when billing is live.
+ *
+ * Reads isPremium + subscriptionEndAt from the user's Firestore profile
+ * (loaded in AuthContext). If subscriptionEndAt is in the past, the user
+ * is treated as free even if isPremium is still true in Firestore
+ * (the verify-payment route will clean it up server-side on next login).
  */
 export function usePremium() {
   const { user } = useAuthContext();
 
-  // Reads isPremium from the Firestore user document (loaded in AuthContext).
-  // Set users.{uid}.isPremium = true in Firestore to grant premium access.
-  // When Stripe/billing is live, update this field via a Cloud Function webhook.
-  const isPremium = user?.isPremium ?? false;
+  const rawIsPremium = user?.isPremium ?? false;
+  const subscriptionEndAt = user?.subscriptionEndAt ?? null;
+
+  // Check if the subscription has expired client-side
+  let isExpired = false;
+  if (rawIsPremium && subscriptionEndAt) {
+    try {
+      isExpired = new Date(subscriptionEndAt) < new Date();
+    } catch { /* ignore date parse errors */ }
+  }
+
+  const isPremium = rawIsPremium && !isExpired;
   const tierId: 'free' | 'premium' = isPremium ? 'premium' : 'free';
+
+  // How many days until expiry (positive = active, 0 = today, negative = expired)
+  let daysLeft: number | null = null;
+  if (subscriptionEndAt) {
+    try {
+      const msLeft = new Date(subscriptionEndAt).getTime() - Date.now();
+      daysLeft = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
+    } catch { /* ignore */ }
+  }
 
   function canAccess(feature: PremiumFeature): boolean {
     return isFeatureAvailable(feature, tierId);
@@ -25,5 +45,8 @@ export function usePremium() {
     isPremium,
     tierId,
     canAccess,
+    daysLeft,
+    subscriptionEndAt,
+    premiumPlan: user?.premiumPlan ?? null,
   };
 }

@@ -25,6 +25,9 @@ interface User {
   displayName?: string;
   providerData: { providerId: string }[];
   isPremium?: boolean;
+  /** ISO string of when the premium subscription expires. Null = no subscription. */
+  subscriptionEndAt?: string | null;
+  premiumPlan?: string | null;
   /** Returns a fresh Firebase ID token. Use in API calls that require Authorization: Bearer. */
   getIdToken: (forceRefresh?: boolean) => Promise<string>;
 }
@@ -134,8 +137,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (userDoc.exists()) {
               const data = userDoc.data();
               if (data?.currencyCode) setCurrencyCode(data.currencyCode);
-              if (data?.isPremium) {
-                setUser(prev => prev ? { ...prev, isPremium: !!data.isPremium } : prev);
+              if (data?.isPremium !== undefined || data?.subscriptionEndAt !== undefined) {
+                // Convert Firestore Timestamp → ISO string for subscriptionEndAt
+                let subEndIso: string | null = null;
+                if (data?.subscriptionEndAt) {
+                  try {
+                    const ts = data.subscriptionEndAt;
+                    subEndIso = (typeof ts.toDate === 'function' ? ts.toDate() : new Date(ts)).toISOString();
+                  } catch { /* ignore conversion errors */ }
+                }
+                setUser(prev => prev ? {
+                  ...prev,
+                  isPremium: !!data.isPremium,
+                  subscriptionEndAt: subEndIso,
+                  premiumPlan: data?.premiumPlan ?? null,
+                } : prev);
               }
             }
           } catch (err) {
