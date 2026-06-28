@@ -68,7 +68,6 @@ export default function DashboardPage() {
   const [activityLog, setActivityLog] = useState<any[]>([]);
   const [dailyParticipantCount, setDailyParticipantCount] = useState(0);
   const [dailyRank, setDailyRank] = useState<{ score: number; rank: number } | null>(null);
-  const [activityLog, setActivityLog] = useState<any[]>([]); // reserved for future Recent Activity section
   const [nudgeDismissed, setNudgeDismissed] = useState(false);
 
   // Initialise timeLeft immediately so it shows on first render
