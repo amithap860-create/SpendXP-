@@ -34,11 +34,10 @@ export async function POST(request: NextRequest) {
       userAgent: request.headers.get('user-agent') || 'unknown',
     };
 
-    // Save to Firestore
+    // Save to Firestore (Admin SDK uses .collection().add(), not client-SDK addDoc)
     try {
       const { db: adminDb } = await getFirebaseAdmin();
-      const { collection, addDoc } = await import('firebase-admin/firestore');
-      await addDoc(collection(adminDb, 'supportTickets'), ticket);
+      await adminDb.collection('supportTickets').add(ticket);
     } catch (dbErr) {
       // Non-fatal — still log and return success so user isn't blocked
       console.error('[SpendXP] Failed to write support ticket to Firestore:', dbErr);

@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { XPWallet } from '@/components/XPWallet';
 import { getAgeGroup } from '@/lib/ageAdapt';
 import { safeSetDoc } from '@/firebase';
+import { increment } from 'firebase/firestore';
 import { ChevronRight, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AVATARS, AvatarConfig } from '@/config/avatars';
@@ -108,6 +109,17 @@ function OnboardingContent() {
       }, { merge: true });
 
       if (success) {
+        // Award onboarding completion XP (+100) + profile completion bonus (+25)
+        // These are one-time awards, safe to do client-side since they only run once
+        try {
+          const progressionRef = doc(db, 'users', uid, 'progression', 'stats');
+          await safeSetDoc(progressionRef, {
+            totalXP: increment(125),
+            lastActivityAt: serverTimestamp(),
+          }, { merge: true });
+        } catch {
+          // Non-fatal — XP will sync on next activity
+        }
         router.push('/games');
       } else {
         setError('Could not save your profile. Please try again.');

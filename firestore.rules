@@ -185,5 +185,18 @@ service cloud.firestore {
       allow create: if request.auth != null || isStudioPreview();
       allow read, update, delete: if isAdmin() || isStudioPreview();
     }
+
+    // Payment records — written exclusively by Admin SDK (verify-payment route).
+    // Users can read their own payments; only admins can see all.
+    match /payments/{id} {
+      allow read: if isAdmin() || isStudioPreview();
+      allow write: if false; // Admin SDK bypasses rules — no client writes needed
+    }
+
+    // Support tickets — no client write (route uses Admin SDK); admins read
+    match /supportTickets/{id} {
+      allow read, update: if isAdmin() || isStudioPreview();
+      allow write: if false; // Admin SDK only
+    }
   }
 }

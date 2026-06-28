@@ -77,8 +77,10 @@ export async function POST(request: NextRequest) {
     if (!questId) {
       return NextResponse.json({ error: 'Missing questId' }, { status: 400 });
     }
+    // Perfect-run bonus: +50 XP if every single choice was optimal
+    const perfectBonus = optimalRate >= 1.0 ? 50 : 0;
     // Cap XP to prevent inflation
-    const xpToAward = Math.min(MAX_XP_PER_QUEST, Math.max(0, Math.round(rawXP)));
+    const xpToAward = Math.min(MAX_XP_PER_QUEST, Math.max(0, Math.round(rawXP) + perfectBonus));
 
     const todayKey = getISTDateKey();
 

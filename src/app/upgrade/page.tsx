@@ -6,27 +6,55 @@ import { useRouter } from 'next/navigation';
 import { PREMIUM_FEATURES } from '@/config/premium';
 import { useAuthContext } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 
+// ── Razorpay type declaration (loaded via CDN script) ────────────────────────
+declare global {
+  interface Window {
+    Razorpay: new (options: RazorpayOptions) => RazorpayInstance;
+  }
+}
+interface RazorpayOptions {
+  key: string;
+  amount: number;
+  currency: string;
+  name: string;
+  description: string;
+  image?: string;
+  order_id: string;
+  handler: (response: RazorpayPaymentResponse) => void;
+  prefill?: { name?: string; email?: string };
+  theme?: { color?: string };
+  modal?: { ondismiss?: () => void };
+}
+interface RazorpayPaymentResponse {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+}
+interface RazorpayInstance {
+  open(): void;
+  on(event: string, handler: () => void): void;
+}
+
+// ── Feature comparison table ─────────────────────────────────────────────────
 const FEATURE_ROWS: Array<{
   label: string;
   free: string | boolean;
   premium: string | boolean;
 }> = [
-  { label: 'Case Files (Quests)',        free: '3 per day',     premium: 'Unlimited' },
-  { label: 'Budget Blitz',               free: true,            premium: true },
-  { label: 'FinIQ Quiz',                 free: true,            premium: true },
-  { label: 'Money Maze',                 free: true,            premium: true },
-  { label: 'Stock Market Simulator',     free: false,           premium: true },
-  { label: 'Credit Score Builder',       free: false,           premium: true },
-  { label: 'Group Play & Challenges',    free: false,           premium: true },
-  { label: 'Streak Shield',             free: false,           premium: '1× per week' },
-  { label: 'Exclusive Avatars',          free: false,           premium: true },
-  { label: 'Deep Analytics',            free: false,           premium: true },
-  { label: 'Shareable Rank Card',        free: false,           premium: true },
-  { label: 'Early Access',              free: false,           premium: true },
+  { label: 'Case Files (Quests)',       free: '3 per day',    premium: 'Unlimited' },
+  { label: 'Budget Blitz',              free: true,           premium: true },
+  { label: 'FinIQ Quiz',                free: true,           premium: true },
+  { label: 'Money Maze',                free: true,           premium: true },
+  { label: 'Stock Market Simulator',    free: false,          premium: true },
+  { label: 'Credit Score Builder',      free: false,          premium: true },
+  { label: 'Group Play & Challenges',   free: false,          premium: true },
+  { label: 'Streak Shield',             free: false,          premium: '1× per week' },
+  { label: 'Exclusive Avatars',         free: false,          premium: true },
+  { label: 'Deep Analytics',            free: false,          premium: true },
+  { label: 'Shareable Rank Card',       free: false,          premium: true },
+  { label: 'Early Access',              free: false,          premium: true },
 ];
 
 function FeatureCell({ value }: { value: string | boolean }) {
@@ -53,92 +81,160 @@ function FeatureCell({ value }: { value: string | boolean }) {
   return <span className="text-xs font-bold text-primary">{value}</span>;
 }
 
-/**
- * UpgradePage
- *
- * HOW TO WIRE STRIPE CHECKOUT (when you're ready to go live):
- *
- *  1. Add your Stripe publishable key to .env.local:
- *       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
- *
- *  2. Create a Stripe Checkout Session endpoint:
- *       src/app/api/stripe/create-checkout/route.ts
- *     It should create a session with:
- *       - price: your price ID (set in Stripe Dashboard)
- *       - metadata: { firebaseUid: uid }
- *       - success_url: https://spendxp.vercel.app/upgrade?success=true
- *       - cancel_url:  https://spendxp.vercel.app/upgrade
- *
- *  3. The STRIPE_WEBHOOK_SECRET webhook at /api/webhooks/stripe will then
- *     automatically set isPremium=true in Firestore when checkout completes.
- *
- *  4. Replace the waitlist form below with:
- *       <button onClick={handleStripeCheckout}>Subscribe to Premium</button>
- *     where handleStripeCheckout calls your create-checkout endpoint and redirects.
- */
+// ── Load Razorpay checkout.js once ──────────────────────────────────────────
+function loadRazorpayScript(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (window.Razorpay) { resolve(true); return; }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload  = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
 
+// ── Main Component ───────────────────────────────────────────────────────────
 export default function UpgradePage() {
   const { user } = useAuthContext();
   const router = useRouter();
   const { toast } = useToast();
-  const [emailSent, setEmailSent] = useState(false);
-  const [email, setEmail] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
-  // ── Waitlist (pre-Stripe) ────────────────────────────────────────────────────
-  async function handleJoinWaitlist(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email.trim()) return;
-    setSubmitting(true);
-    try {
-      await addDoc(collection(db, 'waitlist'), {
-        email: email.trim().toLowerCase(),
-        uid: user?.uid ?? null,
-        createdAt: serverTimestamp(),
-      });
-    } catch (err) {
-      console.warn('[Waitlist] Firestore write failed:', err);
-      // Still show success — don't block user on a network hiccup
-    } finally {
-      setSubmitting(false);
-      setEmailSent(true);
-    }
-  }
+  const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'quarterly'>('monthly');
+  const [loading, setLoading] = useState(false);
+  const [paid, setPaid] = useState(false);
 
-  // ── Stripe Checkout (activate this when Stripe is wired up) ─────────────────
-  async function handleStripeCheckout() {
+  const razorpayKeyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+  const isConfigured  = Boolean(razorpayKeyId);
+
+  async function handlePayment() {
     if (!user) { router.push('/login'); return; }
-    setCheckoutLoading(true);
+    if (!razorpayKeyId) {
+      toast({ title: 'Payments not configured', description: 'Razorpay env vars are missing.', variant: 'destructive' });
+      return;
+    }
+
+    setLoading(true);
+
     try {
+      // 1. Load Razorpay script
+      const loaded = await loadRazorpayScript();
+      if (!loaded) {
+        toast({ title: 'Could not load payment module', description: 'Check your internet connection and try again.', variant: 'destructive' });
+        setLoading(false);
+        return;
+      }
+
+      // 2. Create order on backend
       const token = await user.getIdToken();
-      const res = await fetch('/api/stripe/create-checkout', {
+      const orderRes = await fetch('/api/razorpay/create-order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
+        body: JSON.stringify({ plan: selectedPlan }),
       });
-      if (!res.ok) throw new Error('Checkout session creation failed');
-      const { url } = await res.json();
-      if (url) window.location.href = url;
+
+      if (!orderRes.ok) {
+        const err = await orderRes.json();
+        toast({ title: 'Order creation failed', description: err.error || 'Please try again.', variant: 'destructive' });
+        setLoading(false);
+        return;
+      }
+
+      const { orderId, amount, currency } = await orderRes.json();
+
+      // 3. Open Razorpay modal
+      const rzp = new window.Razorpay({
+        key: razorpayKeyId,
+        amount,
+        currency,
+        name: 'SpendXP',
+        description: selectedPlan === 'quarterly'
+          ? 'SpendXP Premium — 3 Months'
+          : 'SpendXP Premium — 1 Month',
+        image: '/icons/icon-192.png',
+        order_id: orderId,
+
+        handler: async (response: RazorpayPaymentResponse) => {
+          // 4. Verify payment signature on backend
+          try {
+            const freshToken = await user.getIdToken(true);
+            const verifyRes = await fetch('/api/razorpay/verify-payment', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${freshToken}`,
+              },
+              body: JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id:   response.razorpay_order_id,
+                razorpay_signature:  response.razorpay_signature,
+                plan: selectedPlan,
+              }),
+            });
+
+            const result = await verifyRes.json();
+
+            if (verifyRes.ok && result.success) {
+              setPaid(true);
+              // Redirect to success page after a brief celebration moment
+              setTimeout(() => router.push('/upgrade/success?via=razorpay'), 1500);
+            } else {
+              toast({
+                title: 'Verification failed',
+                description: result.error || 'Payment could not be verified. Contact support with your payment ID.',
+                variant: 'destructive',
+              });
+            }
+          } catch {
+            toast({
+              title: 'Network error during verification',
+              description: `Please contact support with Payment ID: ${response.razorpay_payment_id}`,
+              variant: 'destructive',
+            });
+          }
+        },
+
+        prefill: {
+          name:  user.displayName || '',
+          email: user.email || '',
+        },
+        theme: { color: '#2E7D5A' },
+        modal: {
+          ondismiss: () => {
+            setLoading(false);
+          },
+        },
+      });
+
+      rzp.open();
+      // loading spinner stays until modal is dismissed or payment completes
     } catch (err) {
-      console.error('[Upgrade] Stripe checkout error:', err);
-      toast({ title: 'Checkout failed', description: 'Could not start payment. Please try again.', variant: 'destructive' });
-    } finally {
-      setCheckoutLoading(false);
+      console.error('[Upgrade] Payment error:', err);
+      toast({ title: 'Something went wrong', description: 'Please try again.', variant: 'destructive' });
+      setLoading(false);
     }
   }
 
-  // ── Stripe is "live" when the env var is set ─────────────────────────────────
-  const stripeLive = Boolean(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+  // ── Success state (brief, then redirects) ──────────────────────────────────
+  if (paid) {
+    return (
+      <div className="min-h-screen bg-[#1A1F2E] flex items-center justify-center p-4">
+        <div className="text-center space-y-4">
+          <div className="text-6xl animate-bounce">🎖️</div>
+          <h1 className="text-2xl font-black text-white">Payment Successful!</h1>
+          <p className="text-slate-400 text-sm">Activating your Premium access…</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-slate-50 pb-24">
       {/* Hero */}
       <div className="bg-[#1A1F2E] text-white">
         <div className="max-w-2xl mx-auto px-4 pt-14 pb-12 text-center">
-          {/* Back link */}
           <button
             onClick={() => router.back()}
             className="inline-flex items-center gap-1.5 text-slate-400 hover:text-slate-200 text-xs font-black uppercase tracking-widest mb-8 transition-colors"
@@ -149,7 +245,6 @@ export default function UpgradePage() {
             Go Back
           </button>
 
-          {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-500/30 rounded-full px-4 py-1.5 mb-6">
             <span className="text-amber-400 text-xs font-black uppercase tracking-widest">SpendXP Agent Tier</span>
           </div>
@@ -163,23 +258,37 @@ export default function UpgradePage() {
             The Order's most powerful agents unlock every tool. Go from Apprentice to Legend faster with the full arsenal.
           </p>
 
-          {/* Price badge */}
-          <div className="inline-flex flex-col items-center bg-white/5 border border-white/10 rounded-2xl px-8 py-5">
-            <div className="flex items-baseline gap-2 mb-1">
-              <span className="text-4xl font-black text-white">₹149</span>
-              <span className="text-slate-400 text-base font-bold">/month</span>
-            </div>
-            <div className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-3">or ₹349 / 3 months · save 22%</div>
-            <div className="flex flex-wrap gap-2 justify-center text-xs text-slate-500 font-medium">
-              <span>🇺🇸 $2.99/mo</span>
-              <span>·</span>
-              <span>🇬🇧 £1.99/mo</span>
-              <span>·</span>
-              <span>🇪🇺 €1.99/mo</span>
-              <span>·</span>
-              <span>🇦🇺 A$3.99/mo</span>
-            </div>
-            <div className="mt-3 text-xs text-slate-600">Cancel anytime · No contracts · Priced locally</div>
+          {/* Plan selector */}
+          <div className="inline-flex bg-white/5 border border-white/10 rounded-2xl p-1 gap-1 mb-4">
+            <button
+              onClick={() => setSelectedPlan('monthly')}
+              className={cn(
+                'px-6 py-3 rounded-xl text-sm font-black transition-all',
+                selectedPlan === 'monthly'
+                  ? 'bg-primary text-white'
+                  : 'text-slate-400 hover:text-white'
+              )}
+            >
+              Monthly<br />
+              <span className="text-xs font-bold opacity-80">₹149</span>
+            </button>
+            <button
+              onClick={() => setSelectedPlan('quarterly')}
+              className={cn(
+                'px-6 py-3 rounded-xl text-sm font-black transition-all relative',
+                selectedPlan === 'quarterly'
+                  ? 'bg-primary text-white'
+                  : 'text-slate-400 hover:text-white'
+              )}
+            >
+              3 Months<br />
+              <span className="text-xs font-bold opacity-80">₹349</span>
+              <span className="absolute -top-2 -right-2 bg-amber-500 text-black text-[9px] font-black px-1.5 py-0.5 rounded-full">SAVE 22%</span>
+            </button>
+          </div>
+
+          <div className="text-slate-500 text-xs mt-2">
+            {selectedPlan === 'quarterly' ? '₹116/month · billed ₹349 every 3 months' : 'Billed monthly · Cancel anytime'}
           </div>
         </div>
       </div>
@@ -206,13 +315,11 @@ export default function UpgradePage() {
         <div className="mb-10">
           <h2 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-4">Free vs Agent</h2>
           <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
-            {/* Header */}
             <div className="grid grid-cols-[1fr_80px_80px] text-center bg-slate-50 border-b border-slate-100">
               <div className="px-4 py-3 text-left text-xs font-black uppercase tracking-widest text-slate-400">Feature</div>
               <div className="py-3 text-xs font-black uppercase tracking-widest text-slate-500">Explorer</div>
               <div className="py-3 text-xs font-black uppercase tracking-widest" style={{ color: '#2E7D5A' }}>Agent</div>
             </div>
-            {/* Rows */}
             {FEATURE_ROWS.map((row, i) => (
               <div
                 key={row.label}
@@ -222,44 +329,45 @@ export default function UpgradePage() {
                 )}
               >
                 <div className="px-4 py-3 text-left text-xs font-bold text-slate-700">{row.label}</div>
-                <div className="py-3 flex items-center justify-center">
-                  <FeatureCell value={row.free} />
-                </div>
-                <div className="py-3 flex items-center justify-center">
-                  <FeatureCell value={row.premium} />
-                </div>
+                <div className="py-3 flex items-center justify-center"><FeatureCell value={row.free} /></div>
+                <div className="py-3 flex items-center justify-center"><FeatureCell value={row.premium} /></div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* CTA — Stripe checkout (if live) or Waitlist */}
+        {/* CTA */}
         <div className="bg-[#1A1F2E] rounded-2xl p-8 text-center mb-6">
-          {stripeLive ? (
-            /* ── Stripe is wired: show Subscribe button ── */
+          {isConfigured ? (
             <div className="space-y-4">
               <div className="text-amber-400 text-xs font-black uppercase tracking-widest mb-1">SpendXP Agent</div>
-              <h3 className="text-xl font-black text-white">SpendXP Premium</h3>
+              <h3 className="text-xl font-black text-white">
+                {selectedPlan === 'quarterly' ? '3 Months for ₹349' : '₹149 / month'}
+              </h3>
               <p className="text-slate-400 text-sm max-w-xs mx-auto">
                 Unlock all games, unlimited quests, streak shields, and more.
               </p>
               <button
-                onClick={handleStripeCheckout}
-                disabled={checkoutLoading}
-                className="w-full mt-2 h-12 rounded-xl text-sm font-black uppercase tracking-widest text-white transition-all"
-                style={{ background: checkoutLoading ? '#1a3d2b' : '#2E7D5A' }}
+                onClick={handlePayment}
+                disabled={loading}
+                className="w-full mt-2 h-12 rounded-xl text-sm font-black uppercase tracking-widest text-white transition-all disabled:opacity-50"
+                style={{ background: loading ? '#1a3d2b' : '#2E7D5A' }}
               >
-                {checkoutLoading ? 'Loading...' : 'Subscribe to Premium'}
+                {loading ? 'Opening payment…' : `Pay ₹${selectedPlan === 'quarterly' ? '349' : '149'} with Razorpay`}
               </button>
-              <p className="text-slate-600 text-[10px]">Powered by Stripe · Cancel anytime · No contracts</p>
+              <p className="text-slate-600 text-[10px]">
+                UPI · Cards · Netbanking · Wallets · Cancel anytime
+              </p>
             </div>
-          ) : emailSent ? (
-            /* ── Waitlist confirmed ── */
+          ) : (
+            /* Payments not yet configured */
             <div className="space-y-3">
-              <div className="text-4xl">🎖️</div>
-              <h3 className="text-xl font-black text-white">You're on the list!</h3>
+              <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-500/30 rounded-full px-3 py-1 mb-2">
+                <span className="text-amber-400 text-[10px] font-black uppercase tracking-widest">Launching Soon</span>
+              </div>
+              <h3 className="text-xl font-black text-white">Agent Tier Coming Soon</h3>
               <p className="text-slate-400 text-sm max-w-xs mx-auto">
-                We'll notify you the moment Agent tier launches. Your spot is reserved.
+                Premium is almost here. Keep playing to earn your spot at the top.
               </p>
               <Link
                 href="/games"
@@ -268,45 +376,15 @@ export default function UpgradePage() {
                 Back to Arcade →
               </Link>
             </div>
-          ) : (
-            /* ── Waitlist form ── */
-            <>
-              <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-500/30 rounded-full px-3 py-1 mb-4">
-                <span className="text-amber-400 text-[10px] font-black uppercase tracking-widest">Launching Soon</span>
-              </div>
-              <h3 className="text-xl font-black text-white mb-2">Join the Agent Waitlist</h3>
-              <p className="text-slate-400 text-sm mb-6 max-w-xs mx-auto">
-                Premium is coming soon. Drop your email to be first in line — and get a free Streak Shield on launch day.
-              </p>
-              <form onSubmit={handleJoinWaitlist} className="flex gap-2 max-w-sm mx-auto">
-                <input
-                  type="email"
-                  required
-                  placeholder="your@email.com"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 outline-none focus:border-primary transition-colors"
-                />
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-white transition-all"
-                  style={{ background: submitting ? '#1a3d2b' : '#2E7D5A' }}
-                >
-                  {submitting ? '...' : 'Join'}
-                </button>
-              </form>
-              <p className="text-slate-600 text-[10px] mt-3">No spam. Unsubscribe anytime.</p>
-            </>
           )}
         </div>
 
         {/* Reassurance */}
         <div className="grid grid-cols-3 gap-3 text-center">
           {[
-            { icon: '🔒', label: 'Secure Payments', sub: 'Stripe encrypted' },
-            { icon: '↩', label: 'Cancel Anytime', sub: 'No contracts' },
-            { icon: '🛡', label: 'Data Private', sub: 'Never sold' },
+            { icon: '🔒', label: 'Secure Payments', sub: 'Razorpay encrypted' },
+            { icon: '↩', label: 'Cancel Anytime',  sub: 'No contracts' },
+            { icon: '🛡', label: 'Data Private',    sub: 'Never sold' },
           ].map(item => (
             <div key={item.label} className="bg-white rounded-xl p-4 border border-slate-100">
               <div className="text-xl mb-1">{item.icon}</div>
