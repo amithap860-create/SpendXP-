@@ -417,11 +417,7 @@ export default function QuestsHub() {
                         <span className="flex items-center gap-1"><Shield className="h-3 w-3 text-primary" />{quest.steps.length} decisions</span>
                       </div>
 
-                      {!isAvailableForAge ? (
-                        <div className="text-[9px] font-black text-[#2E7D5A] bg-[#E8F5EE] border border-[#A8D5BC] p-2 rounded-lg text-center uppercase tracking-widest">
-                          Unlocks at higher rank
-                        </div>
-                      ) : isLocked ? (
+                      {isLocked ? (
                         <Button disabled className="w-full h-11 bg-slate-100 text-slate-400 border-none font-black" suppressHydrationWarning>
                           Complete prerequisite first
                         </Button>
