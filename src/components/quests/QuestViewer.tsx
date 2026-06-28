@@ -35,7 +35,7 @@ interface QuestViewerProps {
 
 export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
   const { ageGroup } = useAgeAdapt();
-  const { formatINR } = useCurrency();
+  const { formatINR, activeCurrency } = useCurrency();
   const { state, currentStep, progress, startQuest, resetQuest, makeChoice } = useQuestEngine(quest, ageGroup);
   
   const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(null);
@@ -162,25 +162,43 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
 
   if (state.status === 'COMPLETE') {
     const starCount = state.optimalChoiceCount >= quest.steps.length * 0.8 ? 3 : state.optimalChoiceCount >= quest.steps.length * 0.5 ? 2 : 1;
+    // Server tells us if this quest was already completed before this replay
+    const isReplay = state.serverResult?.alreadyCompleted === true;
+    // Use server-confirmed XP (most accurate); fall back to local estimate while response loads
+    const xpDisplay = isReplay
+      ? 0
+      : (state.serverResult?.xpAwarded ?? state.totalXPEarned + quest.xpReward);
 
     return (
       <div className="flex-1 flex flex-col p-4 md:p-8 animate-in slide-in-from-bottom-8 duration-700 bg-slate-50 min-h-screen-safe overflow-y-auto">
         <Card className="max-w-4xl w-full mx-auto border-none shadow-2xl overflow-hidden mb-8">
-          <div className="bg-primary p-8 md:p-12 text-white text-center">
+          <div className={cn("p-8 md:p-12 text-white text-center", isReplay ? "bg-slate-700" : "bg-primary")}>
             <Trophy className="h-16 w-16 mx-auto mb-6 animate-bounce" />
-            <h2 className="text-4xl md:text-6xl font-black mb-6">Mission Success</h2>
-            <div className="flex justify-center gap-3">
-              {[1, 2, 3].map(i => (
-                <Star key={i} className={cn("h-10 w-10 md:h-14 md:w-14 fill-current", i <= starCount ? "text-[#C8E8D8]" : "text-[#4EA07A]")} />
-              ))}
-            </div>
+            <h2 className="text-4xl md:text-6xl font-black mb-6">
+              {isReplay ? 'Replay Complete' : 'Mission Success'}
+            </h2>
+            {isReplay ? (
+              <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-5 py-2 text-sm font-bold">
+                ✓ XP already earned on first completion — replays are practice only
+              </div>
+            ) : (
+              <div className="flex justify-center gap-3">
+                {[1, 2, 3].map(i => (
+                  <Star key={i} className={cn("h-10 w-10 md:h-14 md:w-14 fill-current", i <= starCount ? "text-[#C8E8D8]" : "text-[#4EA07A]")} />
+                ))}
+              </div>
+            )}
           </div>
-          
+
           <CardContent className="p-8 md:p-12 space-y-12">
             <div className="grid md:grid-cols-3 gap-6">
               <ResultCard label="Starting Cash" val={formatINR(quest.startingBalance)} />
               <ResultCard label="Ending Cash" val={formatINR(currentBalance)} color={getBalanceColor()} icon={ArrowUpRight} />
-              <ResultCard label="XP Gained" val={`+${state.totalXPEarned + quest.xpReward}`} color="text-primary" />
+              <ResultCard
+                label={isReplay ? 'XP (Replay)' : 'XP Gained'}
+                val={isReplay ? 'No XP' : `+${xpDisplay}`}
+                color={isReplay ? 'text-slate-400' : 'text-primary'}
+              />
             </div>
 
             <div className="space-y-6">
@@ -282,10 +300,10 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
 
   return (
     <div className="flex-1 flex flex-col p-4 md:p-6 gap-6 md:gap-8 bg-slate-50 min-h-screen-safe overflow-y-auto">
-      <div className="sticky top-4 z-50 animate-in slide-in-from-top-4 duration-500">
+      <div className="sticky top-4 z-50 animate-in slide-in-from-top-4 duration-500 space-y-1.5">
         <div className="max-w-3xl mx-auto bg-white/90 backdrop-blur-md rounded-3xl border-2 border-slate-100 shadow-xl p-4 flex items-center justify-around">
           <div className="flex flex-col items-center">
-            <span className="text-[10px] font-black uppercase text-slate-400">Balance</span>
+            <span className="text-[10px] font-black uppercase text-slate-400">Balance ({activeCurrency.code})</span>
             <span className={cn("text-lg md:text-xl font-black transition-colors duration-500", getBalanceColor())}>
               {formatINR(currentBalance)}
             </span>
@@ -301,6 +319,11 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
             <span className="text-lg md:text-xl font-black text-slate-900">{getHealthLabel(50 + state.totalHealthDelta)}</span>
           </div>
         </div>
+        {activeCurrency.code !== 'INR' && (
+          <p className="max-w-3xl mx-auto text-center text-[10px] font-bold text-slate-400 px-2">
+            Story amounts are in ₹ (INR) for context · Your balance tracker above is in {activeCurrency.code}
+          </p>
+        )}
       </div>
 
       <Card className="max-w-3xl w-full mx-auto border-none shadow-2xl overflow-hidden flex flex-col flex-1">

@@ -13,7 +13,7 @@ import {
   User as FirebaseUser,
 } from 'firebase/auth';
 import { auth, googleProvider, db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -120,25 +120,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Tracks when the last verification email was sent; prevents duplicates within a session
   const lastVerifyEmailSentAt = React.useRef<number>(0);
 
-  // ─── Firebase Auth state listener ──────────────────────────────────────────
-  // This is the SINGLE source of truth for the user's identity.
-  // The uid always comes from Firebase Auth — it is a real 28-character uid,
-  // never the hardcoded stub '1' that the old localStorage approach used.
+  // ─── Firebase Auth + Firestore real-time listener ─────────────────────────
+  // Auth is the SINGLE source of truth for identity (uid).
+  // Firestore is listened to in real-time so currency, isPremium, and
+  // subscriptionEndAt always reflect the latest value without requiring
+  // the user to log out and back in after a profile change.
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(
+    // Holds the Firestore onSnapshot unsubscribe so we can clean it up
+    // when auth state changes (e.g. user logs out or switches accounts).
+    let firestoreUnsub: (() => void) | null = null;
+
+    const authUnsub = onAuthStateChanged(
       auth,
-      async (firebaseUser) => {
+      (firebaseUser) => {
+        // Clean up any existing Firestore listener before setting up a new one
+        if (firestoreUnsub) {
+          firestoreUnsub();
+          firestoreUnsub = null;
+        }
+
         if (firebaseUser) {
           setUser(mapFirebaseUser(firebaseUser));
           setEmailVerified(firebaseUser.emailVerified);
-          // Load currency preference from Firestore — non-fatal if it fails
-          try {
-            const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-            if (userDoc.exists()) {
-              const data = userDoc.data();
-              if (data?.currencyCode) setCurrencyCode(data.currencyCode);
-              if (data?.isPremium !== undefined || data?.subscriptionEndAt !== undefined) {
-                // Convert Firestore Timestamp → ISO string for subscriptionEndAt
+
+          // Real-time listener on the user's Firestore doc.
+          // This fires immediately with the current value, then again on every change
+          // (e.g. currency update from Profile page, premium activation from payment).
+          firestoreUnsub = onSnapshot(
+            doc(db, 'users', firebaseUser.uid),
+            (snap) => {
+              if (snap.exists()) {
+                const data = snap.data();
+
+                // Update currency code
+                if (data?.currencyCode) setCurrencyCode(data.currencyCode);
+
+                // Update premium status and subscription expiry
                 let subEndIso: string | null = null;
                 if (data?.subscriptionEndAt) {
                   try {
@@ -153,16 +170,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   premiumPlan: data?.premiumPlan ?? null,
                 } : prev);
               }
+              setLoading(false);
+            },
+            (err) => {
+              console.warn('[SpendXP] Firestore user doc listener error:', err);
+              setLoading(false);
             }
-          } catch (err) {
-            console.warn('[SpendXP] Could not load currencyCode from Firestore:', err);
-          }
+          );
         } else {
           setUser(null);
           setEmailVerified(false);
           setCurrencyCode('INR');
+          setLoading(false);
         }
-        setLoading(false);
       },
       (authError) => {
         console.error('[SpendXP] onAuthStateChanged error:', authError);
@@ -170,7 +190,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(false);
       }
     );
-    return () => unsubscribe();
+
+    return () => {
+      authUnsub();
+      if (firestoreUnsub) firestoreUnsub();
+    };
   }, []);
 
   // ─── Auth functions ─────────────────────────────────────────────────────────
