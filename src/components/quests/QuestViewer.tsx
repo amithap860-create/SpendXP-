@@ -37,6 +37,19 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
   const { ageGroup } = useAgeAdapt();
   const { formatINR, activeCurrency } = useCurrency();
   const { state, currentStep, progress, startQuest, resetQuest, makeChoice } = useQuestEngine(quest, ageGroup);
+
+  /**
+   * Replaces all ₹N / ₹N,NNN / ₹N,NN,NNN occurrences in a narrative string
+   * with the equivalent amount in the user's active currency.
+   * Preserves the rest of the text exactly as written.
+   */
+  const localiseText = React.useCallback((text: string): string => {
+    if (activeCurrency.code === 'INR') return text;
+    return text.replace(/₹([\d,]+)/g, (_, numStr) => {
+      const inrValue = parseInt(numStr.replace(/,/g, ''), 10);
+      return formatINR(inrValue);
+    });
+  }, [activeCurrency.code, formatINR]);
   
   const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(null);
   const [showBreakdown, setShowBreakdown] = useState(true);
@@ -222,17 +235,17 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
                       <div className="grid md:grid-cols-2 gap-4 text-xs">
                         <div className="space-y-1">
                           <p className="text-slate-400 font-bold uppercase text-[9px]">Your Choice</p>
-                          <p className="font-medium text-slate-700">{choice.text}</p>
+                          <p className="font-medium text-slate-700">{localiseText(choice.text)}</p>
                         </div>
                         {!choice.isOptimal && (
                           <div className="space-y-1">
                             <p className="text-primary font-bold uppercase text-[9px]">Better Move</p>
-                            <p className="font-medium text-primary">{optimal.text}</p>
+                            <p className="font-medium text-primary">{localiseText(optimal.text)}</p>
                           </div>
                         )}
                       </div>
                       <div className="p-3 bg-slate-50 rounded-xl text-xs font-medium text-slate-600 border border-slate-100">
-                        {choice.explanation}
+                        {localiseText(choice.explanation)}
                       </div>
                     </div>
                   ) : null;
@@ -252,7 +265,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
                   return choice?.realLifeTip ? (
                     <div key={i} className="flex gap-3 items-start">
                       <div className="h-7 w-7 rounded-full bg-white/10 flex items-center justify-center shrink-0 font-black text-sm text-primary">{i+1}</div>
-                      <p className="text-slate-300 text-sm font-medium leading-relaxed">{choice.realLifeTip}</p>
+                      <p className="text-slate-300 text-sm font-medium leading-relaxed">{localiseText(choice.realLifeTip)}</p>
                     </div>
                   ) : null;
                 })}
@@ -319,11 +332,6 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
             <span className="text-lg md:text-xl font-black text-slate-900">{getHealthLabel(50 + state.totalHealthDelta)}</span>
           </div>
         </div>
-        {activeCurrency.code !== 'INR' && (
-          <p className="max-w-3xl mx-auto text-center text-[10px] font-bold text-slate-400 px-2">
-            Story amounts are in ₹ (INR) for context · Your balance tracker above is in {activeCurrency.code}
-          </p>
-        )}
       </div>
 
       <Card className="max-w-3xl w-full mx-auto border-none shadow-xl overflow-hidden flex flex-col flex-1">
@@ -336,7 +344,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
               <h2 className="text-lg md:text-xl font-black text-slate-900 tracking-tight">{currentStep?.title}</h2>
             </div>
             <div className="p-4 md:p-5 bg-slate-50 rounded-2xl border-l-4 border-primary italic text-sm md:text-base text-slate-700 leading-relaxed font-medium">
-              &ldquo;{currentStep?.narrative}&rdquo;
+              &ldquo;{localiseText(currentStep?.narrative ?? '')}&rdquo;
             </div>
           </div>
 
@@ -357,7 +365,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
                       : "opacity-40 grayscale"
                 )}
               >
-                <span className="text-sm md:text-base font-bold pr-4">{choice.text}</span>
+                <span className="text-sm md:text-base font-bold pr-4">{localiseText(choice.text)}</span>
                 {selectedChoiceId === choice.id && (
                   choice.isOptimal ? <CheckCircle2 className="h-6 w-6 text-primary shrink-0" /> : <XCircle className="h-6 w-6 text-[#2E7D5A] shrink-0" />
                 )}
@@ -369,7 +377,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
             <div className="animate-in slide-in-from-top-4 duration-500 space-y-5 mt-4">
               <div className="space-y-4">
                 <div className="p-4 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                  <p className="font-bold text-slate-800 text-sm md:text-base leading-relaxed">&ldquo;{activeChoice.consequence}&rdquo;</p>
+                  <p className="font-bold text-slate-800 text-sm md:text-base leading-relaxed">&ldquo;{localiseText(activeChoice.consequence)}&rdquo;</p>
                 </div>
 
                 <div className="p-5 bg-primary/5 rounded-2xl border border-primary/10 space-y-2">
@@ -377,7 +385,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
                     <TrendingUp className="h-4 w-4" /> Intelligence Report
                   </div>
                   <p className="text-sm font-medium text-slate-600 leading-relaxed italic">
-                    {activeChoice.explanation}
+                    {localiseText(activeChoice.explanation)}
                   </p>
                 </div>
               </div>
