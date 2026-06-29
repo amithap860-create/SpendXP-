@@ -9,6 +9,8 @@ import { auth, isFirebaseReady } from '@/lib/firebase';
 import { useFirestore, useDoc, useCollection, useMemoFirebase, useFirebase, useUser as useFirebaseUser } from '@/firebase';
 import { safeSetDoc, safeUpdateDoc } from '@/lib/firestoreSafe';
 import { SecurityQuestion, UserProfile } from '@/types/user';
+import { SUPPORTED_CURRENCIES, DEFAULT_CURRENCY } from '@/config/currency';
+import { formatCurrency, scaleAmount } from '@/lib/formatCurrency';
 
 export interface AppTask {
   id: string;
@@ -79,7 +81,7 @@ function isValidUid(uid: string | null | undefined): uid is string {
 }
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useAuthContext();
+  const { user, currencyCode } = useAuthContext();
   const firebaseUser = useFirebaseUser();
   const db = useFirestore();
   const isLoggedIn = !!firebaseUser.user;
@@ -134,12 +136,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   }
 
+  const activeCurrency = SUPPORTED_CURRENCIES.find(c => c.code === (currencyCode || 'INR')) || DEFAULT_CURRENCY;
   const formatValue = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0,
-    }).format(amount);
+    // Amount in store is INR-based — scale to user's currency before formatting
+    const scaled = scaleAmount(amount, activeCurrency.code);
+    return formatCurrency(scaled, activeCurrency);
   };
 
   const login = async (email: string, age: number) => {
@@ -291,7 +292,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     updateStocks,
     buyStock,
     sellStock,
-    currency: profile?.currency || 'USD',
+    currency: currencyCode || 'INR',
     tasks: remoteTasks,
     formatValue,
     completeTask,

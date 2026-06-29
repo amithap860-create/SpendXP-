@@ -40,7 +40,7 @@ const KEY_TERMS = [
   { term: 'NEED', emoji: '🛒', def: 'Something essential you cannot survive without — food, rent, medicine, transport.' },
   { term: 'WANT', emoji: '🎮', def: 'Something nice to have but not essential — games, snacks, streaming, fashion.' },
   { term: 'SAVE', emoji: '🐷', def: 'Money set aside for future goals, emergencies, or investments.' },
-  { term: '50/30/20 Rule', emoji: '📊', def: '50% of income on Needs, 30% on Wants, 20% into Savings — a simple budgeting guide.' },
+  { term: 'Priority Order', emoji: '📊', def: 'Always pay Needs first, then set aside Savings, then spend Wants with whatever\'s left. The split will look different for everyone.' },
   { term: 'Budget', emoji: '📋', def: 'A plan that tells your money where to go before you spend it.' },
   { term: 'Discretionary Income', emoji: '💸', def: 'Money left over after paying for all necessities — what you can freely choose to spend or save.' },
 ];
@@ -292,7 +292,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
           </div>
           {showInfo && (
             <>
-              <p className="text-slate-600">Cards fall from the top. Tap a bucket button before each card hits the bottom. Miss a card = lose a life. 3 lives per game. Speed increases every 30 seconds.</p>
+              <p className="text-slate-600">Cards fall from the top. Sort each item into the right bucket before it hits the bottom. Miss a card = lose a life. 3 lives per game. Speed increases every 30 seconds. Your accuracy score at the end shows how well you know what actually counts as a Need vs. a Want.</p>
               <div className="grid grid-cols-3 gap-2 text-xs text-center">
                 {[
                   { icon: ShoppingBag, label: 'NEED', desc: 'Must-haves: food, rent, medicine', color: 'bg-[#E8F5EE] border-[#A8D5BC] text-primary' },
@@ -306,7 +306,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
                   </div>
                 ))}
               </div>
-              <p className="text-slate-500 text-xs">On mobile: swipe ← = NEED, → = SAVE, ↓ = WANT. Your Budget Report at the end shows your spending split.</p>
+              <p className="text-slate-500 text-xs">On mobile: swipe ← = NEED, → = SAVE, ↓ = WANT. Your accuracy report at the end shows how well you sorted each category.</p>
             </>
           )}
         </div>
@@ -342,25 +342,22 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
 
   // ── RESULTS ──────────────────────────────────────────────────────────────────
   if (gameState === 'RESULTS' || gameState === 'GAME_OVER') {
-    const needPct = stats.total > 0 ? Math.round((stats.NEED / stats.total) * 100) : 0;
-    const wantPct = stats.total > 0 ? Math.round((stats.WANT / stats.total) * 100) : 0;
-    const savePct = stats.total > 0 ? Math.round((stats.SAVE / stats.total) * 100) : 0;
+    const accuracy = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
 
-    // Simple verdict based on how close they are to 50/30/20
-    const getVerdict = () => {
-      if (stats.total === 0) return { emoji: '🎯', label: 'Keep going!', msg: 'Sort more items to see your budget split.', ok: false };
-      if (savePct >= 20 && needPct <= 55 && wantPct <= 35) return { emoji: '🏆', label: 'Perfect split!', msg: 'You nailed the 50/30/20 rule. Great budgeting habits!', ok: true };
-      if (savePct >= 15 && wantPct <= 40) return { emoji: '✅', label: 'Pretty good!', msg: 'You\'re close to the ideal split. Try saving a bit more next round.', ok: true };
-      if (wantPct > 50) return { emoji: '⚠️', label: 'Too many wants!', msg: 'More than half your spend went on wants. Try keeping it under 30%.', ok: false };
-      if (savePct < 10) return { emoji: '⚠️', label: 'Save more!', msg: 'You saved very little. Aim for at least 20% into savings each time.', ok: false };
-      return { emoji: '👍', label: 'Good effort!', msg: 'Keep practising — aim for 50% Needs, 30% Wants, 20% Savings.', ok: true };
+    // Verdict based on categorisation accuracy
+    const getVerdict = (): { label: string; msg: string; ok: boolean; color: string } => {
+      if (stats.total === 0) return { label: 'Keep going!', msg: 'Sort more items to see your results.', ok: false, color: 'bg-slate-50 border-slate-200' };
+      if (accuracy >= 90) return { label: 'Sharp eye!', msg: 'You instantly know what\'s essential and what can wait. That instinct is worth more than any budget spreadsheet.', ok: true, color: 'bg-[#E8F5EE] border-[#A8D5BC]' };
+      if (accuracy >= 75) return { label: 'Good instincts!', msg: 'You\'re getting the hang of separating needs from wants. A few close calls — but the priority order is clicking.', ok: true, color: 'bg-[#E8F5EE] border-[#A8D5BC]' };
+      if (accuracy >= 55) return { label: 'Getting there!', msg: 'Some items tripped you up — that\'s normal. Remember: NEEDS first, then SAVE a slice, then WANTS with whatever\'s left.', ok: false, color: 'bg-amber-50 border-amber-200' };
+      return { label: 'Keep practising!', msg: 'The key question for every item: "Could I survive without this?" If yes — it\'s a WANT. If no — it\'s a NEED. Savings always come before wants.', ok: false, color: 'bg-rose-50 border-rose-200' };
     };
     const verdict = getVerdict();
 
     const buckets = [
-      { label: 'NEED', emoji: '🛒', pct: needPct, count: stats.NEED, ideal: '≤ 50%', idealOk: needPct <= 55, color: 'bg-primary', ring: 'ring-primary' },
-      { label: 'WANT', emoji: '🎮', pct: wantPct, count: stats.WANT, ideal: '≤ 30%', idealOk: wantPct <= 35, color: 'bg-amber-400', ring: 'ring-amber-400' },
-      { label: 'SAVE', emoji: '🐷', pct: savePct, count: stats.SAVE, ideal: '≥ 20%', idealOk: savePct >= 18, color: 'bg-blue-500', ring: 'ring-blue-500' },
+      { label: 'NEED', Icon: ShoppingBag, count: stats.NEED, color: 'bg-primary/10 text-primary border-primary/20', barColor: 'bg-primary', priority: 1, tip: 'Pay these first — always.' },
+      { label: 'SAVE', Icon: PiggyBank, count: stats.SAVE, color: 'bg-blue-50 text-blue-700 border-blue-200', barColor: 'bg-blue-500', priority: 2, tip: 'Set aside before spending on wants.' },
+      { label: 'WANT', Icon: Wallet, count: stats.WANT, color: 'bg-amber-50 text-amber-700 border-amber-200', barColor: 'bg-amber-400', priority: 3, tip: 'Whatever is left — then enjoy.' },
     ];
 
     return (
@@ -379,45 +376,44 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
 
             <CardContent className="p-5 md:p-8 space-y-5">
 
-              {/* 3 big bucket cards */}
-              <div className="grid grid-cols-3 gap-3">
-                {buckets.map(({ label, emoji, pct, count, ideal, idealOk, color, ring }) => (
-                  <div key={label} className={cn('rounded-2xl border-2 p-3 text-center flex flex-col items-center gap-1', idealOk ? 'border-slate-200 bg-slate-50' : 'border-rose-200 bg-rose-50')}>
-                    <span className="text-2xl">{emoji}</span>
-                    <div className={cn('text-2xl md:text-3xl font-black', idealOk ? 'text-slate-800' : 'text-rose-600')}>{pct}%</div>
-                    <div className="text-[10px] font-black uppercase text-slate-500">{label}</div>
-                    <div className="text-[9px] text-slate-400">{count} items</div>
-                    <div className={cn('text-[9px] font-bold mt-0.5', idealOk ? 'text-primary' : 'text-rose-500')}>
-                      {idealOk ? '✓ ' : '✗ '}{ideal}
-                    </div>
-                  </div>
-                ))}
+              {/* Accuracy ring */}
+              <div className="flex items-center justify-center gap-6 py-2">
+                <div className="text-center">
+                  <div className={cn('text-5xl font-black', accuracy >= 75 ? 'text-primary' : accuracy >= 55 ? 'text-amber-500' : 'text-rose-500')}>{accuracy}%</div>
+                  <div className="text-xs font-black uppercase tracking-widest text-slate-400 mt-1">Accuracy</div>
+                </div>
+                <div className="h-14 w-px bg-slate-200" />
+                <div className="text-center">
+                  <div className="text-5xl font-black text-slate-800">{stats.correct}<span className="text-2xl text-slate-400">/{stats.total}</span></div>
+                  <div className="text-xs font-black uppercase tracking-widest text-slate-400 mt-1">Correct</div>
+                </div>
               </div>
 
               {/* Verdict */}
-              <div className={cn('rounded-xl p-4 text-center', verdict.ok ? 'bg-[#E8F5EE] border border-[#A8D5BC]' : 'bg-rose-50 border border-rose-200')}>
-                <div className="text-3xl mb-1">{verdict.emoji}</div>
-                <div className={cn('font-black text-lg mb-1', verdict.ok ? 'text-primary' : 'text-rose-700')}>{verdict.label}</div>
-                <div className={cn('text-sm', verdict.ok ? 'text-[#2E7D5A]' : 'text-rose-600')}>{verdict.msg}</div>
+              <div className={cn('rounded-xl p-4', verdict.color, 'border')}>
+                <div className={cn('font-black text-base mb-1', verdict.ok ? 'text-primary' : accuracy >= 55 ? 'text-amber-700' : 'text-rose-700')}>{verdict.label}</div>
+                <div className={cn('text-sm', verdict.ok ? 'text-[#2E7D5A]' : accuracy >= 55 ? 'text-amber-600' : 'text-rose-600')}>{verdict.msg}</div>
               </div>
 
-              {/* Simple ideal comparison */}
-              <div className="bg-slate-50 rounded-xl border p-4 space-y-2">
-                <div className="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">The 50 / 30 / 20 Rule</div>
-                {buckets.map(({ label, emoji, pct, ideal, idealOk, color }) => (
-                  <div key={label} className="flex items-center gap-3">
-                    <span className="text-base w-6 shrink-0">{emoji}</span>
-                    <div className="flex-1">
-                      <div className="flex justify-between text-xs font-bold mb-1">
-                        <span>{label}</span>
-                        <span className={idealOk ? 'text-primary' : 'text-rose-500'}>{pct}% <span className="text-slate-400 font-normal">(ideal {ideal})</span></span>
+              {/* Priority order — the real lesson */}
+              <div className="bg-slate-50 rounded-xl border p-4 space-y-3">
+                <div className="text-xs font-black text-slate-500 uppercase tracking-widest">The Priority Order</div>
+                {buckets.map(({ label, Icon, count, color, barColor, priority, tip }) => (
+                  <div key={label} className="flex items-start gap-3">
+                    <div className={cn('flex items-center justify-center h-8 w-8 rounded-lg border shrink-0 text-xs font-black', color)}>
+                      {priority}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <Icon className="h-3.5 w-3.5 text-slate-500 shrink-0" />
+                        <span className="text-sm font-black text-slate-800">{label}</span>
+                        <span className="text-xs text-slate-400 ml-auto">{count} sorted</span>
                       </div>
-                      <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-                        <div className={cn('h-full rounded-full transition-all', color)} style={{ width: `${Math.min(pct, 100)}%` }} />
-                      </div>
+                      <p className="text-xs text-slate-500">{tip}</p>
                     </div>
                   </div>
                 ))}
+                <p className="text-[11px] text-slate-400 pt-1 border-t">The 50/30/20 rule is a guide, not a law. Every person's split looks different — what matters is that you always cover needs and save something before spending on wants.</p>
               </div>
 
               <div className="flex gap-3">
