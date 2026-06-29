@@ -9,10 +9,11 @@ import { Button } from '@/components/ui/button';
 import { WeeklyReport } from '@/components/parent/WeeklyReport';
 import { getConceptStrengths, ConceptStrengths } from '@/lib/progressionService';
 import { safeOnSnapshot } from '@/lib/firestoreSafe';
-import { 
-  Zap, 
-  Gamepad2, 
-  Trophy, 
+import { getRankForXP } from '@/config/narrative';
+import {
+  Zap,
+  Gamepad2,
+  Trophy,
   Activity,
   Users,
   UserPlus,
@@ -154,7 +155,7 @@ export default function ParentDashboard() {
                 </div>
                 <div className="text-left">
                   <div className="font-black text-sm">{child.displayName}</div>
-                  <div className="text-[10px] font-bold uppercase opacity-60">Level {child.level || 1}</div>
+                  <div className="text-[10px] font-bold uppercase opacity-60">{getRankForXP(child.xp || 0).name}</div>
                 </div>
               </button>
             ))}
@@ -180,7 +181,7 @@ export default function ParentDashboard() {
               <Card className="border-none shadow-md bg-white">
                 <CardContent className="p-6 flex items-center gap-4">
                   <div className="h-12 w-12 rounded-xl bg-[#E8F5EE] flex items-center justify-center text-[#2E7D5A]"><Trophy className="h-6 w-6" /></div>
-                  <div><div className="text-[10px] font-bold text-slate-400 uppercase">Current Rank</div><div className="text-2xl font-black">Level {selectedChild.level || 1}</div></div>
+                  <div><div className="text-[10px] font-bold text-slate-400 uppercase">Current Rank</div><div className="text-2xl font-black">{getRankForXP(selectedChild.xp || 0).name}</div></div>
                 </CardContent>
               </Card>
               <Card className="border-none shadow-md bg-white">

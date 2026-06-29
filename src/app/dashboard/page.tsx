@@ -33,7 +33,7 @@ import {
 import { getCurrentStreak } from '@/lib/dailyChallenge';
 import { lessons } from '@/data/lessons';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Scale, Award, BookOpen, ShieldCheck, AlertTriangle, Flame } from 'lucide-react';
+import { Scale, Award, BookOpen, ShieldCheck, AlertTriangle, Flame, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -322,11 +322,7 @@ export default function DashboardPage() {
             </div>
             <div className="flex justify-center md:justify-start gap-2">
               <span className="px-3 py-1 bg-primary text-white rounded-full text-[10px] font-black uppercase tracking-widest">
-                {progression?.level === 1 ? 'Starter' :
-               progression?.level === 2 ? 'Saver' :
-               progression?.level === 3 ? 'Investor' :
-               progression?.level === 4 ? 'Builder' :
-               progression?.level === 5 ? 'Strategist' : 'Master'}
+                {getRankForXP(progression?.totalXP ?? 0).name}
               </span>
               <span className="px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-[10px] font-black uppercase tracking-widest">
                 {profile?.ageGroup ?? 'Student'} • {profile?.birthYear != null ? (new Date().getFullYear() - profile.birthYear) : '8-20'}
@@ -581,8 +577,8 @@ export default function DashboardPage() {
                     <p className="text-xs md:text-sm text-slate-500 font-medium leading-tight">Same questions for everyone — see how you rank against other users.</p>
                   </div>
                   <div className="flex items-center justify-between text-[10px] md:text-xs font-bold text-slate-400">
-                    <span>🔥 {dailyParticipantCount} players today</span>
-                    <span>⏳ {timeLeft} left</span>
+                    <span className="flex items-center gap-1"><Flame className="h-3 w-3 text-rose-500" /> {dailyParticipantCount} players today</span>
+                    <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {timeLeft} left</span>
                   </div>
                   <Link href="/games?game=finIQQuiz&mode=daily">
                     <button className="w-full h-12 bg-slate-900 text-white rounded-xl font-black uppercase text-xs md:text-sm tracking-widest hover:bg-slate-800 transition-colors">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { db, safeGetDoc, safeUpdateDoc } from '@/firebase';
@@ -27,6 +27,7 @@ import {
   Zap,
   Trophy,
   Shield,
+  ShieldCheck,
   Award,
   Pencil,
   Check,
@@ -50,6 +51,23 @@ import {
   Copy,
   Share2,
   RefreshCw,
+  Flame,
+  Wallet,
+  Swords,
+  TrendingUp,
+  FileText,
+  Calendar,
+  Wrench,
+  Target,
+  Landmark,
+  Crown,
+  Calculator,
+  Map,
+  Scale,
+  Medal,
+  PiggyBank,
+  Briefcase,
+  Clock,
 } from 'lucide-react';
 import { getAvatar, AVATARS } from '@/config/avatars';
 import Image from 'next/image';
@@ -94,26 +112,26 @@ const LEVEL_THRESHOLDS = [
   { name: 'Money Master', min: 7500, max: 15000, color: 'bg-secondary' },
 ];
 
-const BADGE_META: Record<string, { label: string; icon: string; color: string }> = {
-  first_win: { label: 'First Win', icon: '🏆', color: 'bg-[#E8F5EE] text-[#2E7D5A] border-[#A8D5BC]' },
-  five_game_streak: { label: '5-Game Streak', icon: '🔥', color: 'bg-rose-50 text-rose-700 border-rose-200' },
-  budget_master: { label: 'Budget Master', icon: '💰', color: 'bg-[#E8F5EE] text-primary border-[#A8D5BC]' },
-  debt_destroyer: { label: 'Debt Destroyer', icon: '⚔️', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-  smart_investor: { label: 'Smart Investor', icon: '📈', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-  tax_whiz: { label: 'Tax Whiz', icon: '🧾', color: 'bg-slate-50 text-slate-700 border-slate-200' },
-  daily_challenger: { label: 'Daily Challenger', icon: '📅', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-  speed_demon: { label: 'Speed Demon', icon: '⚡', color: 'bg-[#E8F5EE] text-primary border-[#A8D5BC]' },
-  perfect_round: { label: 'Perfect Round', icon: '✨', color: 'bg-pink-50 text-pink-700 border-pink-200' },
-  finance_scholar: { label: 'Finance Scholar', icon: '🎓', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-  tool_explorer: { label: 'Tool Explorer', icon: '🔧', color: 'bg-[#E8F5EE] text-primary border-[#A8D5BC]' },
-  goal_getter: { label: 'Goal Getter', icon: '🎯', color: 'bg-[#E8F5EE] text-primary border-[#A8D5BC]' },
-  financially_stable: { label: 'Financially Stable', icon: '🏦', color: 'bg-sky-50 text-sky-700 border-sky-200' },
-  money_master: { label: 'Money Master', icon: '👑', color: 'bg-[#E8F5EE] text-[#2E7D5A] border-[#A8D5BC]' },
-  maths_master: { label: 'Maths Master', icon: '🧮', color: 'bg-primary/5 text-primary border-primary/20' },
-  framework_master: { label: 'Framework Master', icon: '🗺️', color: 'bg-[#E8F5EE] text-primary border-[#A8D5BC]' },
-  family_linked: { label: 'Family Linked', icon: '👨‍👩‍👧', color: 'bg-pink-50 text-pink-700 border-pink-200' },
-  scholar: { label: 'Scholar', icon: '📚', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-  emergency_fund_builder: { label: 'Emergency Builder', icon: '🛡️', color: 'bg-[#E8F5EE] text-primary border-[#A8D5BC]' },
+const BADGE_META: Record<string, { label: string; icon: React.ElementType; color: string }> = {
+  first_win:              { label: 'First Win',          icon: Trophy,      color: 'bg-[#E8F5EE] text-[#2E7D5A] border-[#A8D5BC]' },
+  five_game_streak:       { label: '5-Game Streak',      icon: Flame,       color: 'bg-rose-50 text-rose-700 border-rose-200' },
+  budget_master:          { label: 'Budget Master',       icon: Wallet,      color: 'bg-[#E8F5EE] text-primary border-[#A8D5BC]' },
+  debt_destroyer:         { label: 'Debt Destroyer',      icon: Swords,      color: 'bg-blue-50 text-blue-700 border-blue-200' },
+  smart_investor:         { label: 'Smart Investor',      icon: TrendingUp,  color: 'bg-blue-50 text-blue-700 border-blue-200' },
+  tax_whiz:               { label: 'Tax Whiz',            icon: FileText,    color: 'bg-slate-50 text-slate-700 border-slate-200' },
+  daily_challenger:       { label: 'Daily Challenger',    icon: Calendar,    color: 'bg-blue-50 text-blue-700 border-blue-200' },
+  speed_demon:            { label: 'Speed Demon',         icon: Zap,         color: 'bg-[#E8F5EE] text-primary border-[#A8D5BC]' },
+  perfect_round:          { label: 'Perfect Round',       icon: Star,        color: 'bg-pink-50 text-pink-700 border-pink-200' },
+  finance_scholar:        { label: 'Finance Scholar',     icon: Award,       color: 'bg-blue-50 text-blue-700 border-blue-200' },
+  tool_explorer:          { label: 'Tool Explorer',       icon: Wrench,      color: 'bg-[#E8F5EE] text-primary border-[#A8D5BC]' },
+  goal_getter:            { label: 'Goal Getter',         icon: Target,      color: 'bg-[#E8F5EE] text-primary border-[#A8D5BC]' },
+  financially_stable:     { label: 'Financially Stable', icon: Landmark,    color: 'bg-sky-50 text-sky-700 border-sky-200' },
+  money_master:           { label: 'Money Master',        icon: Crown,       color: 'bg-[#E8F5EE] text-[#2E7D5A] border-[#A8D5BC]' },
+  maths_master:           { label: 'Maths Master',        icon: Calculator,  color: 'bg-primary/5 text-primary border-primary/20' },
+  framework_master:       { label: 'Framework Master',    icon: Map,         color: 'bg-[#E8F5EE] text-primary border-[#A8D5BC]' },
+  family_linked:          { label: 'Family Linked',       icon: Users,       color: 'bg-pink-50 text-pink-700 border-pink-200' },
+  scholar:                { label: 'Scholar',             icon: BookOpen,    color: 'bg-blue-50 text-blue-700 border-blue-200' },
+  emergency_fund_builder: { label: 'Emergency Builder',   icon: ShieldCheck, color: 'bg-[#E8F5EE] text-primary border-[#A8D5BC]' },
 };
 
 function getLevelInfo(xp: number) {
@@ -710,9 +728,9 @@ export default function ProfilePage() {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span>⚖️</span>
+                    <Scale className="h-4 w-4 text-primary shrink-0" />
                     <span className="text-xs font-black uppercase tracking-widest text-primary">Order of the Golden Ledger</span>
-                    {saga && <span className="hidden sm:inline text-[10px] text-slate-400 border border-slate-200 rounded-full px-2 py-0.5 font-bold">{saga.emoji} {saga.name}</span>}
+                    {saga && <span className="hidden sm:inline text-[10px] text-slate-400 border border-slate-200 rounded-full px-2 py-0.5 font-bold">{saga.name}</span>}
                   </div>
                   <Link href="/story" className="text-xs font-black text-primary hover:underline uppercase tracking-widest">Lore →</Link>
                 </div>
@@ -724,33 +742,33 @@ export default function ProfilePage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2 mb-1">
-                      <span className="text-base font-black text-slate-900">{rank.emoji} {rank.name}</span>
+                      <span className="text-base font-black text-slate-900">{rank.name}</span>
                       <span className="text-[11px] font-bold text-slate-400">{rank.district}</span>
                     </div>
                     <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden mb-1">
                       <div className="h-full bg-gradient-to-r from-primary to-primary/60 rounded-full" style={{ width: `${rankPct}%` }} />
                     </div>
                     <p className="text-[11px] font-bold text-slate-400">
-                      {nextRank ? `${(nextRank.minXP - totalXP).toLocaleString()} XP to ${nextRank.emoji} ${nextRank.name}` : 'Max Rank!'}
+                      {nextRank ? `${(nextRank.minXP - totalXP).toLocaleString()} XP to ${nextRank.name}` : 'Max Rank!'}
                     </p>
                   </div>
                 </div>
 
                 {/* Mission brief */}
                 <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
-                  <p className="text-xs font-black uppercase tracking-widest text-primary mb-1">📋 Current Mission</p>
+                  <p className="text-xs font-black uppercase tracking-widest text-primary mb-1 flex items-center gap-1"><BookOpen className="h-3.5 w-3.5" /> Current Mission</p>
                   <p className="text-xs font-medium text-slate-600 italic">"{rank.storyLine}"</p>
                 </div>
 
                 {/* Fog threat compact */}
                 <div className="flex gap-3">
                   <div className="flex-1 bg-red-50 border border-red-100 rounded-xl p-3">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-1">⚠️ Active Threat</p>
-                    <p className="text-xs font-black text-red-700">{fog.emoji} {fog.name}</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-1 flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> Active Threat</p>
+                    <p className="text-xs font-black text-red-700">{fog.name}</p>
                     <p className="text-[10px] text-red-500 mt-0.5 leading-tight">{fog.description.slice(0, 60)}…</p>
                   </div>
                   <div className="flex-1 bg-primary/5 border border-primary/10 rounded-xl p-3">
-                    <p className="text-xs font-black uppercase tracking-widest text-primary mb-1">🛡️ Counter</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-primary mb-1 flex items-center gap-1"><ShieldCheck className="h-3.5 w-3.5" /> Counter</p>
                     <p className="text-[10px] text-slate-700 leading-tight font-medium">{fog.weakness.slice(0, 70)}…</p>
                   </div>
                 </div>
@@ -768,10 +786,11 @@ export default function ProfilePage() {
           <Section title={`Badges (${progression.badges.length})`} icon={Trophy} iconColor="text-[#2E7D5A]" defaultOpen={false}>
             <div className="flex flex-wrap gap-2 pt-4">
               {progression.badges.map(b => {
-                const meta = BADGE_META[b] ?? { label: b, icon: '🏅', color: 'bg-slate-50 text-slate-700 border-slate-200' };
+                const meta = BADGE_META[b] ?? { label: b, icon: Medal, color: 'bg-slate-50 text-slate-700 border-slate-200' };
+                const BadgeIcon = meta.icon;
                 return (
                   <div key={b} className={cn('inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold', meta.color)}>
-                    <span>{meta.icon}</span><span>{meta.label}</span>
+                    <BadgeIcon className="h-3.5 w-3.5 shrink-0" /><span>{meta.label}</span>
                   </div>
                 );
               })}

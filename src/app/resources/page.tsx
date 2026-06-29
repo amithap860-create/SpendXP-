@@ -16,11 +16,11 @@ import { Progress } from '@/components/ui/progress';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { 
-  CheckCircle2, 
-  Circle, 
-  Star, 
-  TrendingUp, 
-  Target, 
+  CheckCircle2,
+  Circle,
+  Star,
+  TrendingUp,
+  Target,
   Calendar,
   BookOpen,
   Award,
@@ -28,7 +28,11 @@ import {
   ChevronDown,
   ChevronUp,
   Plus,
-  X
+  X,
+  Gamepad2,
+  ClipboardList,
+  GraduationCap,
+  Trophy,
 } from 'lucide-react';
 
 interface ResourceProgress {
@@ -255,7 +259,7 @@ const FrameworkCard: React.FC<{
                 className="text-xs h-6 px-2"
                 onClick={() => window.location.href = `/games?game=${game}`}
               >
-                🎮 {game}
+                <Gamepad2 className="h-3 w-3 mr-1" />{game}
               </Button>
             ))}
             {CURRICULUM_MAP[framework.id].relatedQuests.map((quest) => (
@@ -266,7 +270,7 @@ const FrameworkCard: React.FC<{
                 className="text-xs h-6 px-2"
                 onClick={() => window.location.href = `/quests?quest=${quest}`}
               >
-                📋 {quest}
+                <ClipboardList className="h-3 w-3 mr-1" />{quest}
               </Button>
             ))}
             {CURRICULUM_MAP[framework.id].relatedLessons.map((lesson) => (
@@ -277,7 +281,7 @@ const FrameworkCard: React.FC<{
                 className="text-xs h-6 px-2"
                 onClick={() => window.location.href = `/learn?lesson=${lesson}`}
               >
-                📚 {lesson}
+                <GraduationCap className="h-3 w-3 mr-1" />{lesson}
               </Button>
             ))}
           </div>
@@ -1158,8 +1162,8 @@ export default function ResourcesPage() {
         {resourceProgress.exploredCards.length >= 10 && !resourceProgress.completedInteractions.includes('all_cards_explored') && (
           <div className="mt-8 p-6 bg-gradient-to-r from-primary/5 to-blue-50 border-2 border-[#A8D5BC] rounded-2xl text-center">
             <Award className="h-12 w-12 text-primary mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-slate-900 mb-2">
-              🎉 Framework Master Achievement!
+            <h3 className="text-xl font-bold text-slate-900 mb-2 flex items-center justify-center gap-2">
+              <Trophy className="h-5 w-5 text-primary" /> Framework Master Achievement!
             </h3>
             <p className="text-primary mb-4">
               You've explored all 10 financial literacy frameworks! You've earned the Framework Master badge and 150 XP.
