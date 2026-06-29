@@ -33,15 +33,18 @@ import {
 import { cn } from '@/lib/utils';
 import { useCurrency } from '@/hooks/useCurrency';
 import { fireConfettiBadgeUnlock } from '@/lib/confetti';
+import { getRankForXP, getNextRank, getRankProgress } from '@/config/narrative';
 
-const LEVELS = [
-  { level: 1, title: 'Starter', minXP: 0, icon: User },
-  { level: 2, title: 'Saver', minXP: 500, icon: PiggyBank },
-  { level: 3, title: 'Investor', minXP: 1500, icon: TrendingUp },
-  { level: 4, title: 'Banker', minXP: 3500, icon: Landmark },
-  { level: 5, title: 'Finance Pro', minXP: 7500, icon: Briefcase },
-  { level: 6, title: 'Money Master', minXP: 15000, icon: Crown },
-];
+// Lucide icon mapped to each narrative rank (Apprentice → Legend)
+const RANK_ICONS: Record<string, React.ElementType> = {
+  apprentice: User,
+  scout:      PiggyBank,
+  agent:      Briefcase,
+  inspector:  TrendingUp,
+  detective:  Landmark,
+  grandmaster: Crown,
+  legend:     Trophy,
+};
 
 const BADGE_MAP = [
   { id: 'first-win', title: 'First Win', icon: Trophy, color: 'text-[#2E7D5A]' },
@@ -84,13 +87,13 @@ export function XPWallet() {
   }, [data.badges, prevBadges]);
 
   const levelInfo = useMemo(() => {
-    const current = [...LEVELS].reverse().find(l => data.totalXP >= l.minXP) || LEVELS[0];
-    const nextIdx = LEVELS.indexOf(current) + 1;
-    const next = LEVELS[nextIdx] || null;
-    
-    const progressInLevel = next ? ((data.totalXP - current.minXP) / (next.minXP - current.minXP)) * 100 : 100;
-    
-    return { current, next, progress: progressInLevel };
+    const totalXP = data.totalXP;
+    const current = getRankForXP(totalXP);
+    const next = getNextRank(totalXP);
+    const progress = getRankProgress(totalXP) * 100;
+    const RankIcon = RANK_ICONS[current.id] ?? User;
+    const xpToNext = next ? next.minXP - totalXP : 0;
+    return { current, next, progress, RankIcon, xpToNext };
   }, [data.totalXP]);
 
   const walletMilestone = useMemo(() => {
@@ -110,22 +113,22 @@ export function XPWallet() {
           <div className="flex justify-between items-end mb-4">
             <div className="flex items-center gap-3">
               <div className="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center">
-                <levelInfo.current.icon className="h-7 w-7" />
+                <levelInfo.RankIcon className="h-7 w-7" />
               </div>
               <div>
-                <div className="text-[10px] font-black uppercase tracking-widest text-white/60">Rank {levelInfo.current.level}</div>
-                <div className="text-2xl font-black">{levelInfo.current.title}</div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-white/60">Order of the Golden Ledger</div>
+                <div className="text-2xl font-black">{levelInfo.current.name}</div>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-3xl font-black">{data.totalXP}</div>
+              <div className="text-3xl font-black">{data.totalXP.toLocaleString()}</div>
               <div className="text-[10px] font-bold uppercase text-white/60">Total XP</div>
             </div>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-xs font-bold uppercase">
-              <span>{levelInfo.current.title}</span>
-              <span>{levelInfo.next ? `${levelInfo.next.minXP - data.totalXP} XP to ${levelInfo.next.title}` : 'MAX LEVEL'}</span>
+              <span>{levelInfo.current.name}</span>
+              <span>{levelInfo.next ? `${levelInfo.xpToNext.toLocaleString()} XP to ${levelInfo.next.name}` : 'MAX RANK'}</span>
             </div>
             <Progress value={levelInfo.progress} className="h-2 bg-white/20" />
           </div>
