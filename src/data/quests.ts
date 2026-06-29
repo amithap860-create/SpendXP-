@@ -1927,5 +1927,342 @@ export const quests: Quest[] = [
         ]
       }
     ]
+  },
+
+  // ─────────────────────────────────────────────────────────
+  // STARTING POINT PHILOSOPHY — YOUR JOURNEY, YOUR RULES
+  // Core theme: your starting point ≠ your destination.
+  // Consistency + intention beats timing + luck, every time.
+  // ─────────────────────────────────────────────────────────
+
+  {
+    id: 'two-piggy-banks',
+    title: 'Two Piggy Banks',
+    description: "Your friend Arjun gets 3× your allowance. You both want the same ₹1,000 headset. Here's the twist — it's not about who has more. It's about what you do with what you have.",
+    category: 'income',
+    difficulty: 'beginner',
+    ageGroups: ['junior'],
+    estimatedMinutes: 4,
+    xpReward: 90,
+    startingBalance: 200,
+    steps: [
+      {
+        id: 'tpb-1',
+        title: 'The Headset Hunt',
+        narrative: "You and your best friend Arjun both want the same wireless headset — it costs ₹1,000. You get ₹200 pocket money every week. Arjun gets ₹600. Arjun laughs: \"I'll have mine in 2 weeks! You'll need 5 whole weeks.\" You feel a bit stung. What do you actually do?",
+        ageGroups: ['junior'],
+        choices: [
+          {
+            id: 'tpb-c1',
+            text: '"Fine. I\'ll save ₹100 every week — half my allowance. I can do this in 10 weeks."',
+            consequence: "You commit: every week, ₹100 goes straight into your savings before you touch anything else. Arjun, meanwhile, spends ₹550 of his ₹600 on games and snacks most weeks. 8 weeks later…",
+            xpDelta: 80,
+            healthDelta: 15,
+            walletDelta: 100,
+            nextStepId: 'tpb-2a',
+            isOptimal: true,
+            explanation: "Saving 50% of what you have beats spending 90% of something bigger. It doesn't matter how much you start with — it matters what percentage you keep.",
+            realLifeTip: "Never compare your income to someone else's. Compare your savings RATE. Someone saving 20% of ₹200 will outrun someone saving 5% of ₹600 every single time."
+          },
+          {
+            id: 'tpb-c2',
+            text: '"It\'s not fair. I\'ll just wait until I get more pocket money someday."',
+            consequence: "Three months later you still have ₹200/week, still haven't saved for the headset, and Arjun has already bought AND broken his. Meanwhile you have ₹0 saved and the headset is now ₹1,200. The wait didn't help.",
+            xpDelta: 15,
+            healthDelta: -5,
+            walletDelta: 0,
+            nextStepId: 'tpb-2b',
+            isOptimal: false,
+            explanation: "Waiting for a 'better starting point' is the most expensive mistake you can make. Every week you wait is a week you didn't save. Your starting point doesn't need to be perfect to begin.",
+            realLifeTip: "The only bad time to start saving is next week. Your starting amount doesn't matter — your starting habit does."
+          }
+        ]
+      },
+      {
+        id: 'tpb-2a',
+        title: 'The 8-Week Reveal',
+        narrative: "8 weeks in. You've saved ₹100 every single week = ₹800 saved. You're close! Then you check on Arjun. He saved maybe ₹50 some weeks when he felt like it. He has ₹350 total — less than you, even though his weekly allowance is 3× yours. He's shocked. What do you say?",
+        ageGroups: ['junior'],
+        choices: [
+          {
+            id: 'tpb-c3',
+            text: '"The amount you get doesn\'t matter. It\'s the amount you save that counts."',
+            consequence: "Arjun actually listens. He agrees to save ₹300/week from now on (50% of his ₹600). Two weeks later you both have the headset — you for ₹1,000 at week 10, Arjun slightly later. You both win, because you both picked a savings HABIT.",
+            xpDelta: 90,
+            healthDelta: 20,
+            walletDelta: -1000,
+            nextStepId: 'end',
+            isOptimal: true,
+            explanation: "You just discovered the single most important money idea: your savings rate (% of income saved) determines your outcome — not your income level. Arjun had 3× your income and saved LESS. You saved MORE by being consistent with a percentage.",
+            realLifeTip: "The richest people in the world got there by saving a high PERCENTAGE — not by earning a big number. Saving 50% of ₹200 is literally better than saving 5% of ₹1,000. Start your percentage habit today."
+          },
+          {
+            id: 'tpb-c4',
+            text: '"Ha! I beat him. I should ask for more pocket money now."',
+            consequence: "You get the headset and feel proud — but you miss the bigger lesson. Your parents don't increase your allowance, and you go back to spending everything. 3 months later, you\'re back to ₹0 savings because you thought the win was about luck, not habit.",
+            xpDelta: 40,
+            healthDelta: 5,
+            walletDelta: -1000,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "You won this round, but you didn't notice WHY. It wasn't the amount you saved (₹100/week) — it was the CONSISTENCY. Without that insight, the habit disappears after the goal is reached.",
+            realLifeTip: "Every financial win teaches you something. Ask 'WHY did this work?' — not just 'what can I spend now?'"
+          }
+        ]
+      },
+      {
+        id: 'tpb-2b',
+        title: 'The Cost of Waiting',
+        narrative: "Three months have passed. The headset now costs ₹1,200 (prices went up). You still have ₹200/week and ₹0 saved. Arjun already bought his — and broke it. Your cousin visits and asks why you don't have headphones yet. How do you answer?",
+        ageGroups: ['junior'],
+        choices: [
+          {
+            id: 'tpb-c5',
+            text: '"I was waiting for the right time. Starting now — ₹100/week, no matter what."',
+            consequence: "Late start, but a real start. You save ₹100/week for 12 weeks and buy the headset for ₹1,200. You could have had it 8 weeks earlier — but starting now beats continuing to wait. You\'ve learned the most important lesson without anyone telling you.",
+            xpDelta: 60,
+            healthDelta: 10,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: true,
+            explanation: "Starting late is still infinitely better than not starting. The 3 months you waited cost you some time — but 'starting now' will always be the right answer. You can never go back and start earlier, but you CAN start today.",
+            realLifeTip: "The best time to start saving was 3 months ago. The second best time is right now. Don't let guilt about waiting stop you from starting."
+          },
+          {
+            id: 'tpb-c6',
+            text: '"I\'ll wait a bit longer — maybe I\'ll get a bigger allowance soon."',
+            consequence: "6 more months pass. No bigger allowance. Headset is now ₹1,400. You\'ve spent 9 months with ₹0 saved and the goal is further away than when you started. Waiting made it harder, not easier.",
+            xpDelta: 5,
+            healthDelta: -8,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Every month you wait, two things happen: the goal gets more expensive, and you lose another month of savings. Waiting for better conditions is the most expensive choice you can make.",
+            realLifeTip: "Your circumstances might improve — but they might not. Build the habit with what you have now, so you're ready either way."
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    id: 'raise-trap',
+    title: 'The Raise Trap',
+    description: "Your tutoring income just jumped from ₹1,500 to ₹2,500 a month. Everyone's celebrating. But this moment — right here — is where most people quietly give up their financial future without realising it.",
+    category: 'income',
+    difficulty: 'intermediate',
+    ageGroups: ['teen'],
+    estimatedMinutes: 5,
+    xpReward: 110,
+    startingBalance: 2500,
+    steps: [
+      {
+        id: 'rt-1',
+        title: 'The Extra ₹1,000',
+        narrative: "Your tutoring clients increased. You now earn ₹2,500/month instead of ₹1,500. Your current expenses: phone (₹350), snacks/hangouts (₹400), transport (₹250) = ₹1,000 total. So you were already saving ₹500/month before the raise. Now you have a new ₹1,000 sitting there. Your friends are suggesting ways to spend it. What do you do?",
+        ageGroups: ['teen'],
+        choices: [
+          {
+            id: 'rt-c1',
+            text: 'Upgrade: better phone plan (₹500 extra), eat out more (₹400 extra). I earned this.',
+            consequence: "Fair feeling. But your new monthly spend is ₹1,900. You save only ₹600/month — just ₹100 more than before the raise, even though your income rose by ₹1,000. In 6 months, you have ₹3,600 saved. Meanwhile…",
+            xpDelta: 30,
+            healthDelta: 0,
+            walletDelta: -900,
+            nextStepId: 'rt-2b',
+            isOptimal: false,
+            explanation: "Lifestyle inflation: when your spending rises to match your income, your savings stay flat. A raise feels like a reward — and spending it all feels deserved. But it's actually a trap that keeps your savings growth locked in place.",
+            realLifeTip: "Every raise is a fork in the road. One path: spend the extra. Other path: invest the extra and keep spending the same. The second path compounds over decades."
+          },
+          {
+            id: 'rt-c2',
+            text: 'Keep my exact same lifestyle. Invest the whole ₹1,000 extra every month.',
+            consequence: "Your daily life doesn't change at all — same phone plan, same hangouts. But your savings jump from ₹500/month to ₹1,500/month. In 6 months you've saved ₹9,000. In a year: ₹18,000. That's almost a month's salary in savings — before you even turn 18.",
+            xpDelta: 110,
+            healthDelta: 20,
+            walletDelta: 1000,
+            nextStepId: 'rt-2a',
+            isOptimal: true,
+            explanation: "This is the most powerful financial move most people never make: keeping your lifestyle STABLE when your income rises. You don't need to sacrifice — your old lifestyle was already working. The new money just goes straight to your future.",
+            realLifeTip: "The raise doesn't have to change your daily life at all. If your current lifestyle is comfortable, you don't NEED to upgrade it just because you can."
+          }
+        ]
+      },
+      {
+        id: 'rt-2a',
+        title: 'The 6-Month Snapshot',
+        narrative: "Six months in. You've saved ₹9,000 — triple what you would have with the old income + old habits. Your friend Riya got the same raise but upgraded everything. She has ₹3,200 saved. Same starting point, same raise, completely different outcome. She now wants to invest but has nothing left. What advice do you give her?",
+        ageGroups: ['teen'],
+        choices: [
+          {
+            id: 'rt-c3',
+            text: '"Start now — even ₹200/month. Don\'t wait to have the \'right amount\'."',
+            consequence: "Riya starts with ₹200/month. It feels small, but she's building the habit. In a year she has ₹2,400 saved and the habit is locked in. She gradually increases as her income grows. She started late — but she started. That's what matters.",
+            xpDelta: 90,
+            healthDelta: 15,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: true,
+            explanation: "The advice you give Riya is the most important thing in personal finance: start with whatever you have, start now, and increase over time. ₹200 now + the habit is worth more than ₹2,000 later without the habit.",
+            realLifeTip: "Any amount saved consistently is better than a large amount saved sporadically. The habit is the asset, not the number."
+          },
+          {
+            id: 'rt-c4',
+            text: '"You should have saved from day one. Now you need to save ₹1,000/month to catch up."',
+            consequence: "The advice is harsh and unrealistic — Riya\'s lifestyle is now built around her full ₹2,500. Cutting ₹1,000 out overnight causes stress, and she gives up after 3 weeks. The guilt of starting late stopped her from starting at all.",
+            xpDelta: 20,
+            healthDelta: -5,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Guilt-based advice rarely works. Telling someone they should have started sooner doesn't help them start now. The most useful financial advice meets people where they are — not where they should have been.",
+            realLifeTip: "When helping friends with money, lead with 'here's what you can do starting today' — never 'here's what you should have done.' The past is fixed. The next decision isn't."
+          }
+        ]
+      },
+      {
+        id: 'rt-2b',
+        title: 'The Reality Check',
+        narrative: "Six months in. Your income is ₹2,500 but you only saved ₹3,600 (₹600/month). Your friend who got the same raise but kept their old lifestyle saved ₹9,000. You both started from the same place. The difference? You upgraded your lifestyle, they upgraded their savings. How do you feel about this?",
+        ageGroups: ['teen'],
+        choices: [
+          {
+            id: 'rt-c5',
+            text: '"From this month: same income, no more upgrades. Every extra rupee goes to savings."',
+            consequence: "You downgrade to your original phone plan and cut the extra dining. It stings for a week. But within 3 months, you've recovered and are saving ₹1,500/month like your friend. Starting late here cost you ₹5,400 in savings — but you corrected course. That matters more.",
+            xpDelta: 80,
+            healthDelta: 10,
+            walletDelta: 600,
+            nextStepId: 'end',
+            isOptimal: true,
+            explanation: "Correcting course is always worth it. You lost 6 months, but you didn't lose the habit. The willingness to reset — without guilt — is what separates people who build wealth from those who don't.",
+            realLifeTip: "If you realise you've let lifestyle inflation in, don't spiral. Quietly reverse it, start saving the difference, and don't look back. One correction now is worth 10 years of better compounding."
+          },
+          {
+            id: 'rt-c6',
+            text: '"₹3,600 is still a lot. I\'ll work harder next month to save more."',
+            consequence: "Next month, your 'work harder' plan doesn't kick in because your expenses are now habits. You save ₹600 again. And the month after. The upgraded lifestyle has become your new baseline, and 'next month I'll save more' turns into a phrase you say for years without it ever happening.",
+            xpDelta: 15,
+            healthDelta: -5,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Lifestyle inflation is self-reinforcing — once you're used to the better phone plan and nicer lunches, they feel like needs, not upgrades. The solution isn't willpower. It's structural: change the system, not just the intention.",
+            realLifeTip: "Don't rely on willpower to save more next month. Set up an automatic transfer to savings on the day income arrives. Make saving the default, not the intention."
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    id: 'right-on-time',
+    title: 'Right On Time',
+    description: "Rohan started tracking his money at 14. You're starting at 16 or 17 and you feel behind. Here's what actually happens when you compare 'perfect timing' to 'consistent intention' — the result might surprise you.",
+    category: 'investing',
+    difficulty: 'advanced',
+    ageGroups: ['senior'],
+    estimatedMinutes: 6,
+    xpReward: 130,
+    startingBalance: 500,
+    steps: [
+      {
+        id: 'rot-1',
+        title: 'The Comparison Trap',
+        narrative: "Rohan mentions in class that he started saving at 14. He has ₹8,000 saved. You're 17, you've only just started thinking about money, and you have ₹500. Your immediate instinct is: \"I'm already behind.\" You feel a knot in your stomach. What do you actually do with that feeling?",
+        ageGroups: ['senior'],
+        choices: [
+          {
+            id: 'rot-c1',
+            text: '"I\'m too late. There\'s no point starting with just ₹500 when Rohan already has ₹8,000."',
+            consequence: "You decide to wait until you 'have more to invest with.' Six months pass. Rohan now has ₹11,000 because he kept going. You have ₹500 — the same ₹500 from 6 months ago. The gap grew because you paused, not because you started late.",
+            xpDelta: 10,
+            healthDelta: -10,
+            walletDelta: 0,
+            nextStepId: 'rot-2b',
+            isOptimal: false,
+            explanation: "Comparing your Chapter 1 to someone else's Chapter 3 is the most common reason people never start. You're not competing with Rohan. You're building your own trajectory — and it starts with ₹500, not ₹8,000.",
+            realLifeTip: "Someone else's head start doesn't reduce your potential. It just means your story starts a few chapters later. That's fine — all the best stories have a protagonist who starts behind."
+          },
+          {
+            id: 'rot-c2',
+            text: '"₹500 is my starting point. I\'ll save ₹600/month from here. My journey starts today."',
+            consequence: "You set up a recurring ₹600/month savings commitment. In 12 months, you have ₹7,700 (₹500 + ₹7,200 saved). Rohan has ₹14,000 — but here's the thing: you're 18, you both have years ahead of you, and your SAVINGS RATE is actually higher than his. The gap is shrinking, not growing.",
+            xpDelta: 110,
+            healthDelta: 25,
+            walletDelta: 600,
+            nextStepId: 'rot-2a',
+            isOptimal: true,
+            explanation: "Starting with less than someone else just means your early numbers are smaller — not your potential. If your savings rate is higher than theirs, you will eventually overtake them regardless of the head start. Consistency competes with timing every time, and consistency wins long-term.",
+            realLifeTip: "Your starting point is just that — a starting point. What matters infinitely more is what you do consistently from here. Pick a savings percentage (even 20%), start it today, and don't touch it."
+          }
+        ]
+      },
+      {
+        id: 'rot-2a',
+        title: 'The Intentional Upgrade',
+        narrative: "A year in, you have ₹7,700 saved. You've been consistent at ₹600/month. Now your income from part-time work grew — you earn ₹3,500/month instead of ₹2,500. You have a choice about what to do with the extra ₹1,000. Rohan just spent his raise on a new gaming setup. What's your move?",
+        ageGroups: ['senior'],
+        choices: [
+          {
+            id: 'rot-c3',
+            text: 'Increase my savings to ₹1,400/month. Keep the same lifestyle. Accelerate.',
+            consequence: "Your savings go from ₹600/month to ₹1,400/month. In the next 12 months you add ₹16,800. Total at age 19: ₹24,500. Rohan, who spent his raise, has ₹16,000. You've overtaken him — not because you started earlier, but because you were more intentional when it mattered.",
+            xpDelta: 130,
+            healthDelta: 25,
+            walletDelta: 1400,
+            nextStepId: 'end',
+            isOptimal: true,
+            explanation: "This is the 'starting late' advantage nobody talks about: when you start a little behind, you develop intentionality. You can't coast. You have to be deliberate — and deliberate investors outperform casual investors almost every time.",
+            realLifeTip: "Every time your income rises, resist the lifestyle upgrade for 3 months. In those 3 months, increase your savings percentage first. Lifestyle can rise slowly — your savings rate should rise fast."
+          },
+          {
+            id: 'rot-c4',
+            text: 'Treat myself — I\'ve been consistent for a year. New phone (₹8,000), keep saving ₹600/month.',
+            consequence: "You spend ₹8,000 on a phone, wiping out most of a year's savings. You're back to ₹700 in savings. You feel good for a month, then you feel the setback. Your savings rate stays at ₹600/month because the lifestyle upgrade felt earned.",
+            xpDelta: 40,
+            healthDelta: 0,
+            walletDelta: -8000,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "You had the right instinct (stay consistent) but the wrong reward structure (a single large purchase that wiped out progress). Treats are fine — but they should come from a separate 'want fund', not from your savings. The savings are untouchable.",
+            realLifeTip: "Build a 'fun fund' — a separate small pot for big treats. This protects your savings from yourself. When the fun fund is full, you can spend it guilt-free. When it's empty, you wait. Savings stay separate."
+          }
+        ]
+      },
+      {
+        id: 'rot-2b',
+        title: 'The Restart',
+        narrative: "Six months have passed. You still have ₹500, haven't saved anything. Rohan has ₹11,000. The gap feels even bigger now, and you feel worse. Your school runs a financial literacy workshop and the speaker says: \"The best financial plan isn't the one that started earliest. It's the one you can stick to for the next 20 years.\" Something shifts. What do you do?",
+        ageGroups: ['senior'],
+        choices: [
+          {
+            id: 'rot-c5',
+            text: 'Start today. ₹500/month, automatic transfer, every month without fail.',
+            consequence: "You set it up that afternoon. ₹500/month, automatic. No willpower needed. In 12 months: ₹6,500. In 24 months: ₹12,500. At 20 years old, you have ₹12,500 and a savings habit that will run for decades. Rohan has ₹20,000 — but his inconsistency is already showing. The gap is narrowing.",
+            xpDelta: 100,
+            healthDelta: 20,
+            walletDelta: 500,
+            nextStepId: 'end',
+            isOptimal: true,
+            explanation: "You lost 6 months. But you found the most important insight: start now, automate it, and stop feeling guilty about the delay. The guilt was costing you more than the delay. Starting today with ₹500/month beats waiting another year for ₹1,000/month every single time.",
+            realLifeTip: "Automate your savings. Set up a transfer for the day after income arrives. Remove the decision entirely. The most important financial habit is one you don't have to think about."
+          },
+          {
+            id: 'rot-c6',
+            text: '"I\'ll start properly when I get a job and earn real money. This is just practice money."',
+            consequence: "At 22, you get your first salary. But you haven't built the habit. So you spend most of your salary the same way you spent your pocket money — instinctively, without a plan. The 'real money' arrives, and the 'real savings' somehow never do.",
+            xpDelta: 5,
+            healthDelta: -15,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Habits built with small money are the exact same habits that run with big money. If you can't save 20% of ₹500, you won't magically save 20% of ₹50,000. The muscle is built through repetition — amount is secondary.",
+            realLifeTip: "There is no such thing as 'practice money.' The habits you build with ₹200/month are the same habits that will handle ₹20,000/month. Start building the muscle now."
+          }
+        ]
+      }
+    ]
   }
+
 ];

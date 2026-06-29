@@ -1017,5 +1017,55 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
     },
     estimatedReadSeconds: 55,
     relatedActivityIds: ['first-credit-card']
+  },
+
+  {
+    id: 'consistency-over-timing',
+    title: "Consistency beats timing — every single time",
+    hook: "The biggest financial lie is that you missed your window. You didn't.",
+    keyPoints: [
+      "Your savings RATE (%) matters infinitely more than your savings AMOUNT",
+      "Starting 'late' with a high savings rate outperforms starting 'early' with a low one",
+      "Lifestyle inflation — spending more whenever you earn more — is how people with rising incomes stay broke",
+      "The best financial plan isn't the one that started earliest. It's the one you can stick to for 20 years.",
+      "Guilt about starting late is more expensive than starting late — it stops you from starting at all"
+    ],
+    realWorldStat: "People who start investing consistently at 22 with 15% of income accumulate more wealth by 45 than those who invested a lump sum at 18 and stopped. Rate and consistency beat timing.",
+    quickQuestion: "If your income doubled tomorrow, what % would you save vs spend? Why?",
+    ageAdapted: {
+      junior: {
+        hook: "Your friend gets more pocket money than you. Doesn't matter. Here's why.",
+        keyPoints: [
+          "If you save 50% of ₹200, you save ₹100/week",
+          "If your friend saves 10% of ₹600, they save only ₹60/week",
+          "You saved MORE even though they earn 3× what you do",
+          "It's not about how much you start with — it's about what percentage you keep",
+          "Starting to save now — with even ₹10 — is worth more than waiting for 'more money'"
+        ]
+      },
+      teen: {
+        hook: "You got a raise in your allowance. This is the exact moment most people quietly destroy their financial future — without realising it.",
+        keyPoints: [
+          "Lifestyle inflation: spending more every time you earn more = savings never growing",
+          "The fix: every time income rises, keep your spending the SAME and invest the entire difference",
+          "A ₹1,000/month raise invested for 5 years grows to over ₹80,000 — or you could upgrade your phone and have nothing",
+          "Your savings % is a habit, not a one-time decision — build it now and it runs on autopilot",
+          "No amount is too small to start. ₹100/month beats ₹0/month by an infinite margin"
+        ]
+      },
+      senior: {
+        hook: "Rohan started at 14. You're starting at 17. You're not behind — here's the math that proves it.",
+        keyPoints: [
+          "Compound interest rewards time AND rate — if your rate is higher, you catch up faster than you think",
+          "The 'intentional advantage': starting later forces you to be deliberate. Deliberate investors outperform casual investors",
+          "Automate savings on the day income arrives — remove the decision, remove the willpower requirement",
+          "When income rises, your savings % should rise faster than your lifestyle does",
+          "Guilt about starting late costs you more than the delay itself — it stops you from starting"
+        ],
+        extraStat: "Investors who start at 25 with a 20% savings rate accumulate more wealth by 45 than those who started at 18 with a 5% rate. Consistency and intentionality beat timing every time."
+      }
+    },
+    estimatedReadSeconds: 60,
+    relatedActivityIds: ['two-piggy-banks', 'raise-trap', 'right-on-time']
   }
 ];
