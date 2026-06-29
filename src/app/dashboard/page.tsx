@@ -103,21 +103,17 @@ export default function DashboardPage() {
   }, [user, authLoading, router]);
 
   // These useMemo hooks must be declared before any conditional return (Rules of Hooks)
+  // Both use the narrative rank system (Apprentice → Legend) so the XP circle
+  // stays consistent with the Order of the Golden Ledger section below.
   const nextLevelXP = useMemo(() => {
-    if (!progression) return 500;
-    const currentLevel = progression.level || 1;
-    const levels = [0, 500, 1500, 3500, 7500, 15000, 30000];
-    return levels[currentLevel] || levels[levels.length - 1];
+    const totalXP = progression?.totalXP ?? 0;
+    const nextRank = getNextRank(totalXP);
+    return nextRank ? nextRank.minXP - totalXP : 0;
   }, [progression]);
 
   const levelProgress = useMemo(() => {
-    if (!progression) return 0;
-    const currentXP = progression.totalXP || 0;
-    const levels = [0, 500, 1500, 3500, 7500, 15000, 30000];
-    const currentLevel = progression.level || 1;
-    const floor = levels[currentLevel - 1] || 0;
-    const ceil = levels[currentLevel] || levels[levels.length - 1];
-    return Math.min(100, Math.max(0, ((currentXP - floor) / (ceil - floor)) * 100));
+    const totalXP = progression?.totalXP ?? 0;
+    return Math.round(getRankProgress(totalXP) * 100);
   }, [progression]);
 
   // Resize effect — must be before the conditional return (Rules of Hooks)
@@ -361,7 +357,9 @@ export default function DashboardPage() {
             </div>
             <div className="mt-2 text-center">
               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                / {nextLevelXP.toLocaleString()} XP to Next Rank
+                {nextLevelXP > 0
+                  ? `/ ${nextLevelXP.toLocaleString()} XP to ${getNextRank(progression?.totalXP ?? 0)?.name ?? 'Next Rank'}`
+                  : 'Max Rank Achieved!'}
               </p>
             </div>
           </div>
