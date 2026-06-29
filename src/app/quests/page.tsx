@@ -360,7 +360,7 @@ export default function QuestsHub() {
         {/* ── CASE FILES ─────────────────────────────────────────── */}
         <div>
           <div className="flex items-center gap-3 mb-5">
-            <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">Open Case Files</div>
+            <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">Learning Path</div>
             <div className="flex-1 h-px bg-slate-200" />
             {/* Daily quest counter for free users */}
             {!dailyStatus.isLoading && (
@@ -381,13 +381,32 @@ export default function QuestsHub() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {quests.map((quest, i) => {
-              const isCompleted = completedQuestIds.includes(quest.id);
-              // All quests are accessible to all ages — age groups adapt narrative only
-              const isLocked = quest.unlockRequirement?.completedQuestId &&
-                !completedQuestIds.includes(quest.unlockRequirement.completedQuestId);
-              const caseId = getCaseFileId(i);
+          {/* Quests sorted by curriculum order, grouped by chapter */}
+          {(() => {
+            const sorted = [...quests].sort((a, b) => a.chapterNumber - b.chapterNumber);
+            const chapters: Record<string, typeof quests> = {};
+            sorted.forEach(q => {
+              if (!chapters[q.chapter]) chapters[q.chapter] = [];
+              chapters[q.chapter].push(q);
+            });
+            let globalIndex = 0;
+            return Object.entries(chapters).map(([chapterName, chapterQuests]) => (
+              <div key={chapterName} className="mb-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="text-[10px] font-black uppercase tracking-widest text-primary">{chapterName}</div>
+                  <div className="flex-1 h-px bg-primary/20" />
+                  <div className="text-[10px] font-bold text-slate-400">
+                    {chapterQuests.filter(q => completedQuestIds.includes(q.id)).length}/{chapterQuests.length} done
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {chapterQuests.map((quest) => {
+                    const i = globalIndex++;
+                    const isCompleted = completedQuestIds.includes(quest.id);
+                    // All quests are accessible to all ages — age groups adapt narrative only
+                    const isLocked = quest.unlockRequirement?.completedQuestId &&
+                      !completedQuestIds.includes(quest.unlockRequirement.completedQuestId);
+                    const caseId = getCaseFileId(i);
 
               return (
                 <Card
@@ -466,14 +485,17 @@ export default function QuestsHub() {
                     </div>
                   </div>
                 </Card>
-              );
-            })}
-          </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ));
+          })()}
         </div>
 
         {/* ── INFINITE FOOTER ────────────────────────────────────── */}
         <div className="bg-slate-900 rounded-2xl p-6 text-center space-y-2">
-          <div className="text-2xl">♾️</div>
+          <div className="text-2xl font-black text-slate-500">∞</div>
           <p className="text-slate-400 text-sm font-medium">
             New case files are added every season. The Gray Fog never stops — and neither does the Order.
           </p>
