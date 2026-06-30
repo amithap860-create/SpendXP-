@@ -103,32 +103,23 @@ export const FREE_TIER: PremiumTier = {
 };
 
 /**
- * Stripe Price IDs per market.
+ * Razorpay pricing — INR only (Razorpay processes INR).
+ * Display prices in other currencies are for UI localisation only.
  *
- * HOW TO SET UP:
- *  1. Go to stripe.com/dashboard → Products → + Add product
- *     Name: "SpendXP Premium"
- *  2. Add a price for each currency below:
- *     INR ₹149/month, USD $2.99/month, GBP £1.99/month, EUR €1.99/month, AUD A$3.99/month
- *  3. Copy each Price ID (price_xxx) and add them to Vercel env vars:
- *     STRIPE_PRICE_ID_INR, STRIPE_PRICE_ID_USD, STRIPE_PRICE_ID_GBP,
- *     STRIPE_PRICE_ID_EUR, STRIPE_PRICE_ID_AUD
- *  4. Set STRIPE_PRICE_ID as the fallback (USD price).
+ * Vercel env vars required:
+ *   NEXT_PUBLIC_RAZORPAY_KEY_ID   — rzp_live_T7rvEPuehbeRPt
+ *   RAZORPAY_KEY_SECRET            — from Razorpay dashboard (keep secret, server-only)
  */
-export const PRICING_BY_CURRENCY: Record<string, { symbol: string; monthly: string; quarterly: string; envVar: string }> = {
-  INR: { symbol: '₹', monthly: '149',  quarterly: '349',  envVar: 'STRIPE_PRICE_ID_INR' },
-  USD: { symbol: '$', monthly: '2.99', quarterly: '6.99', envVar: 'STRIPE_PRICE_ID_USD' },
-  GBP: { symbol: '£', monthly: '1.99', quarterly: '4.99', envVar: 'STRIPE_PRICE_ID_GBP' },
-  EUR: { symbol: '€', monthly: '1.99', quarterly: '4.99', envVar: 'STRIPE_PRICE_ID_EUR' },
-  AUD: { symbol: 'A$', monthly: '3.99', quarterly: '9.99', envVar: 'STRIPE_PRICE_ID_AUD' },
-  SGD: { symbol: 'S$', monthly: '2.99', quarterly: '6.99', envVar: 'STRIPE_PRICE_ID_SGD' },
-};
+export const RAZORPAY_PLANS = {
+  monthly: { amountPaise: 14900, display: '₹149', label: '1 Month' },
+  annual:  { amountPaise: 59900, display: '₹599', label: '12 Months · ₹50/mo' },
+} as const;
 
 export const PREMIUM_TIER: PremiumTier = {
   id: 'premium',
   name: 'Agent',
-  price: '₹149/mo',
-  billingPeriod: 'monthly',
+  price: '₹149/mo or ₹599/yr',
+  billingPeriod: 'monthly or annual',
   features: [
     'Everything in Explorer',
     'Unlimited quests',

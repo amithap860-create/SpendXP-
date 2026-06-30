@@ -23,8 +23,8 @@ export const dynamic = 'force-dynamic';
 
 // How long each plan grants Premium access
 const PLAN_DURATION_DAYS: Record<string, number> = {
-  monthly:   30,
-  quarterly: 90,
+  monthly: 30,
+  annual:  365,
 };
 
 export async function POST(request: NextRequest) {

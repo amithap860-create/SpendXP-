@@ -5,11 +5,11 @@
  * order_id to open the Razorpay checkout modal.
  *
  * ENV VARS (add to Vercel → Settings → Environment Variables):
- *   RAZORPAY_KEY_ID     — rzp_live_... (or rzp_test_... for testing)
- *   RAZORPAY_KEY_SECRET — your Razorpay secret key
+ *   RAZORPAY_KEY_ID     — rzp_live_T7rvEPuehbeRPt
+ *   RAZORPAY_KEY_SECRET — from rzp-key.csv (delete that file after adding here)
  *   FIREBASE_ADMIN_SDK_KEY — full Firebase service account JSON
  *
- * Request body: { plan: 'monthly' | 'quarterly' }
+ * Request body: { plan: 'monthly' | 'annual' }
  * Response:     { orderId, amount, currency, keyId }
  */
 
@@ -19,9 +19,10 @@ import { getFirebaseAdmin } from '@/lib/firebaseAdmin';
 export const dynamic = 'force-dynamic';
 
 // Pricing in paise (1 INR = 100 paise)
+// Monthly: ₹149 | Annual: ₹599 (saves ₹1,189 vs monthly × 12)
 const PLANS = {
-  monthly:   { amount: 14900, label: 'SpendXP Premium — 1 Month' },
-  quarterly: { amount: 34900, label: 'SpendXP Premium — 3 Months' },
+  monthly: { amount: 14900, label: 'SpendXP Premium — 1 Month' },
+  annual:  { amount: 59900, label: 'SpendXP Premium — 12 Months' },
 } as const;
 
 type PlanKey = keyof typeof PLANS;
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
   let plan: PlanKey = 'monthly';
   try {
     const body = await request.json();
-    if (body.plan === 'quarterly') plan = 'quarterly';
+    if (body.plan === 'annual') plan = 'annual';
   } catch { /* default to monthly */ }
 
   const { amount, label } = PLANS[plan];
