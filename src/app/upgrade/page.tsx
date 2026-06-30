@@ -360,21 +360,24 @@ export default function UpgradePage() {
               </p>
             </div>
           ) : (
-            /* Payments not yet configured */
+            /* Payments not yet configured — NEXT_PUBLIC_RAZORPAY_KEY_ID missing */
             <div className="space-y-3">
-              <div className="inline-flex items-center gap-2 bg-amber-500/20 border border-amber-500/30 rounded-full px-3 py-1 mb-2">
-                <span className="text-amber-400 text-[10px] font-black uppercase tracking-widest">Launching Soon</span>
+              <div className="inline-flex items-center gap-2 bg-rose-500/20 border border-rose-500/30 rounded-full px-3 py-1 mb-2">
+                <span className="text-rose-400 text-[10px] font-black uppercase tracking-widest">Setup Required</span>
               </div>
-              <h3 className="text-xl font-black text-white">Agent Tier Coming Soon</h3>
-              <p className="text-slate-400 text-sm max-w-xs mx-auto">
-                Premium is almost here. Keep playing to earn your spot at the top.
+              <h3 className="text-xl font-black text-white">Payment Keys Not Configured</h3>
+              <p className="text-slate-400 text-sm max-w-xs mx-auto leading-relaxed">
+                Add <code className="text-rose-400 font-mono text-xs">NEXT_PUBLIC_RAZORPAY_KEY_ID</code> and{' '}
+                <code className="text-rose-400 font-mono text-xs">RAZORPAY_KEY_SECRET</code> to your Vercel environment variables.
               </p>
-              <Link
-                href="/games"
-                className="inline-block mt-4 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest text-white border border-white/20 hover:bg-white/10 transition-colors"
-              >
-                Back to Arcade →
-              </Link>
+              <div className="bg-slate-800 rounded-xl p-4 text-left text-[11px] font-mono text-slate-300 mt-2 space-y-1.5">
+                <div className="text-slate-500 mb-2 font-sans text-[10px] uppercase tracking-widest">Vercel → Settings → Environment Variables</div>
+                <div><span className="text-rose-400">NEXT_PUBLIC_RAZORPAY_KEY_ID</span>=rzp_live_...</div>
+                <div><span className="text-rose-400">RAZORPAY_KEY_SECRET</span>=your_secret</div>
+              </div>
+              <p className="text-slate-500 text-[10px] mt-2">
+                Get these from razorpay.com → Dashboard → API Keys. Use test keys (rzp_test_...) during development.
+              </p>
             </div>
           )}
         </div>

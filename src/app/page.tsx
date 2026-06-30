@@ -26,15 +26,18 @@ export default function LandingPage() {
     }
   }, [user, loading, router]);
 
-  if (!mounted || loading) {
+  // Only block render on SSR hydration — not on Firebase auth loading.
+  // The redirect useEffect above handles logged-in users in the background,
+  // so the landing page content shows immediately without a blank spinner.
+  if (!mounted) {
     return (
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        minHeight: '100dvh', background: 'white'
+        minHeight: '100dvh', background: '#F2F7F4'
       }}>
         <div style={{
           width: '32px', height: '32px',
-          border: '3px solid #E1F5EE', borderTop: '3px solid #1A1F2E',
+          border: '3px solid #E1F5EE', borderTop: '3px solid #2E7D5A',
           borderRadius: '50%', animation: 'spin 0.8s linear infinite'
         }} />
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
