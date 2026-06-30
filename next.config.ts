@@ -69,7 +69,19 @@ const securityHeaders = [
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   {
     key: 'Permissions-Policy',
-    value: 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
+    value: 'camera=(), microphone=(), geolocation=(), usb=(), interest-cohort=()',
+  },
+  {
+    key: 'Content-Security-Policy',
+    value: [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://apis.google.com",
+      "frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://api.razorpay.com",
+      "connect-src 'self' https://*.razorpay.com https://*.googleapis.com https://*.google.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com",
+      "img-src 'self' data: blob: https://*.razorpay.com https://*.googleusercontent.com",
+      "style-src 'self' 'unsafe-inline' https://checkout.razorpay.com",
+      "font-src 'self' data:",
+    ].join('; '),
   },
   { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
 ];
