@@ -28,12 +28,13 @@ const PLANS = {
 type PlanKey = keyof typeof PLANS;
 
 export async function POST(request: NextRequest) {
-  const keyId     = process.env.RAZORPAY_KEY_ID;
+  // NEXT_PUBLIC_ prefix makes it available client-side too; server can also read it
+  const keyId     = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID;
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
   if (!keyId || !keySecret) {
     return NextResponse.json(
-      { error: 'Razorpay is not configured. Add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to Vercel env vars.' },
+      { error: 'Razorpay is not configured. Add NEXT_PUBLIC_RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to Vercel env vars.' },
       { status: 503 }
     );
   }
