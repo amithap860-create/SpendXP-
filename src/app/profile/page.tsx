@@ -540,6 +540,30 @@ export default function ProfilePage() {
     }
   };
 
+  // Age / birth year change
+  const [editingAge, setEditingAge] = useState(false);
+  const [pendingBirthYear, setPendingBirthYear] = useState<string>('');
+
+  const handleSaveAge = async () => {
+    if (!user?.uid) return;
+    const year = parseInt(pendingBirthYear);
+    const currentYear = new Date().getFullYear();
+    const age = currentYear - year;
+    if (!year || age < 8 || age > 25) {
+      toast({ title: 'Enter a valid birth year (age 8–25)', variant: 'destructive' });
+      return;
+    }
+    const newAgeGroup = age <= 12 ? 'junior' : age <= 16 ? 'teen' : 'senior';
+    try {
+      await safeUpdateDoc(doc(db, 'users', user.uid), { birthYear: year, ageGroup: newAgeGroup });
+      setProfile(p => p ? { ...p, birthYear: year, ageGroup: newAgeGroup } : p);
+      setEditingAge(false);
+      toast({ title: 'Age updated!' });
+    } catch {
+      toast({ title: 'Failed to update age', variant: 'destructive' });
+    }
+  };
+
   // Currency / country change
   const [editingCurrency, setEditingCurrency] = useState(false);
   const [pendingCountryCode, setPendingCountryCode] = useState<string>('');
@@ -659,7 +683,30 @@ export default function ProfilePage() {
                   </div>
                 )}
                 <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                  <Badge variant="secondary" className="text-xs font-bold">{ageLabel}</Badge>
+                  {editingAge ? (
+                    <div className="flex items-center gap-1.5">
+                      <Input
+                        type="number"
+                        placeholder="Birth year e.g. 2010"
+                        value={pendingBirthYear}
+                        onChange={e => setPendingBirthYear(e.target.value)}
+                        className="h-7 w-36 text-xs"
+                        min={2000} max={new Date().getFullYear() - 8}
+                        suppressHydrationWarning
+                      />
+                      <Button size="sm" onClick={handleSaveAge} className="h-7 w-7 p-0" suppressHydrationWarning><Check className="h-3 w-3" /></Button>
+                      <Button size="sm" variant="outline" onClick={() => setEditingAge(false)} className="h-7 w-7 p-0" suppressHydrationWarning><X className="h-3 w-3" /></Button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => { setPendingBirthYear(profile.birthYear?.toString() ?? ''); setEditingAge(true); }}
+                      className="flex items-center gap-1 group"
+                      suppressHydrationWarning
+                    >
+                      <Badge variant="secondary" className="text-xs font-bold group-hover:bg-primary/10 transition-colors">{ageLabel}</Badge>
+                      <Pencil className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </button>
+                  )}
                   <span className="text-xs text-slate-400 font-medium">
                     {countryCfg.flag} {countryCfg.name} · {profile.currencyCode}
                   </span>

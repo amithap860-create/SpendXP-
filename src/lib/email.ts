@@ -13,12 +13,12 @@ export class EmailService {
 
   constructor() {
     this.transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.EMAIL_PORT || '587'),
-      secure: false, // true for 465, false for other ports
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: 'spendxp.app@gmail.com',
+        pass: process.env.GMAIL_APP_PASSWORD,
       },
     });
   }
@@ -26,7 +26,7 @@ export class EmailService {
   async sendEmail(email: EmailTemplate): Promise<boolean> {
     try {
       await this.transporter.sendMail({
-        from: `"SpendXP" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
+        from: '"SpendXP" <spendxp.app@gmail.com>',
         to: email.to,
         subject: email.subject,
         html: email.html,
