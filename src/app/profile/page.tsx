@@ -850,7 +850,7 @@ export default function ProfilePage() {
               </div>
             )}
           </Section>
-        }
+        )}
 
         {/* ── Currency & Country ── */}
         <Section title="Currency & Country" icon={ToggleLeft} iconColor="text-primary">

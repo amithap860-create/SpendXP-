@@ -1067,5 +1067,55 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
     },
     estimatedReadSeconds: 60,
     relatedActivityIds: ['two-piggy-banks', 'raise-trap', 'right-on-time']
+  },
+
+  {
+    id: 'investment-trap',
+    title: "How to spot a financial scam before it costs you",
+    hook: "30% monthly returns. Guaranteed. Your friend already made money. Sound familiar? Here's why that's always a lie.",
+    keyPoints: [
+      "Guaranteed high returns are mathematically impossible — any 'guaranteed' profit promise is a fraud signal",
+      "The three red flags: urgency ('limited time'), guaranteed returns, and friend referrals — scammers specifically exploit social trust",
+      "Dashboard numbers are not real money — only a confirmed bank withdrawal proves an investment is legitimate",
+      "The withdrawal fee trap: scammers show fake gains, block withdrawal, then demand fees to 'unlock' your money — never pay",
+      "Sunk cost fallacy: 'I've already lost ₹5,000 so I should pay ₹500 more to recover it' is exactly how scammers extract more"
+    ],
+    realWorldStat: "Financial scams cost the world over $8 billion annually. Young people aged 18–25 are the fastest-growing victim group — not because they're less intelligent, but because they have digital access and are actively looking for ways to grow money.",
+    quickQuestion: "If someone showed you a screenshot of ₹50,000 in profits, what's the ONE thing you'd ask to verify it's actually real?",
+    ageAdapted: {
+      junior: {
+        hook: "Someone says 'give me ₹100 and I'll give you ₹500 tomorrow.' What would you do?",
+        keyPoints: [
+          "If it sounds too good to be true — it always is",
+          "Never give money to someone who promises big returns with no real explanation",
+          "Ask a parent or trusted adult before sending money to anyone online",
+          "Real banks and savings accounts earn small amounts slowly — that is normal and safe",
+          "Anyone promising to 'double your money' quickly is trying to take it"
+        ]
+      },
+      teen: {
+        hook: "Your friend made money on a platform — or so they think. Here's how to know if it's real.",
+        keyPoints: [
+          "Ask: has your friend actually received money in their bank account? Dashboard numbers do not equal real money",
+          "Google '[platform name] scam review Reddit' before investing anything — takes 5 minutes",
+          "Red flags: no company registration, WhatsApp-only support, referral bonuses bigger than investment returns",
+          "The fee trap: any request for money to 'unlock' or 'verify' your own balance is the final scam move",
+          "If you are scammed: stop immediately, document everything, warn your network — being scammed does not make you naive, it makes you a target of professionals"
+        ]
+      },
+      senior: {
+        hook: "Investment scams now look indistinguishable from real platforms. Here is your 5-minute verification checklist.",
+        keyPoints: [
+          "Verify regulatory registration through your country's financial regulator (SEBI in India, FCA in UK, SEC in USA)",
+          "Search '[platform] + complaint + Reddit + forum' — real scams accumulate victim stories within weeks of launch",
+          "Request a small test withdrawal before investing large amounts — if it succeeds without fees, the platform is likely legitimate",
+          "No legitimate platform ever charges fees to withdraw your own money — this is an absolute rule",
+          "Escalating fee requests are a designed pattern: each payment is rationalised by previous sunk costs — the only escape is stopping immediately"
+        ],
+        extraStat: "The most common scam victims are not the least financially literate — they are people actively trying to invest who are targeted by professionally designed platforms with real marketing budgets and fake social proof."
+      }
+    },
+    estimatedReadSeconds: 75,
+    relatedActivityIds: ['investment-trap']
   }
 ];

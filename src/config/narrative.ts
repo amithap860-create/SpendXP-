@@ -182,7 +182,7 @@ export const FOG_ENEMIES: FogEnemy[] = [
     emoji: '🎭',
     description: 'A shapeshifter who takes any form — Ponzi schemes, crypto cons, fake investment promises.',
     realWorldTrap: 'Get-rich-quick schemes, unregulated crypto, WhatsApp investment groups',
-    weakness: 'If returns sound too good to be true, they always are. SEBI-registered only.',
+    weakness: 'If returns sound too good to be true, they always are. Only invest through licensed, regulated platforms in your country.',
   },
   {
     id: 'inflation_spiral',

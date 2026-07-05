@@ -840,6 +840,130 @@ export const quests: Quest[] = [
     ]
   },
 
+  {
+    id: 'investment-trap',
+    title: 'The Investment Trap',
+    description: "Your friend forwards a WhatsApp message: 'I made ₹3,200 profit in one week! This app gives 30% monthly returns — guaranteed.' The link leads to a slick website. Do you know a scam when you see one?",
+    category: 'investing',
+    difficulty: 'intermediate',
+    ageGroups: ['teen'],
+    chapterNumber: 19,
+    chapter: 'Staying Safe',
+    estimatedMinutes: 5,
+    xpReward: 120,
+    startingBalance: 5000,
+    steps: [
+      {
+        id: 'it-1',
+        title: 'The Forwarded Message',
+        narrative: "Your friend Dev sends you a WhatsApp message: 'This app changed my life. Invested ₹5,000, got back ₹8,200 in 3 weeks. Guaranteed 30% monthly returns. Limited slots — join now!' There's a link and a referral code. Your ₹5,000 savings is just sitting in your account. What do you do?",
+        ageGroups: ['teen'],
+        choices: [
+          {
+            id: 'it-c1',
+            text: 'Sign up immediately — Dev\'s a close friend and ₹8,200 from ₹5,000 is incredible',
+            consequence: "You sign up and invest ₹5,000. The dashboard shows your balance growing. It looks real. But when you try to withdraw after 2 weeks, you hit a wall...",
+            xpDelta: -20,
+            healthDelta: -20,
+            walletDelta: -5000,
+            nextStepId: 'it-2b',
+            isOptimal: false,
+            explanation: "Scammers use friends as unwitting recruiters — Dev probably genuinely believes it because he saw fake 'gains' on a dashboard. Urgency ('limited slots'), guaranteed returns, and friend referrals are the three biggest red flags in financial fraud.",
+            realLifeTip: "If a friend promotes an investment: (1) Ask if they actually withdrew real money to their bank — not just a dashboard screenshot. (2) Guaranteed high returns are mathematically impossible. Even Warren Buffett averages 20% per year, not per month."
+          },
+          {
+            id: 'it-c2',
+            text: 'Ask Dev: did he actually withdraw money to his bank account yet — or just see it on a dashboard?',
+            consequence: "Dev pauses. '...I haven't actually withdrawn yet. The app says I need to upgrade my account first.' That's a red flag. You tell him you'll research before putting in any money.",
+            xpDelta: 60,
+            healthDelta: 10,
+            walletDelta: 0,
+            nextStepId: 'it-2a',
+            isOptimal: true,
+            explanation: "The most important question for any investment: 'Has someone received real money in their real bank account?' Dashboard numbers mean nothing — they're just pixels. Real money in a real account is the only proof that works.",
+            realLifeTip: "Before investing in anything a friend promotes: ask them to show you a bank statement or payment confirmation of a successful withdrawal. If they can't — or haven't tried yet — the 'returns' may not be real."
+          },
+          {
+            id: 'it-c3',
+            text: 'Google the platform name + \"scam\" before doing anything',
+            consequence: "Five minutes of searching reveals: forum posts calling it a Ponzi scheme, a Reddit thread documenting blocked withdrawals, and no regulatory registration anywhere. Your ₹5,000 stays safely in your account.",
+            xpDelta: 100,
+            healthDelta: 20,
+            walletDelta: 0,
+            nextStepId: 'it-2a',
+            isOptimal: true,
+            explanation: "Searching '[platform name] + scam + review + Reddit' is the fastest way to surface fraud. Scam platforms accumulate victims who post warnings online. Legitimate investments welcome scrutiny — scams fear it.",
+            realLifeTip: "Before any investment: Google '[name] scam review Reddit'. Takes 5 minutes. Saves thousands. Make it a rule: always research before transferring money."
+          }
+        ]
+      },
+      {
+        id: 'it-2a',
+        title: 'Connecting the Dots',
+        narrative: "You and Dev look more carefully. The platform: no company registration you can find, customer support is only a WhatsApp number, the 'CEO' photo is a stock image, and forum posts say withdrawals get blocked. Dev has ₹8,000 in there and is worried. What do you both do?",
+        ageGroups: ['teen'],
+        choices: [
+          {
+            id: 'it-c4',
+            text: 'Help Dev immediately request a withdrawal — and warn everyone who got the same forward',
+            consequence: "Dev tries to withdraw. The app asks for a ₹500 'verification fee.' You both immediately recognise this as another trap and refuse. You send a warning to the group chat with evidence. Two other friends who were about to invest don't. Your quick action saved ₹10,000+ across the group.",
+            xpDelta: 120,
+            healthDelta: 25,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: true,
+            explanation: "The 'withdrawal fee' is the final trap — scammers use it to extract more money before disappearing. Any legitimate platform never charges fees to withdraw your own money. Warning others is the most important thing you can do after spotting a scam.",
+            realLifeTip: "Red flag: any platform that charges a fee to access or withdraw your own money. That's not a process — that's theft. Report to your country's financial regulator and warn everyone who received the same message."
+          },
+          {
+            id: 'it-c5',
+            text: 'Block the link and move on — not your problem, you didn\'t invest',
+            consequence: "Three friends in the group invest ₹5,000 each over the next week. The platform disappears 3 weeks later, and they lose ₹15,000 combined. Dev loses his ₹8,000. All of them feel betrayed — and you had information that could have protected them.",
+            xpDelta: 20,
+            healthDelta: -5,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Saying nothing when you know something is fraud means others pay the price with information you had. Financial scams thrive on silence and embarrassment. Warning your network costs nothing and could save real money.",
+            realLifeTip: "When you identify a scam: send a clear, factual message — 'I researched this platform. Here is what I found: [evidence]. Don't invest.' Most people will be grateful. Those who ignore it still can't say they weren't warned."
+          }
+        ]
+      },
+      {
+        id: 'it-2b',
+        title: 'The Withdrawal Trap',
+        narrative: "Two weeks in, your dashboard shows ₹8,200 — a stunning ₹3,200 profit! You try to withdraw it. The app says: 'Your account must be verified to process withdrawals. Pay a ₹500 security deposit to unlock your full balance.' Dev says he paid the fee and is 'waiting for his money.' What do you do?",
+        ageGroups: ['teen'],
+        choices: [
+          {
+            id: 'it-c6',
+            text: 'Pay the ₹500 fee — I\'m so close to getting ₹8,200 back',
+            consequence: "You pay ₹500. The app then asks for a ₹1,500 'tax clearance' payment. You're now down ₹6,500 total. Then the app goes dark — support stops responding. Dev also paid multiple fees and lost ₹12,000. The '₹8,200' was always just numbers on a screen designed to keep you paying.",
+            xpDelta: -30,
+            healthDelta: -30,
+            walletDelta: -500,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "The escalating fee trap: show fake gains → block withdrawal → demand fees to unlock → demand more fees → disappear. Each fee payment is justified by the sunk cost of the previous one. This is a textbook Ponzi exit strategy.",
+            realLifeTip: "Sunk cost fallacy: 'I've lost ₹5,000, so I should pay ₹500 more to recover it.' This is exactly how scammers extract more money. Cut your losses at the first fee demand. Never pay money to access your own money."
+          },
+          {
+            id: 'it-c7',
+            text: 'Refuse to pay — legitimate platforms never charge fees to withdraw your own money',
+            consequence: "You refuse the fee and accept the likely loss. You document everything — screenshots, chat records — and share a detailed warning with your school group chat. Four friends who were about to invest don't, protecting ₹20,000. Your ₹5,000 loss became a lesson that protected many others.",
+            xpDelta: 60,
+            healthDelta: 5,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: true,
+            explanation: "Recognising the withdrawal fee trap and refusing to escalate stops the bleeding. Your ₹5,000 is almost certainly gone — but paying more makes it worse. Sharing your experience openly is the most valuable thing you can do at this point.",
+            realLifeTip: "If you've been scammed: (1) Stop paying immediately. (2) Screenshot everything. (3) Report to your country's financial fraud authority. (4) Share your experience openly — not shamefully. These platforms are professionally designed to deceive. Falling for one doesn't make you naive; it makes you human."
+          }
+        ]
+      }
+    ]
+  },
+
   // ─────────────────────────────────────────────────────────
   // EXISTING SENIOR QUESTS FOLLOW BELOW
   // ─────────────────────────────────────────────────────────

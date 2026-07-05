@@ -146,15 +146,15 @@ export const lessons: Lesson[] = [
       }
     ],
     quizCard: {
-      question: "Which of these is a famous Indian stock market index?",
-      options: ["Nifty 50", "The Big Bazar", "RBI Index", "Cricket Score"],
-      correctIndex: 0,
-      explanation: "The Nifty 50 tracks the 50 largest companies in India and is a great way to see how the market is doing."
+      question: "What does a stock market index (like the Nifty 50 or S&P 500) actually measure?",
+      options: ["The total money in all bank accounts", "The average performance of a selected group of companies", "The price of one specific company's stock", "The government's budget"],
+      correctIndex: 1,
+      explanation: "A stock market index tracks the average performance of a selected group of companies — for example, the Nifty 50 tracks India's 50 largest, and the S&P 500 tracks America's 500 largest. They act as a 'health check' for the economy."
     },
     briefs: [
-      { emoji: '📈', fact: 'The Nifty 50 has given an average annual return of about 12% over the last 20 years — turning ₹1L into ₹9.6L without touching it.' },
-      { emoji: '⏰', fact: 'If you invested ₹500/month from age 15 to age 60 at 12% returns, you would have over ₹2.6 crore at retirement.' },
-      { emoji: '🏠', fact: 'Historically, equities outperform real estate in India over 10+ year periods when inflation is accounted for — but most people still prefer property.' },
+      { emoji: '📈', fact: 'Global stock markets have historically returned 8–12% per year over long periods. ₹1 lakh invested in a broad market index 20 years ago would be worth ₹9L+ today — without touching it once.' },
+      { emoji: '⏰', fact: 'If you invested ₹500/month from age 15 to age 60 at 12% annual returns, you would have over ₹2.6 crore at retirement — built almost entirely from compound growth, not contributions.' },
+      { emoji: '🏠', fact: 'Historically, equities outperform real estate over 10+ year periods when adjusted for inflation — but most people still prefer property because it feels more "real" and tangible.' },
     ]
   },
   {
@@ -209,15 +209,15 @@ export const lessons: Lesson[] = [
       }
     ],
     quizCard: {
-      question: "A Nifty 50 ETF tracks India's top 50 companies. If you invest ₹1,000 in it, you own...",
-      options: ["Only 1 company", "50 companies proportionally", "All BSE companies", "Only tech companies"],
+      question: "An index ETF (e.g. Nifty 50 or S&P 500 fund) lets you invest ₹1,000 and immediately own...",
+      options: ["Only the top 1 company", "All companies in the index, proportionally", "Only tech companies", "A fixed deposit with bonus shares"],
       correctIndex: 1,
-      explanation: "ETFs give you instant diversification by spreading your money across all companies in the index."
+      explanation: "Index ETFs give you instant diversification — your ₹1,000 is spread across every company in the index, proportional to its size. One purchase, dozens or hundreds of companies."
     },
     briefs: [
-      { emoji: '💰', fact: 'The average Indian equity mutual fund charges 1.5% annual expense ratio. A Nifty 50 ETF charges just 0.04%. On ₹10L over 20 years, that difference is ₹12+ lakhs.' },
-      { emoji: '📊', fact: 'In any given 10-year window, about 80% of active fund managers fail to beat the Nifty 50 index after fees. Passive investing wins statistically.' },
-      { emoji: '🌏', fact: 'John Bogle founded Vanguard and invented the index fund in 1976. He was rejected by everyone. Today index funds manage over $15 trillion globally.' },
+      { emoji: '💰', fact: 'The average actively managed mutual fund charges 1–2% annual expense ratio. A broad market ETF (tracking Nifty 50, S&P 500, or similar) charges just 0.03–0.1%. On ₹10L over 20 years, that fee difference is worth ₹10+ lakhs.' },
+      { emoji: '📊', fact: 'In any given 10-year window, about 80% of active fund managers fail to beat their benchmark index after fees. Passive investing wins statistically — consistently, across every major market globally.' },
+      { emoji: '🌏', fact: 'John Bogle founded Vanguard and invented the index fund in 1976. He was rejected by everyone. Today, index funds and ETFs manage over $15 trillion globally — the biggest shift in personal finance history.' },
     ]
   },
   {
@@ -281,9 +281,9 @@ export const lessons: Lesson[] = [
       explanation: "No legitimate investment guarantees 50% monthly returns. This pattern is typical of a Ponzi scheme."
     },
     briefs: [
-      { emoji: '📉', fact: 'Bitcoin lost 83% of its value in 2018 and 77% again in 2022. It recovered both times — but only those who held through the crash benefited.' },
-      { emoji: '🕵️', fact: 'India had more crypto scams than any other country in 2022 (Chainalysis report). ₹1,000 crore was lost to Ponzi schemes disguised as "DeFi" projects.' },
-      { emoji: '⚖️', fact: 'Crypto is legal to hold in India but gains are taxed at a flat 30% with no offset allowed for losses — higher than almost any other asset class.' },
+      { emoji: '📉', fact: 'Bitcoin lost 83% of its value in 2018 and 77% again in 2022. It recovered both times — but only those who held through the crash and had no urgent need for the money benefited.' },
+      { emoji: '🕵️', fact: 'Crypto scams cost the world over $8 billion in 2022 (Chainalysis report). Ponzi schemes disguised as "DeFi" and "staking" projects are the most common trap — promising yield that never materialises.' },
+      { emoji: '⚖️', fact: 'Crypto tax treatment varies by country but is generally unfavourable — gains are often taxed as income with limited or no ability to offset losses. Always check local tax rules before investing.' },
     ]
   },
 
@@ -353,7 +353,7 @@ export const lessons: Lesson[] = [
       explanation: '"Pay yourself first" means saving before you spend. It is the single most effective savings habit because it removes the decision entirely.',
     },
     briefs: [
-      { emoji: '💡', fact: 'The average Indian household saves 30% of income — but most of that is property. Liquid savings (accessible cash) for under-25s is often less than 1 month of expenses.' },
+      { emoji: '💡', fact: 'Most young adults save far less than they think. Liquid savings (accessible cash) for under-25s is often less than 1 month of expenses — leaving no real buffer when something unexpected happens.' },
       { emoji: '🤖', fact: 'Automation is the #1 factor in savings success. People who automate savings save 3× more than those who save "what is left over" at month end.' },
       { emoji: '🏺', fact: 'Ancient Indians used the "kumbh" system — storing grain away before eating. Modern finance just replaced grain with money and earthen pots with savings accounts.' },
     ],
@@ -420,7 +420,7 @@ export const lessons: Lesson[] = [
     briefs: [
       { emoji: '💳', fact: 'India has 60M+ credit cards in circulation. The average revolving balance costs ₹540/year per ₹1,500 in interest alone — paid to the bank for spending money that wasn\'t theirs.' },
       { emoji: '📊', fact: 'A ₹10,000 credit card balance at 3% monthly interest takes 8+ years to repay with minimum payments — paying back ₹28,000 total on a ₹10,000 purchase.' },
-      { emoji: '⛓️', fact: 'BNPL (Buy Now Pay Later) apps like LazyPay charge 0% only for 15 days. After that, annualised rates can hit 30–50%. Read the fine print before every split payment.' },
+      { emoji: '⛓️', fact: 'Buy Now Pay Later (BNPL) apps advertise 0% interest — but only for 15–30 days. After that, annualised rates can reach 30–50%. Always read the repayment terms before splitting any payment.' },
     ],
   },
 
@@ -434,16 +434,16 @@ export const lessons: Lesson[] = [
     cards: [
       {
         id: 'cr1',
-        title: 'What is a CIBIL Score?',
+        title: 'What is a Credit Score?',
         body: {
           junior: '',
-          teen: 'Your CIBIL score is a 3-digit number (300–900) that banks use to decide if they will lend you money and at what interest rate. Higher = better terms, lower interest.',
-          senior: 'CIBIL (Credit Information Bureau India Ltd.) scores range 300–900. Scores above 750 qualify for the best loan rates. Scores below 650 lead to rejections or high-risk premiums. It is calculated from 5 factors.',
+          teen: 'Your credit score is a 3-digit number that banks use to decide whether to lend you money and at what interest rate. Higher = better loan terms and lower interest rates. Every country has its own credit bureau: CIBIL in India (300–900), FICO in the USA (300–850), Experian in the UK.',
+          senior: 'Credit bureaus compute your creditworthiness as a score: CIBIL in India (300–900), FICO in the USA (300–850), Experian in the UK. Scores above ~750 unlock the best loan rates. Scores below ~650 lead to rejections or high-risk premiums. Globally, the same five factors determine your score.',
         },
         example: {
           junior: '',
-          teen: 'Amit\'s CIBIL score is 800. He gets a home loan at 8.5%. His friend with a score of 600 pays 11.5% — on a ₹50L loan, that is ₹15L extra in interest.',
-          senior: 'On a ₹60L, 20-year home loan: 8.5% = EMI ₹52,118 = Total ₹1.25 crore. At 11.5% = EMI ₹63,879 = Total ₹1.53 crore. Score difference costs ₹28L.',
+          teen: 'Amit\'s credit score is 800. He gets a home loan at 8.5%. His friend with a score of 600 pays 11.5% — on a ₹50L loan, that\'s ₹15L extra in interest over 20 years.',
+          senior: 'On a ₹60L, 20-year home loan: 8.5% (score 800+) = EMI ₹52,118 = Total ₹1.25 crore. At 11.5% (score 600): EMI ₹63,879 = Total ₹1.53 crore. Score difference costs ₹28L.',
         },
         visual: 'bar',
         visualData: {
@@ -485,15 +485,15 @@ export const lessons: Lesson[] = [
       },
     ],
     quizCard: {
-      question: 'Which factor has the BIGGEST impact on your CIBIL score?',
+      question: 'Which factor has the BIGGEST impact on your credit score?',
       options: ['Number of credit cards you own', 'Payment history', 'Total balance across all accounts', 'The type of bank you use'],
       correctIndex: 1,
       explanation: 'Payment history accounts for 35% of your score — the largest single factor. Even one missed payment can drop your score by 50–100 points instantly.',
     },
     briefs: [
-      { emoji: '📋', fact: 'You can check your CIBIL score for free once a year at cibil.com. Most banks and apps like Paytm, CRED, and BankBazaar offer unlimited free checks with soft pulls (no score impact).' },
+      { emoji: '📋', fact: 'You can usually check your credit score for free through your bank\'s app, your country\'s official credit bureau (CIBIL in India, Experian/Equifax in USA/UK), or many financial apps. Free checks are "soft inquiries" and do not affect your score.' },
       { emoji: '🛡️', fact: 'Checking your OWN credit score is a "soft inquiry" — it does NOT lower your score. Only "hard inquiries" (when a lender checks for an application) have a small, temporary impact.' },
-      { emoji: '⚡', fact: 'Paying credit card dues 2 days BEFORE the billing cycle closes is a secret weapon: the bank reports a lower balance to CIBIL, boosting your utilisation score even with the same spending.' },
+      { emoji: '⚡', fact: 'Paying credit card dues 2 days BEFORE the billing cycle closes is a secret weapon: the bank reports a lower balance to the credit bureau, boosting your utilisation score even with the same spending.' },
     ],
   },
 
@@ -503,64 +503,63 @@ export const lessons: Lesson[] = [
     relatedGame: 'finIQ',
     title: 'Taxes Made Simple',
     estimatedMinutes: 4,
-    ageGroups: ['senior'],
+    ageGroups: ['teen', 'senior'],
     cards: [
       {
         id: 'tx1',
-        title: 'How Income Tax Works in India',
+        title: 'Progressive Tax: How Brackets Work',
         body: {
           junior: '',
-          teen: '',
-          senior: 'India uses a slab-based income tax system. You pay different rates on different portions of your income — not the same rate on everything. In the new regime (2024-25), the first ₹3L is tax-free, ₹3–7L is 5%, ₹7–10L is 10%, and so on.',
+          teen: 'Most countries use progressive income tax — you pay low rates on lower income and higher rates on higher income. The key insight: only the income in each "bracket" is taxed at that higher rate, not your entire income.',
+          senior: 'Progressive taxation means your effective tax rate (total tax ÷ total income) is always lower than your marginal rate (the rate on your top bracket). Standard deductions and retirement contributions reduce your taxable income before any bracket applies — that\'s the foundation of all legal tax optimisation.',
         },
         example: {
           junior: '',
-          teen: '',
-          senior: 'Annual income ₹8L. Tax: ₹0 on first ₹3L + (₹4L × 5%) + (₹1L × 10%) = ₹0 + ₹20,000 + ₹10,000 = ₹30,000 tax. Standard deduction ₹50,000 reduces taxable income, so effective tax = ₹22,500.',
+          teen: 'Two brackets: ₹0–3L = 0%, ₹3–8L = 5%. If you earn ₹6L: tax = ₹0 (first ₹3L) + ₹15,000 (next ₹3L × 5%) = ₹15,000. Not ₹6L × 5% = ₹30,000. Bracket math saves you money.',
+          senior: 'Income ₹10L: ₹0–3L at 0% = ₹0. ₹3–7L at 5% = ₹20,000. ₹7–10L at 10% = ₹30,000. Total = ₹50,000. Effective rate = 5%, even though the top bracket rate is 10%. Standard deduction reduces this further.',
         },
         visual: 'bar',
         visualData: {
           items: [
-            { label: '0–3L (0%)', value: 0, color: '#10b981' },
-            { label: '3–7L (5%)', value: 5, color: '#3b82f6' },
-            { label: '7–10L (10%)', value: 10, color: '#f59e0b' },
-            { label: '10–12L (15%)', value: 15, color: '#f97316' },
-            { label: '12–15L (20%)', value: 20, color: '#ef4444' },
+            { label: 'Band 1 (0%)', value: 0, color: '#10b981' },
+            { label: 'Band 2 (5%)', value: 5, color: '#3b82f6' },
+            { label: 'Band 3 (10%)', value: 10, color: '#f59e0b' },
+            { label: 'Band 4 (20%)', value: 20, color: '#ef4444' },
           ],
         },
         xpReward: 30,
       },
       {
         id: 'tx2',
-        title: 'Tax Saving Strategies',
+        title: 'Legal Ways to Pay Less Tax',
         body: {
           junior: '',
-          teen: '',
-          senior: 'Section 80C allows ₹1.5L of deductions per year: EPF, PPF, ELSS mutual funds, life insurance premiums, home loan principal repayment. NPS (Section 80CCD) adds ₹50,000 more. Home loan interest gets ₹2L deduction under Section 24.',
+          teen: 'Most countries allow deductions that reduce your taxable income before any brackets apply. The most powerful: contributions to retirement accounts (EPF, PPF, 401k, ISA, pension). Investing here is essentially earning a government discount on top of your investment returns.',
+          senior: 'Tax-advantaged accounts are the single biggest legal tax lever: employer pension matching (free money + deduction), retirement account contributions (deferred or exempt from tax), healthcare savings where available. Max these before any other investing — the combined tax benefit often delivers a higher return than the investment itself in year one.',
         },
         example: {
           junior: '',
-          teen: '',
-          senior: 'Income ₹12L. Without planning: tax ~₹1.1L. With 80C (₹1.5L ELSS) + 80CCD (₹50K NPS) + standard deduction (₹50K): taxable income = ₹9.5L. Tax ~₹62,500. Saves ₹47,500 in one year.',
+          teen: 'Investing ₹10,000 in a tax-saving account: if your marginal tax rate is 10%, you immediately owe ₹1,000 less in tax. Your effective cost is only ₹9,000 — an instant 11% return before the money even grows.',
+          senior: 'Salary ₹12L. Without planning: tax ~₹1.05L. With ₹1.5L in retirement savings + standard deduction (₹50K): taxable income drops to ~₹10L. Tax ~₹62,500. Annual saving: ~₹42,500 — just from using the right accounts.',
         },
         visual: 'comparison',
         visualData: {
           left: { label: 'No planning', value: 100, color: '#ef4444' },
-          right: { label: 'With 80C', value: 43, color: '#10b981' },
+          right: { label: 'With deductions', value: 41, color: '#10b981' },
         },
         xpReward: 30,
       },
     ],
     quizCard: {
-      question: 'Under the new tax regime (2024-25), income up to which limit is tax-free?',
-      options: ['₹2.5 lakh', '₹3 lakh', '₹5 lakh', '₹7 lakh'],
-      correctIndex: 1,
-      explanation: 'The new tax regime (FY2024-25) sets the basic exemption limit at ₹3 lakh. Combined with the standard deduction of ₹50,000, individuals earning up to ₹7.5L can have zero tax liability with rebate u/s 87A.',
+      question: 'You earn ₹8L. Brackets: ₹0–3L at 0%, ₹3–8L at 5%. How much total tax do you owe?',
+      options: ['₹25,000', '₹40,000', '₹8,000', '₹0'],
+      correctIndex: 0,
+      explanation: 'Progressive tax: ₹0 on first ₹3L + (₹5L × 5%) = ₹25,000. Not ₹8L × 5% = ₹40,000. Only the income in each bracket is taxed at that rate — never your full income.',
     },
     briefs: [
-      { emoji: '📝', fact: 'TDS (Tax Deducted at Source) is automatically cut from your salary before you receive it. Your Form 16 from your employer shows exactly how much was deducted — you can verify or claim refunds using ITR filing.' },
-      { emoji: '🏦', fact: 'EPF (Employee Provident Fund) is mandatory for salaried employees earning under ₹15,000/month, but voluntary above. Both employee and employer contribute 12% each. The interest is tax-free.' },
-      { emoji: '⏰', fact: 'ITR filing deadline is July 31 each year. Filing even if you have no tax due builds financial history, enables visa applications, and is required to carry forward capital losses.' },
+      { emoji: '📝', fact: 'In most countries, tax is deducted from your salary before you receive it (called withholding, TDS, or PAYE). Your annual tax return reconciles what was withheld vs. what you actually owed — and you either get a refund or pay the difference.' },
+      { emoji: '🧮', fact: 'Your "marginal tax rate" (top bracket rate) is almost always higher than your "effective tax rate" (actual % of total income paid). On ₹8L income with standard deductions, an effective rate of 4–6% is common even with a 10% top bracket.' },
+      { emoji: '🏦', fact: '"Tax-advantaged" retirement accounts (EPF, 401k, ISA, pension) let your investments grow tax-free or tax-deferred. Over 30 years, this tax shelter effect alone can add lakhs to your final balance.' },
     ],
   },
 
@@ -608,9 +607,9 @@ export const lessons: Lesson[] = [
       explanation: 'Emergency funds must be liquid — accessible within 24 hours. Savings accounts or liquid mutual funds are ideal: safe, earning modest interest, and available immediately without penalties.',
     },
     briefs: [
-      { emoji: '🚑', fact: 'In India, 63% of households report that a single medical emergency would either push them into debt or require selling an asset. An emergency fund is the one protection against this.' },
-      { emoji: '🔒', fact: 'Do NOT keep your emergency fund in a Fixed Deposit with a lock-in. FD premature withdrawal attracts a 1% penalty and takes 2–3 business days. Liquid mutual fund redemptions take 1 business day.' },
-      { emoji: '🎯', fact: 'The FIRST savings goal for anyone should be a 1-month emergency fund. Even before starting an SIP, build a basic emergency buffer so you never have to break investments in a crisis.' },
+      { emoji: '🚑', fact: 'Globally, medical emergencies and sudden job loss are the top two triggers for household debt crises. An emergency fund is the one financial buffer that stands between stability and a debt spiral.' },
+      { emoji: '🔒', fact: 'Do NOT keep your emergency fund in a locked account or fixed-term deposit with early-withdrawal penalties. You need the money available within 24 hours — not in 3 business days with a penalty fee.' },
+      { emoji: '🎯', fact: 'The FIRST savings goal for anyone should be a 1-month emergency fund — even before starting investments. A crisis that forces you to sell investments at a bad time costs far more than delayed investing.' },
     ],
   },
 
@@ -633,7 +632,7 @@ export const lessons: Lesson[] = [
         example: {
           junior: '',
           teen: 'Trader: buys a stock at ₹500 on Monday, sells at ₹550 on Wednesday for ₹50 profit. But 80% of such trades lose money. Investor: buys a ₹500 stock, holds 10 years, sells at ₹2,200.',
-          senior: 'Day trading in India: profits taxed at 30% as business income. Equity held >12 months: 10% LTCG over ₹1L. Trading costs + taxes often erase short-term profits entirely.',
+          senior: 'Day trading profits are typically taxed as ordinary business income — your highest marginal rate. Long-term capital gains on equity usually get a lower preferential rate. Trading costs + taxes + spread often erase short-term profits entirely.',
         },
         visual: 'comparison',
         visualData: {
@@ -648,7 +647,7 @@ export const lessons: Lesson[] = [
         body: {
           junior: '',
           teen: 'Short selling is betting that a stock will FALL. You borrow shares, sell them now, buy them back cheaper later, and return them — keeping the difference. If the price rises, you lose — with no cap on how much.',
-          senior: 'Shorting mechanics: borrow shares via broker margin account, sell at market price, monitor, cover by buying back. Risk: unlimited upside on the stock means unlimited loss. Requires SEBI margin account, maintenance margin, and daily mark-to-market. Not suitable for retail investors without deep experience.',
+          senior: 'Shorting mechanics: borrow shares via broker margin account, sell at market price, monitor, cover by buying back. Risk: unlimited upside on the stock means unlimited downside loss. Requires a margin account, maintenance margin requirements, and daily mark-to-market. Not suitable for retail investors without deep experience.',
         },
         example: {
           junior: '',
@@ -675,9 +674,75 @@ export const lessons: Lesson[] = [
       explanation: 'Short sellers profit when prices fall and lose when prices rise. A rise from ₹300 to ₹450 means the trader must buy back at ₹150 more per share to close the position — a real loss.',
     },
     briefs: [
-      { emoji: '📊', fact: 'Studies show that 80–90% of day traders in India lose money over a 3-year period. The few who profit consistently are usually institutions with speed, data, and capital advantages over retail traders.' },
-      { emoji: '💸', fact: 'Short-term trading profits are taxed at 15% STCG for equity held under 12 months. Day-trading profits are taxed as business income at your slab rate — which can be 30%.' },
+      { emoji: '📊', fact: 'Studies across every major market show 75–90% of day traders lose money over a 3-year period. The few who profit consistently are usually institutions with speed, data, and capital advantages that retail traders cannot match.' },
+      { emoji: '💸', fact: 'Tax treatment of trading profits varies by country — but short-term gains are almost always taxed at higher rates than long-term gains. Frequent trading also generates more taxable events, a hidden cost that compounds over years.' },
       { emoji: '📖', fact: '"The market can remain irrational longer than you can remain solvent." — John Maynard Keynes. This is the core risk of short selling: being right but running out of margin before the price corrects.' },
+    ],
+  },
+
+  {
+    id: 'l-insurance',
+    topic: 'spending',
+    relatedGame: 'budgetBlitz',
+    title: 'Insurance: Protecting What You Build',
+    estimatedMinutes: 4,
+    ageGroups: ['teen', 'senior'],
+    cards: [
+      {
+        id: 'ins1',
+        title: 'What Is Insurance?',
+        body: {
+          junior: '',
+          teen: 'Insurance is a risk-pooling system. Everyone pays a small regular amount (a "premium"), and the fund covers large unexpected costs for whoever needs it. You are essentially sharing financial risk with thousands of strangers.',
+          senior: 'Insurance transfers low-probability, high-impact financial risk to an insurer for a predictable cost. The insurer profits because most policyholders never claim — but for those who do, the payout far exceeds the premiums paid. It is the only financial product where the goal is to never "get your money\'s worth."',
+        },
+        example: {
+          junior: '',
+          teen: '1,000 people each pay ₹3,000 per year for health insurance = ₹30L in the pool. When one person needs surgery costing ₹5L, the pool pays. Each person\'s small premium funds coverage that would otherwise be unaffordable.',
+          senior: 'Health insurance premium: ₹8,000/year. Hospitalisation claim: ₹2.5L. Effective "return" on the premium: 31×. But the value was never the return — it was eliminating the risk of a ₹2.5L expense with no savings to cover it.',
+        },
+        visual: 'comparison',
+        visualData: {
+          left: { label: 'Without insurance', value: 15, color: '#ef4444' },
+          right: { label: 'With insurance', value: 95, color: '#10b981' },
+        },
+        xpReward: 30,
+      },
+      {
+        id: 'ins2',
+        title: 'What Insurance Do You Actually Need?',
+        body: {
+          junior: '',
+          teen: 'Start with health insurance — always. If you are on a parent\'s policy, understand what it covers and when you age off. After health: renters/contents insurance if you have valuables, and eventually life insurance if others depend on your income.',
+          senior: 'Priority order for most young adults: (1) Health insurance — non-negotiable. (2) Term life insurance — only if you have dependents or co-signed debt. (3) Disability insurance — often overlooked, but you are 3–4× more likely to be disabled for 3+ months than to die before 65. (4) Property insurance — renters or home. Skip whole-life and investment-linked policies as a rule: buy term, invest the difference.',
+        },
+        example: {
+          junior: '',
+          teen: 'Anaya, 19, pays ₹400/month for health insurance. Without it, a single ER visit or fracture could mean ₹50,000–₹2L in bills — a financial disaster on a student budget.',
+          senior: 'Rohan, 26, earns ₹8L/year. Term life at ₹500/month gives ₹1 crore cover — protecting his parents who depend on his income. Whole-life equivalent: ₹4,500/month for smaller cover. He invests the ₹4,000 difference in index funds.',
+        },
+        visual: 'bar',
+        visualData: {
+          items: [
+            { label: 'Health (must-have)', value: 100, color: '#ef4444' },
+            { label: 'Disability (overlooked)', value: 75, color: '#f59e0b' },
+            { label: 'Term Life (if dependents)', value: 60, color: '#3b82f6' },
+            { label: 'Property (if you have valuables)', value: 45, color: '#10b981' },
+          ],
+        },
+        xpReward: 30,
+      },
+    ],
+    quizCard: {
+      question: 'Which type of insurance should a young adult prioritise above all others?',
+      options: ['Whole-life insurance', 'Health insurance', 'Car insurance (even without a car)', 'Travel insurance'],
+      correctIndex: 1,
+      explanation: 'Health insurance is universally the most important for a young adult — medical costs are unpredictable, potentially catastrophic, and happen at any age. No other insurance replaces it.',
+    },
+    briefs: [
+      { emoji: '🏥', fact: 'Medical bills are the #1 cause of personal bankruptcy in the USA, and a leading cause of debt crises worldwide. Health insurance doesn\'t feel necessary — until it is desperately necessary.' },
+      { emoji: '🔒', fact: 'Term life vs whole life: term covers you for a fixed period at low cost (₹500–800/month for ₹1 crore). Whole life mixes insurance and investment at high cost. Financial experts near-universally recommend: buy term, invest the difference.' },
+      { emoji: '⚠️', fact: 'Disability insurance is the most underrated protection: you are statistically 3–4× more likely to be unable to work for 3+ months due to illness or injury than to die before retirement. Yet most people never think about it.' },
     ],
   },
 ];
