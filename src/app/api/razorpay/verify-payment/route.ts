@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
       razorpayPaymentId: razorpay_payment_id,
       razorpayOrderId:   razorpay_order_id,
       plan:              plan || 'monthly',
-      amount:            durationDays === 90 ? 34900 : 14900,
+      amount:            plan === 'annual' ? 39900 : 10000,
       currency:          'INR',
       activatedAt:       FieldValue.serverTimestamp(),
       subscriptionEndAt,
