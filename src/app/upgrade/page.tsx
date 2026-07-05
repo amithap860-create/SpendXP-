@@ -95,6 +95,17 @@ function loadRazorpayScript(): Promise<boolean> {
   });
 }
 
+// ── Currency helpers ─────────────────────────────────────────────────────────
+// Approximate INR → USD conversion (update periodically as rates shift)
+const INR_TO_USD = 1 / 84;
+function toUSD(inr: number) {
+  return `~$${(inr * INR_TO_USD).toFixed(2)}`;
+}
+function isIndianTimezone() {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  return tz === 'Asia/Kolkata' || tz === 'Asia/Calcutta';
+}
+
 // ── Main Component ───────────────────────────────────────────────────────────
 export default function UpgradePage() {
   const { user } = useAuthContext();
@@ -104,6 +115,11 @@ export default function UpgradePage() {
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'annual'>('monthly');
   const [loading, setLoading] = useState(false);
   const [paid, setPaid] = useState(false);
+  const [isInternational, setIsInternational] = useState(false);
+
+  useEffect(() => {
+    setIsInternational(!isIndianTimezone());
+  }, []);
 
   // Group Play waitlist
   const [waitlistEmail, setWaitlistEmail] = useState('');
@@ -307,6 +323,7 @@ export default function UpgradePage() {
             >
               Monthly<br />
               <span className="text-xs font-bold opacity-80">₹100</span>
+              {isInternational && <span className="block text-[9px] font-medium opacity-60">{toUSD(100)}</span>}
             </button>
             <button
               onClick={() => setSelectedPlan('annual')}
@@ -319,12 +336,15 @@ export default function UpgradePage() {
             >
               Annual<br />
               <span className="text-xs font-bold opacity-80">₹399</span>
+              {isInternational && <span className="block text-[9px] font-medium opacity-60">{toUSD(399)}</span>}
               <span className="absolute -top-2 -right-2 bg-amber-500 text-black text-[9px] font-black px-1.5 py-0.5 rounded-full">SAVE 67%</span>
             </button>
           </div>
 
           <div className="text-slate-500 text-xs mt-2">
-            {selectedPlan === 'annual' ? '₹33/month · billed ₹399 once a year' : 'Billed monthly · Cancel anytime'}
+            {selectedPlan === 'annual'
+              ? <>₹33/month · billed ₹399 once a year{isInternational && <span className="opacity-70"> ({toUSD(33)}/mo)</span>}</>
+              : 'Billed monthly · Cancel anytime'}
           </div>
         </div>
       </div>
@@ -378,13 +398,26 @@ export default function UpgradePage() {
             <div className="space-y-4">
               <div className="text-amber-400 text-xs font-black uppercase tracking-widest mb-1">SpendXP Agent</div>
               <h3 className="text-xl font-black text-white">
-                {selectedPlan === 'annual' ? '12 Months for ₹399' : '₹100 / month'}
+                {selectedPlan === 'annual'
+                  ? <>12 Months for ₹399{isInternational && <span className="text-slate-400 text-sm font-medium ml-2">({toUSD(399)})</span>}</>
+                  : <>₹100 / month{isInternational && <span className="text-slate-400 text-sm font-medium ml-2">({toUSD(100)})</span>}</>}
               </h3>
               <p className="text-slate-400 text-sm max-w-xs mx-auto">
                 {selectedPlan === 'annual'
                   ? 'That\'s just ₹33/month. Best value — pay once, play all year.'
                   : 'Unlock all games, unlimited quests, streak shields, and more.'}
               </p>
+
+              {/* International currency notice */}
+              {isInternational && (
+                <div className="flex items-start gap-2 bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3 text-left">
+                  <span className="text-base leading-none mt-0.5">🌍</span>
+                  <p className="text-amber-200 text-xs leading-relaxed">
+                    Prices are shown in <strong>Indian Rupees (INR)</strong>. USD equivalents are approximate and may vary with exchange rates. International cards are accepted via Razorpay.
+                  </p>
+                </div>
+              )}
+
               <button
                 onClick={handlePayment}
                 disabled={loading}
