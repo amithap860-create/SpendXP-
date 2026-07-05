@@ -155,6 +155,40 @@ export default function LearnHub() {
             />,
             document.body
           )}
+
+          {/* ── More to Explore ── */}
+          <div className="mt-12 pt-8 border-t border-slate-100 space-y-4">
+            <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">More to Explore</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <a href="/tools" className="group flex items-center gap-4 bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M14 3a3 3 0 0 1 0 6 3 3 0 0 1-2.45-1.26L5.7 13.6a1.5 1.5 0 1 1-2.12-2.12l5.86-5.87A3 3 0 0 1 14 3Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-black text-slate-900 text-sm group-hover:text-primary transition-colors">Financial Tools</p>
+                  <p className="text-xs text-slate-400 font-medium mt-0.5">EMI, compound interest, SIP &amp; more calculators</p>
+                </div>
+                <span className="ml-auto text-xs font-black text-slate-300 group-hover:text-primary transition-colors">→</span>
+              </a>
+              <a href="/resources" className="group flex items-center gap-4 bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M2 5c0-1.1.9-2 2-2h4a2 2 0 0 1 2 2v10H4a2 2 0 0 1-2-2V5Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+                    <path d="M22 5c0-1.1-.9-2-2-2h-4a2 2 0 0 0-2 2v10h6a2 2 0 0 0 2-2V5Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+                    <line x1="12" y1="5" x2="12" y2="15" stroke="currentColor" strokeWidth="1.8"/>
+                    <line x1="2" y1="19" x2="22" y2="19" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-black text-slate-900 text-sm group-hover:text-primary transition-colors">Resource Library</p>
+                  <p className="text-xs text-slate-400 font-medium mt-0.5">Frameworks, budgeting methods &amp; curriculum map</p>
+                </div>
+                <span className="ml-auto text-xs font-black text-slate-300 group-hover:text-primary transition-colors">→</span>
+              </a>
+            </div>
+          </div>
         </div>
       </main>
     </div>

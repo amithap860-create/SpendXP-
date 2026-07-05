@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { PREMIUM_FEATURES } from '@/config/premium';
 import { useAuthContext } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { db } from '@/firebase';
+import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 
 // ── Razorpay type declaration (loaded via CDN script) ────────────────────────
 declare global {
@@ -102,6 +104,40 @@ export default function UpgradePage() {
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'annual'>('monthly');
   const [loading, setLoading] = useState(false);
   const [paid, setPaid] = useState(false);
+
+  // Group Play waitlist
+  const [waitlistEmail, setWaitlistEmail] = useState('');
+  const [waitlistLoading, setWaitlistLoading] = useState(false);
+  const [waitlistDone, setWaitlistDone] = useState(false);
+  // Pre-fill email once auth resolves
+  useEffect(() => {
+    if (user?.email && !waitlistEmail) setWaitlistEmail(user.email);
+  }, [user?.email]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function handleWaitlist() {
+    const email = waitlistEmail.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast({ title: 'Enter a valid email', variant: 'destructive' }); return;
+    }
+    setWaitlistLoading(true);
+    try {
+      // Deduplicate by email
+      const existing = await getDocs(query(collection(db, 'waitlist'), where('email', '==', email)));
+      if (existing.empty) {
+        await addDoc(collection(db, 'waitlist'), {
+          email,
+          uid: user?.uid ?? null,
+          feature: 'group_play',
+          createdAt: serverTimestamp(),
+        });
+      }
+      setWaitlistDone(true);
+    } catch {
+      toast({ title: 'Something went wrong', description: 'Please try again.', variant: 'destructive' });
+    } finally {
+      setWaitlistLoading(false);
+    }
+  }
 
   const razorpayKeyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
   const isConfigured  = Boolean(razorpayKeyId);
@@ -397,6 +433,53 @@ export default function UpgradePage() {
               <div className="text-[10px] text-slate-400 mt-0.5">{item.sub}</div>
             </div>
           ))}
+        </div>
+
+        {/* Group Play Waitlist */}
+        <div className="mt-6 bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="9" cy="7" r="3" stroke="#92400E" strokeWidth="1.6"/>
+                <circle cx="15" cy="7" r="3" stroke="#92400E" strokeWidth="1.6"/>
+                <path d="M3 19c0-3 2.7-5 6-5" stroke="#92400E" strokeWidth="1.6" strokeLinecap="round"/>
+                <path d="M21 19c0-3-2.7-5-6-5" stroke="#92400E" strokeWidth="1.6" strokeLinecap="round"/>
+                <path d="M9 19c0-2.8 2-5 5-5" stroke="#92400E" strokeWidth="1.6" strokeLinecap="round"/>
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-black text-slate-900">Group Play — Coming Soon</p>
+              <p className="text-xs text-slate-400 font-medium">Challenge friends and compete on leaderboards</p>
+            </div>
+            <span className="ml-auto text-[10px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full shrink-0">In Development</span>
+          </div>
+
+          {waitlistDone ? (
+            <div className="flex items-center gap-2 bg-primary/10 rounded-xl p-4">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                <circle cx="10" cy="10" r="9" fill="#2E7D5A" opacity="0.15"/>
+                <path d="M6 10l2.5 2.5L14 7" stroke="#2E7D5A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <p className="text-xs font-black text-primary">You&apos;re on the list! We&apos;ll email you when Group Play launches.</p>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <input
+                type="email"
+                value={waitlistEmail}
+                onChange={e => setWaitlistEmail(e.target.value)}
+                placeholder="your@email.com"
+                className="flex-1 h-10 px-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+              <button
+                onClick={handleWaitlist}
+                disabled={waitlistLoading}
+                className="h-10 px-4 bg-[#1A1F2E] text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-colors disabled:opacity-50 shrink-0"
+              >
+                {waitlistLoading ? '…' : 'Notify Me'}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </main>

@@ -829,21 +829,25 @@ export default function ProfilePage() {
         })()}
 
         {/* ── Badges ── */}
-        {progression.badges.length > 0 && (
-          <Section title={`Badges (${progression.badges.length})`} icon={Trophy} iconColor="text-[#2E7D5A]" defaultOpen={false}>
-            <div className="flex flex-wrap gap-2 pt-4">
-              {progression.badges.map(b => {
-                const meta = BADGE_META[b] ?? { label: b, icon: Medal, color: 'bg-slate-50 text-slate-700 border-slate-200' };
-                const BadgeIcon = meta.icon;
-                return (
-                  <div key={b} className={cn('inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold', meta.color)}>
-                    <BadgeIcon className="h-3.5 w-3.5 shrink-0" /><span>{meta.label}</span>
-                  </div>
-                );
-              })}
-            </div>
+        {(
+          <Section title={`Badges (${progression.badges.length})`} icon={Trophy} iconColor="text-[#2E7D5A]" defaultOpen={true}>
+            {progression.badges.length === 0 ? (
+              <p className="pt-4 text-xs text-slate-400 font-medium">Complete quests and lessons to earn your first badge.</p>
+            ) : (
+              <div className="flex flex-wrap gap-2 pt-4">
+                {progression.badges.map(b => {
+                  const meta = BADGE_META[b] ?? { label: b, icon: Medal, color: 'bg-slate-50 text-slate-700 border-slate-200' };
+                  const BadgeIcon = meta.icon;
+                  return (
+                    <div key={b} className={cn('inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold', meta.color)}>
+                      <BadgeIcon className="h-3.5 w-3.5 shrink-0" /><span>{meta.label}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </Section>
-        )}
+        }
 
         {/* ── Currency & Country ── */}
         <Section title="Currency & Country" icon={ToggleLeft} iconColor="text-primary">
