@@ -460,26 +460,29 @@ export default function ProfilePage() {
   const handleSaveAvatar = async (avatarId: string) => {
     if (!user?.uid) return;
     setAvatarSaving(true);
-    try {
-      await safeUpdateDoc(doc(db, 'users', user.uid), { avatarId });
+    const success = await safeUpdateDoc(doc(db, 'users', user.uid), { avatarId });
+    if (success) {
       setProfile(p => p ? { ...p, avatarId } : p);
       setShowAvatarPicker(false);
       toast({ title: 'Operative updated!' });
-    } catch {
-      toast({ title: 'Failed to update avatar', variant: 'destructive' });
-    } finally {
-      setAvatarSaving(false);
+    } else {
+      toast({ title: 'Failed to update avatar', description: 'Check your connection and try again.', variant: 'destructive' });
     }
+    setAvatarSaving(false);
   };
 
   const handleSaveName = async () => {
     if (!user?.uid || !nameInput.trim()) return;
     try {
       await updateProfile(auth.currentUser!, { displayName: nameInput.trim() });
-      await safeUpdateDoc(doc(db, 'users', user.uid), { displayName: nameInput.trim() });
-      setProfile(p => p ? { ...p, displayName: nameInput.trim() } : p);
-      setEditingName(false);
-      toast({ title: 'Name updated!' });
+      const success = await safeUpdateDoc(doc(db, 'users', user.uid), { displayName: nameInput.trim() });
+      if (success) {
+        setProfile(p => p ? { ...p, displayName: nameInput.trim() } : p);
+        setEditingName(false);
+        toast({ title: 'Name updated!' });
+      } else {
+        toast({ title: 'Failed to save name', description: 'Check your connection and try again.', variant: 'destructive' });
+      }
     } catch {
       toast({ title: 'Failed to update name', variant: 'destructive' });
     }
@@ -531,12 +534,12 @@ export default function ProfilePage() {
   const handleToggleParent = async () => {
     if (!user?.uid || !profile) return;
     const newVal = !profile.isParent;
-    try {
-      await safeUpdateDoc(doc(db, 'users', user.uid), { isParent: newVal });
+    const success = await safeUpdateDoc(doc(db, 'users', user.uid), { isParent: newVal });
+    if (success) {
       setProfile(p => p ? { ...p, isParent: newVal } : p);
       toast({ title: newVal ? 'Parent mode enabled' : 'Parent mode disabled' });
-    } catch {
-      toast({ title: 'Failed to update account type', variant: 'destructive' });
+    } else {
+      toast({ title: 'Failed to update account type', description: 'Check your connection and try again.', variant: 'destructive' });
     }
   };
 
@@ -554,13 +557,13 @@ export default function ProfilePage() {
       return;
     }
     const newAgeGroup = age <= 12 ? 'junior' : age <= 16 ? 'teen' : 'senior';
-    try {
-      await safeUpdateDoc(doc(db, 'users', user.uid), { birthYear: year, ageGroup: newAgeGroup });
+    const success = await safeUpdateDoc(doc(db, 'users', user.uid), { birthYear: year, ageGroup: newAgeGroup });
+    if (success) {
       setProfile(p => p ? { ...p, birthYear: year, ageGroup: newAgeGroup } : p);
       setEditingAge(false);
       toast({ title: 'Age updated!' });
-    } catch {
-      toast({ title: 'Failed to update age', variant: 'destructive' });
+    } else {
+      toast({ title: 'Failed to update age', description: 'Check your connection and try again.', variant: 'destructive' });
     }
   };
 
@@ -572,16 +575,16 @@ export default function ProfilePage() {
     if (!user?.uid || !pendingCountryCode) return;
     const country = COUNTRIES.find(c => c.code === pendingCountryCode);
     if (!country) return;
-    try {
-      await safeUpdateDoc(doc(db, 'users', user.uid), {
-        countryCode: country.code,
-        currencyCode: country.currency.code,
-      });
+    const success = await safeUpdateDoc(doc(db, 'users', user.uid), {
+      countryCode: country.code,
+      currencyCode: country.currency.code,
+    });
+    if (success) {
       setProfile(p => p ? { ...p, countryCode: country.code, currencyCode: country.currency.code } : p);
       setEditingCurrency(false);
       toast({ title: `Currency updated to ${country.currency.code} (${country.flag} ${country.name})` });
-    } catch {
-      toast({ title: 'Failed to save currency preference', variant: 'destructive' });
+    } else {
+      toast({ title: 'Failed to save currency preference', description: 'Check your connection and try again.', variant: 'destructive' });
     }
   };
 

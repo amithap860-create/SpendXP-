@@ -21,8 +21,8 @@ export const dynamic = 'force-dynamic';
 // Pricing in paise (1 INR = 100 paise)
 // Monthly: ₹149 | Annual: ₹599 (saves ₹1,189 vs monthly × 12)
 const PLANS = {
-  monthly: { amount: 14900, label: 'SpendXP Premium — 1 Month' },
-  annual:  { amount: 59900, label: 'SpendXP Premium — 12 Months' },
+  monthly: { amount: 10000, label: 'SpendXP Premium — 1 Month' },
+  annual:  { amount: 39900, label: 'SpendXP Premium — 12 Months' },
 } as const;
 
 type PlanKey = keyof typeof PLANS;
