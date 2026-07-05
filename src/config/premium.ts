@@ -111,14 +111,14 @@ export const FREE_TIER: PremiumTier = {
  *   RAZORPAY_KEY_SECRET            — from Razorpay dashboard (keep secret, server-only)
  */
 export const RAZORPAY_PLANS = {
-  monthly: { amountPaise: 14900, display: '₹149', label: '1 Month' },
-  annual:  { amountPaise: 59900, display: '₹599', label: '12 Months · ₹50/mo' },
+  monthly: { amountPaise: 10000, display: '₹100', label: '1 Month' },
+  annual:  { amountPaise: 39900, display: '₹399', label: '12 Months · ₹33/mo' },
 } as const;
 
 export const PREMIUM_TIER: PremiumTier = {
   id: 'premium',
   name: 'Agent',
-  price: '₹149/mo or ₹599/yr',
+  price: '₹100/mo or ₹399/yr',
   billingPeriod: 'monthly or annual',
   features: [
     'Everything in Explorer',

@@ -1080,8 +1080,8 @@ export const quests: Quest[] = [
   },
   {
     id: 'first-apartment',
-    title: 'Renting in Mumbai: The BKC Choice',
-    description: 'You got a job in BKC (₹55,000/month). Mumbai is expensive. Can you find a home without going broke?',
+    title: 'Your First Apartment',
+    description: "You landed your first real job (₹55,000/month). Now you need a place to live. The city is expensive — can you find a home without going broke?",
     category: 'housing',
     difficulty: 'advanced',
     ageGroups: ['senior'],
@@ -1094,132 +1094,132 @@ export const quests: Quest[] = [
       {
         id: 'ra-1',
         title: 'Choosing Where to Live',
-        narrative: "BKC is your office. You have ₹90,000 in savings. Renting here is high-stakes.",
+        narrative: "Your office is downtown. You have ₹90,000 in savings. Renting close to work is expensive — but commuting far drains your time and energy.",
         ageGroups: ['senior'],
         choices: [
           {
             id: 'ra-c1',
-            text: 'PG in BKC (Walking): ₹18,000',
-            consequence: 'High rent, but ₹0 commute and meals included. Deposit: ₹18,000.',
+            text: 'Shared room near office: ₹18,000',
+            consequence: 'High rent, but ₹0 commute and utilities included. Deposit: ₹18,000.',
             xpDelta: 40,
             healthDelta: 5,
             walletDelta: -18000,
             nextStepId: 'ra-2',
             isOptimal: false,
-            explanation: "Good for time management, but eats 33% of salary. Balanced for a first job.",
+            explanation: "Good for time management, but eats 33% of salary. Tight but manageable for a first job.",
             realLifeTip: "Commute time is money. Living close can save you 100+ hours of travel a month."
           },
           {
             id: 'ra-c2',
-            text: 'Shared 1BHK in Andheri: ₹12,500',
-            consequence: 'Low rent (23% of salary). Deposit: ₹37,500. 45 min commute.',
+            text: 'Shared flat across town: ₹12,500',
+            consequence: 'Low rent (23% of salary). Deposit: ₹37,500. 45-min commute each way.',
             xpDelta: 60,
             healthDelta: 10,
             walletDelta: -37500,
             nextStepId: 'ra-2',
             isOptimal: true,
-            explanation: "Housing under 25% of salary is the gold standard for wealth building in India.",
-            realLifeTip: "Use the 3:1 income-to-rent ratio rule."
+            explanation: "Housing under 25% of salary is the gold standard for early wealth building.",
+            realLifeTip: "Use the 3:1 income-to-rent ratio rule — your income should be at least 3× your monthly rent."
           },
           {
             id: 'ra-c3',
-            text: 'Self 1BHK in Ghatkopar: ₹22,000',
-            consequence: 'Your own space, but 40% of salary. Deposit: ₹66,000. Commute extra.',
+            text: 'Own studio in far suburb: ₹22,000',
+            consequence: 'Your own space, but 40% of salary. Deposit: ₹66,000. Long commute adds up.',
             xpDelta: 20,
             healthDelta: -8,
             walletDelta: -66000,
             nextStepId: 'ra-2',
             isOptimal: false,
-            explanation: "40% on rent is a 'House Poor' trap. Your savings will never grow.",
-            realLifeTip: "Mumbai deposits are high. Plan for 3-6 months' rent upfront."
+            explanation: "Spending 40%+ on rent is the 'house poor' trap. Your savings will stagnate.",
+            realLifeTip: "Always plan for 2–3 months' rent in deposit upfront when moving to a new city."
           }
         ]
       },
       {
         id: 'ra-2',
-        title: 'The Broker Problem',
-        narrative: "The broker wants 1 month rent as brokerage. This is on top of your deposit.",
+        title: 'The Agent Problem',
+        narrative: "The letting agent wants 1 month's rent as a finder's fee. This is on top of your deposit.",
         ageGroups: ['senior'],
         choices: [
           {
             id: 'ra-c4',
-            text: 'Negotiate brokerage to 50%',
-            consequence: 'Success! You save ₹6,250 - ₹11,000. Most people never ask.',
+            text: 'Negotiate the fee to 50%',
+            consequence: 'Success! You save ₹6,250–₹11,000. Most people never ask.',
             xpDelta: 55,
             healthDelta: 8,
             walletDelta: -6250,
             nextStepId: 'ra-3',
             isOptimal: true,
-            explanation: "Brokerage is negotiable. A 30-minute talk saved you 10 days of work.",
-            realLifeTip: "Brokers are more willing to negotiate if you can sign and pay today."
+            explanation: "Agent fees are negotiable. A short conversation saved you over a week's salary.",
+            realLifeTip: "Agents are more willing to negotiate if you can sign and pay quickly."
           },
           {
             id: 'ra-c5',
-            text: 'Use NoBroker.in (₹0 fees)',
-            consequence: 'Saves ₹12,500 - ₹22,000 but takes 2 weeks longer to find a place.',
+            text: 'Find a no-fee listing directly (₹0)',
+            consequence: 'Saves ₹12,500–₹22,000 but takes 2 extra weeks to find a place.',
             xpDelta: 60,
             healthDelta: 10,
             walletDelta: 0,
             nextStepId: 'ra-3',
             isOptimal: true,
-            explanation: "Avoid unnecessary middleman fees whenever possible to preserve your capital.",
-            realLifeTip: "Direct owner listings are rare but high-value."
+            explanation: "Avoiding middleman fees preserves your capital — time spent is worth it.",
+            realLifeTip: "Direct landlord listings are rarer but always worth checking first."
           },
           {
             id: 'ra-c6',
-            text: 'Pay full to secure flat',
-            consequence: 'Flat secured! But your savings are now dangerously low. No buffer left.',
+            text: 'Pay full fee to secure it fast',
+            consequence: 'Flat secured quickly! But your savings are now dangerously low with no buffer.',
             xpDelta: 15,
             healthDelta: -4,
             walletDelta: -12500,
             nextStepId: 'ra-3',
             isOptimal: false,
-            explanation: "Accepting high upfront costs without pushback drains your liquidity.",
-            realLifeTip: "Always have a 'Move-in Fund' separate from your security deposit."
+            explanation: "Accepting high upfront costs without negotiating drains your emergency fund.",
+            realLifeTip: "Always keep a 'Move-in Fund' separate from your security deposit."
           }
         ]
       },
       {
         id: 'ra-3',
         title: 'The Lease Trap',
-        narrative: "Clause 7 says: rent increases 10% on renewal. Clause 12: tenant pays for all repairs under ₹5,000.",
+        narrative: "Clause 7: rent increases 10% on renewal. Clause 12: tenant pays all repair costs under ₹5,000.",
         ageGroups: ['senior'],
         choices: [
           {
             id: 'ra-c7',
-            text: 'Negotiate Clause 12 to ₹2,000',
-            consequence: 'Saves you ₹3,000 per repair event. Landlord agreed to 5% cap on hike too.',
+            text: 'Negotiate Clause 12 limit down to ₹2,000',
+            consequence: 'Saves you ₹3,000 per repair event. Landlord also agreed to a 5% cap on rent hikes.',
             xpDelta: 70,
             healthDelta: 9,
             walletDelta: 0,
             nextStepId: 'end',
             isOptimal: true,
-            explanation: "Leases are living documents. Negotiating terms now saves thousands later.",
-            realLifeTip: "Landlords often put aggressive clauses just to see if you'll sign."
+            explanation: "Leases are negotiable documents. Pushing back now saves thousands over the tenancy.",
+            realLifeTip: "Landlords often include aggressive clauses just to see if you'll sign without reading."
           },
           {
             id: 'ra-c8',
             text: 'Sign without reading fully',
-            consequence: "Month 3: pipe bursts. Repair cost ₹3,200. Clause 12 means you pay it. Month 11: Rent jumps ₹2,200.",
+            consequence: "Month 3: pipe bursts. Repair costs ₹3,200 — Clause 12 means you pay it. Month 11: rent jumps ₹2,200.",
             xpDelta: 5,
             healthDelta: -8,
             walletDelta: -3200,
             nextStepId: 'end',
             isOptimal: false,
-            explanation: "Ignorance of contract terms is a recurring cost in personal finance.",
-            realLifeTip: "The 11-month lease is standard in India to avoid high stamp duty registration."
+            explanation: "Signing contracts without reading them is a recurring and expensive financial mistake.",
+            realLifeTip: "Never sign a lease without reading every clause. Ask a friend or look up tenant rights in your country."
           },
           {
             id: 'ra-c9',
-            text: 'Accept terms as written',
-            consequence: "You have the place, but you've accepted high maintenance risk and high future costs.",
+            text: 'Accept the terms as written',
+            consequence: "You have the place, but you've accepted high maintenance risk and uncapped rent increases.",
             xpDelta: 25,
             healthDelta: 2,
             walletDelta: 0,
             nextStepId: 'end',
             isOptimal: false,
-            explanation: "Failing to push back on boilerplate terms leaves money on the table.",
-            realLifeTip: "Normal wear and tear should always be the owner's responsibility."
+            explanation: "Failing to push back on boilerplate terms leaves recurring money on the table.",
+            realLifeTip: "Normal wear and tear should always be the landlord's responsibility — not yours."
           }
         ]
       }

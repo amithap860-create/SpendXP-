@@ -207,7 +207,7 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
     }
   }, [resolvedParams, router]);
 
-  const dailyTopics = ['budgeting-basics', 'investing-basics', 'credit-scores', 'taxes-india', 'spending-habits', 'emergency-fund', 'emi-and-debt'];
+  const dailyTopics = ['budgeting-basics', 'investing-basics', 'credit-scores', 'taxes-global', 'spending-habits', 'emergency-fund', 'emi-and-debt'];
   const todayBreakdownId = dailyTopics[new Date().getDate() % dailyTopics.length];
 
   const renderGame = () => {

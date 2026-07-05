@@ -303,7 +303,7 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
     BUDGETING: 'budgeting-basics',
     INVESTING: 'investing-basics',
     CREDIT: 'credit-scores',
-    TAXES: 'taxes-india',
+    TAXES: 'taxes-global',
     SPENDING: 'spending-habits'
   };
 

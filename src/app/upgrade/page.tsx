@@ -270,7 +270,7 @@ export default function UpgradePage() {
               )}
             >
               Monthly<br />
-              <span className="text-xs font-bold opacity-80">₹149</span>
+              <span className="text-xs font-bold opacity-80">₹100</span>
             </button>
             <button
               onClick={() => setSelectedPlan('annual')}
@@ -282,13 +282,13 @@ export default function UpgradePage() {
               )}
             >
               Annual<br />
-              <span className="text-xs font-bold opacity-80">₹599</span>
+              <span className="text-xs font-bold opacity-80">₹399</span>
               <span className="absolute -top-2 -right-2 bg-amber-500 text-black text-[9px] font-black px-1.5 py-0.5 rounded-full">SAVE 67%</span>
             </button>
           </div>
 
           <div className="text-slate-500 text-xs mt-2">
-            {selectedPlan === 'annual' ? '₹50/month · billed ₹599 once a year' : 'Billed monthly · Cancel anytime'}
+            {selectedPlan === 'annual' ? '₹33/month · billed ₹399 once a year' : 'Billed monthly · Cancel anytime'}
           </div>
         </div>
       </div>
@@ -342,11 +342,11 @@ export default function UpgradePage() {
             <div className="space-y-4">
               <div className="text-amber-400 text-xs font-black uppercase tracking-widest mb-1">SpendXP Agent</div>
               <h3 className="text-xl font-black text-white">
-                {selectedPlan === 'annual' ? '12 Months for ₹599' : '₹149 / month'}
+                {selectedPlan === 'annual' ? '12 Months for ₹399' : '₹100 / month'}
               </h3>
               <p className="text-slate-400 text-sm max-w-xs mx-auto">
                 {selectedPlan === 'annual'
-                  ? 'That\'s just ₹50/month. Best value — pay once, play all year.'
+                  ? 'That\'s just ₹33/month. Best value — pay once, play all year.'
                   : 'Unlock all games, unlimited quests, streak shields, and more.'}
               </p>
               <button
@@ -355,7 +355,7 @@ export default function UpgradePage() {
                 className="w-full mt-2 h-12 rounded-xl text-sm font-black uppercase tracking-widest text-white transition-all disabled:opacity-50"
                 style={{ background: loading ? '#1a3d2b' : '#2E7D5A' }}
               >
-                {loading ? 'Opening payment…' : `Pay ₹${selectedPlan === 'annual' ? '599' : '149'} with Razorpay`}
+                {loading ? 'Opening payment…' : `Pay ₹${selectedPlan === 'annual' ? '399' : '100'} with Razorpay`}
               </button>
               <p className="text-slate-600 text-[10px]">
                 UPI · Cards · Netbanking · Wallets · {selectedPlan === 'annual' ? 'One-time annual payment' : 'Cancel anytime'}
