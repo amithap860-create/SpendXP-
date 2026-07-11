@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — SpendXP</title>
+  <meta name="description" content="SpendXP Privacy Policy — how we collect, use, and protect your information." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --paper:  #F7F2E8;
+      --navy:   #1A1A2E;
+      --green:  #2D6A4F;
+      --greenl: #74C69D;
+      --muted:  #6B6050;
+      --divider:#D4C9B5;
+      --card:   #EDEAE0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--paper);
+      color: var(--navy);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Top bar ── */
+    header {
+      background: var(--navy);
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 12px rgba(0,0,0,.18);
+    }
+    .header-inner {
+      max-width: 760px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -.3px;
+      text-decoration: none;
+      color: #fff;
+    }
+    .logo span { color: var(--greenl); }
+    .back-link {
+      font-size: 13px;
+      color: var(--greenl);
+      text-decoration: none;
+      opacity: .85;
+      transition: opacity .15s;
+    }
+    .back-link:hover { opacity: 1; }
+
+    /* ── Hero ── */
+    .hero {
+      background: var(--navy);
+      padding: 48px 24px 40px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: var(--green);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-size: clamp(28px, 6vw, 40px);
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -.5px;
+      line-height: 1.2;
+    }
+    .hero h1 span { color: var(--greenl); }
+    .hero-meta {
+      margin-top: 14px;
+      font-size: 13px;
+      color: rgba(255,255,255,.5);
+    }
+
+    /* ── Content wrapper ── */
+    .content {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* ── Summary cards ── */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+    .summary-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 18px 20px;
+      border-left: 4px solid var(--green);
+    }
+    .summary-card .sc-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 6px;
+    }
+    .summary-card p {
+      font-size: 14px;
+      color: var(--navy);
+      line-height: 1.5;
+    }
+
+    /* ── Section ── */
+    section { margin-bottom: 40px; }
+    section + section { border-top: 1px solid var(--divider); padding-top: 36px; }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h2 .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      background: var(--green);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    p { margin-bottom: 12px; color: var(--navy); }
+    p:last-child { margin-bottom: 0; }
+
+    ul {
+      padding-left: 0;
+      list-style: none;
+      margin-bottom: 12px;
+    }
+    ul li {
+      padding-left: 22px;
+      position: relative;
+      margin-bottom: 8px;
+      font-size: 15px;
+      color: var(--navy);
+    }
+    ul li::before {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 10px;
+      width: 7px;
+      height: 7px;
+      background: var(--greenl);
+      border-radius: 50%;
+    }
+
+    /* ── Highlight box ── */
+    .highlight-box {
+      background: #E8F4ED;
+      border-left: 4px solid var(--green);
+      border-radius: 0 10px 10px 0;
+      padding: 16px 20px;
+      margin: 16px 0;
+      font-size: 14.5px;
+      color: #1E4D35;
+    }
+    .highlight-box strong { font-weight: 700; }
+
+    .warning-box {
+      background: #FDF3E3;
+      border-left: 4px solid #D4860A;
+      border-radius: 0 10px 10px 0;
+      padding: 16px 20px;
+      margin: 16px 0;
+      font-size: 14.5px;
+      color: #6B4200;
+    }
+
+    /* ── Data table ── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 14px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .data-table th {
+      background: var(--navy);
+      color: #fff;
+      padding: 10px 16px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+    }
+    .data-table td {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--divider);
+      vertical-align: top;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:nth-child(even) td { background: var(--card); }
+
+    /* ── Contact card ── */
+    .contact-card {
+      background: var(--navy);
+      border-radius: 14px;
+      padding: 28px 28px;
+      color: #fff;
+      margin-top: 8px;
+    }
+    .contact-card h3 {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .contact-card h3 span { color: var(--greenl); }
+    .contact-card p { color: rgba(255,255,255,.75); margin-bottom: 8px; }
+    .contact-card a {
+      color: var(--greenl);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .contact-card a:hover { text-decoration: underline; }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--navy);
+      padding: 28px 24px;
+      text-align: center;
+    }
+    footer p { color: rgba(255,255,255,.45); font-size: 13px; margin-bottom: 6px; }
+    footer a { color: var(--greenl); text-decoration: none; font-size: 13px; }
+
+    /* ── Mobile tweaks ── */
+    @media (max-width: 480px) {
+      .hero { padding: 36px 20px 30px; }
+      .content { padding: 28px 20px 60px; }
+      .data-table { font-size: 13px; }
+      .data-table th, .data-table td { padding: 8px 12px; }
+      h2 { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Top bar ─────────────────────────────────────── -->
+<header>
+  <div class="header-inner">
+    <a href="https://spendxp.vercel.app" class="logo">Spend<span>XP</span></a>
+    <a href="https://spendxp.vercel.app" class="back-link">← Back to SpendXP</a>
+  </div>
+</header>
+
+<!-- ── Hero ────────────────────────────────────────── -->
+<div class="hero">
+  <div class="hero-badge">Legal</div>
+  <h1>Privacy <span>Policy</span></h1>
+  <p class="hero-meta">Last updated: July 11, 2026 &nbsp;·&nbsp; Effective immediately</p>
+</div>
+
+<!-- ── Content ─────────────────────────────────────── -->
+<main class="content">
+
+  <!-- Quick summary cards -->
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="sc-label">What we collect</div>
+      <p>Email, country, age group, and newsletter preference — only what you give us.</p>
+    </div>
+    <div class="summary-card">
+      <div class="sc-label">Why we collect it</div>
+      <p>To notify you when SpendXP launches and send you optional updates.</p>
+    </div>
+    <div class="summary-card">
+      <div class="sc-label">Who sees it</div>
+      <p>Only SpendXP and our form tool (Tally.so). We never sell your data.</p>
+    </div>
+    <div class="summary-card">
+      <div class="sc-label">Your rights</div>
+      <p>You can request to view, correct, or delete your data at any time.</p>
+    </div>
+  </div>
+
+  <!-- 1. Who we are -->
+  <section>
+    <h2><span class="num">1</span>Who We Are</h2>
+    <p>SpendXP is a financial literacy app designed to teach young people (ages 8 and up) how to manage, save, and understand money through quests, ranks, and real-life financial challenges.</p>
+    <p>We are currently in pre-launch and collecting a waitlist ahead of our August 2026 release. This Privacy Policy explains how we handle information submitted through our waitlist form.</p>
+    <p><strong>Contact:</strong> <a href="mailto:spendxp.app@gmail.com">spendxp.app@gmail.com</a></p>
+  </section>
+
+  <!-- 2. Data we collect -->
+  <section>
+    <h2><span class="num">2</span>Information We Collect</h2>
+    <p>We only collect the information you voluntarily submit through our waitlist form. This includes:</p>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Data Point</th>
+          <th>What It Is</th>
+          <th>Why We Need It</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Email address</strong></td>
+          <td>Your email</td>
+          <td>To notify you when SpendXP launches</td>
+        </tr>
+        <tr>
+          <td><strong>Country</strong></td>
+          <td>The country you're based in</td>
+          <td>To ensure availability in your region at launch</td>
+        </tr>
+        <tr>
+          <td><strong>Age group</strong></td>
+          <td>8–12, 13–15, 16–18, or 19–20</td>
+          <td>To tailor content and comply with age-related legal requirements</td>
+        </tr>
+        <tr>
+          <td><strong>Newsletter preference</strong></td>
+          <td>Yes / No</td>
+          <td>To know if you'd like to receive updates about SpendXP development</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>We do <strong>not</strong> collect payment information, identification documents, school details, or any sensitive personal data through this form.</p>
+  </section>
+
+  <!-- 3. How we use it -->
+  <section>
+    <h2><span class="num">3</span>How We Use Your Information</h2>
+    <ul>
+      <li>To send you a notification when SpendXP launches in your region</li>
+      <li>To send development updates and newsletters if you opted in</li>
+      <li>To understand which age groups and countries are most interested in SpendXP</li>
+      <li>To improve our app before launch based on interest signals</li>
+    </ul>
+    <p>We will never sell, rent, or trade your personal information to any third party for marketing purposes.</p>
+  </section>
+
+  <!-- 4. Children's privacy -->
+  <section>
+    <h2><span class="num">4</span>Children's Privacy</h2>
+    <div class="warning-box">
+      <strong>Important — for users under 13:</strong> If you are under 13 years old, please ask a parent or guardian to complete this form on your behalf, or to review this policy and give their consent before you submit your information.
+    </div>
+    <p>SpendXP is designed for users as young as age 8. We take children's privacy very seriously and comply with applicable laws including India's Information Technology (Reasonable Security Practices) Rules and, where applicable, the Children's Online Privacy Protection Act (COPPA).</p>
+    <ul>
+      <li>We only collect the minimum information necessary — no full name, school, location beyond country, or any detailed profile</li>
+      <li>We do not display advertising to children on our waitlist or in our app</li>
+      <li>Parents or guardians may contact us at any time to request deletion of their child's information</li>
+      <li>We do not share children's data with any third party except our form service (Tally.so) as described below</li>
+    </ul>
+  </section>
+
+  <!-- 5. Third-party services -->
+  <section>
+    <h2><span class="num">5</span>Third-Party Services</h2>
+    <p>Our waitlist form is powered by <strong>Tally.so</strong>. When you submit the form, your information is stored on Tally's servers. Tally's own Privacy Policy applies to how they store and process this data — you can read it at <a href="https://tally.so/privacy" target="_blank" rel="noopener">tally.so/privacy</a>.</p>
+    <p>SpendXP's main application (launching August 2026) is built with <strong>Firebase</strong> (Google). Once the app launches, a separate in-app privacy policy will apply to registered users.</p>
+    <div class="highlight-box">
+      <strong>We do not use advertising networks, sell data, or share your information with any analytics companies.</strong> The only data processor involved at this stage is Tally.so for form submission storage.
+    </div>
+  </section>
+
+  <!-- 6. Data retention -->
+  <section>
+    <h2><span class="num">6</span>How Long We Keep Your Data</h2>
+    <p>We will retain your waitlist information until one of the following occurs:</p>
+    <ul>
+      <li>SpendXP launches and we have sent you the notification you signed up for</li>
+      <li>You request deletion of your information (see Your Rights below)</li>
+      <li>We decide not to proceed with the SpendXP launch, in which case we will delete all waitlist data within 30 days of that decision</li>
+    </ul>
+    <p>If you opted in to the newsletter, we will continue to store your email for the purpose of sending updates until you unsubscribe.</p>
+  </section>
+
+  <!-- 7. Your rights -->
+  <section>
+    <h2><span class="num">7</span>Your Rights</h2>
+    <p>Regardless of where you are located, you have the right to:</p>
+    <ul>
+      <li><strong>Access</strong> — Request a copy of the information we hold about you</li>
+      <li><strong>Correct</strong> — Ask us to update inaccurate information</li>
+      <li><strong>Delete</strong> — Request that we delete your information from our records and from Tally</li>
+      <li><strong>Withdraw consent</strong> — Unsubscribe from newsletters at any time via the unsubscribe link in any email we send</li>
+      <li><strong>Complain</strong> — If you believe we have mishandled your data, you may contact your local data protection authority</li>
+    </ul>
+    <p>To exercise any of these rights, email us at <a href="mailto:amithap860@gmail.com">amithap860@gmail.com</a> with the subject line "Privacy Request." We will respond within 14 days.</p>
+  </section>
+
+  <!-- 8. Security -->
+  <section>
+    <h2><span class="num">8</span>Security</h2>
+    <p>We take reasonable precautions to protect your information. Your form data is stored by Tally.so, which uses industry-standard encryption (HTTPS/TLS) for data in transit. We access the data only via Tally's secure dashboard.</p>
+    <p>However, no method of electronic transmission or storage is 100% secure. While we strive to protect your data, we cannot guarantee absolute security.</p>
+  </section>
+
+  <!-- 9. Changes -->
+  <section>
+    <h2><span class="num">9</span>Changes to This Policy</h2>
+    <p>As SpendXP grows, this policy may be updated. If we make material changes, we will update the "Last updated" date at the top of this page. We encourage you to review this policy periodically.</p>
+    <p>If you have joined our newsletter, we may also notify you of significant changes via email.</p>
+  </section>
+
+  <!-- 10. Contact -->
+  <section>
+    <h2><span class="num">10</span>Contact Us</h2>
+    <div class="contact-card">
+      <h3>Questions? Reach out to <span>SpendXP</span></h3>
+      <p>If you have any questions about this Privacy Policy, want to exercise your rights, or need to report a concern:</p>
+      <p>📧 <a href="mailto:spendxp.app@gmail.com">spendxp.app@gmail.com</a></p>
+      <p>🌐 <a href="https://spendxp.vercel.app">spendxp.vercel.app</a></p>
+      <p style="margin-top:12px; font-size:13px; color:rgba(255,255,255,.45);">We aim to respond to all privacy-related requests within 14 days.</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- ── Footer ───────────────────────────────────────── -->
+<footer>
+  <p><strong style="color:rgba(255,255,255,.7);">Spend<span style="color:#74C69D">XP</span></strong></p>
+  <p>© 2026 SpendXP. All rights reserved.</p>
+  <p style="margin-top:8px;">
+    <a href="https://spendxp.vercel.app">Home</a>
+    &nbsp;·&nbsp;
+    <a href="mailto:amithap860@gmail.com">Contact</a>
+  </p>
+</footer>
+
+</body>
+</html>
