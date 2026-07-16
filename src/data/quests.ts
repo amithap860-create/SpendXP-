@@ -2427,6 +2427,201 @@ export const quests: Quest[] = [
         ]
       }
     ]
-  }
+  },
+
+  // ─────────────────────────────────────────────────────────
+  // THE STOCK INVESTIGATOR — Peter Lynch Framework Quest
+  // ─────────────────────────────────────────────────────────
+  {
+    id: 'stock-investigator',
+    title: 'The Stock Investigator',
+    description: "A hot stock tip is circulating and everyone in your class is talking about NovaTech. Your friend just put in ₹5,000. Before you follow the crowd, can you run Peter Lynch's 4-question filter and make a decision you'll actually understand?",
+    category: 'investing',
+    difficulty: 'advanced',
+    ageGroups: ['teen', 'senior'],
+    chapterNumber: 9,
+    chapter: 'Investing Decisions',
+    estimatedMinutes: 7,
+    xpReward: 280,
+    startingBalance: 5000,
+    steps: [
+      {
+        id: 'si-1',
+        title: 'The Hot Tip',
+        narrative: "It's Monday morning and your school WhatsApp group is buzzing. 'NovaTech just hit ₹320! My cousin made 40% in 2 months!' Your friend Rohan has already invested ₹5,000. He keeps saying: 'Everyone's buying it — you'll regret missing this.' You have ₹5,000 saved from tutoring. What's your first move?",
+        ageGroups: ['teen', 'senior'],
+        choices: [
+          {
+            id: 'si-c1',
+            text: "Run Lynch's check first: 'What does NovaTech actually do to make money?'",
+            consequence: "Smart pause. You search for NovaTech. After 10 minutes you find: it's a B2B cloud storage company serving small businesses. Revenue: ₹48 crore/year, growing 18% annually. You can now explain it in one sentence.",
+            xpDelta: 60,
+            healthDelta: 15,
+            walletDelta: 0,
+            nextStepId: 'si-2',
+            isOptimal: true,
+            explanation: "Lynch's first filter — can you explain what the company does in one sentence? — forces you out of the excitement and into reality. Most hot tips collapse at this first question because the buyer never actually checked.",
+            realLifeTip: "Before acting on any stock tip, spend 10 minutes answering: 'What does this company do to make money?' If you can't answer it, you shouldn't be buying it."
+          },
+          {
+            id: 'si-c2',
+            text: "Buy immediately — Rohan made 40% and he seems confident",
+            consequence: "You transfer ₹5,000. Three weeks later, NovaTech drops 28% after poor quarterly results. Rohan sold last week — he didn't tell you. You're down ₹1,400 with no idea why or when to sell.",
+            xpDelta: 5,
+            healthDelta: -20,
+            walletDelta: -1400,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Following a tip without understanding the company leaves you with no framework for decision-making. You don't know when to hold, when to sell, or why the price moved. That's not investing — it's gambling with extra steps.",
+            realLifeTip: "Other people's past returns are not a reason to buy. Their situation, entry price, and exit timing are all different from yours. Never invest in something you can't explain."
+          },
+          {
+            id: 'si-c3',
+            text: "Ask Rohan more about it — maybe he knows something useful",
+            consequence: "Rohan says 'It's in cloud tech — huge sector! A friend from college told me about it.' That's all he knows. He's also up 40% — on paper, unrealised. You realise no one in this group actually researched the company.",
+            xpDelta: 25,
+            healthDelta: 5,
+            walletDelta: 0,
+            nextStepId: 'si-2',
+            isOptimal: false,
+            explanation: "Good instinct to ask — but you learned the tip chain: friend → college contact → Rohan → you. Nobody in this chain actually knows the company. This is how most retail losses happen. You need to be the one who does the research.",
+            realLifeTip: "The further a tip is from the original source, the more degraded the information. If your source is 'a friend said,' you're at the end of a chain where risk has only gone up and returns have only gone down."
+          }
+        ]
+      },
+      {
+        id: 'si-2',
+        title: 'Question 2 — Why Is It Growing?',
+        narrative: "You know NovaTech is a B2B cloud storage company growing at 18% per year. Now Lynch's second question: WHY specifically is it growing? You open their investor presentation. It says: 'We are growing because the cloud storage sector is expanding rapidly in India.' That's it. No specific competitive advantage mentioned anywhere.",
+        ageGroups: ['teen', 'senior'],
+        choices: [
+          {
+            id: 'si-c4',
+            text: "Sector growth isn't a specific enough reason — this fails Lynch's second test",
+            consequence: "Correct call. You dig deeper and find 3 direct competitors with similar products and lower prices. NovaTech has no moat — no proprietary tech, no switching costs, no unique market position. The sector is growing, but NovaTech may not capture that growth.",
+            xpDelta: 70,
+            healthDelta: 15,
+            walletDelta: 0,
+            nextStepId: 'si-3',
+            isOptimal: true,
+            explanation: "Lynch's second filter demands a company-specific reason. 'The sector is hot' lifts all boats — including leaking ones. If a company can't articulate what makes them specifically better, competitors can easily eat their lunch.",
+            realLifeTip: "Ask: if the market doubled in size tomorrow, which company would capture that growth and why? If the answer isn't clearly NovaTech, it's just riding a wave."
+          },
+          {
+            id: 'si-c5',
+            text: "18% annual growth with a growing sector — that's enough. Buy ₹5,000 worth.",
+            consequence: "You invest ₹5,000. NovaTech grows 8% over the next year — but a better-positioned competitor you'd never heard of grows 60% in the same period. You made money, but missed the real opportunity by not doing the full research.",
+            xpDelta: 20,
+            healthDelta: -5,
+            walletDelta: 400,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "You got lucky — sector growth carried NovaTech. But without knowing why it specifically grows, you have no framework to evaluate whether it will continue. You made money this time; the next time you use this reasoning you might not.",
+            realLifeTip: "Accidental profits are dangerous — they teach bad habits. If you made money without understanding why, you'll apply the same reasoning next time and the outcome will be random."
+          },
+          {
+            id: 'si-c6',
+            text: "Accept the sector reasoning — investors are optimistic about cloud",
+            consequence: "You move forward with incomplete research. NovaTech loses a major contract to a cheaper competitor you didn't know existed. The stock drops 35%. You hold because you don't know when to sell — and it drops further.",
+            xpDelta: 5,
+            healthDelta: -15,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Optimism about a sector isn't the same as a thesis for a specific company. Without a specific growth driver, you can't evaluate threats — or know when the investment thesis has broken down.",
+            realLifeTip: "If your reason to hold a stock disappears (e.g. the competitor wins the contract), that's usually a signal to sell — but only if you knew the reason to begin with."
+          }
+        ]
+      },
+      {
+        id: 'si-3',
+        title: 'Question 3 — What Are You Paying?',
+        narrative: "You've identified a gap in NovaTech's moat. But you're still curious. You check the numbers: NovaTech's P/E ratio is 55. Its earnings are growing at 18% per year. You calculate the PEG ratio: 55 ÷ 18 = 3.05. Peter Lynch considered PEG > 2 to be an expensive premium.",
+        ageGroups: ['teen', 'senior'],
+        choices: [
+          {
+            id: 'si-c7',
+            text: "PEG of 3.05 is too expensive — I'm paying 3× what the growth justifies. Pass.",
+            consequence: "Disciplined call. You're not just identifying problems — you're pricing them correctly. NovaTech fails both the moat test and the valuation test. The crowd is paying a premium for a business with no clear edge. You save your ₹5,000.",
+            xpDelta: 80,
+            healthDelta: 20,
+            walletDelta: 0,
+            nextStepId: 'si-4',
+            isOptimal: true,
+            explanation: "PEG > 2 means you're paying a steep premium for future growth. That's only justified if the growth is very certain and very durable. NovaTech's growth isn't certain (weak moat) and isn't durable (competitors). You're being asked to overpay for uncertainty.",
+            realLifeTip: "Lynch's rule: the P/E of a fairly valued company equals its growth rate (PEG = 1). Above 1, you're paying a premium. Above 2, you'd better be very, very confident."
+          },
+          {
+            id: 'si-c8',
+            text: "P/E of 55 is normal for growth tech companies — PEG doesn't matter for cloud",
+            consequence: "You invest ₹5,000 at an inflated price. Six months later, the broader market corrects. High-PEG stocks like NovaTech fall hardest — they drop 42% as investors reprice growth companies. Your ₹5,000 is worth ₹2,900.",
+            xpDelta: 10,
+            healthDelta: -20,
+            walletDelta: -2100,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "High-multiple stocks are most vulnerable in market corrections. When investors become cautious, they sell the most expensive stocks first. Paying PEG 3 for a company with a weak moat is the riskiest combination possible.",
+            realLifeTip: "Valuation matters most when things go wrong. A cheap stock with problems has a floor. An expensive stock with problems has no floor — the repricing can be sudden and severe."
+          },
+          {
+            id: 'si-c9',
+            text: "Invest a smaller amount — ₹1,000 — to not miss out entirely",
+            consequence: "You put in ₹1,000. The stock declines 38% over the next year. You lose ₹380 — less than you would have, but you still bought something you identified as overvalued with a weak moat. The discipline of your analysis wasn't matched by your action.",
+            xpDelta: 30,
+            healthDelta: -5,
+            walletDelta: -380,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Investing in something you've identified as flawed — just smaller — is FOMO in disguise. If the analysis says no, the position size should be zero. Partial FOMO is still FOMO.",
+            realLifeTip: "Lynch's filter is binary — the stock either passes or it doesn't. A 'small position on a bad thesis' is not a compromise. It's paying for the psychological comfort of participation, not for genuine expected return."
+          }
+        ]
+      },
+      {
+        id: 'si-4',
+        title: 'The Right Stock',
+        narrative: "You've wisely passed on NovaTech. Now you apply the same 4-question filter to another company: MediTrack, a healthcare SaaS platform. (1) One sentence: 'MediTrack helps hospitals manage patient records digitally, charging a monthly subscription.' ✓ (2) Growth reason: 'India has 50,000+ private hospitals and fewer than 15% use digital records — MediTrack has first-mover advantage in a largely untouched market.' ✓ (3) PEG: P/E is 28, growth is 35% → PEG = 0.8. ✓ (4) The promoter just bought ₹1.2 crore of their own shares last quarter. ✓ All 4 pass. What do you do?",
+        ageGroups: ['teen', 'senior'],
+        choices: [
+          {
+            id: 'si-c10',
+            text: "Put all ₹5,000 in — all 4 checks pass, this is clearly better than NovaTech",
+            consequence: "You invest everything. MediTrack rises 22% over the next year. But you also discover you don't fully understand some risks — regulatory changes in healthcare data policy create uncertainty. You didn't read the annual report first.",
+            xpDelta: 50,
+            healthDelta: 5,
+            walletDelta: 1100,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Lynch's filter gets you to the research shortlist — not the buy list. The 4 questions open the door. The next step is reading the annual report, understanding risks, and sizing your position based on conviction, not FOMO.",
+            realLifeTip: "Passing the Lynch filter means: 'this deserves serious research.' It doesn't mean 'invest everything immediately.' Great investors distinguish between a research candidate and a buy decision."
+          },
+          {
+            id: 'si-c11',
+            text: "Add it to my research shortlist — read the annual report before deciding how much to invest",
+            consequence: "Smart. You read the annual report. You find a risk you didn't know about: one large hospital chain accounts for 28% of revenue. Concentration risk. You decide to invest ₹2,000 — meaningful but sized for your actual conviction level. Over the next year, MediTrack rises 24%. You make ₹480 on a well-researched, right-sized position.",
+            xpDelta: 100,
+            healthDelta: 25,
+            walletDelta: 480,
+            nextStepId: 'end',
+            isOptimal: true,
+            explanation: "This is the complete Lynch framework: use the 4 questions to build a shortlist, then do the deeper work — annual report, risk factors, concentration, competition. Then size your position to match your actual conviction, not your excitement. This is how professional investors think.",
+            realLifeTip: "Lynch's framework eliminates bad stocks. After that, the job of a good investor begins: understanding what could go wrong and sizing accordingly. A well-researched ₹2,000 position beats a poorly-researched ₹5,000 position every time."
+          },
+          {
+            id: 'si-c12',
+            text: "Wait and watch — the 4 checks pass but I want to see it rise first to be sure",
+            consequence: "You wait. MediTrack rises 15% in 2 months. You buy at a higher price — now PEG is 1.1. You've turned a great entry into an average one. Waiting for confirmation often means you pay more for the same thesis.",
+            xpDelta: 35,
+            healthDelta: 0,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Waiting for a price rise as 'confirmation' is backwards. If your research is solid and the price is attractive, waiting costs you the margin of safety. Lynch's filter is the confirmation — you don't need the market to agree with you first.",
+            realLifeTip: "By the time a stock has risen 15–20% as 'confirmation,' the easy money is already made. Buy on research, not on price momentum."
+          }
+        ]
+      }
+    ],
+  },
 
 ];

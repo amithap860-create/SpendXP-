@@ -745,4 +745,102 @@ export const lessons: Lesson[] = [
       { emoji: '⚠️', fact: 'Disability insurance is the most underrated protection: you are statistically 3–4× more likely to be unable to work for 3+ months due to illness or injury than to die before retirement. Yet most people never think about it.' },
     ],
   },
+
+  // ── Peter Lynch Stock Framework ──────────────────────────────────────────
+  {
+    id: 'l-stock-analysis',
+    topic: 'investing',
+    relatedGame: 'stockMarketSim',
+    title: 'Pick Stocks Like Peter Lynch',
+    estimatedMinutes: 4,
+    ageGroups: ['teen', 'senior'],
+    cards: [
+      {
+        id: 'sl-1',
+        title: 'The 2-Minute Stock Test',
+        body: {
+          junior: "Before you buy anything, you should be able to explain what it is in simple words. If you can't, you probably don't understand it well enough yet!",
+          teen: "Legendary investor Peter Lynch managed the world's best-performing fund for 13 years. His rule: if you can't explain why you own a stock in 2 minutes, you probably shouldn't own it. Confusion costs money in the market.",
+          senior: "Peter Lynch returned 29.2% annually at Magellan Fund (1977–1990). His core thesis: genuine understanding is the only reliable edge a retail investor has over institutional money. If you can't articulate the investment thesis in 2 minutes, you don't have one."
+        },
+        example: {
+          junior: "Like explaining a game to a friend — if you need 20 minutes, you don't really know the rules yet. Money is the same!",
+          teen: "Bad: 'I'm buying ZetaCorp because everyone says it's going up.' Good: 'ZetaCorp runs India's top UPI payment rails, growing 40% per year as digital payments replace cash.' The second person has a thesis.",
+          senior: "The 2-minute test eliminates FOMO, hot tips, and hype. It forces you to locate your actual edge. Without a clear thesis, you don't know when to sell — which means you'll panic at the first correction."
+        },
+        visual: 'none',
+        xpReward: 20,
+      },
+      {
+        id: 'sl-2',
+        title: 'Question 1: What Does It Do?',
+        body: {
+          junior: "The first question to ask about any investment: what does this company do to make money? Say it in one sentence. One sentence only!",
+          teen: "Question 1 of Lynch's framework: 'What does this company do to make money?' Answer in exactly one sentence. Not a paragraph — one sentence. If it takes longer, you don't fully understand the business model yet.",
+          senior: "The first filter: one-sentence business model articulation. This tests whether you understand the revenue engine, not just the product. Revenue model clarity is the foundation of all subsequent valuation work."
+        },
+        example: {
+          junior: "Amul: 'Amul makes milk and dairy products and sells them across India.' Done — one sentence. You understand Amul.",
+          teen: "Good: 'Zomato earns commissions from restaurant deliveries and charges restaurants for platform visibility.' Bad: 'Zomato is a tech-enabled food-ecosystem platform leveraging network effects...' — that second sentence says nothing.",
+          senior: "The test: can you write the business model on a post-it note? If not, the company may not have a clear model — or your understanding is incomplete. Either is a risk you're carrying into your portfolio."
+        },
+        visual: 'none',
+        xpReward: 20,
+      },
+      {
+        id: 'sl-3',
+        title: 'Question 2: Why Is It Growing?',
+        body: {
+          junior: "If a company is doing better and better, there must be a specific reason. 'Everyone likes it' isn't a reason. What is the real reason?",
+          teen: "Question 2: 'Why specifically is it growing?' The answer cannot be 'the sector is hot.' You need the company's specific reason — a product, a market, or an advantage only they have. Generic answers = generic results.",
+          senior: "Sector tailwinds are necessary but not sufficient. The core question: what is this company's defensible competitive advantage within the sector? Network effects? Switching costs? Proprietary data? Regulatory moat? The 'why' must be company-specific to be investment-grade."
+        },
+        example: {
+          junior: "Why does your school canteen sell more than the one next to it? Maybe the samosas are better! That's the specific reason — not just 'because students are hungry.'",
+          teen: "Weak: 'IndiaMART is growing because e-commerce is growing.' Strong: 'IndiaMART has a 7-million SMB network with deep switching costs — businesses can't easily migrate their buyer-seller relationships elsewhere.' That's a specific moat.",
+          senior: "Beware 'rising tide' reasoning. Sector booms lift all boats — including boats with holes. The question is: does this company have a moat that protects it when the tide inevitably recedes? Lynch looked for companies with durable, specific, articulable advantages."
+        },
+        visual: 'none',
+        xpReward: 20,
+      },
+      {
+        id: 'sl-4',
+        title: 'Questions 3 & 4: Price and Conviction',
+        body: {
+          junior: "Would you pay ₹200 for a toy that costs ₹100 elsewhere? No! The same idea applies to stocks — even a great company can be a bad investment if you pay too much. And when the people who own the company buy more of it themselves, that's a great sign!",
+          teen: "Question 3: 'What are you paying per unit of growth?' Use the PEG ratio — divide the P/E ratio by the annual earnings growth rate. PEG below 1 = potentially undervalued. PEG above 2 = paying a high premium. Question 4: 'Is the promoter buying with their own money?' When founders buy their own shares, they're voting with real cash — not just optimistic quotes to journalists.",
+          senior: "PEG = P/E ÷ Annual EPS Growth Rate. Lynch considered PEG < 1 as a fair-to-low price. PEG > 2 requires very high conviction on sustained growth. For Q4, check BSE/NSE insider trading disclosures — promoter buying is a quantitative conviction signal. These two checks together cover price sanity and insider alignment, two of the most reliable edges in fundamental analysis."
+        },
+        example: {
+          junior: "Meera's lemonade stand earns ₹100/day. You want to buy it for ₹200. That's only 2 days of earnings — cheap! But if she only earns ₹5/day, ₹200 is 40 days of earnings — too expensive!",
+          teen: "Stock A: P/E 40, growing at 20% → PEG 2.0 (expensive). Stock B: P/E 20, growing at 25% → PEG 0.8 (potential bargain!). Then check: did the CEO just buy ₹2 crore of their own shares? That's real conviction.",
+          senior: "PEG is most useful for steady-growth companies. It breaks down for cyclicals, financials, and pre-profit companies. Cross-reference with FCF yield and ROIC to avoid value traps where earnings are manipulated but cash flow tells the truth."
+        },
+        visual: 'comparison',
+        visualData: {
+          items: [
+            { label: 'Stock A (PEG 2.0)', value: 40, color: '#ef4444', note: 'Expensive' },
+            { label: 'Stock B (PEG 0.8)', value: 80, color: '#10b981', note: 'Potential value' }
+          ]
+        },
+        xpReward: 30,
+      },
+    ],
+    quizCard: {
+      question: "After passing all 4 Lynch checks (clear business model, specific growth reason, PEG < 1, promoter buying), the stock should go:",
+      options: [
+        "Straight into your portfolio — all signals green!",
+        "Onto your research shortlist for deeper investigation",
+        "Into a ₹10,000 immediate investment",
+        "Into the bin — Lynch's rules are too old now"
+      ],
+      correctIndex: 1,
+      explanation: "Lynch's 4 questions eliminate 95% of stocks — but what remains is your research shortlist, not your buy list. Reading annual reports, understanding risks, sizing positions — the real work starts here. The framework finds the door; you still have to walk through it."
+    },
+    briefs: [
+      { emoji: '📈', fact: 'Peter Lynch averaged 29.2% annual returns for 13 years at Magellan Fund — growing it from $18M to $14B. His edge? Only buying what he deeply understood, never what sounded impressive.' },
+      { emoji: '🔍', fact: 'Lynch coined "invest in what you know." He found winning stocks like Hanes and Dunkin\' Donuts by noticing products his family used daily — months before Wall Street analysts noticed them.' },
+      { emoji: '📊', fact: 'The PEG ratio Lynch popularised is now one of the most widely used stock screening metrics globally — 35 years after he introduced it to mainstream investors in his book One Up on Wall Street.' },
+    ],
+  },
 ];

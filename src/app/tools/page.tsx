@@ -22,6 +22,7 @@ import {
   ArrowRight,
   Info,
   MinusCircle,
+  Search,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import dynamic from 'next/dynamic';
@@ -32,8 +33,9 @@ const CompoundVisualiser = dynamic(() => import('@/components/tools/CompoundVisu
 const SavingsGoalTracker = dynamic(() => import('@/components/tools/SavingsGoalTracker').then(mod => mod.SavingsGoalTracker), { ssr: false });
 const SIPCalculator = dynamic(() => import('@/components/tools/SIPCalculator').then(mod => mod.SIPCalculator), { ssr: false });
 const SWPCalculator = dynamic(() => import('@/components/tools/SWPCalculator').then(mod => mod.SWPCalculator), { ssr: false });
+const StockResearchChecker = dynamic(() => import('@/components/tools/StockResearchChecker').then(mod => mod.StockResearchChecker), { ssr: false });
 
-type ToolId = 'emi' | 'compound' | 'savings' | 'sip' | 'swp';
+type ToolId = 'emi' | 'compound' | 'savings' | 'sip' | 'swp' | 'stockcheck';
 
 const TOOL_BADGE_THRESHOLD = 5;
 
@@ -117,6 +119,15 @@ export default function ToolsHub() {
       icon: Target,
       color: 'bg-secondary',
       component: <SavingsGoalTracker />,
+    },
+    {
+      id: 'stockcheck' as ToolId,
+      name: 'Stock Research Checker',
+      description: "Apply Peter Lynch's 4-question filter before buying any stock.",
+      info: "Based on legendary investor Peter Lynch's framework from 'One Up on Wall Street.' Answer 4 questions about any stock — can you explain it in one sentence, do you know the specific growth driver, is the PEG ratio below 1, and is the promoter buying? Lynch's filter eliminates 95% of stocks. What passes belongs on your research shortlist.",
+      icon: Search,
+      color: 'bg-amber-600',
+      component: <StockResearchChecker />,
     },
   ];
 

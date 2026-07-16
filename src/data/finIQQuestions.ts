@@ -688,4 +688,61 @@ export const finIQQuestions: Question[] = [
     xpReward: 35,
     difficulty: 'hard'
   },
+
+  // --- PETER LYNCH INVESTING (5) ---
+  {
+    id: 'inv-lynch-1',
+    category: 'INVESTING',
+    ageGroups: ['teen', 'senior'],
+    question: "Peter Lynch says: 'If you can't explain why you own a stock in under ___, you probably shouldn't own it.'",
+    options: ["2 minutes", "5 minutes", "10 minutes", "1 hour"],
+    correctIndex: 0,
+    explanation: "Lynch's 2-minute drill forces clarity. If you can't explain the investment simply, you don't understand it well enough — and confusion is expensive in the stock market.",
+    xpReward: 30,
+    difficulty: 'medium'
+  },
+  {
+    id: 'inv-lynch-2',
+    category: 'INVESTING',
+    ageGroups: ['teen', 'senior'],
+    question: "You're researching a stock and your reason for buying is 'the sector is hot right now.' According to Peter Lynch, this reason is:",
+    options: ["Not good enough — find the company-specific reason", "Excellent — ride the wave", "The most important factor", "Enough if combined with a rising share price"],
+    correctIndex: 0,
+    explanation: "Lynch insisted on knowing WHY a specific company is growing, not just that its sector is popular. Sector tailwinds lift all boats — including sinking ones. You need the company's specific competitive edge.",
+    xpReward: 30,
+    difficulty: 'medium'
+  },
+  {
+    id: 'inv-lynch-3',
+    category: 'INVESTING',
+    ageGroups: ['senior'],
+    question: "The PEG ratio divides a stock's P/E by its earnings growth rate. Stock A has P/E 20 and grows at 25% per year. Its PEG is approximately:",
+    options: ["0.8 — potentially undervalued", "20 — fairly valued", "25 — overvalued", "1.25 — overvalued"],
+    correctIndex: 0,
+    explanation: "PEG = P/E ÷ Growth Rate = 20 ÷ 25 = 0.8. Lynch considered PEG below 1 as a potential bargain — you're paying less than the growth justifies. It's a quick filter, not a guarantee.",
+    xpReward: 50,
+    difficulty: 'hard'
+  },
+  {
+    id: 'inv-lynch-4',
+    category: 'INVESTING',
+    ageGroups: ['teen', 'senior'],
+    question: "Why does Peter Lynch consider promoters (founders/management) buying their own company's shares a bullish signal?",
+    options: ["They have the deepest knowledge and are voting with real money", "It legally guarantees the stock will rise", "It means the company is profitable", "It reduces the number of shares available"],
+    correctIndex: 0,
+    explanation: "Promoters know their business better than any analyst. When they spend their own personal money buying shares, it signals genuine confidence in future growth — not just optimistic press releases.",
+    xpReward: 40,
+    difficulty: 'medium'
+  },
+  {
+    id: 'inv-lynch-5',
+    category: 'INVESTING',
+    ageGroups: ['teen', 'senior'],
+    question: "You've answered all 4 Lynch questions strongly: clear business model, specific growth reason, PEG of 0.7, promoter bought ₹2 crore of their own shares. What should you do next?",
+    options: ["Add it to your research shortlist and dig deeper", "Buy immediately — all signals are green", "Invest your entire savings", "Ignore it — PEG alone isn't reliable"],
+    correctIndex: 0,
+    explanation: "Lynch's 4 questions eliminate 95% of stocks — but what remains is your research shortlist, not your buy list. The real work — annual reports, risk assessment, position sizing — starts here. The framework opens the door; it doesn't walk you through it.",
+    xpReward: 50,
+    difficulty: 'hard'
+  },
 ];
