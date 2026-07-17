@@ -54,10 +54,13 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
 
   const handleFinish = async () => {
     completeTask(`lesson-${lesson.id}`);
-    // Award quiz completion bonus XP
+    // Award card XP always; the +20 quiz bonus only fires if the quiz was
+    // actually answered correctly — otherwise a wrong answer pays the same
+    // as a right one, which defeats the point of asking (xpConfig.ts gap #1).
     if (user?.uid) {
       const totalCardXP = lesson.cards.reduce((acc, c) => acc + c.xpReward, 0);
-      const quizBonus = 20;
+      const answeredCorrectly = selectedQuizIndex === lesson.quizCard.correctIndex;
+      const quizBonus = answeredCorrectly ? 20 : 0;
       await safeUpdateDoc(doc(db, 'users', user.uid, 'progression', 'stats'), {
         totalXP: increment(totalCardXP + quizBonus),
         lastActivityAt: new Date(),

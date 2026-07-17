@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useGameEngine } from '@/hooks/useGameEngine';
 import { useAgeAdapt } from '@/lib/ageAdaptProvider';
-import { finIQQuestions, Question, Category } from '@/data/finIQQuestions';
+import { useCountry } from '@/hooks/useCountry';
+import { finIQQuestions, Question, Category, resolveQuestion } from '@/data/finIQQuestions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -41,17 +42,24 @@ interface ShuffledQuestion extends Question {
   shuffledCorrectIndex: number;
 }
 
-/** Shuffle a question's options and return new correct index */
-function shuffleOptions(q: Question): ShuffledQuestion {
-  const indexed = q.options.map((opt, i) => ({ opt, original: i }));
+/** Resolves the question to the user's country variant (falls back to the
+ *  base fields for the ~40 universal questions with no country override),
+ *  then shuffles that variant's options and returns the new correct index. */
+function shuffleOptions(q: Question, countryCode: string): ShuffledQuestion {
+  const resolved = resolveQuestion(q, countryCode);
+  const indexed = resolved.options.map((opt, i) => ({ opt, original: i }));
   for (let i = indexed.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [indexed[i], indexed[j]] = [indexed[j], indexed[i]];
   }
   return {
     ...q,
+    question: resolved.question,
+    options: resolved.options,
+    correctIndex: resolved.correctIndex,
+    explanation: resolved.explanation,
     shuffledOptions: indexed.map(x => x.opt),
-    shuffledCorrectIndex: indexed.findIndex(x => x.original === q.correctIndex),
+    shuffledCorrectIndex: indexed.findIndex(x => x.original === resolved.correctIndex),
   };
 }
 
@@ -197,6 +205,7 @@ function getTimerForQuestion(ageGroup: string, difficulty: string): number {
 
 export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) {
   const { ageGroup } = useAgeAdapt();
+  const { countryCode } = useCountry();
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [roundQuestions, setRoundQuestions] = useState<ShuffledQuestion[]>([]);
@@ -259,10 +268,11 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
     if (gameState === 'IDLE') {
       const filtered = finIQQuestions.filter(q => q.ageGroups.includes(ageGroup));
       const raw = isDailyChallenge ? getDailySeededQuestions(filtered) : getRandomQuestions(filtered);
-      // Shuffle each question's options independently for variety on every load
-      setRoundQuestions(raw.map(shuffleOptions));
+      // Resolve each question to the user's country variant, then shuffle
+      // options independently for variety on every load.
+      setRoundQuestions(raw.map(q => shuffleOptions(q, countryCode)));
     }
-  }, [gameState, ageGroup, isDailyChallenge, getDailySeededQuestions, getRandomQuestions]);
+  }, [gameState, ageGroup, isDailyChallenge, countryCode, getDailySeededQuestions, getRandomQuestions]);
 
   const currentQuestion = roundQuestions[currentRound - 1];
 

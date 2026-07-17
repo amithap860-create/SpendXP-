@@ -53,6 +53,8 @@ interface AuthContextType {
   currentAgeGroup: 'junior' | 'teen' | 'senior';
   emailVerified: boolean;
   currencyCode?: string;
+  /** ISO 3166-1 alpha-2 country code (e.g. 'IN', 'US') set at onboarding. Defaults to 'IN'. */
+  countryCode: string;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -117,6 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [emailVerified, setEmailVerified] = useState(false);
   const [currencyCode, setCurrencyCode] = useState<string>('INR');
+  const [countryCode, setCountryCode] = useState<string>('IN');
   // Tracks when the last verification email was sent; prevents duplicates within a session
   const lastVerifyEmailSentAt = React.useRef<number>(0);
 
@@ -155,6 +158,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 // Update currency code
                 if (data?.currencyCode) setCurrencyCode(data.currencyCode);
 
+                // Update country code (set at onboarding, editable in Profile).
+                // Drives which country-specific content variant content files show
+                // (tax authority, credit score system, stock index, etc.) via
+                // src/data/countryFinance.ts — separate from currencyCode because
+                // Sudan shares USD with the US but is still its own country.
+                if (data?.countryCode) setCountryCode(data.countryCode);
+
                 // Update premium status and subscription expiry
                 let subEndIso: string | null = null;
                 if (data?.subscriptionEndAt) {
@@ -181,6 +191,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(null);
           setEmailVerified(false);
           setCurrencyCode('INR');
+          setCountryCode('IN');
           setLoading(false);
         }
       },
@@ -385,6 +396,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         currentAgeGroup: 'teen',
         emailVerified,
         currencyCode,
+        countryCode,
       }}
     >
       {children}

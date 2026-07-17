@@ -114,7 +114,8 @@ export const BADGE_XP = {
 // These are places where XP SHOULD be awarded but currently isn't.
 // Fix each one by adding the relevant increment call.
 //
-// 1. Lesson quiz correct answer  → add +20 XP bonus in LessonViewer handleFinish
+// 1. Lesson quiz correct answer  → FIXED (2026-07) — LessonViewer.handleFinish now
+//    only pays the +20 bonus when selectedQuizIndex === quizCard.correctIndex.
 // 2. Onboarding completion       → add +100 XP in onboarding/page.tsx final step
 // 3. Daily login streak          → not yet implemented; add login streak counter
 // 4. Quest optimal-choice bonus  → audit questEngine for extra bonus on 100% optimal rate

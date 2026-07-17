@@ -17,6 +17,13 @@ const SUGGESTED_QUESTIONS = [
   'How do I build an emergency fund?',
 ];
 
+// Gate the entire feature behind an explicit flag. The backend (/api/chat)
+// already 503s gracefully if OPENAI_API_KEY is missing, but that still means
+// every user sees a floating button that always fails. Hide it until someone
+// deliberately turns it on by setting NEXT_PUBLIC_FIN_EDUCATOR_ENABLED=true
+// in Vercel (after OPENAI_API_KEY + ASSISTANT_ID are also set).
+const FIN_EDUCATOR_ENABLED = process.env.NEXT_PUBLIC_FIN_EDUCATOR_ENABLED === 'true';
+
 export function FinEducatorChat() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -36,6 +43,10 @@ export function FinEducatorChat() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
+
+  // Feature flag check happens after hooks (rules of hooks) but before any
+  // rendering or network calls — nothing mounts if the flag isn't on.
+  if (!FIN_EDUCATOR_ENABLED) return null;
 
   const sendMessage = async (text: string) => {
     const userText = text.trim();

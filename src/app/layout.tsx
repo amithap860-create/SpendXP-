@@ -57,6 +57,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
     { label: 'Home',    href: '/dashboard', icon: 'grid' },
     { label: 'Quests',  href: '/quests',    icon: 'flag' },
     { label: 'Games',   href: '/games',     icon: 'arcade' },
+    { label: 'Tools',   href: '/tools',     icon: 'wrench' },
     { label: 'Learn',   href: '/learn',     icon: 'book' },
     { label: 'Profile', href: '/profile',   icon: 'user' },
   ];

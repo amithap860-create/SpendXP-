@@ -159,7 +159,7 @@ export default function LearnHub() {
           {/* ── More to Explore ── */}
           <div className="mt-12 pt-8 border-t border-slate-100 space-y-4">
             <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">More to Explore</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <a href="/tools" className="group flex items-center gap-4 bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
                 <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -184,6 +184,19 @@ export default function LearnHub() {
                 <div>
                   <p className="font-black text-slate-900 text-sm group-hover:text-primary transition-colors">Resource Library</p>
                   <p className="text-xs text-slate-400 font-medium mt-0.5">Frameworks, budgeting methods &amp; curriculum map</p>
+                </div>
+                <span className="ml-auto text-xs font-black text-slate-300 group-hover:text-primary transition-colors">→</span>
+              </a>
+              <a href="/flashcards" className="group flex items-center gap-4 bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="5" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.8"/>
+                    <rect x="7" y="9" width="14" height="10" rx="2" fill="currentColor" fillOpacity="0.15" stroke="currentColor" strokeWidth="1.8"/>
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-black text-slate-900 text-sm group-hover:text-primary transition-colors">Flashcards</p>
+                  <p className="text-xs text-slate-400 font-medium mt-0.5">AI-generated quick-review cards for you</p>
                 </div>
                 <span className="ml-auto text-xs font-black text-slate-300 group-hover:text-primary transition-colors">→</span>
               </a>
