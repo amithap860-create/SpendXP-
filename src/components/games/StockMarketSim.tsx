@@ -29,9 +29,18 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { useGameTutorial, GameTutorialModal, HowToPlayButton } from '@/components/games/GameTutorial';
 
-const ROUND_TIME = 20;
 const SPARKLINE_LEN = 20; // points of history to show
+
+const STOCK_SIM_TUTORIAL_STEPS = [
+  'Each "day" is a timed round. Prices update on their own — watch the sparkline and the up/down arrow next to each stock.',
+  'A news headline appears between days and moves one specific stock\'s price — read it before you trade.',
+  'Tap Buy on a stock, then pick how many shares to buy with your available cash.',
+  'Own shares already? Tap Sell the same way to cash out before the price drops.',
+  'When the timer hits zero the day ends automatically — you don\'t need to do anything to move on.',
+  'After 5 days, your Cash + Portfolio value becomes your final score. Diversifying across stocks lowers your risk.',
+];
 
 // ─── Sparkline SVG ────────────────────────────────────────────────────────────
 
@@ -99,8 +108,16 @@ function getRecommendedSymbols(r: PersonalityResult, companies: StockCompany[]):
 
 export function StockMarketSim({ onExit }: { onExit: () => void }) {
   const { ageGroup } = useAgeAdapt();
+  const tutorial = useGameTutorial('stockMarketSim');
   const startingCash = useMemo(() => ageGroup === 'junior' ? 100 : ageGroup === 'senior' ? 5000 : 1000, [ageGroup]);
   const companies = useMemo(() => ageGroup === 'junior' ? STOCK_COMPANIES.slice(0, 3) : STOCK_COMPANIES, [ageGroup]);
+  // NOTE (2026-09): this used to be a flat 20s for every age group — the only
+  // timed game in the app that didn't scale its round length by age (compare
+  // FinIQQuiz: 22s junior / 15s teen / 12s senior). A "day" here means read a
+  // headline, check price direction, then a multi-tap Buy/Sell flow (tap
+  // Buy -> pick quantity -> confirm) — 20s is tight even for adults, and
+  // rushed for 8-12 year olds. Scaled to match the app's existing pattern.
+  const ROUND_TIME = ageGroup === 'junior' ? 35 : ageGroup === 'senior' ? 20 : 25;
 
   const gameConfig = useMemo(() => ({
     gameName: 'stockMarketSim' as const,
@@ -109,7 +126,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
     livesEnabled: false,
     xpPerWin: 200,
     xpPerCorrectAnswer: 0,
-  }), []);
+  }), [ROUND_TIME]);
 
   const { gameState, currentRound, timeLeft, startGame, nextRound, endGame } = useGameEngine(gameConfig);
 
@@ -138,6 +155,17 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
   }, [personality, companies]);
 
   // Price updates + history tracking
+  // NOTE (2026-09): this used to have `prices` in its dependency array, so
+  // this effect tore down and recreated the setInterval on every single
+  // price tick (every 3-5s) instead of once per game/round — needless churn,
+  // and on a slower Android WebView repeated interval teardown/creation like
+  // this can visibly stutter the round. It also updated priceHistory from
+  // the *stale* `prices` closure variable (the value from the last render,
+  // not the value just computed a few lines above), so the sparkline lagged
+  // a tick behind the actual price. Both are fixed by computing the new
+  // price history from the same `next` snapshot the price update just
+  // produced, inside the same functional setState — no need to read `prices`
+  // from the outer closure or list it as a dependency at all.
   useEffect(() => {
     if (gameState !== 'PLAYING') return;
     const interval = ageGroup === 'junior' ? 5000 : 3000;
@@ -150,29 +178,38 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
           if (currentHeadline && currentHeadline.ticker === company.symbol) multiplier *= currentHeadline.multiplier;
           next[company.symbol] = Number(Math.max(1, prev[company.symbol] * multiplier).toFixed(2));
         });
-        return next;
-      });
-      // Track history (keep last SPARKLINE_LEN points)
-      setPriceHistory(prev => {
-        const next = { ...prev };
-        companies.forEach(c => {
-          const h = prev[c.symbol] || [];
-          next[c.symbol] = [...h, prices[c.symbol]].slice(-SPARKLINE_LEN);
+        setPriceHistory(prevHist => {
+          const nextHist = { ...prevHist };
+          companies.forEach(c => {
+            const h = prevHist[c.symbol] || [];
+            nextHist[c.symbol] = [...h, next[c.symbol]].slice(-SPARKLINE_LEN);
+          });
+          return nextHist;
         });
         return next;
       });
     }, interval);
     return () => clearInterval(timer);
-  }, [gameState, ageGroup, companies, currentHeadline, prices]);
+  }, [gameState, ageGroup, companies, currentHeadline]);
 
   useEffect(() => {
     if (gameState === 'PLAYING' && timeLeft === 0) {
       if (currentRound < 5) {
         setCurrentHeadline(NEWS_HEADLINES[Math.floor(Math.random() * NEWS_HEADLINES.length)]);
         nextRound();
-      } else endGame();
+      } else {
+        // NOTE (2026-09-something): on the final round, this used to call
+        // endGame() with no argument. The 200 xpPerWin bonus is only ever
+        // added inside the NEXT_ROUND reducer case when currentRound reaches
+        // totalRounds — but nextRound() is never dispatched on the last
+        // round (this branch calls endGame() instead), so that code path
+        // was unreachable and XP stayed at 0 for every playthrough. Passing
+        // xpPerWin directly into endGame()'s finalXpBonus param fixes it —
+        // same mechanism MoneyMaze already uses for its win case.
+        endGame(gameConfig.xpPerWin);
+      }
     }
-  }, [timeLeft, gameState, currentRound, nextRound, endGame]);
+  }, [timeLeft, gameState, currentRound, nextRound, endGame, gameConfig.xpPerWin]);
 
   const handleTrade = (qty: number) => {
     if (!tradeModal) return;
@@ -228,8 +265,10 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
   // ─── IDLE ──────────────────────────────────────────────────────────────────
 
   if (gameState === 'IDLE') return (
+    <>
     <Card className="max-w-2xl mx-auto border-none shadow-2xl bg-white overflow-hidden">
       <div className="bg-primary p-10 text-white text-center relative">
+        <HowToPlayButton onClick={tutorial.reopen} />
         <button
           onClick={() => setShowInfo(v => !v)}
           className="absolute top-4 right-4 h-8 w-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center"
@@ -252,7 +291,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
             <li><span className="font-bold text-primary">Volatility</span> — high-volatility stocks swing more. Higher risk = higher potential reward.</li>
             <li><span className="font-bold text-rose-700">Never invest what you can&apos;t afford to lose</span> — markets can go down.</li>
           </ul>
-          <p className="text-slate-400 text-xs">In this simulator: each &quot;day&quot; is 20 seconds. News headlines appear between days and affect specific stocks.</p>
+          <p className="text-slate-400 text-xs">In this simulator: each &quot;day&quot; is {ROUND_TIME} seconds. News headlines appear between days and affect specific stocks.</p>
         </div>
       )}
 
@@ -280,6 +319,13 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
         </Button>
       </CardContent>
     </Card>
+    <GameTutorialModal
+      open={tutorial.open}
+      onClose={tutorial.dismiss}
+      title="Stock Simulator"
+      steps={STOCK_SIM_TUTORIAL_STEPS}
+    />
+    </>
   );
 
   // ─── RESULTS ───────────────────────────────────────────────────────────────

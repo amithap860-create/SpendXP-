@@ -68,6 +68,7 @@ import {
   PiggyBank,
   Briefcase,
   Clock,
+  HelpCircle,
 } from 'lucide-react';
 import { getAvatar, AVATARS } from '@/config/avatars';
 import Image from 'next/image';
@@ -349,6 +350,8 @@ export default function ProfilePage() {
   const [linkedChildren, setLinkedChildren] = useState<LinkedChild[]>([]);
   const [linkEmailSent, setLinkEmailSent] = useState(false);
   const [linkEmailLoading, setLinkEmailLoading] = useState(false);
+  const [linkChildEmail, setLinkChildEmail] = useState('');
+  const [linkEmailSentTo, setLinkEmailSentTo] = useState('');
 
   // Logout confirm
   const [logoutConfirm, setLogoutConfirm] = useState(false);
@@ -517,23 +520,71 @@ export default function ProfilePage() {
     }
   };
 
+  // NOTE (2026-08-25): this previously called Firebase's sendEmailVerification()
+  // on the PARENT'S OWN account — a leftover/mismatched wiring that had nothing
+  // to do with linking a child. It re-sent a "verify your email" email to
+  // yourself and displayed your own email in the success message, which is
+  // why the invite never reached any child. This now calls the real,
+  // already-working invite endpoint (/api/parent/email-child-invite — same
+  // one used by the Parent Setup page's "Email your child directly" option),
+  // which requires an actual child email and generates a real invite code.
   const handleSendLinkEmail = async () => {
-    if (!auth.currentUser) return;
+    if (!user) return;
+    const childEmail = linkChildEmail.trim().toLowerCase();
+    if (!childEmail || !childEmail.includes('@')) {
+      toast({ title: 'Enter a valid email address for your child.', variant: 'destructive' });
+      return;
+    }
     setLinkEmailLoading(true);
     try {
-      await sendEmailVerification(auth.currentUser);
-      setLinkEmailSent(true);
-      toast({ title: 'Verification email sent — check your inbox!' });
+      const token = await user.getIdToken();
+      const res = await fetch('/api/parent/email-child-invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ childEmail }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setLinkEmailSentTo(childEmail);
+        setLinkEmailSent(true);
+        toast({ title: 'Invitation sent — ask your child to check their inbox!' });
+      } else {
+        toast({ title: data.error || 'Could not send invitation. Try again later.', variant: 'destructive' });
+      }
     } catch {
-      toast({ title: 'Could not send email. Try again later.', variant: 'destructive' });
+      toast({ title: 'Network error. Please try again.', variant: 'destructive' });
     } finally {
       setLinkEmailLoading(false);
     }
   };
 
+  // NOTE (2026-08-25): previously this toggle had no gate at all — any
+  // signed-in account, including a child's, could flip itself into parent
+  // mode with one tap and land on the full parent dashboard. Locked down to
+  // require a verified birth year showing age 18+, same age floor as an
+  // adult in the outside world. Someone can still lie about their birth year
+  // at signup, same as any app — this isn't meant to be unbeatable identity
+  // verification, just to stop the one-tap self-declaration that had zero
+  // friction at all. Turning parent mode OFF is still always allowed.
   const handleToggleParent = async () => {
     if (!user?.uid || !profile) return;
     const newVal = !profile.isParent;
+
+    if (newVal) {
+      const currentYear = new Date().getFullYear();
+      const age = profile.birthYear ? currentYear - profile.birthYear : null;
+      if (age === null || age < 18) {
+        toast({
+          title: 'Parent mode requires a verified age of 18+',
+          description: profile.birthYear
+            ? "Your account's birth year shows you're under 18."
+            : 'Set your birth year first (above) to enable this.',
+          variant: 'destructive',
+        });
+        return;
+      }
+    }
+
     const success = await safeUpdateDoc(doc(db, 'users', user.uid), { isParent: newVal });
     if (success) {
       setProfile(p => p ? { ...p, isParent: newVal } : p);
@@ -586,6 +637,18 @@ export default function ProfilePage() {
     } else {
       toast({ title: 'Failed to save currency preference', description: 'Check your connection and try again.', variant: 'destructive' });
     }
+  };
+
+  // Replay the first-run intro slides + tooltip tour. Both are gated by
+  // localStorage flags (spendxp_intro_done / spendxp_tour_done) that get set
+  // once on first completion — clearing them and sending the user back to
+  // /dashboard re-triggers the same one-time-only logic that runs on first
+  // visit. See src/app/dashboard/page.tsx for where these flags are read.
+  const handleReplayTour = () => {
+    localStorage.removeItem('spendxp_intro_done');
+    localStorage.removeItem('spendxp_tour_done');
+    toast({ title: 'Tour reset — taking you to your dashboard' });
+    router.push('/dashboard');
   };
 
   const handleDeleteAccount = async () => {
@@ -1025,18 +1088,28 @@ export default function ProfilePage() {
                   </p>
                   {linkEmailSent ? (
                     <div className="text-xs text-primary bg-[#E8F5EE] border border-[#A8D5BC] rounded-lg p-3 font-medium">
-                      ✓ Link invitation sent to {profile.email}. Ask your child to check their email and tap the link.
+                      ✓ Link invitation sent to {linkEmailSentTo}. Ask your child to check their email and tap the link.
                     </div>
                   ) : (
-                    <Button
-                      variant="outline"
-                      onClick={handleSendLinkEmail}
-                      disabled={linkEmailLoading}
-                      className="w-full min-h-[44px] text-sm"
-                      suppressHydrationWarning
-                    >
-                      {linkEmailLoading ? 'Sending…' : 'Send Link Invitation via Email'}
-                    </Button>
+                    <div className="flex gap-2">
+                      <Input
+                        type="email"
+                        placeholder="child@email.com"
+                        value={linkChildEmail}
+                        onChange={(e) => setLinkChildEmail(e.target.value)}
+                        className="min-h-[44px] text-sm"
+                        suppressHydrationWarning
+                      />
+                      <Button
+                        variant="outline"
+                        onClick={handleSendLinkEmail}
+                        disabled={linkEmailLoading || !linkChildEmail.trim()}
+                        className="min-h-[44px] text-sm shrink-0 px-4"
+                        suppressHydrationWarning
+                      >
+                        {linkEmailLoading ? 'Sending…' : 'Send'}
+                      </Button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -1086,6 +1159,11 @@ export default function ProfilePage() {
         </div>
 
         {/* ── Subscription management ── */}
+        {/* Extra top spacing + divider here — the quick-links grid above and
+            these two full-width buttons are all direct children of the same
+            space-y-4 container, but flat buttons stacked with no card
+            boundary read as visually cramped even at the same pixel gap. */}
+        <div className="pt-3 mt-1 border-t border-slate-100 space-y-3">
         {isPremium ? (
           <Card className="border-primary/20 bg-primary/5">
             <CardContent className="p-4 flex items-center justify-between gap-3">
@@ -1142,6 +1220,28 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
         )}
+        </div>
+
+        {/* ── Help & tour ── */}
+        <Section title="Help & Tour" icon={HelpCircle} iconColor="text-primary">
+          <div className="pt-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-black text-slate-800">Replay Welcome Tour</p>
+                <p className="text-xs text-slate-400 font-bold">See the intro slides and app walkthrough again</p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="font-bold border-2"
+                onClick={handleReplayTour}
+                suppressHydrationWarning
+              >
+                Replay
+              </Button>
+            </div>
+          </div>
+        </Section>
 
         {/* ── Delete account ── */}
         <Section title="Delete Account" icon={Trash2} iconColor="text-rose-500">

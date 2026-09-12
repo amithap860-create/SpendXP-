@@ -55,6 +55,15 @@ interface AuthContextType {
   currencyCode?: string;
   /** ISO 3166-1 alpha-2 country code (e.g. 'IN', 'US') set at onboarding. Defaults to 'IN'. */
   countryCode: string;
+  /**
+   * True when this account was created as a parent/guardian account (either
+   * via the signup checkbox or by accepting a child's invite link). Read
+   * live from the user's Firestore doc so the layout can route parents to
+   * their own dashboard instead of the kid-facing nav. Previously this was
+   * only ever written at signup and never read back anywhere, which left
+   * parent accounts with no way back to /parent after initial setup.
+   */
+  isParent: boolean;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -120,6 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [emailVerified, setEmailVerified] = useState(false);
   const [currencyCode, setCurrencyCode] = useState<string>('INR');
   const [countryCode, setCountryCode] = useState<string>('IN');
+  const [isParent, setIsParent] = useState<boolean>(false);
   // Tracks when the last verification email was sent; prevents duplicates within a session
   const lastVerifyEmailSentAt = React.useRef<number>(0);
 
@@ -132,6 +142,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Holds the Firestore onSnapshot unsubscribe so we can clean it up
     // when auth state changes (e.g. user logs out or switches accounts).
     let firestoreUnsub: (() => void) | null = null;
+    // Watchdog: Firestore's persistentLocalCache has a known failure mode
+    // (INTERNAL ASSERTION FAILED / ca9 / b815 — see firestoreSafe.ts) that can
+    // be triggered by backgrounding and foregrounding the app. When it hits,
+    // the onSnapshot listener can die silently without ever calling either
+    // callback below, which left `loading` stuck at true forever — the app
+    // would sit on the splash/loading screen indefinitely after being
+    // reopened. This timer guarantees loading resolves regardless of what
+    // Firestore's internals do, so the app always gets past the splash.
+    let loadingWatchdog: ReturnType<typeof setTimeout> | null = null;
 
     const authUnsub = onAuthStateChanged(
       auth,
@@ -141,10 +160,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           firestoreUnsub();
           firestoreUnsub = null;
         }
+        if (loadingWatchdog) {
+          clearTimeout(loadingWatchdog);
+          loadingWatchdog = null;
+        }
 
         if (firebaseUser) {
           setUser(mapFirebaseUser(firebaseUser));
           setEmailVerified(firebaseUser.emailVerified);
+
+          loadingWatchdog = setTimeout(() => {
+            console.warn('[SpendXP] Firestore user doc listener watchdog fired — forcing loading=false');
+            setLoading(false);
+          }, 7000);
 
           // Real-time listener on the user's Firestore doc.
           // This fires immediately with the current value, then again on every change
@@ -152,6 +180,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           firestoreUnsub = onSnapshot(
             doc(db, 'users', firebaseUser.uid),
             (snap) => {
+              if (loadingWatchdog) {
+                clearTimeout(loadingWatchdog);
+                loadingWatchdog = null;
+              }
               if (snap.exists()) {
                 const data = snap.data();
 
@@ -164,6 +196,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 // src/data/countryFinance.ts — separate from currencyCode because
                 // Sudan shares USD with the US but is still its own country.
                 if (data?.countryCode) setCountryCode(data.countryCode);
+
+                // Parent/guardian accounts get a different nav (see layout.tsx) —
+                // this is the only place that flag is read back after signup.
+                setIsParent(!!data?.isParent);
 
                 // Update premium status and subscription expiry
                 let subEndIso: string | null = null;
@@ -184,6 +220,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             },
             (err) => {
               console.warn('[SpendXP] Firestore user doc listener error:', err);
+              if (loadingWatchdog) {
+                clearTimeout(loadingWatchdog);
+                loadingWatchdog = null;
+              }
               setLoading(false);
             }
           );
@@ -192,11 +232,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setEmailVerified(false);
           setCurrencyCode('INR');
           setCountryCode('IN');
+          setIsParent(false);
           setLoading(false);
         }
       },
       (authError) => {
         console.error('[SpendXP] onAuthStateChanged error:', authError);
+        if (loadingWatchdog) {
+          clearTimeout(loadingWatchdog);
+          loadingWatchdog = null;
+        }
         setUser(null);
         setLoading(false);
       }
@@ -205,6 +250,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       authUnsub();
       if (firestoreUnsub) firestoreUnsub();
+      if (loadingWatchdog) clearTimeout(loadingWatchdog);
     };
   }, []);
 
@@ -397,6 +443,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         emailVerified,
         currencyCode,
         countryCode,
+        isParent,
       }}
     >
       {children}

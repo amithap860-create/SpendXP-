@@ -11,6 +11,7 @@ import { LearnMoreLink } from '@/components/LearnMoreLink';
 import { useAuthContext } from '@/context/AuthContext';
 import { db, safeUpdateDoc } from '@/firebase';
 import { doc, increment } from 'firebase/firestore';
+import { useCurrency } from '@/hooks/useCurrency';
 
 interface LessonViewerProps {
   lesson: Lesson;
@@ -21,6 +22,7 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
   const { ageGroup } = useAgeAdapt();
   const { completeTask } = useUser();
   const { user } = useAuthContext();
+  const { activeCurrency } = useCurrency();
   // Steps: 0..cards.length-1 = lesson cards, cards.length = briefs, cards.length+1 = quiz
   const BRIEF_STEP = lesson.cards.length;
   const QUIZ_STEP = lesson.cards.length + 1;
@@ -53,7 +55,10 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
   };
 
   const handleFinish = async () => {
-    completeTask(`lesson-${lesson.id}`);
+    // Pass the lesson's real topic (budgeting/saving/investing/credit/
+    // taxes/spending) so it correctly feeds the Financial Knowledge radar
+    // chart on the home page — see the fix note in store.tsx's completeTask.
+    completeTask(`lesson-${lesson.id}`, lesson.topic);
     // Award card XP always; the +20 quiz bonus only fires if the quiz was
     // actually answered correctly — otherwise a wrong answer pays the same
     // as a right one, which defeats the point of asking (xpConfig.ts gap #1).
@@ -176,6 +181,19 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
         </div>
         <div className="w-10" />
       </header>
+
+      {/* STOPGAP (2026-09): lesson content in lessons.ts hardcodes rupee
+          amounts (and India-only units like "lakh"/"crore") directly into
+          prose, so it doesn't actually convert to the user's selected
+          currency. A proper fix requires re-templating all lesson content —
+          flagged as a bigger follow-up. For now, tell non-INR users the
+          numbers are illustrative rather than silently showing wrong-currency
+          amounts as if they were correct. */}
+      {activeCurrency.code !== 'INR' && (
+        <div className="px-4 py-2 bg-amber-50 border-b border-amber-200 text-amber-800 text-xs font-bold text-center">
+          Amounts in this lesson are illustrative examples in ₹ (INR) and haven't been converted to {activeCurrency.code} yet.
+        </div>
+      )}
 
       <main className="flex-1 overflow-y-auto relative bg-slate-50 p-4 md:p-8 flex items-center justify-center">
         <div className="max-w-2xl w-full">

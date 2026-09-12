@@ -11,6 +11,7 @@ import {
   onNetworkChange,
   onAppResume,
   onAndroidBack,
+  disableServiceWorkerIfNative,
 } from '@/lib/native';
 
 interface UseNativeInitOptions {
@@ -37,6 +38,11 @@ export function useNativeInit({
   onPushMessage,
   onResume,
 }: UseNativeInitOptions) {
+  // ── Service worker teardown (must run first — see native.ts) ───────────
+  useEffect(() => {
+    disableServiceWorkerIfNative();
+  }, []);
+
   // ── Status bar + splash ────────────────────────────────────────────────
   useEffect(() => {
     if (!isNative()) return;

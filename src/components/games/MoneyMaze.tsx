@@ -13,6 +13,15 @@ import {
   ArrowDownUp, Trophy, RefreshCcw, Sparkles, Info, CheckCircle2, X, BookOpen, Target
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useGameTutorial, GameTutorialModal, HowToPlayButton } from '@/components/games/GameTutorial';
+
+const MONEY_MAZE_TUTORIAL_STEPS = [
+  'Debt Domino: drag the debts into your preferred payoff order, most urgent at the top.',
+  'Try to match a real strategy — Avalanche pays the highest interest rate first, Snowball pays the smallest balance first.',
+  'Portfolio Builder: answer 5 quick questions about your risk comfort and goals instead.',
+  'Based on your answers, you\'ll get a recommended split across cash, bonds, stocks and property.',
+  'Neither mode has a timer — take your time and think it through before committing.',
+];
 
 type GameMode = 'DEBT' | 'PORTFOLIO';
 
@@ -201,6 +210,7 @@ function getRiskProfile(total: number): { label: string; recommended: Allocation
 
 export function MoneyMaze({ onExit }: { onExit: () => void }) {
   const { ageGroup } = useAgeAdapt();
+  const tutorial = useGameTutorial('moneyMaze');
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
 
   const gameConfig = useMemo(() => ({
@@ -355,8 +365,10 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
 
   if (gameState === 'IDLE' && !selectedMode) {
     return (
+      <>
       <div className="max-w-4xl mx-auto space-y-8">
-        <header className="text-center">
+        <header className="text-center relative">
+          <HowToPlayButton onClick={tutorial.reopen} position="right" variant="onLight" />
           <Puzzle className="h-16 w-16 text-primary mx-auto mb-4" />
           <h2 className="text-4xl font-black text-primary mb-2">Money Maze</h2>
           <p className="text-muted-foreground text-lg">Choose a strategy puzzle to master your finances.</p>
@@ -382,6 +394,13 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
           </Card>
         </div>
       </div>
+      <GameTutorialModal
+        open={tutorial.open}
+        onClose={tutorial.dismiss}
+        title="Money Maze"
+        steps={MONEY_MAZE_TUTORIAL_STEPS}
+      />
+      </>
     );
   }
 

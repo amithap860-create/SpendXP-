@@ -14,6 +14,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { collection, query, where, getDocs, doc, serverTimestamp, writeBatch, arrayUnion } from 'firebase/firestore';
 import { db } from '@/firebase';
 import { auth } from '@/lib/firebase';
+import { isNative } from '@/lib/native';
 
 // ── Age helpers ──────────────────────────────────────────────────────────────
 const CURRENT_YEAR = new Date().getFullYear();
@@ -202,7 +203,12 @@ function SignupContent() {
     }
 
     // 13+ — normal flow
-    const res = await signUpWithEmail(email, password, displayName, isParent);
+    // Defensive re-check: the checkbox above only renders for age 18+, but if
+    // someone changed their birth year after checking it (e.g. went back a
+    // step), isParent state could still be stale — never trust the checkbox
+    // value alone for something that grants parent-dashboard access.
+    const effectiveIsParent = isParent && age >= 18;
+    const res = await signUpWithEmail(email, password, displayName, effectiveIsParent);
 
     if (res.success) {
       const newUid = (res as any).userId as string | undefined;
@@ -226,7 +232,7 @@ function SignupContent() {
       }
 
       // Normal redirect
-      router.push(isParent ? '/parent/setup' : `/onboarding?birthYear=${parseInt(birthYear, 10)}`);
+      router.push(effectiveIsParent ? '/parent/setup' : `/onboarding?birthYear=${parseInt(birthYear, 10)}`);
       return;
     }
 
@@ -352,7 +358,12 @@ function SignupContent() {
               <CardDescription className="text-base">Create your account to start earning.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-5 pt-4">
-              {!isUnder13 && (
+              {/* Google's OAuth policy blocks signInWithPopup inside an embedded
+                  WebView (which is what the Capacitor app is), producing
+                  "missing initial state" errors. Hiding this on native until a
+                  proper native Google Sign-In plugin is added — email/password
+                  below is unaffected and works fine in the app. */}
+              {!isUnder13 && !isNative() && (
                 <>
                   <Button
                     onClick={handleGoogleSignUp}
@@ -415,7 +426,12 @@ function SignupContent() {
                   </div>
                 </div>
 
-                {!isUnder13 && (
+                {/* NOTE (2026-08-25): previously shown to anyone 13+, meaning a
+                    13-17 year old could self-declare as a parent with one tap
+                    and land on the full parent dashboard. Now requires a
+                    verified birth year showing 18+, matching the same age
+                    floor added to the Profile page's parent toggle. */}
+                {!isUnder13 && age !== null && age >= 18 && (
                   <div className="flex items-center space-x-2 pt-1">
                     <Checkbox
                       id="isParent"

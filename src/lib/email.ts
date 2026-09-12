@@ -151,6 +151,24 @@ export class EmailService {
           </div>
         </body>
         </html>
+      `,
+      text: `
+        Login Detected
+
+        Hi ${displayName},
+
+        We detected a new login to your SpendXP account:
+        Time: ${loginTime.toLocaleString()}
+        IP Address: ${ip}
+        Location: ${location}
+
+        If this was you, no action is needed.
+
+        If this wasn't you, please secure your account: change your password, review your account activity, and contact support if needed.
+
+        ${process.env.NEXT_PUBLIC_APP_URL}/profile
+
+        © 2024 SpendXP. All rights reserved.
       `
     });
   }
@@ -202,6 +220,21 @@ export class EmailService {
           </div>
         </body>
         </html>
+      `,
+      text: `
+        Password Reset Request
+
+        Hi ${displayName},
+
+        We received a request to reset your SpendXP password.
+
+        Reset it here: ${resetUrl}
+
+        This link expires in 1 hour.
+
+        If you didn't request a password reset, you can safely ignore this email. Your account remains secure.
+
+        © 2024 SpendXP. All rights reserved.
       `
     });
   }
@@ -247,6 +280,19 @@ export class EmailService {
           </div>
         </body>
         </html>
+      `,
+      text: `
+        Password Changed
+
+        Hi ${displayName},
+
+        Your SpendXP password has been successfully changed.
+
+        If this was you, no action is needed — log in with your new password at ${process.env.NEXT_PUBLIC_APP_URL}/login
+
+        If this wasn't you, please contact support immediately as your account may have been compromised.
+
+        © 2024 SpendXP. All rights reserved.
       `
     });
   }
@@ -262,7 +308,7 @@ export class EmailService {
     const { parentEmail, childName, childEmail, approveUrl, expiresInHours } = opts;
     return this.sendEmail({
       to: parentEmail,
-      subject: `Action Required: ${childName} wants to join SpendXP`,
+      subject: `${childName} wants to join SpendXP — your approval needed`,
       html: `
         <!DOCTYPE html>
         <html>

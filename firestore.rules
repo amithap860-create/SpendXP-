@@ -30,7 +30,27 @@ service cloud.firestore {
 
     // User documents
     match /users/{uid} {
-      allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
+      // NOTE (2026-08-25): this top-level read rule must NOT go through
+      // isParentOf(uid), even though that's what every subcollection below
+      // uses. isParentOf() does get(/users/$(uid)) — for THIS match block
+      // uid IS the doc already being evaluated (resource), so that get() is
+      // a redundant self-lookup. That redundant get() is exactly what broke
+      // the parent dashboard: it queries `collection(db,'users').where(
+      // 'parentUid','==',parentUid)` to find a parent's children, which is a
+      // Firestore `list` request, not a `get`. For `list` requests, Firestore
+      // can only prove a rule safe using resource.data of the very document
+      // being tested (or the query's own filters) — it will NOT resolve
+      // per-document get() calls for an unbounded collection scan, so the
+      // whole list request was denied outright ("Missing or insufficient
+      // permissions", confirmed via browser console on spendxp.vercel.app/parent).
+      // Fix: check resource.data.parentUid directly. No extra read needed —
+      // resource already IS this document, and this is exactly the field the
+      // query filters on, so Firestore can now verify the rule from the query
+      // itself.
+      allow read: if isOwner(uid)
+                  || (request.auth != null && resource.data.parentUid == request.auth.uid)
+                  || isAdmin()
+                  || isStudioPreview();
 
       // Create: owner can create their own doc, but cannot set protected fields
       allow create: if (isOwner(uid) && !hasProtectedFields(request.resource.data))

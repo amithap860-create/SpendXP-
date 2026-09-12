@@ -70,3 +70,5 @@ android/
 spendxp-release.jks
 keystore.properties
 android/keystore.properties
+
+.vercel

@@ -17,7 +17,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { safeUpdateDoc } from '@/lib/firestoreSafe';
-import { db } from '@/firebase';
+import { db, safeGetDoc } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
 export default function ParentSetup() {
@@ -116,8 +116,31 @@ export default function ParentSetup() {
     }
   };
 
+  // NOTE (2026-08-25): this wizard is reachable by URL by any signed-in
+  // account, including a child's — there was nothing stopping a minor from
+  // clicking through it and landing here with isParent set to true, same
+  // underlying gap as the Profile page's parent toggle and the signup
+  // checkbox (both now locked to 18+). Re-checking here too, since this is
+  // the actual write that grants parent-dashboard access and a determined
+  // user could reach this page directly without going through the others.
   const handleComplete = async () => {
     if (!user) return;
+    const userData = await safeGetDoc(doc(db, 'users', user.uid));
+    const birthYear = (userData as any)?.birthYear ?? null;
+    const age = birthYear ? new Date().getFullYear() - birthYear : null;
+
+    if (age === null || age < 18) {
+      toast({
+        title: 'Parent mode requires a verified age of 18+',
+        description: birthYear
+          ? "Your account's birth year shows you're under 18."
+          : 'Set your birth year in Profile first, then try again.',
+        variant: 'destructive',
+      });
+      router.push('/profile');
+      return;
+    }
+
     const parentRef = doc(db, 'users', user.uid);
     await safeUpdateDoc(parentRef, {
       notificationPrefs: notifs,

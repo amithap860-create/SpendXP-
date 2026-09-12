@@ -45,15 +45,23 @@ export function middleware(request: NextRequest) {
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  // NOTE (2026-08-24): this middleware's CSP is the one that actually reaches
+  // the browser — it runs after next.config.ts's headers() and its values win
+  // for any header both places set. next.config.ts has its own CSP that
+  // includes checkout.razorpay.com, but since THIS is the one actually
+  // served, that addition never took effect — Razorpay's checkout.js has been
+  // silently CSP-blocked since it was first integrated. Adding it here, the
+  // place that matters. Keep this and next.config.ts's CSP in sync going
+  // forward, or better, remove next.config.ts's version to avoid a repeat.
   response.headers.set('Content-Security-Policy',
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com https://apis.google.com",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://apis.google.com https://checkout.razorpay.com",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://checkout.razorpay.com",
       "img-src 'self' data: https:",
       "font-src 'self' data: https://fonts.gstatic.com",
       "connect-src 'self' https: wss:",
-      "frame-src 'self' https://www.google.com https://*.firebaseapp.com",
+      "frame-src 'self' https://www.google.com https://*.firebaseapp.com https://checkout.razorpay.com https://api.razorpay.com",
       "frame-ancestors 'none'",
       "worker-src 'self' blob:",
     ].join('; ')

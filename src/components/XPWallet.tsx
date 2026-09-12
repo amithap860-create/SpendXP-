@@ -7,9 +7,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
-  Trophy, 
-  Flame, 
-  Wallet, 
+  Trophy,
+  Wallet,
   ShieldCheck, 
   TrendingUp, 
   Calculator, 
@@ -46,26 +45,30 @@ const RANK_ICONS: Record<string, React.ElementType> = {
   legend:     Trophy,
 };
 
+// NOTE (2026-09): this used to also list 9 badges with hyphenated ids
+// ('first-win', 'streak-5', 'budget-master', 'debt-slayer', 'stock-picker',
+// 'tax-whiz', 'daily-challenger', 'speed-demon', 'perfect-round') that
+// nothing in the codebase ever awards — no awardBadge() call anywhere uses
+// those ids, only the underscore ids below (which come from BADGES in
+// badgeService.ts). Those 9 were permanently-locked dead tiles by
+// construction, not a bug a user could ever fix by playing more. Removed
+// until real trigger conditions are designed and built for them.
+// Also: 'budget-master' (hyphen, fake) and 'budget_master' (underscore,
+// real — the actual earnable one) were BOTH present with different titles
+// ("Budget Master" on the fake one, "Strategic Saver" on the real one) —
+// consolidated onto the real id with the clearer title.
 const BADGE_MAP = [
-  { id: 'first-win', title: 'First Win', icon: Trophy, color: 'text-[#2E7D5A]' },
-  { id: 'streak-5', title: '5-Game Streak', icon: Flame, color: 'text-[#4EA07A]' },
-  { id: 'budget-master', title: 'Budget Master', icon: Wallet, color: 'text-primary' },
-  { id: 'debt-slayer', title: 'Debt Slayer', icon: ShieldCheck, color: 'text-blue-500' },
-  { id: 'stock-picker', title: 'Stock Picker', icon: TrendingUp, color: 'text-primary' },
-  { id: 'tax-whiz', title: 'Tax Whiz', icon: Calculator, color: 'text-rose-500' },
-  { id: 'daily-challenger', title: 'Daily Challenger', icon: Calendar, color: 'text-primary' },
-  { id: 'speed-demon', title: 'Speed Demon', icon: Zap, color: 'text-[#2E7D5A]' },
-  { id: 'perfect-round', title: 'Perfect Round', icon: Star, color: 'text-primary' },
   { id: 'emergency_fund_builder', title: 'Safety First', icon: ShieldCheck, color: 'text-primary' },
   { id: 'debt_destroyer', title: 'Debt Destroyer', icon: Zap, color: 'text-rose-500' },
   { id: 'smart_investor', title: 'Smart Investor', icon: TrendingUp, color: 'text-blue-500' },
   { id: 'scam_spotter', title: 'Scam Spotter', icon: AlertTriangle, color: 'text-[#2E7D5A]' },
-  { id: 'budget_master', title: 'Strategic Saver', icon: Wallet, color: 'text-primary' },
+  { id: 'budget_master', title: 'Budget Master', icon: Wallet, color: 'text-primary' },
   { id: 'tool_explorer', title: 'Tool Explorer', icon: Wrench, color: 'text-slate-600' },
   { id: 'goal_getter', title: 'Goal Getter', icon: Target, color: 'text-primary' },
   { id: 'financially_stable', title: 'Financially Stable', icon: Heart, color: 'text-rose-400' },
   { id: 'money_master', title: 'Money Master', icon: Trophy, color: 'text-[#2E7D5A]' },
   { id: 'scholar', title: 'Finance Scholar', icon: Star, color: 'text-primary' },
+  { id: 'framework_master', title: 'Framework Master', icon: Calculator, color: 'text-rose-500' },
 ];
 
 export function XPWallet() {

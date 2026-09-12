@@ -23,11 +23,16 @@ const config: CapacitorConfig = {
     url: 'https://spendxp.vercel.app',
     cleartext: false,
     androidScheme: 'https',
-    // Allow the native bridge to work across the remote domain
+    // Allow the native bridge to work across the remote domain.
+    // *.razorpay.com added 2026-08-24 — the Razorpay checkout.js script and
+    // its follow-up API calls were being blocked inside the native WebView
+    // (worked fine in a normal mobile browser, which has no such allowlist,
+    // confirming this was the cause rather than a network/DNS block).
     allowNavigation: [
       'spendxp.vercel.app',
       '*.firebaseapp.com',
       '*.googleapis.com',
+      '*.razorpay.com',
     ],
   },
 

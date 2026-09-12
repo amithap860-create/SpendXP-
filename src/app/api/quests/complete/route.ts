@@ -8,7 +8,7 @@
  *  • Quest progress record (idempotent — re-submitting same questId is a no-op)
  *
  * Request body:
- *   { questId: string, xpEarned: number, optimalRate: number, healthDelta: number }
+ *   { questId: string, xpEarned: number, optimalRate: number, healthDelta: number, walletDelta: number }
  *
  * Response:
  *   200 { success: true, xpAwarded, streak, questsToday, dailyLimitReached }
@@ -73,6 +73,12 @@ export async function POST(request: NextRequest) {
     const rawXP: number = Number(body.xpEarned) || 0;
     const optimalRate: number = Math.min(1, Math.max(0, Number(body.optimalRate) || 0));
     const healthDelta: number = Math.min(30, Math.max(-30, Number(body.healthDelta) || 0));
+    // FIX (2026-09): walletDelta was computed client-side (useQuestEngine.ts)
+    // but never sent to or persisted by this route — progression.walletBalance
+    // (shown as "Saved Virtually" on the dashboard) had no write path at all.
+    // Clamped generously (quests.ts's largest single-choice value is 50,000)
+    // to allow legitimate high-value quests while bounding tampering.
+    const walletDelta: number = Math.min(200000, Math.max(-200000, Number(body.walletDelta) || 0));
 
     if (!questId) {
       return NextResponse.json({ error: 'Missing questId' }, { status: 400 });
@@ -166,6 +172,10 @@ export async function POST(request: NextRequest) {
       const currentHealth: number = statsData.financialHealth ?? 50;
       const newHealth = Math.min(100, Math.max(0, currentHealth + healthDelta));
 
+      // ── Virtual wallet balance (floored at 0 — no negative savings) ───────
+      const currentWallet: number = statsData.walletBalance ?? 0;
+      const newWalletBalance = Math.max(0, currentWallet + walletDelta);
+
       // ── Write quest progress ──────────────────────────────────────────────
       tx.set(questProgressRef, {
         completed: true,
@@ -186,6 +196,7 @@ export async function POST(request: NextRequest) {
           longestStreak,
           lastActivityDate: FieldValue.serverTimestamp(),
           financialHealth: newHealth,
+          walletBalance: newWalletBalance,
         },
         { merge: true }
       );

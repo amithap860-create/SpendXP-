@@ -76,6 +76,42 @@ export async function initStatusBar(): Promise<void> {
   } catch { /* ignore */ }
 }
 
+// ─── Service worker (native only) ─────────────────────────────────────────
+
+/**
+ * Strips out any registered service worker + caches when running inside the
+ * native shell. The PWA service worker (next-pwa/Workbox) exists to help
+ * browser-installed PWA users load faster offline — it provides no benefit
+ * inside Capacitor, which already fetches fresh content from Vercel on every
+ * load via the remote-URL architecture. Across several rounds of debugging,
+ * the service worker was consistently the actual cause of "app won't
+ * reopen" bugs (stale cached shells, hung navigation requests after
+ * skipWaiting/clientsClaim races, corrupted persistent cache). Tuning its
+ * cache lifetimes only reduced how often it happened — it didn't stop it.
+ *
+ * Call this on every successful native app load so that even if a service
+ * worker gets registered, it's torn back out before the NEXT reopen gives
+ * it a chance to intercept and hang that load.
+ */
+export async function disableServiceWorkerIfNative(): Promise<void> {
+  if (!isNative()) return;
+  if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
+  try {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(registrations.map((r) => r.unregister()));
+  } catch {
+    // Best-effort — don't block app load if this fails
+  }
+  try {
+    if (typeof caches !== 'undefined') {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((k) => caches.delete(k)));
+    }
+  } catch {
+    // Best-effort
+  }
+}
+
 // ─── Splash screen ─────────────────────────────────────────────────────────
 
 /** Call once the app is fully loaded and hydrated. */

@@ -72,9 +72,17 @@ export function useDoc<T = any>(
     setIsLoading(true);
     setError(null);
 
+    // Watchdog — see identical comment in use-collection.tsx. Same
+    // persistentLocalCache failure mode can kill this listener silently.
+    const watchdog = setTimeout(() => {
+      console.warn('[SpendXP] useDoc watchdog fired — forcing isLoading=false');
+      setIsLoading(false);
+    }, 8000);
+
     const unsubscribe = onSnapshot(
       memoizedDocRef,
       (snapshot: DocumentSnapshot<DocumentData>) => {
+        clearTimeout(watchdog);
         if (snapshot.exists()) {
           setData({ ...(snapshot.data() as T), id: snapshot.id });
         } else {
@@ -85,6 +93,7 @@ export function useDoc<T = any>(
         setIsLoading(false);
       },
       (error: FirestoreError) => {
+        clearTimeout(watchdog);
         const contextualError = new FirestorePermissionError({
           operation: 'get',
           path: memoizedDocRef.path,
@@ -99,7 +108,10 @@ export function useDoc<T = any>(
       }
     );
 
-    return () => unsubscribe();
+    return () => {
+      clearTimeout(watchdog);
+      unsubscribe();
+    };
   }, [memoizedDocRef, isAuthReady]); // Re-run when auth state settles
 
   return { data, isLoading, error };

@@ -30,7 +30,6 @@ import {
   getNextISTMidnight,
   formatRelativeTime
 } from '@/lib/dateHelpers';
-import { getCurrentStreak } from '@/lib/dailyChallenge';
 import { lessons } from '@/data/lessons';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Scale, Award, BookOpen, ShieldCheck, AlertTriangle, Flame, Clock } from 'lucide-react';
@@ -165,9 +164,16 @@ export default function DashboardPage() {
         );
         setDailyParticipantCount(dailyDoc?.participantCount || 0);
 
-        // Fetch real streak
-        const streak = await getCurrentStreak(uid);
-        setCurrentStreak(streak);
+        // FIX (2026-09): this used to call getCurrentStreak() from
+        // src/lib/dailyChallenge.ts, which reads a `dailyChallenges/{uid}_
+        // {date}` doc. That doc is only ever created by OnboardingOverlay.tsx
+        // (a one-time onboarding step) — nothing in normal gameplay (games,
+        // lessons, quests) ever writes to it again, so this always returned
+        // 0 for everyone past their first day. The real, actively-maintained
+        // streak lives on progression.currentStreak (updated transactionally
+        // by /api/quests/complete on each quest completion) — already
+        // fetched above via getProgression(), no extra request needed.
+        setCurrentStreak(progData.currentStreak || 0);
 
         const rankSnap = await getDocs(query(
           collection(db, 'dailyChallenges', istDateKey, 'scores'),
@@ -480,7 +486,13 @@ export default function DashboardPage() {
             { label: 'Day Streak', val: currentStreak, icon: true },
             { label: 'Games Played', val: progression?.totalGamesPlayed || 0 },
             { label: 'Saved Virtually', val: formatValue(progression?.walletBalance || 0), smallVal: true },
-            { label: 'Lessons Done', val: `${completedLessonsCount} / 8` },
+            {
+              // FIX (2026-09): hardcoded "/ 8" — lessons.ts now has 12
+              // lessons (was 8 when this was written), so a user who'd done
+              // 9 lessons saw the nonsensical "9 / 8". Uses lessons.length
+              // so it can't drift out of sync again.
+              label: 'Lessons Done', val: `${completedLessonsCount} / ${lessons.length}`
+            },
           ].map((stat, i) => (
             <div key={i} className="bg-white p-3 md:p-5 rounded-2xl border-[0.5px] border-slate-200 shadow-sm text-center space-y-1">
               <div className="flex items-center justify-center gap-2">

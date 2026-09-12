@@ -15,6 +15,7 @@ import { MiniCalc } from '@/components/MiniCalc';
 import { validateDisplayName } from '@/firebase';
 import { cn } from '@/lib/utils';
 import { fireConfettiGoalReached } from '@/lib/confetti';
+import { awardBadge } from '@/lib/badgeService';
 
 type GoalShape = 'circle' | 'square' | 'triangle' | 'diamond' | 'hexagon' | 'pentagon' | 'star' | 'bolt';
 
@@ -73,6 +74,11 @@ export function SavingsGoalTracker() {
         safeUpdateDoc(doc(db, 'users', uid, 'savingsGoals', goal.id), {
           isCompleted: true
         });
+        // FIX (2026-09): 'goal_getter' was a defined, real badge in
+        // badgeService.ts's BADGES array, but nothing anywhere ever called
+        // awardBadge() for it — this is the one place a goal actually gets
+        // marked reached, so it's the right spot to award it.
+        awardBadge(uid, 'goal_getter').catch(() => {});
       }
     });
   }, [goals, uid]);

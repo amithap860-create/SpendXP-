@@ -8,7 +8,7 @@ import { useAuthContext } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { db } from '@/firebase';
-import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 // ── Razorpay type declaration (loaded via CDN script) ────────────────────────
 declare global {
@@ -84,15 +84,33 @@ function FeatureCell({ value }: { value: string | boolean }) {
 }
 
 // ── Load Razorpay checkout.js once ──────────────────────────────────────────
-function loadRazorpayScript(): Promise<boolean> {
+// Previously this gave up after a single failed script load, showing "Could
+// not load payment module" on any transient network blip — a real risk for
+// a payment flow. Now retries a couple of times with a short delay before
+// actually giving up.
+function loadRazorpayScriptOnce(): Promise<boolean> {
   return new Promise((resolve) => {
     if (window.Razorpay) { resolve(true); return; }
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
     script.onload  = () => resolve(true);
-    script.onerror = () => resolve(false);
+    script.onerror = () => {
+      script.remove();
+      resolve(false);
+    };
     document.body.appendChild(script);
   });
+}
+
+async function loadRazorpayScript(maxAttempts = 3): Promise<boolean> {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const ok = await loadRazorpayScriptOnce();
+    if (ok) return true;
+    if (attempt < maxAttempts) {
+      await new Promise((r) => setTimeout(r, 800 * attempt)); // 800ms, then 1600ms
+    }
+  }
+  return false;
 }
 
 // ── Currency helpers ─────────────────────────────────────────────────────────
@@ -137,16 +155,20 @@ export default function UpgradePage() {
     }
     setWaitlistLoading(true);
     try {
-      // Deduplicate by email
-      const existing = await getDocs(query(collection(db, 'waitlist'), where('email', '==', email)));
-      if (existing.empty) {
-        await addDoc(collection(db, 'waitlist'), {
-          email,
-          uid: user?.uid ?? null,
-          feature: 'group_play',
-          createdAt: serverTimestamp(),
-        });
-      }
+      // NOTE: this used to query the `waitlist` collection first to dedupe
+      // by email, but firestore.rules only allows admins to READ that
+      // collection (`allow read: if isAdmin()`) — every regular user's
+      // getDocs() call was hitting permission-denied and landing in the
+      // catch block below, which is why this button never actually worked.
+      // `create` is allowed for any signed-in user, so just write directly;
+      // an occasional duplicate email entry is harmless since only admins
+      // ever read this list anyway.
+      await addDoc(collection(db, 'waitlist'), {
+        email,
+        uid: user?.uid ?? null,
+        feature: 'group_play',
+        createdAt: serverTimestamp(),
+      });
       setWaitlistDone(true);
     } catch {
       toast({ title: 'Something went wrong', description: 'Please try again.', variant: 'destructive' });

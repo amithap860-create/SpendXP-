@@ -1,13 +1,15 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { Quest } from '@/data/quests';
+import { Quest, quests } from '@/data/quests';
 import { AgeGroup } from '@/lib/ageAdapt';
 import { useAuthContext } from '@/context/AuthContext';
 import { updateLeaderboardEntry } from '@/lib/progressionService';
-import { checkAndAwardQuestBadges } from '@/lib/badgeService';
+import { checkAndAwardQuestBadges, awardBadge } from '@/lib/badgeService';
 import { cancelStreakReminder } from '@/lib/native';
 import { trackQuestCompleted } from '@/lib/analytics';
+import { db } from '@/lib/firebase';
+import { collection, getDocs } from 'firebase/firestore';
 
 export type QuestState = {
   status: 'INTRO' | 'IN_PROGRESS' | 'COMPLETE' | 'LIMIT_REACHED';
@@ -134,6 +136,13 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
               xpEarned: xpToAward,
               optimalRate,
               healthDelta: nextState.totalHealthDelta,
+              // FIX (2026-09): totalWalletDelta was computed here the whole
+              // time but never actually sent to the server — the "Saved
+              // Virtually" stat on the dashboard (progression.walletBalance)
+              // had no write path anywhere in the codebase, so it always
+              // showed ₹0 for every user no matter how many quests they
+              // completed.
+              walletDelta: nextState.totalWalletDelta,
             }),
           });
 
@@ -172,6 +181,24 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
             await checkAndAwardQuestBadges(uid, quest.id, optimalRate).catch(
               () => {}
             );
+            // FIX (2026-09): 'money_master' ("Completed all 6 quests") was
+            // defined in badgeService.ts's BADGES array but nothing ever
+            // checked for it — there was no invocation anywhere in the
+            // codebase. (Its description is also stale: quests.ts now has
+            // 20 quests, not 6 — using quests.length here instead of a
+            // hardcoded number so it stays correct as quests are added.)
+            // Counts distinct completed quests via the questProgress
+            // subcollection each API route already writes to per quest.
+            (async () => {
+              try {
+                const progressSnap = await getDocs(collection(db, 'users', uid, 'questProgress'));
+                if (progressSnap.size >= quests.length) {
+                  await awardBadge(uid, 'money_master');
+                }
+              } catch {
+                // non-critical — skip silently
+              }
+            })();
             await updateLeaderboardEntry(uid, user.displayName || 'Strategist').catch(
               () => {}
             );

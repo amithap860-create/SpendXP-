@@ -1,14 +1,24 @@
 import type { NextConfig } from 'next';
 import withPWAInit from '@ducanh2912/next-pwa';
 
+// PWA/service worker fully disabled as of 2026-08-24. Across one debugging
+// session it was traced as the root cause of: the native app failing to
+// reopen, currency preferences appearing stuck after a deploy (stale cached
+// JS), and a client-side crash on /profile caused by a Workbox "no-response"
+// error on the web build. Its only benefit was letting someone install
+// spendxp.vercel.app as an offline-capable browser PWA — not a real
+// distribution channel for this app (Play Store / App Store are). Native
+// already had the service worker torn out separately in src/lib/native.ts
+// (disableServiceWorkerIfNative) as a safety net for existing installs;
+// this stops a new one from ever being generated again, for web or native.
 const withPWA = withPWAInit({
   dest: 'public',
-  cacheOnFrontEndNav: true,
-  aggressiveFrontEndNavCaching: true,
-  reloadOnOnline: true,
-  disable: process.env.NODE_ENV === 'development',
+  disable: true,
   workboxOptions: {
     disableDevLogs: true,
+    skipWaiting: true,
+    clientsClaim: true,
+    cleanupOutdatedCaches: true,
     // Cache strategies for different route types
     runtimeCaching: [
       // Google Fonts
@@ -30,17 +40,22 @@ const withPWA = withPWAInit({
           expiration: { maxEntries: 32, maxAgeSeconds: 24 * 60 * 60 },
         },
       },
-      // App pages — NetworkFirst with offline fallback (domain-agnostic)
+      // App pages — NetworkFirst with a short cache lifetime. This is
+      // intentionally short (1 hour, not 24) so a phone that was offline or
+      // slow when it reopened the app falls back to a recent shell, not a
+      // build that's a day (or several deploys) old.
       {
         urlPattern: ({ url }: { url: URL }) => url.pathname.startsWith('/') && !url.pathname.startsWith('/api/'),
         handler: 'NetworkFirst',
         options: {
           cacheName: 'pages',
           networkTimeoutSeconds: 10,
-          expiration: { maxEntries: 32, maxAgeSeconds: 24 * 60 * 60 },
+          expiration: { maxEntries: 32, maxAgeSeconds: 60 * 60 },
         },
       },
-      // Static assets (JS/CSS chunks) — StaleWhileRevalidate
+      // Static assets (JS/CSS chunks) — StaleWhileRevalidate. Safe to keep
+      // long-lived since Next.js content-hashes these filenames; a new
+      // deploy produces new filenames rather than overwriting old ones.
       {
         urlPattern: /\/_next\/static\/.*/i,
         handler: 'CacheFirst',
@@ -71,6 +86,11 @@ const securityHeaders = [
     key: 'Permissions-Policy',
     value: 'camera=(), microphone=(), geolocation=(), usb=(), interest-cohort=()',
   },
+  // NOTE: src/middleware.ts sets its OWN Content-Security-Policy on every
+  // request, and its value is what the browser actually receives — this one
+  // gets silently overridden for page routes. Discovered 2026-08-24 after
+  // this CSP's Razorpay allowance never actually took effect. Keep both in
+  // sync if either changes, or better, consolidate into one source later.
   {
     key: 'Content-Security-Policy',
     value: [

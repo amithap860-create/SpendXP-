@@ -1,10 +1,26 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { AgeGroup } from '@/lib/ageAdapt';
 import { conceptBreakdowns } from '@/data/conceptBreakdowns';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useCurrency } from '@/hooks/useCurrency';
+
+// FIX (2026-09): conceptBreakdowns.ts content is authored inconsistently —
+// the 12 core lesson-tied entries (budgeting-basics, emergency-fund, etc.)
+// are written almost entirely in hardcoded $ amounts (real-world US/global
+// stats), while the 14 quest-specific entries (birthday-loot onward) are
+// written in ₹. Neither currency was ever converted for display — an
+// Indian user (default INR) was reading raw "$400 phone", "$3,500 offer
+// letter" text, and a US-currency user was reading raw "₹500" text. This
+// is exactly the "currencies are inconsistent" bug reported.
+// Rather than hand-rewriting ~70 dollar figures across the file (real risk
+// of breaking the internal math in sentences like "$5,000 trip could be
+// $50,000" if done as a rushed find/replace), both symbols are normalized
+// at render time using the same fixed educational rate the rest of the app
+// already uses (RATES_FROM_INR in formatCurrency.ts, ~₹83.33 = $1).
+const USD_TO_INR_RATE = 1 / 0.012; // mirrors RATES_FROM_INR.USD in lib/formatCurrency.ts
 
 interface ConceptBreakdownProps {
   breakdownId: string;
@@ -22,15 +38,33 @@ export function ConceptBreakdown({
   activityType
 }: ConceptBreakdownProps) {
   const breakdown = conceptBreakdowns.find(b => b.id === breakdownId);
+  const { formatINR } = useCurrency();
 
-  if (!breakdown) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[100dvh] p-8 text-center bg-slate-50">
-        <p className="text-slate-500 font-bold mb-4">Briefing data missing for: {breakdownId}</p>
-        <Button onClick={onContinue} className="w-full h-14 font-black" suppressHydrationWarning>Continue Anyway</Button>
-      </div>
-    );
-  }
+  /** Converts every ₹N and $N amount in a string to the user's active display currency. */
+  const localiseCurrency = useCallback((text: string): string => {
+    if (!text) return text;
+    let result = text.replace(/₹([\d,]+(?:\.\d+)?)/g, (_, numStr) => {
+      const inrValue = parseFloat(numStr.replace(/,/g, ''));
+      return formatINR(inrValue);
+    });
+    result = result.replace(/\$([\d,]+(?:\.\d+)?)/g, (_, numStr) => {
+      const usdValue = parseFloat(numStr.replace(/,/g, ''));
+      return formatINR(usdValue * USD_TO_INR_RATE);
+    });
+    return result;
+  }, [formatINR]);
+
+  // Defensive fallback for any activity that doesn't have a matching entry
+  // in conceptBreakdowns.ts (some still don't — content gap, being filled
+  // in separately). Previously this showed a raw "Briefing data missing
+  // for: X" debug message to real users with a "Continue Anyway" button —
+  // now it just skips the briefing screen entirely and goes straight into
+  // the activity, since a missing brief shouldn't block anyone from playing.
+  useEffect(() => {
+    if (!breakdown) onContinue();
+  }, [breakdown, onContinue]);
+
+  if (!breakdown) return null;
 
   const isSenior = ageGroup === 'senior';
   const hook = isSenior ? breakdown.hook : breakdown.ageAdapted[ageGroup as 'junior' | 'teen']?.hook || breakdown.hook;
@@ -102,7 +136,7 @@ export function ConceptBreakdown({
         <section className="relative bg-white p-5 pl-6 rounded-xl border-l-[3px] border-primary shadow-sm overflow-hidden">
           <div className="quote-shape" />
           <p className="relative z-10 text-[18px] font-medium text-slate-800 leading-relaxed">
-            "{hook}"
+            "{localiseCurrency(hook)}"
           </p>
         </section>
 
@@ -112,7 +146,7 @@ export function ConceptBreakdown({
             {keyPoints.map((point, i) => (
               <li key={i} className="flex items-start gap-3">
                 <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
-                <span className="text-[14px] font-medium text-slate-600 leading-relaxed">{point}</span>
+                <span className="text-[14px] font-medium text-slate-600 leading-relaxed">{localiseCurrency(point)}</span>
               </li>
             ))}
           </ul>
@@ -121,11 +155,11 @@ export function ConceptBreakdown({
         <section className="bg-[#E8F5EE]/40 p-5 rounded-xl border-l-[3px] border-[#2E7D5A]">
           <span className="text-[11px] font-black uppercase text-[#2E7D5A] tracking-widest block mb-1">Real world</span>
           <p className="text-[14px] font-bold text-slate-700 leading-relaxed">
-            {breakdown.realWorldStat}
+            {localiseCurrency(breakdown.realWorldStat)}
           </p>
           {isSenior && breakdown.ageAdapted.senior.extraStat && (
             <p className="text-[12px] font-medium text-slate-500 mt-3 italic border-t border-[#4EA07A]/10 pt-2">
-              Note: {breakdown.ageAdapted.senior.extraStat}
+              Note: {localiseCurrency(breakdown.ageAdapted.senior.extraStat)}
             </p>
           )}
         </section>
@@ -134,7 +168,7 @@ export function ConceptBreakdown({
           <section className="flex items-start gap-2 pt-2">
             <div className="thought-bubble-shape mt-1.5 shrink-0" />
             <p className="text-[13px] font-medium italic text-slate-500 leading-relaxed">
-              {breakdown.quickQuestion}
+              {localiseCurrency(breakdown.quickQuestion)}
             </p>
           </section>
         )}

@@ -151,11 +151,22 @@ export function useGameEngine(config: GameConfig) {
     timerDurationRef.current = durationSeconds * 1000;
   }, []);
 
+  // NOTE (2026-09): this used to depend on state.timeLeft and call
+  // startTimer(state.timeLeft) every time timeLeft changed (i.e. every ~1s
+  // tick). Since state.timeLeft is a Math.ceil()'d integer, that resync
+  // always set the "true" reference duration to a value >= the actual
+  // precise remaining time — meaning every tick could add back up to ~1s of
+  // drift. Compounded across a round, timed games (e.g. Stock Market Sim's
+  // 20s trading days) could run inconsistently long or feel like they'd
+  // stalled. A round's timeLeft is always reset to config.timePerRound
+  // exactly when the round starts (see NEXT_ROUND / initialState below), so
+  // there's no need to reference state.timeLeft at all — just (re)seed the
+  // timer once when the round actually starts.
   useEffect(() => {
     if (state.status === 'PLAYING' && config.timePerRound !== undefined) {
-      startTimer(state.timeLeft);
+      startTimer(config.timePerRound);
     }
-  }, [state.status, config.timePerRound, state.currentRound, startTimer, state.timeLeft]);
+  }, [state.status, state.currentRound, config.timePerRound, startTimer]);
 
   useEffect(() => {
     if (state.status !== 'PLAYING') return;

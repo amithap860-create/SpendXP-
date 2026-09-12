@@ -44,6 +44,11 @@ export interface UserProfile {
   // Additional fields from existing implementations
   uid?: string;
   birthYear?: number;
+  // Written directly by onboarding (onboarding/page.tsx) and the Profile
+  // page's age-edit flow (profile/page.tsx) — was already a real Firestore
+  // field, just never declared here. profile/page.tsx already reads this
+  // directly to show "Junior/Teen/Senior (age range)" on the Profile screen.
+  ageGroup?: 'junior' | 'teen' | 'senior';
   country?: string;
   currency?: string;
   balance?: number;
@@ -76,6 +81,7 @@ export const UserProfileSchema = z.object({
   age: z.number().optional(),
   uid: z.string().optional(),
   birthYear: z.number().optional(),
+  ageGroup: z.enum(['junior', 'teen', 'senior']).optional(),
   country: z.string().optional(),
   currency: z.string().optional(),
   balance: z.number().optional(),

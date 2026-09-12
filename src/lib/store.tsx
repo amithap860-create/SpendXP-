@@ -11,6 +11,7 @@ import { safeSetDoc, safeUpdateDoc } from '@/lib/firestoreSafe';
 import { SecurityQuestion, UserProfile } from '@/types/user';
 import { SUPPORTED_CURRENCIES, DEFAULT_CURRENCY } from '@/config/currency';
 import { formatCurrency, scaleAmount } from '@/lib/formatCurrency';
+import { getAgeGroup } from '@/lib/ageAdapt';
 
 export interface AppTask {
   id: string;
@@ -47,7 +48,7 @@ interface UserContextType {
   currency?: string;
   tasks: AppTask[];
   formatValue: (amount: number) => string;
-  completeTask: (taskId: string) => void;
+  completeTask: (taskId: string, category?: string) => void;
   isInitialLoading: boolean;
   isLoggedIn: boolean;
   login: (email: string, age: number) => Promise<void>;
@@ -167,7 +168,18 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
-  const completeTask = (taskId: string) => {
+  // FIX (2026-09): this always hardcoded category: 'Academy' regardless of
+  // which lesson (or task) was actually completed. getConceptStrengths()
+  // (src/lib/progressionService.ts) reads this same category field and only
+  // credits it toward the Financial Knowledge radar chart if it matches one
+  // of budgeting/saving/investing/credit/taxes/spending — 'academy' matches
+  // none of them, so EVERY lesson completion was silently thrown away for
+  // chart purposes, for every user, no matter how many lessons they
+  // finished. Now accepts the real topic (lessons.ts's `topic` field, e.g.
+  // 'budgeting') from the caller, falling back to 'Academy' for non-lesson
+  // tasks (e.g. the flashcards-set task in flashcards/page.tsx) that aren't
+  // tied to a specific financial topic anyway.
+  const completeTask = (taskId: string, category: string = 'Academy') => {
     // Use uid from Firebase Auth, not from the localStorage AuthContext
     if (!uid) return;
     const existing = remoteTasks.find(t => t.id === taskId);
@@ -179,7 +191,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       completed: true,
       completedAt: serverTimestamp(),
       userId: uid,
-      category: 'Academy'
+      category
     }, { merge: true });
 
     const userRef = doc(db, 'users', uid);
@@ -282,7 +294,28 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     xp: profile?.xp || 0,
     level: profile?.level || 1,
     age: profile?.age,
-    ageGroup: 'junior',
+    // NOTE (2026-09): this was hardcoded to 'junior' for every user, which
+    // meant the Learn page's age-gate (src/app/learn/page.tsx) permanently
+    // locked any lesson tagged for 'teen'/'senior' only — regardless of what
+    // the user had completed.
+    // FOLLOW-UP FIX (2026-09): the first attempt at this recomputed ageGroup
+    // fresh from birthYear/age every time, ignoring the `ageGroup` field
+    // onboarding and the Profile page's "edit age" flow already write
+    // directly to this same Firestore doc (see onboarding/page.tsx:101 and
+    // profile/page.tsx:611) — the exact field profile/page.tsx already
+    // displays as "Junior/Teen/Senior (age range)". If birthYear was ever
+    // missing/stale on an account while that stored ageGroup field was
+    // correct, this recompute would silently override it back to 'junior',
+    // which is exactly what caused age-appropriate lessons to stay falsely
+    // locked even after the first fix. Now prefers the already-stored,
+    // already-correct field, and only computes from birthYear/age as a
+    // fallback for accounts that predate that field being written at all.
+    ageGroup: profile?.ageGroup
+      || (profile?.birthYear
+        ? getAgeGroup(profile.birthYear)
+        : profile?.age
+          ? getAgeGroup(new Date().getFullYear() - profile.age)
+          : 'junior'),
     user,
     savingsCurrent: profile?.savingsCurrent,
     savingsGoal: profile?.savingsGoal,

@@ -20,14 +20,20 @@ export const BADGES: BadgeDefinition[] = [
     name: 'Emergency Fund Builder',
     description: 'Made the right choices in the Emergency Expense quest',
     xpReward: 75,
-    questId: 'emergency-fund'
+    // FIX (2026-09): this said 'emergency-fund', but the real quest id in
+    // src/data/quests.ts is 'emergency-expense'. checkAndAwardQuestBadges()
+    // filters BADGES by exact questId match, so this badge could never
+    // fire — the id it was waiting for didn't exist.
+    questId: 'emergency-expense'
   },
   {
     id: 'debt_destroyer',
     name: 'Debt Destroyer',
     description: 'Completed the Phone EMI quest with 2+ optimal choices',
     xpReward: 75,
-    questId: 'buying-phone-emi'
+    // FIX (2026-09): same bug — this said 'buying-phone-emi', real quest id
+    // is 'phone-emi'. Never fired for the same reason as above.
+    questId: 'phone-emi'
   },
   {
     id: 'smart_investor',
@@ -73,14 +79,30 @@ export const BADGES: BadgeDefinition[] = [
   {
     id: 'money_master',
     name: 'Money Master',
-    description: 'Completed all 6 quests',
+    // NOTE (2026-09): was "Completed all 6 quests" — stale, quests.ts now
+    // has 20. Description genericized so it doesn't need updating every
+    // time a quest is added.
+    description: 'Completed every quest in the app',
     xpReward: 200
   },
   {
     id: 'scholar',
     name: 'Finance Scholar',
-    description: 'Completed all 8 Academy lessons',
+    // NOTE (2026-09): was "Completed all 8 Academy lessons" — stale, same
+    // issue as money_master above (lessons.ts now has 12 lessons).
+    description: 'Completed every lesson in the Academy',
     xpReward: 150
+  },
+  {
+    // FIX (2026-09): src/app/resources/page.tsx has been calling
+    // awardBadge(uid, 'framework_master') for a while, but this id was never
+    // added here — awardBadge() looks up `BADGES.find(b => b.id === badgeId)`
+    // and silently returns false when it doesn't find a match, so every one
+    // of those calls was a no-op. The badge could never actually be earned.
+    id: 'framework_master',
+    name: 'Framework Master',
+    description: 'Explored every framework in the Resource Library',
+    xpReward: 75
   }
 ];
 

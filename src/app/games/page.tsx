@@ -9,6 +9,25 @@ import { GameLoadingSkeleton } from '@/components/games/GameLoadingSkeleton';
 import { useAgeAdapt } from '@/lib/ageAdaptProvider';
 import { ConceptBreakdown } from '@/components/ConceptBreakdown';
 import { usePremium } from '@/hooks/usePremium';
+import { useUser } from '@/lib/store';
+import { lessons } from '@/data/lessons';
+
+// Per founder request (2026-09): gate each game behind the lesson that
+// introduces it, so players learn the concept before practicing it, instead
+// of the Learn and Arcade hubs being two disconnected sections. Several
+// lessons in lessons.ts point at the same game via `relatedGame` (e.g. four
+// different lessons all practice with budgetBlitz) — we gate on the FIRST
+// one in lessons.ts's authored order, since that's the intro lesson for that
+// topic and matches the reading order already enforced on the Learn page.
+// NOTE: lessons.ts's relatedGame field uses 'finIQ', not this file's
+// GameID 'finIQQuiz' — same mismatch already worked around in learn/page.tsx.
+const REQUIRED_LESSON_FOR_GAME: Record<string, string> = {
+  budgetBlitz: 'l-budgeting',
+  finIQQuiz: 'l-taxes',
+  moneyMaze: 'l-debt',
+  stockMarketSim: 'l-investing',
+  creditScoreBuilder: 'l-credit',
+};
 
 const BudgetBlitz = dynamic(() => import('@/components/games/BudgetBlitz').then(mod => mod.BudgetBlitz), {
   loading: () => <GameLoadingSkeleton />,
@@ -172,6 +191,8 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
   const resolvedParams = use(searchParams);
   const { ageGroup } = useAgeAdapt();
   const { canAccess } = usePremium();
+  const { tasks } = useUser();
+  const isLessonComplete = (id: string) => !!tasks.find(t => t.id === `lesson-${id}`)?.completed;
 
   const [activeGame, setActiveGame] = useState<GameID | null>(null);
   const [isDaily, setIsDaily] = useState(false);
@@ -192,6 +213,11 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
       ];
       if (validGames.includes(gameParam)) {
         if (gameParam === 'finIQQuiz' && modeParam === 'daily') {
+          // Deliberately NOT lesson-gated: the Daily Challenge rotates through
+          // all topics (see dailyTopics below), not just taxes, and is a
+          // separate streak/retention feature from the regular FinIQ Quiz
+          // card below it — gating it on one specific lesson would break
+          // that daily habit loop for reasons unrelated to its content.
           setIsDaily(true);
           setShowDailyBreakdown(true);
           setActiveGame('finIQQuiz');
@@ -245,13 +271,22 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {GAMES.map(game => {
-              const isLocked = game.premium && !canAccess(game.id as any);
+              const isPremiumLocked = game.premium && !canAccess(game.id as any);
+              const requiredLessonId = REQUIRED_LESSON_FOR_GAME[game.id];
+              const requiredLesson = requiredLessonId ? lessons.find(l => l.id === requiredLessonId) : undefined;
+              // Only apply the lesson gate once premium access is settled —
+              // no point telling a non-premium user to "finish a lesson
+              // first" for a game they can't open regardless.
+              const isLessonLocked = !isPremiumLocked && !game.comingSoon && !!requiredLesson && !isLessonComplete(requiredLesson.id);
+              const isLocked = isPremiumLocked || isLessonLocked;
               const handleClick = () => {
                 if (game.comingSoon) {
                   // Coming-soon features → join the waitlist on the upgrade page
                   router.push('/upgrade');
-                } else if (isLocked) {
+                } else if (isPremiumLocked) {
                   router.push('/upgrade');
+                } else if (isLessonLocked) {
+                  router.push('/learn');
                 } else {
                   setActiveGame(game.id as GameID);
                 }
@@ -262,6 +297,8 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
                   game={game}
                   isHighlighted={highlightedGame === game.id}
                   locked={!!isLocked}
+                  lockReason={isPremiumLocked ? 'premium' : isLessonLocked ? 'lesson' : null}
+                  requiredLessonTitle={requiredLesson?.title}
                   onClick={handleClick}
                 />
               );
@@ -294,11 +331,15 @@ function GameCard({
   game,
   isHighlighted,
   locked,
+  lockReason,
+  requiredLessonTitle,
   onClick,
 }: {
   game: GameDef;
   isHighlighted: boolean;
   locked: boolean;
+  lockReason: 'premium' | 'lesson' | null;
+  requiredLessonTitle?: string;
   onClick: () => void;
 }) {
   const { Icon } = game;
@@ -316,12 +357,16 @@ function GameCard({
       {/* Left accent bar */}
       <div className={cn("absolute top-0 left-0 w-2 h-full", locked ? "bg-slate-200" : game.accentColor)} />
 
-      {/* Premium / Coming Soon badge */}
+      {/* Premium / Coming Soon / Lesson-locked badge */}
       {locked && (
         <div className="absolute top-4 right-4 flex flex-col items-end gap-1">
           {game.comingSoon ? (
             <span className="text-[11px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">
               Waitlist
+            </span>
+          ) : lockReason === 'lesson' ? (
+            <span className="text-[11px] font-black uppercase tracking-widest bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+              <IconLock /> Lesson First
             </span>
           ) : (
             <span className="text-[11px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -345,13 +390,17 @@ function GameCard({
         )}>
           {game.name}
         </h3>
-        <p className="text-sm text-slate-500 font-medium leading-snug">{game.desc}</p>
+        <p className="text-sm text-slate-500 font-medium leading-snug">
+          {lockReason === 'lesson' && requiredLessonTitle
+            ? `Complete "${requiredLessonTitle}" in Learn to unlock this game.`
+            : game.desc}
+        </p>
       </div>
 
       <div className="flex justify-end pt-4">
         {locked ? (
           <span className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
-            {game.comingSoon ? 'JOIN WAITLIST →' : <><IconLock />UNLOCK</>}
+            {game.comingSoon ? 'JOIN WAITLIST →' : lockReason === 'lesson' ? <><IconLock />GO TO LESSON</> : <><IconLock />UNLOCK</>}
           </span>
         ) : (
           <span className="text-xs font-black text-slate-400 group-hover:text-primary transition-colors uppercase tracking-widest">

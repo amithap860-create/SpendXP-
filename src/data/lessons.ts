@@ -163,18 +163,18 @@ export const lessons: Lesson[] = [
     relatedGame: 'stockMarketSim',
     title: 'ETFs & Index Funds',
     estimatedMinutes: 4,
-    ageGroups: ['teen', 'senior'],
+    ageGroups: ['junior', 'teen', 'senior'],
     cards: [
       {
         id: 'e1',
         title: 'What is an ETF?',
         body: {
-          junior: "",
+          junior: "An ETF is like a basket that holds tiny pieces of LOTS of different companies at once — instead of picking just one company, you get a little bit of many!",
           teen: "An ETF (Exchange Traded Fund) is like a basket of many stocks. When you buy one ETF, you own tiny pieces of many companies at once.",
           senior: "An ETF tracks an index like the Nifty 50, holding all constituent stocks proportionally. Low expense ratios (typically 0.1–0.5%) make them highly cost-efficient vs active funds."
         },
         example: {
-          junior: "",
+          junior: "It's like a mixed candy bag instead of just one candy bar — if one company does badly, you still have all the others in your basket!",
           teen: "Nifty 50 ETF = owning a small piece of India's 50 biggest companies for ₹100/unit",
           senior: "Nifty BeES ETF: expense ratio 0.04% vs average active fund 1.5% — saves ₹14,600 on ₹10L invested over 10 years"
         },
@@ -189,12 +189,12 @@ export const lessons: Lesson[] = [
         id: 'e2',
         title: 'Passive vs Active',
         body: {
-          junior: "",
+          junior: "Some people try to pick the one 'best' company. An ETF instead just owns a little bit of EVERYTHING — and owning everything usually wins more often than trying to guess the winner!",
           teen: "Active managers try to pick winners. Passive funds (ETFs) just follow the whole market. Statistically, the market wins more often!",
           senior: "Index funds aim for market returns (beta). Active funds aim to beat the market (alpha). However, 80% of active fund managers underperform their benchmark index over 10+ years."
         },
         example: {
-          junior: "",
+          junior: "It's like picking one runner to win a race vs betting on the whole team — the whole team almost always does better over time!",
           teen: "An active manager might bet all on tech. An index fund owns tech, banking, energy, and more.",
           senior: "Passive investing removes the human error factor and significantly lowers management fees."
         },
@@ -226,19 +226,23 @@ export const lessons: Lesson[] = [
     relatedGame: 'stockMarketSim',
     title: 'Crypto & High-Risk Assets',
     estimatedMinutes: 3,
-    ageGroups: ['senior'],
+    // FIX (2026-09): was senior-only with blank junior AND teen text — the
+    // only lesson missing two age tiers instead of one. Adding both closes
+    // the gap consistently rather than leaving teen stranded while junior
+    // gets access.
+    ageGroups: ['junior', 'teen', 'senior'],
     cards: [
       {
         id: 'c1',
         title: 'What is Cryptocurrency?',
         body: {
-          junior: "",
-          teen: "",
+          junior: "Crypto is a kind of money that only exists on computers — no coins or notes! Its price can jump up or crash down A LOT, much more wildly than normal money, because no company or government stands behind it.",
+          teen: "Cryptocurrency (like Bitcoin) is digital money not controlled by any government or bank. Unlike a company's stock, there's no business behind it earning profits — its value comes purely from what other people are willing to pay for it.",
           senior: "Crypto (Bitcoin, Ethereum etc.) is a digital currency with no government backing. Unlike stocks, crypto has no underlying business earnings to support its value — price is purely based on what someone else will pay for it."
         },
         example: {
-          junior: "",
-          teen: "",
+          junior: "It's like a rare digital trading card — some days everyone wants it and the price shoots up, other days nobody wants it and the price crashes.",
+          teen: "One Bitcoin might be worth a lot today and much less next month — its price depends entirely on demand, not on any factory or store making money.",
           senior: "Buying a stock is like owning a piece of a pizza shop. Buying crypto is like owning a digital collectible where the price depends on hype."
         },
         visual: 'comparison',
@@ -252,13 +256,13 @@ export const lessons: Lesson[] = [
         id: 'c2',
         title: 'Serious Risks',
         body: {
-          junior: "",
-          teen: "",
+          junior: "Crypto prices can crash really fast — sometimes losing most of their value in just a few months. Never touch this without a trusted adult, and never with money you can't afford to lose.",
+          teen: "Crypto is extremely volatile — drops of 70-90% have happened more than once. There's little to no regulation, so if an exchange collapses or a wallet gets hacked, there's often no way to get your money back.",
           senior: "Crypto is extremely volatile. Crashes of 70–90% are common. There is no regulation in India, meaning no legal recourse if an exchange collapses or your wallet is hacked."
         },
         example: {
-          junior: "",
-          teen: "",
+          junior: "Imagine a toy that was worth ₹500 last month and is only worth ₹100 today — that's how fast crypto prices can fall.",
+          teen: "Bitcoin dropped 83% in 2018 and 77% in 2022 — money invested could have shrunk to less than a fifth of its value in months.",
           senior: "Bitcoin lost 83% of its value in 2018 and 77% in 2022. Only invest what you can afford to lose entirely."
         },
         visual: 'line',
@@ -365,18 +369,18 @@ export const lessons: Lesson[] = [
     relatedGame: 'moneyMaze',
     title: 'Understanding Debt',
     estimatedMinutes: 4,
-    ageGroups: ['teen', 'senior'],
+    ageGroups: ['junior', 'teen', 'senior'],
     cards: [
       {
         id: 'd1',
         title: 'Good Debt vs Bad Debt',
         body: {
-          junior: '',
+          junior: "Borrowing money isn't always bad. 'Good borrowing' helps you get something useful, like tools to earn more later. 'Bad borrowing' is for things you don't need — and you end up owing extra on top!",
           teen: 'Not all debt is bad. "Good debt" helps you build wealth or skills — like a student loan. "Bad debt" buys things that lose value and costs you extra via interest.',
           senior: 'Good debt has low interest rates and creates an asset or income: home loan, education loan, business loan. Bad debt is high-interest consumption: credit card revolving, personal loans for lifestyle, BNPL misuse.',
         },
         example: {
-          junior: '',
+          junior: "If you borrow ₹50 from your sister for school notebooks and pay her back, that's smart borrowing. If you borrow ₹50 for candy and now owe her ₹60, that's not so smart!",
           teen: 'Education loan at 8%: returns 3× in higher salary. Credit card debt at 36% APR: you pay ₹360 every year on every ₹1,000 borrowed — just for the privilege of using money.',
           senior: 'A ₹50L home loan at 8.5% builds equity. A ₹1L personal loan at 14% for a vacation builds nothing — just a ₹14,000/year interest bill.',
         },
@@ -391,12 +395,12 @@ export const lessons: Lesson[] = [
         id: 'd2',
         title: 'The Debt Avalanche',
         body: {
-          junior: '',
+          junior: "If you owe money to more than one person, pay back whoever charges you the most extra first — that way you stop losing extra money the fastest!",
           teen: 'The avalanche method: list all debts by interest rate (highest first). Pay minimums on all — then throw every extra rupee at the highest-rate debt. Mathematically optimal.',
           senior: 'Avalanche vs Snowball: Avalanche saves the most interest. Snowball (smallest balance first) provides psychological wins. Research shows snowball produces better completion rates despite higher cost — choose what keeps you motivated.',
         },
         example: {
-          junior: '',
+          junior: "You owe your brother ₹20 (no extra charge) and a friend ₹10 (he wants ₹2 extra every week). Pay your friend back first so the extra ₹2 stops piling up!",
           teen: 'Credit card at 36%: ₹5,000 debt. Student loan at 10%: ₹30,000. Pay minimum on student loan; attack credit card first. Saves ₹1,800/year in interest.',
           senior: 'With avalanche, a ₹3L mixed-debt portfolio gets cleared 8 months faster and saves ₹28,000 vs paying equal amounts on each.',
         },
@@ -430,18 +434,18 @@ export const lessons: Lesson[] = [
     relatedGame: 'creditScoreBuilder',
     title: 'How Credit Scores Work',
     estimatedMinutes: 4,
-    ageGroups: ['teen', 'senior'],
+    ageGroups: ['junior', 'teen', 'senior'],
     cards: [
       {
         id: 'cr1',
         title: 'What is a Credit Score?',
         body: {
-          junior: '',
+          junior: "A credit score is like a trust score! It tells grown-ups whether someone pays back what they borrow, on time. The more you keep your promises to pay people back, the more they trust you with bigger things later.",
           teen: 'Your credit score is a 3-digit number that banks use to decide whether to lend you money and at what interest rate. Higher = better loan terms and lower interest rates. Every country has its own credit bureau: CIBIL in India (300–900), FICO in the USA (300–850), Experian in the UK.',
           senior: 'Credit bureaus compute your creditworthiness as a score: CIBIL in India (300–900), FICO in the USA (300–850), Experian in the UK. Scores above ~750 unlock the best loan rates. Scores below ~650 lead to rejections or high-risk premiums. Globally, the same five factors determine your score.',
         },
         example: {
-          junior: '',
+          junior: "If you always pay your friend back on time when you borrow money, they'll happily lend to you again. If you forget, they won't trust you next time!",
           teen: 'Amit\'s credit score is 800. He gets a home loan at 8.5%. His friend with a score of 600 pays 11.5% — on a ₹50L loan, that\'s ₹15L extra in interest over 20 years.',
           senior: 'On a ₹60L, 20-year home loan: 8.5% (score 800+) = EMI ₹52,118 = Total ₹1.25 crore. At 11.5% (score 600): EMI ₹63,879 = Total ₹1.53 crore. Score difference costs ₹28L.',
         },
@@ -461,12 +465,12 @@ export const lessons: Lesson[] = [
         id: 'cr2',
         title: 'Building Your Score',
         body: {
-          junior: '',
+          junior: "You build trust by always paying back what you borrow, on time, and by not borrowing more than you can pay back. Small promises kept build big trust over time!",
           teen: 'The fastest ways to build credit: always pay on time, keep your card balance below 30% of the limit, don\'t apply for many cards at once, and keep old accounts open.',
           senior: 'Credit-building strategy for beginners: start with a secured credit card (deposit-backed), pay in full every month, never exceed 30% utilisation. After 12–18 months of clean history, upgrade to a rewards card.',
         },
         example: {
-          junior: '',
+          junior: "Ravi borrows ₹20 from his mom every week for the bus and always pays her back on Friday. After a few months, she trusts him enough to lend him more when he really needs it.",
           teen: 'Neha started with a ₹10,000 limit card and always paid full balance. 18 months later, her score was 760 — she qualified for a ₹1L limit at a premium rate.',
           senior: 'Secured card strategy: ₹20,000 fixed deposit → ₹20,000 credit limit. Spend ₹4,000/month (20%) and pay in full. Score goes from 0 to 720+ in 12 months.',
         },
@@ -503,18 +507,18 @@ export const lessons: Lesson[] = [
     relatedGame: 'finIQ',
     title: 'Taxes Made Simple',
     estimatedMinutes: 4,
-    ageGroups: ['teen', 'senior'],
+    ageGroups: ['junior', 'teen', 'senior'],
     cards: [
       {
         id: 'tx1',
         title: 'Progressive Tax: How Brackets Work',
         body: {
-          junior: '',
+          junior: "When grown-ups earn money, the government takes a small part of it to pay for things everyone uses, like roads and schools. People who earn more give a bit more — but only on the EXTRA amount above a certain point, not on everything they earn!",
           teen: 'Most countries use progressive income tax — you pay low rates on lower income and higher rates on higher income. The key insight: only the income in each "bracket" is taxed at that higher rate, not your entire income.',
           senior: 'Progressive taxation means your effective tax rate (total tax ÷ total income) is always lower than your marginal rate (the rate on your top bracket). Standard deductions and retirement contributions reduce your taxable income before any bracket applies — that\'s the foundation of all legal tax optimisation.',
         },
         example: {
-          junior: '',
+          junior: "Imagine your parents earn ₹100. The first ₹50 isn't taxed at all. Only the next ₹50 gets a small tax — so they don't pay tax on everything, just the part above ₹50!",
           teen: 'Two brackets: ₹0–3L = 0%, ₹3–8L = 5%. If you earn ₹6L: tax = ₹0 (first ₹3L) + ₹15,000 (next ₹3L × 5%) = ₹15,000. Not ₹6L × 5% = ₹30,000. Bracket math saves you money.',
           senior: 'Income ₹10L: ₹0–3L at 0% = ₹0. ₹3–7L at 5% = ₹20,000. ₹7–10L at 10% = ₹30,000. Total = ₹50,000. Effective rate = 5%, even though the top bracket rate is 10%. Standard deduction reduces this further.',
         },
@@ -533,12 +537,12 @@ export const lessons: Lesson[] = [
         id: 'tx2',
         title: 'Legal Ways to Pay Less Tax',
         body: {
-          junior: '',
+          junior: "There are smart, legal ways grown-ups can save some of the money they'd otherwise pay in tax — like putting money into special savings accounts for the future. It's like a reward for saving instead of spending!",
           teen: 'Most countries allow deductions that reduce your taxable income before any brackets apply. The most powerful: contributions to retirement accounts (EPF, PPF, 401k, ISA, pension). Investing here is essentially earning a government discount on top of your investment returns.',
           senior: 'Tax-advantaged accounts are the single biggest legal tax lever: employer pension matching (free money + deduction), retirement account contributions (deferred or exempt from tax), healthcare savings where available. Max these before any other investing — the combined tax benefit often delivers a higher return than the investment itself in year one.',
         },
         example: {
-          junior: '',
+          junior: "If your dad puts ₹1,000 into a special retirement savings account, the government might let him pay less tax that year — so saving for later also helps him save right now!",
           teen: 'Investing ₹10,000 in a tax-saving account: if your marginal tax rate is 10%, you immediately owe ₹1,000 less in tax. Your effective cost is only ₹9,000 — an instant 11% return before the money even grows.',
           senior: 'Salary ₹12L. Without planning: tax ~₹1.05L. With ₹1.5L in retirement savings + standard deduction (₹50K): taxable income drops to ~₹10L. Tax ~₹62,500. Annual saving: ~₹42,500 — just from using the right accounts.',
         },
@@ -619,18 +623,18 @@ export const lessons: Lesson[] = [
     relatedGame: 'stockMarketSim',
     title: 'Short-Term Trading vs Long-Term Investing',
     estimatedMinutes: 3,
-    ageGroups: ['teen', 'senior'],
+    ageGroups: ['junior', 'teen', 'senior'],
     cards: [
       {
         id: 'st1',
         title: 'Trading vs Investing: The Difference',
         body: {
-          junior: '',
+          junior: "Trading means buying something and selling it again really fast to try to make a quick profit. Investing means holding onto something for a long time and letting it grow bigger — like planting a tree instead of selling the seeds right away.",
           teen: 'Trading means buying and selling quickly to profit from price changes — sometimes in hours or days. Investing means holding for years to benefit from business growth. Both have very different risk profiles.',
           senior: 'Active traders use technical analysis, chart patterns, and momentum signals. Investors use fundamental analysis: revenue, earnings, moat, management quality. Academic research consistently shows that long-term passive index investing outperforms active trading for retail investors after fees and taxes.',
         },
         example: {
-          junior: '',
+          junior: "If you buy a rare trading card for ₹50 and try to sell it tomorrow for ₹60, that's trading — quick and risky. If you keep a good stock for 10 years and it grows a lot, that's investing — usually safer.",
           teen: 'Trader: buys a stock at ₹500 on Monday, sells at ₹550 on Wednesday for ₹50 profit. But 80% of such trades lose money. Investor: buys a ₹500 stock, holds 10 years, sells at ₹2,200.',
           senior: 'Day trading profits are typically taxed as ordinary business income — your highest marginal rate. Long-term capital gains on equity usually get a lower preferential rate. Trading costs + taxes + spread often erase short-term profits entirely.',
         },
@@ -645,12 +649,12 @@ export const lessons: Lesson[] = [
         id: 'st2',
         title: 'Short Selling Explained',
         body: {
-          junior: '',
+          junior: "Short selling is a tricky, advanced move where someone bets a price will go DOWN. If they're wrong and it goes up a lot instead, they can lose way more money than they started with — this is really for grown-up experts, not beginners!",
           teen: 'Short selling is betting that a stock will FALL. You borrow shares, sell them now, buy them back cheaper later, and return them — keeping the difference. If the price rises, you lose — with no cap on how much.',
           senior: 'Shorting mechanics: borrow shares via broker margin account, sell at market price, monitor, cover by buying back. Risk: unlimited upside on the stock means unlimited downside loss. Requires a margin account, maintenance margin requirements, and daily mark-to-market. Not suitable for retail investors without deep experience.',
         },
         example: {
-          junior: '',
+          junior: "Imagine borrowing your friend's bike, selling it for ₹200, planning to buy it back cheaper later and return it. If the bike suddenly becomes worth ₹500, you're in big trouble — you still have to buy it back to give it back!",
           teen: 'Short at ₹200, price drops to ₹140 → profit ₹60. But if price rises to ₹350 → loss ₹150 per share. Every ₹1 price rise = ₹1 loss per share.',
           senior: 'GME short squeeze (2021): retail traders on Reddit forced hedge funds to cover shorts as the price rose 1,700% in a week. Several professional short-sellers lost billions.',
         },
@@ -686,18 +690,18 @@ export const lessons: Lesson[] = [
     relatedGame: 'budgetBlitz',
     title: 'Insurance: Protecting What You Build',
     estimatedMinutes: 4,
-    ageGroups: ['teen', 'senior'],
+    ageGroups: ['junior', 'teen', 'senior'],
     cards: [
       {
         id: 'ins1',
         title: 'What Is Insurance?',
         body: {
-          junior: '',
+          junior: "Insurance is when lots of people each pay a small amount into a shared pot, so that if something bad happens to ONE of them — like getting hurt or breaking something expensive — there's enough money to help them out.",
           teen: 'Insurance is a risk-pooling system. Everyone pays a small regular amount (a "premium"), and the fund covers large unexpected costs for whoever needs it. You are essentially sharing financial risk with thousands of strangers.',
           senior: 'Insurance transfers low-probability, high-impact financial risk to an insurer for a predictable cost. The insurer profits because most policyholders never claim — but for those who do, the payout far exceeds the premiums paid. It is the only financial product where the goal is to never "get your money\'s worth."',
         },
         example: {
-          junior: '',
+          junior: "Imagine you and 20 friends each put ₹10 into a jar every month. If one friend's bike breaks, the jar pays to fix it — even though that friend only put in ₹10 themselves!",
           teen: '1,000 people each pay ₹3,000 per year for health insurance = ₹30L in the pool. When one person needs surgery costing ₹5L, the pool pays. Each person\'s small premium funds coverage that would otherwise be unaffordable.',
           senior: 'Health insurance premium: ₹8,000/year. Hospitalisation claim: ₹2.5L. Effective "return" on the premium: 31×. But the value was never the return — it was eliminating the risk of a ₹2.5L expense with no savings to cover it.',
         },
@@ -712,12 +716,12 @@ export const lessons: Lesson[] = [
         id: 'ins2',
         title: 'What Insurance Do You Actually Need?',
         body: {
-          junior: '',
+          junior: "The most important insurance for anyone is health insurance — it helps pay for doctors and hospitals if you get sick or hurt, which can cost a LOT of money without it.",
           teen: 'Start with health insurance — always. If you are on a parent\'s policy, understand what it covers and when you age off. After health: renters/contents insurance if you have valuables, and eventually life insurance if others depend on your income.',
           senior: 'Priority order for most young adults: (1) Health insurance — non-negotiable. (2) Term life insurance — only if you have dependents or co-signed debt. (3) Disability insurance — often overlooked, but you are 3–4× more likely to be disabled for 3+ months than to die before 65. (4) Property insurance — renters or home. Skip whole-life and investment-linked policies as a rule: buy term, invest the difference.',
         },
         example: {
-          junior: '',
+          junior: "If Meera breaks her arm and the hospital bill is ₹20,000, her family's health insurance covers most of it — so they don't have to use all their savings at once.",
           teen: 'Anaya, 19, pays ₹400/month for health insurance. Without it, a single ER visit or fracture could mean ₹50,000–₹2L in bills — a financial disaster on a student budget.',
           senior: 'Rohan, 26, earns ₹8L/year. Term life at ₹500/month gives ₹1 crore cover — protecting his parents who depend on his income. Whole-life equivalent: ₹4,500/month for smaller cover. He invests the ₹4,000 difference in index funds.',
         },
@@ -753,7 +757,14 @@ export const lessons: Lesson[] = [
     relatedGame: 'stockMarketSim',
     title: 'Pick Stocks Like Peter Lynch',
     estimatedMinutes: 4,
-    ageGroups: ['teen', 'senior'],
+    // FIX (2026-09): this had full, well-written junior body/example text on
+    // every card (lemonade-stand analogies etc.) but was still excluded from
+    // junior's ageGroups — an oversight, not a deliberate content gap like
+    // the other teen/senior-only lessons (which have genuinely blank junior
+    // text). Note: the quizCard below (PEG ratio, promoter buying) isn't
+    // junior-adapted — that's fine since it doesn't block completion XP, but
+    // it's not fully polished for junior yet either.
+    ageGroups: ['junior', 'teen', 'senior'],
     cards: [
       {
         id: 'sl-1',

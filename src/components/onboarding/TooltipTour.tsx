@@ -49,7 +49,7 @@ const TOUR_STEPS: TourStep[] = [
     id: 'profile-nav',
     targetId: 'tour-profile',
     title: 'Your Profile',
-    body: 'Set your country and currency, change your avatar, track your badges, and see your full progress history here.',
+    body: 'Set your country and currency, change your avatar, track your badges, and see your full progress history here. Forgot something from this tour? You can replay it anytime from Profile → Replay Welcome Tour.',
     emoji: '👤',
     position: 'top',
   },
@@ -79,15 +79,30 @@ export function TooltipTour({ onComplete }: TooltipTourProps) {
     const timeout = setTimeout(() => {
       const el = document.getElementById(currentStep.targetId);
       if (el) {
+        // Scroll into view FIRST (instantly, not smooth) so the rect we
+        // measure below reflects the element's final resting position.
+        // Previously this measured the rect, THEN scrolled — so the
+        // highlight/tooltip were drawn at the pre-scroll position while the
+        // real element ended up somewhere else, making the tour look broken.
+        el.scrollIntoView({ behavior: 'instant' as ScrollBehavior, block: 'center' });
         const rect = el.getBoundingClientRect();
+        // NOTE: no + window.scrollY/scrollX here. The highlight ring and
+        // tooltip card below are rendered with `position: fixed`, which is
+        // already viewport-relative — adding scroll offset on top of that
+        // was double-counting scroll and pushed the tour further off-target
+        // on every step after the page had scrolled at all.
         setTargetPos({
-          top: rect.top + window.scrollY,
-          left: rect.left + window.scrollX,
+          top: rect.top,
+          left: rect.left,
           width: rect.width,
           height: rect.height,
         });
-        // Scroll element into view
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        // Target not found in the DOM (e.g. this step's nav item isn't
+        // rendered at the current viewport width) — don't get stuck showing
+        // a stale position from a previous step. Reset so the tour doesn't
+        // silently freeze.
+        setTargetPos(null);
       }
       setVisible(true);
     }, 300);
@@ -113,6 +128,7 @@ export function TooltipTour({ onComplete }: TooltipTourProps) {
 
   // Calculate tooltip position
   const tooltipWidth = 280;
+  const tooltipHeightEstimate = 200; // approx card height incl. padding
   const gap = 12;
   let tooltipTop = 0;
   let tooltipLeft = 0;
@@ -126,7 +142,7 @@ export function TooltipTour({ onComplete }: TooltipTourProps) {
       ));
       break;
     case 'top':
-      tooltipTop = targetPos.top - gap - 160; // approx tooltip height
+      tooltipTop = targetPos.top - gap - tooltipHeightEstimate;
       tooltipLeft = Math.max(8, Math.min(
         targetPos.left + targetPos.width / 2 - tooltipWidth / 2,
         window.innerWidth - tooltipWidth - 8
@@ -136,6 +152,24 @@ export function TooltipTour({ onComplete }: TooltipTourProps) {
       tooltipTop = targetPos.top;
       tooltipLeft = targetPos.left + targetPos.width + gap;
   }
+
+  // Previously unclamped vertically — tooltipLeft was always kept on-screen,
+  // but a target element positioned low on a long page (e.g. dashboard cards
+  // near the bottom) could push tooltipTop well past window.innerHeight,
+  // rendering the card entirely below the visible viewport since it's
+  // `position: fixed` (not reachable by scrolling). This is what the "guide
+  // goes way too low, doesn't come on screen" report was describing. Clamp
+  // the same way the horizontal position already was.
+  //
+  // Also reserve room for the fixed mobile bottom nav bar (~72px + safe-area
+  // inset) — the first clamp alone let the tooltip land in that strip, so
+  // its "Next" button ended up sitting right where the nav bar is, which is
+  // what caused it to look like it was hidden behind the nav.
+  const bottomNavReserve = 96;
+  tooltipTop = Math.max(
+    8,
+    Math.min(tooltipTop, window.innerHeight - tooltipHeightEstimate - bottomNavReserve)
+  );
 
   return (
     <>

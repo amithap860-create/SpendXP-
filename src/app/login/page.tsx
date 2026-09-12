@@ -10,6 +10,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { checkLockout } from '@/firebase';
 import { db } from '@/firebase';
 import { cn } from '@/lib/utils';
+import { isNative } from '@/lib/native';
 
 type Tab = 'signin' | 'signup';
 
@@ -23,6 +24,7 @@ function LoginContent() {
     error: authError,
     user,
     loading: authLoading,
+    isParent: isParentAccount,
   } = useAuthContext();
 
   const router = useRouter();
@@ -37,7 +39,18 @@ function LoginContent() {
   // Redirect already-authenticated users away from the login page
   useEffect(() => {
     if (!authLoading && user) {
-      const nextUrl = searchParams.get('next') || '/dashboard';
+      const defaultUrl = isParentAccount ? '/parent' : '/dashboard';
+      // NOTE (2026-08-25): this page must accept BOTH 'next' and 'redirect' as
+      // the return-to param. join/page.tsx (the parent<->child invite accept
+      // flow) sends signed-out users here with ?redirect=/join?..., but this
+      // page previously only ever read ?next=. That mismatch meant a child
+      // with an existing account, signing IN (not up) to accept a parent's
+      // invite link, got silently sent to their normal dashboard after
+      // logging in instead of back to /join to finish accepting — the invite
+      // was never completed and nothing visibly failed. profile/page.tsx
+      // still uses ?next=, so both params are honored, 'next' taking
+      // precedence only because it's checked first (no real callers pass both).
+      const nextUrl = searchParams.get('next') || searchParams.get('redirect') || defaultUrl;
       try {
         const parsed = new URL(nextUrl, window.location.origin);
         if (parsed.origin === window.location.origin) {
@@ -45,9 +58,9 @@ function LoginContent() {
           return;
         }
       } catch {}
-      router.replace('/dashboard');
+      router.replace(defaultUrl);
     }
-  }, [user, authLoading, router, searchParams]);
+  }, [user, authLoading, isParentAccount, router, searchParams]);
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -86,7 +99,18 @@ function LoginContent() {
     setLoading(true);
     const res = await signInWithGoogle();
     if (res.success) {
-      const nextUrl = searchParams.get('next') || '/dashboard';
+      const defaultUrl = isParentAccount ? '/parent' : '/dashboard';
+      // NOTE (2026-08-25): this page must accept BOTH 'next' and 'redirect' as
+      // the return-to param. join/page.tsx (the parent<->child invite accept
+      // flow) sends signed-out users here with ?redirect=/join?..., but this
+      // page previously only ever read ?next=. That mismatch meant a child
+      // with an existing account, signing IN (not up) to accept a parent's
+      // invite link, got silently sent to their normal dashboard after
+      // logging in instead of back to /join to finish accepting — the invite
+      // was never completed and nothing visibly failed. profile/page.tsx
+      // still uses ?next=, so both params are honored, 'next' taking
+      // precedence only because it's checked first (no real callers pass both).
+      const nextUrl = searchParams.get('next') || searchParams.get('redirect') || defaultUrl;
       try {
         const parsed = new URL(nextUrl, window.location.origin);
         if (parsed.origin === window.location.origin) {
@@ -95,7 +119,7 @@ function LoginContent() {
           return;
         }
       } catch {}
-      router.replace('/dashboard');
+      router.replace(defaultUrl);
     }
     setLoading(false);
   };
@@ -111,8 +135,19 @@ function LoginContent() {
     }
     const res = await signInWithEmail(email, password);
     if (res.success) {
-      // Get next from URL params, default to dashboard
-      const nextUrl = searchParams.get('next') || '/dashboard';
+      // Get next from URL params, default to the right dashboard for this account type
+      const defaultUrl = isParentAccount ? '/parent' : '/dashboard';
+      // NOTE (2026-08-25): this page must accept BOTH 'next' and 'redirect' as
+      // the return-to param. join/page.tsx (the parent<->child invite accept
+      // flow) sends signed-out users here with ?redirect=/join?..., but this
+      // page previously only ever read ?next=. That mismatch meant a child
+      // with an existing account, signing IN (not up) to accept a parent's
+      // invite link, got silently sent to their normal dashboard after
+      // logging in instead of back to /join to finish accepting — the invite
+      // was never completed and nothing visibly failed. profile/page.tsx
+      // still uses ?next=, so both params are honored, 'next' taking
+      // precedence only because it's checked first (no real callers pass both).
+      const nextUrl = searchParams.get('next') || searchParams.get('redirect') || defaultUrl;
       if (reason === 'reauth_required') {
         router.push('/profile');
       } else {
@@ -122,10 +157,10 @@ function LoginContent() {
           if (nextUrlObj.origin === window.location.origin) {
             router.replace(nextUrl); // Use replace to avoid back button to login
           } else {
-            router.replace('/dashboard'); // Fallback for invalid origin
+            router.replace(defaultUrl); // Fallback for invalid origin
           }
         } catch {
-          router.replace('/dashboard'); // Fallback for invalid URL
+          router.replace(defaultUrl); // Fallback for invalid URL
         }
       }
     } else {
@@ -275,19 +310,26 @@ function LoginContent() {
                   {loading ? <RefreshCw className="h-5 w-5 animate-spin" /> : 'Sign In'}
                 </Button>
 
-                <Button
-                  onClick={handleGoogleSignIn}
-                  variant="outline"
-                  type="button"
-                  className="w-full h-14 gap-3 font-bold border-2 min-h-[44px]"
-                  disabled={loading}
-                  suppressHydrationWarning
-                >
-                  {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : (
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
-                  )}
-                  Continue with Google
-                </Button>
+                {/* Google's OAuth policy blocks signInWithPopup inside an embedded
+                    WebView (which is what the Capacitor app is), producing
+                    "missing initial state" errors. Hiding this on native until
+                    a proper native Google Sign-In plugin is added — email/password
+                    below is unaffected and works fine in the app. */}
+                {!isNative() && (
+                  <Button
+                    onClick={handleGoogleSignIn}
+                    variant="outline"
+                    type="button"
+                    className="w-full h-14 gap-3 font-bold border-2 min-h-[44px]"
+                    disabled={loading}
+                    suppressHydrationWarning
+                  >
+                    {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : (
+                      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
+                    )}
+                    Continue with Google
+                  </Button>
+                )}
               </form>
             )}
 

@@ -86,10 +86,22 @@ export function useCollection<T = any>(
     setIsLoading(true);
     setError(null);
 
+    // Watchdog: same class of bug as AuthContext's Firestore listener —
+    // persistentLocalCache can hit an internal assertion failure (see
+    // firestoreSafe.ts) that kills a listener silently, without calling
+    // either callback below. Without this, isLoading would stay true
+    // forever and any component using this hook would show a permanent
+    // spinner. Forces loading to resolve regardless.
+    const watchdog = setTimeout(() => {
+      console.warn('[SpendXP] useCollection watchdog fired — forcing isLoading=false');
+      setIsLoading(false);
+    }, 8000);
+
     // Directly use memoizedTargetRefOrQuery as it's assumed to be the final query
     const unsubscribe = onSnapshot(
       memoizedTargetRefOrQuery,
       (snapshot: QuerySnapshot<DocumentData>) => {
+        clearTimeout(watchdog);
         const results: ResultItemType[] = [];
         for (const doc of snapshot.docs) {
           results.push({ ...(doc.data() as T), id: doc.id });
@@ -99,6 +111,7 @@ export function useCollection<T = any>(
         setIsLoading(false);
       },
       (error: FirestoreError) => {
+        clearTimeout(watchdog);
         // This logic extracts the path from either a ref or a query
         const path: string =
           memoizedTargetRefOrQuery.type === 'collection'
@@ -119,7 +132,10 @@ export function useCollection<T = any>(
       }
     );
 
-    return () => unsubscribe();
+    return () => {
+      clearTimeout(watchdog);
+      unsubscribe();
+    };
   }, [memoizedTargetRefOrQuery, isAuthReady]); // Re-run when auth state settles
 
   if (memoizedTargetRefOrQuery && !memoizedTargetRefOrQuery.__memo) {

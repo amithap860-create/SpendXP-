@@ -1117,5 +1117,141 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
     },
     estimatedReadSeconds: 75,
     relatedActivityIds: ['investment-trap']
+  },
+
+  {
+    id: 'balanced-budget',
+    title: "The 50/20/30 rule — a budget you can actually stick to",
+    hook: "A budget isn't a leash. It's the plan that lets you spend the 30% guilt-free, because the other 70% is already handled.",
+    keyPoints: [
+      "50% of income goes to needs — rent, food, transport, bills you can't skip",
+      "20% goes to your future — savings, investments, paying down debt",
+      "30% is yours to spend on whatever you want, with zero guilt, because it's already budgeted for",
+      "Most budgets fail not from bad math but from leaving out the 30% — no one sticks to a plan that never lets them enjoy anything",
+      "Split the money the moment it arrives, before it sits in one account tempting you to spend it on whatever comes first"
+    ],
+    realWorldStat: "People who use a percentage-based budget save roughly 2-3x more over five years than people who track nothing and 'wing it' month to month.",
+    quickQuestion: "If you had to cut your 30% 'living' bucket in half this month, what's the first thing you'd give up — and would you actually be okay with that?",
+    ageAdapted: {
+      junior: {
+        hook: "Pocket money that runs out three days early? Try splitting it the moment you get it, not after you've already spent some.",
+        keyPoints: [
+          "Try three jars: needs, saving, spending — decide what goes where before you spend a single rupee",
+          "You don't need a big allowance for this to work — the habit matters more than the amount",
+          "The 'spending' jar isn't wasteful — it's there on purpose, so you don't feel like saving means never having fun",
+          "If a jar runs dry before the week's over, that's useful information, not a failure"
+        ]
+      },
+      teen: {
+        hook: "Your allowance or part-time pay feels tight even without big expenses. A three-way split fixes that — starting today.",
+        keyPoints: [
+          "50% needs (transport, school costs, phone recharge), 20% savings, 30% is yours to enjoy",
+          "Decide the split the day the money lands, not after a week of random spending",
+          "The 30% isn't a loophole — it's the part that makes the other 70% sustainable long-term",
+          "If your needs are eating more than 50%, that's a signal to look at what's actually essential vs habitual"
+        ]
+      },
+      senior: {
+        hook: "Your first salary disappears fast unless you decide where it goes before it ever hits your account.",
+        keyPoints: [
+          "Fixed costs — rent, EMIs, insurance — should stay under 50% of take-home pay; if they don't, that's a lifestyle decision worth revisiting",
+          "Automate the 20% savings transfer on salary day, before you can see or spend it",
+          "The 30% 'lifestyle' bucket is what keeps a budget from being abandoned within two months — deprivation-based budgets rarely survive",
+          "Review the split every 6 months — income and needs both change, and a budget that never gets revisited stops being useful"
+        ],
+        extraStat: "Financial planners commonly cite that budgets fail within 90 days when they allocate 100% of income to 'responsible' categories and leave nothing for discretionary spending."
+      }
+    },
+    estimatedReadSeconds: 45,
+    relatedActivityIds: ['balanced-budget']
+  },
+
+  {
+    id: 'lifestyle-design',
+    title: "Design the life first — then build the income to fund it",
+    hook: "Most people let their lifestyle be whatever their income happens to allow. Flip it: decide the life, then work backward to the income that supports it.",
+    keyPoints: [
+      "Decide what your ideal life actually looks like before deciding how you'll earn for it",
+      "Working backward from a target lifestyle reveals exactly which skills, income sources, or career moves you need — not just whichever opportunity shows up first",
+      "Without a deliberate plan, spending quietly rises to match whatever you earn — a raise disappears the same way a smaller paycheck did",
+      "This isn't about guessing a dream job — it's a repeatable exercise: define the life, cost it out, then find income that covers it"
+    ],
+    realWorldStat: "Research on lifestyle inflation shows most people's spending rises to absorb roughly 70-90% of any income increase within a year — unless they decide in advance where the extra goes.",
+    quickQuestion: "If you designed your ideal week starting today — not 10 years from now — what would have to change about how you currently earn or spend?",
+    ageAdapted: {
+      junior: {
+        hook: "You don't need a job yet to start designing your future — this is about deciding what matters before money even enters the picture.",
+        keyPoints: [
+          "It's okay to dream big about grown-up life — that's not silly, that's planning",
+          "Think about what you'd want to spend your time doing, not just which job title sounds impressive",
+          "The earlier you think about this, the more choices you'll have later — nothing to act on yet, just to notice"
+        ]
+      },
+      teen: {
+        hook: "You don't need a career yet to start designing — figure out what kind of life excites you, and let that guide the choices you make now.",
+        keyPoints: [
+          "List what you actually want your life to look like in 5-10 years — be specific, not vague ('freedom' isn't specific, 'working from anywhere 3 months a year' is)",
+          "Work backward: what skills, subjects, or income would that life realistically require?",
+          "This beats drifting into whatever opportunity shows up first, because you'll actually recognize the right one when it appears"
+        ]
+      },
+      senior: {
+        hook: "Your first job offer will shape your lifestyle by default unless you decide on purpose what you're optimizing for.",
+        keyPoints: [
+          "Before accepting an offer, ask if it funds the life you actually want — not just any comfortable life",
+          "Income you didn't plan for tends to get absorbed without you noticing — this is lifestyle inflation happening in real time",
+          "People who design their lifestyle first tend to make deliberate career moves; people who don't tend to make reactive ones and wonder later why nothing feels like progress"
+        ],
+        extraStat: "Career-satisfaction surveys consistently find that people who set explicit lifestyle goals before choosing a job report significantly higher long-term career satisfaction than those who chase salary alone."
+      }
+    },
+    estimatedReadSeconds: 45,
+    relatedActivityIds: ['lifestyle-design']
+  },
+
+  {
+    id: 'stock-investigator',
+    title: "Before you buy the hype, run the 4-question filter",
+    hook: "Everyone in your class is talking about the same hot stock. That's not a reason to buy it — it's a reason to slow down.",
+    keyPoints: [
+      "Question 1 — Do I understand what this company actually does, in one sentence? If not, you're not investing, you're gambling on a name",
+      "Question 2 — Is it profitable, or growing revenue in a way I can verify, not just a story I've been told?",
+      "Question 3 — Is everyone talking about it BECAUSE it's a good investment, or is it a good investment because everyone's talking about it? Hype and value aren't the same thing",
+      "Question 4 — Would I still buy this if no one else was talking about it? If the answer is no, the crowd is the only reason you want in",
+      "A tip from a friend is not research — it's a starting point that still requires you to check the fundamentals yourself"
+    ],
+    realWorldStat: "Studies of retail investing behavior consistently show that stocks bought during hype spikes underperform the same stocks bought before the spike — buying on hype means buying at the highest price, not the best one.",
+    quickQuestion: "If your friend's hot tip turned out to be a company you couldn't explain in one sentence, would you still invest — and why might you be tempted to anyway?",
+    ageAdapted: {
+      junior: {
+        hook: "If a friend says 'everyone's buying this,' that's exactly the moment to ask 'why' instead of just following along.",
+        keyPoints: [
+          "Before joining in on something because 'everyone's doing it,' ask what it actually is and why it's supposed to be good",
+          "It's okay to say 'I don't understand this yet' and wait until you do",
+          "Following the crowd feels safe in the moment but isn't the same as making a good decision"
+        ]
+      },
+      teen: {
+        hook: "A hot stock tip is circulating in your group chat. Before you put money in because everyone else is, run it through 4 quick questions.",
+        keyPoints: [
+          "Can you explain what the company does, in one sentence, without repeating what someone else told you?",
+          "Is there real evidence it's doing well (revenue, growth, news) — or just excitement and screenshots of gains?",
+          "Ask yourself honestly: would you still want in if nobody else was talking about it?",
+          "A tip is a starting point for research, not a substitute for it — five minutes of checking beats zero"
+        ]
+      },
+      senior: {
+        hook: "Peter Lynch's 4-question filter exists because hype and value get confused constantly, even by experienced investors.",
+        keyPoints: [
+          "Understand the business model well enough to explain it to someone else before you put money in — if you can't, you don't understand your own risk",
+          "Separate verifiable fundamentals (revenue, profit, growth trends) from narrative (excitement, headlines, 'everyone's buying')",
+          "Ask whether the excitement is driving the price, or whether the price is driving the excitement — these create very different outcomes",
+          "The best filter against FOMO-driven investing is a simple personal rule: no purchase decision made same-day as hearing the tip"
+        ],
+        extraStat: "Peter Lynch, one of the most successful mutual fund managers in history, is famous for advising retail investors to only buy what they can explain clearly in a couple of sentences to a child."
+      }
+    },
+    estimatedReadSeconds: 50,
+    relatedActivityIds: ['stock-investigator']
   }
 ];

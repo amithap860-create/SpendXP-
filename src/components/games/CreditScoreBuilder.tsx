@@ -12,9 +12,19 @@ import { XPWallet } from '@/components/XPWallet';
 import { ShieldCheck, Trophy, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ConceptBreakdown } from '@/components/ConceptBreakdown';
+import { useGameTutorial, GameTutorialModal, HowToPlayButton } from '@/components/games/GameTutorial';
+
+const CREDIT_BUILDER_TUTORIAL_STEPS = [
+  'Each month you\'ll face a real-life money decision — read the scenario before choosing.',
+  'Tap an option to pick what you\'d do. There\'s no timer, so take your time.',
+  'Your choice moves the credit factor bars on the left and your overall score.',
+  'After choosing, read the explanation — it tells you why that pick helped or hurt your score.',
+  'Keep going until the simulation ends, then see your final score and band.',
+];
 
 export function CreditScoreBuilder({ onExit }: { onExit: () => void }) {
   const { ageGroup } = useAgeAdapt();
+  const tutorial = useGameTutorial('creditScoreBuilder');
   const rounds = ageGroup === 'junior' ? 6 : ageGroup === 'teen' ? 10 : 12;
   const gameConfig = useMemo(() => ({ gameName: 'creditScoreBuilder' as const, totalRounds: rounds, livesEnabled: false, xpPerWin: 150, xpPerCorrectAnswer: 0 }), [rounds]);
   const { gameState, score: roundCount, currentRound, xpEarned, startGame, nextRound, endGame } = useGameEngine(gameConfig);
@@ -70,7 +80,12 @@ export function CreditScoreBuilder({ onExit }: { onExit: () => void }) {
     setSelectedOption(null);
     setCurrentChoice(null); // clear stale card while next question loads
     if (currentRound < rounds) nextRound();
-    else endGame();
+    // NOTE (2026-09): same bug as StockMarketSim — xpPerWin (150) is only
+    // added inside the NEXT_ROUND reducer case when currentRound reaches
+    // totalRounds, but nextRound() is never called on the final round (this
+    // branch calls endGame() instead), so that bonus was unreachable and XP
+    // stayed at 0 for every playthrough. Passing it directly fixes it.
+    else endGame(gameConfig.xpPerWin);
   };
 
   if (showBrief) return (
@@ -84,8 +99,10 @@ export function CreditScoreBuilder({ onExit }: { onExit: () => void }) {
   );
 
   if (gameState === 'IDLE') return (
+    <>
     <Card className="max-w-2xl mx-auto border-none shadow-2xl bg-white text-center overflow-hidden">
-      <div className="bg-primary p-8 md:p-10 text-white">
+      <div className="bg-primary p-8 md:p-10 text-white relative">
+        <HowToPlayButton onClick={tutorial.reopen} position="right" />
         <ShieldCheck className="h-12 w-12 mx-auto mb-6" />
         <CardTitle className="text-3xl md:text-4xl font-black mb-2">CREDIT BUILDER</CardTitle>
         <CardDescription className="text-primary-foreground/80">Master the lifecycle choices that build your score.</CardDescription>
@@ -94,6 +111,13 @@ export function CreditScoreBuilder({ onExit }: { onExit: () => void }) {
         <Button onClick={startGame} className="w-full h-16 text-xl font-black rounded-2xl shadow-xl">START SIMULATION</Button>
       </CardContent>
     </Card>
+    <GameTutorialModal
+      open={tutorial.open}
+      onClose={tutorial.dismiss}
+      title="Credit Score Builder"
+      steps={CREDIT_BUILDER_TUTORIAL_STEPS}
+    />
+    </>
   );
 
   if (gameState === 'RESULTS') {

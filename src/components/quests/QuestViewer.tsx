@@ -75,9 +75,15 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
   };
 
   const getBalanceColor = () => {
-    const ratio = currentBalance / quest.startingBalance;
+    // FIX (2026-09): quests with startingBalance: 0 (e.g. 'first-side-hustle',
+    // 'lifestyle-design') made `ratio` divide by zero (NaN/Infinity). The
+    // three checks above usually short-circuit before `ratio` is read, but
+    // when currentBalance < 0 with a 0 starting balance, ratio was NaN and
+    // fell through unpredictably. Guard the division explicitly.
     if (currentBalance > quest.startingBalance) return 'text-primary';
     if (currentBalance === quest.startingBalance) return 'text-slate-600';
+    if (quest.startingBalance === 0) return 'text-rose-600'; // any negative dip from a 0 base is a loss
+    const ratio = currentBalance / quest.startingBalance;
     if (ratio > 0.5) return 'text-[#2E7D5A]';
     return 'text-rose-600';
   };
@@ -92,7 +98,17 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
   if (showBreakdown) {
     return (
       <ConceptBreakdown
-        breakdownId={quest.id === 'calculations-quest' ? 'investing-basics' : quest.id}
+        breakdownId={
+          quest.id === 'calculations-quest'
+            ? 'investing-basics'
+            // These 3 quests share one breakdown entry ('consistency-over-timing')
+            // that was written to cover all of them — its relatedActivityIds
+            // already lists all three, it just needed this id redirect (same
+            // pattern as calculations-quest above) to actually be reachable.
+            : ['two-piggy-banks', 'raise-trap', 'right-on-time'].includes(quest.id)
+            ? 'consistency-over-timing'
+            : quest.id
+        }
         ageGroup={ageGroup}
         activityType="quest"
         activityTitle={quest.title}
@@ -348,30 +364,54 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
             </div>
           </div>
 
-          <div className="grid gap-3">
-            {currentStep?.choices.map((choice) => (
-              <button
-                key={choice.id}
-                disabled={!!selectedChoiceId}
-                onClick={() => handleChoiceSelect(choice.id)}
-                className={cn(
-                  "w-full min-h-[60px] p-4 md:p-5 text-left rounded-2xl border-2 transition-all duration-300 flex items-center justify-between group",
-                  !selectedChoiceId
-                    ? "hover:border-primary hover:bg-primary/5 border-slate-100"
-                    : choice.id === selectedChoiceId
-                      ? choice.isOptimal
-                        ? "bg-[#E8F5EE] border-[#2E7D5A] text-[#1A1F2E] scale-[1.01] shadow-lg"
-                        : "bg-[#E8F5EE] border-[#4A556B] text-[#1A1F2E] scale-[1.01] shadow-lg"
-                      : "opacity-40 grayscale"
-                )}
-              >
-                <span className="text-sm md:text-base font-bold pr-4">{localiseText(choice.text)}</span>
-                {selectedChoiceId === choice.id && (
-                  choice.isOptimal ? <CheckCircle2 className="h-6 w-6 text-primary shrink-0" /> : <XCircle className="h-6 w-6 text-[#2E7D5A] shrink-0" />
-                )}
-              </button>
-            ))}
-          </div>
+          {/* NOTE (2026-09): a handful of steps in quests.ts (mainly
+              "recap/catch-up" narrative beats where earlier branches
+              converge back to one path) only have a single QuestChoice —
+              this isn't a bug, the code renders however many choices exist.
+              But styling that lone option identically to a real multi-option
+              decision made it look like a broken/empty choice screen. When
+              there's only one option, it's not a decision — it's a
+              "continue the story" beat, so it's framed that way instead. */}
+          {currentStep && currentStep.choices.length === 1 ? (
+            <button
+              disabled={!!selectedChoiceId}
+              onClick={() => handleChoiceSelect(currentStep.choices[0].id)}
+              className={cn(
+                "w-full min-h-[60px] p-4 md:p-5 rounded-2xl border-2 transition-all duration-300 flex items-center justify-center gap-2 font-black text-sm md:text-base",
+                !selectedChoiceId
+                  ? "bg-primary text-white border-primary hover:bg-primary/90"
+                  : "bg-[#E8F5EE] border-[#2E7D5A] text-[#1A1F2E] opacity-90"
+              )}
+            >
+              {localiseText(currentStep.choices[0].text)}
+              {!selectedChoiceId && <ArrowRight className="h-4 w-4" />}
+            </button>
+          ) : (
+            <div className="grid gap-3">
+              {currentStep?.choices.map((choice) => (
+                <button
+                  key={choice.id}
+                  disabled={!!selectedChoiceId}
+                  onClick={() => handleChoiceSelect(choice.id)}
+                  className={cn(
+                    "w-full min-h-[60px] p-4 md:p-5 text-left rounded-2xl border-2 transition-all duration-300 flex items-center justify-between group",
+                    !selectedChoiceId
+                      ? "hover:border-primary hover:bg-primary/5 border-slate-100"
+                      : choice.id === selectedChoiceId
+                        ? choice.isOptimal
+                          ? "bg-[#E8F5EE] border-[#2E7D5A] text-[#1A1F2E] scale-[1.01] shadow-lg"
+                          : "bg-[#E8F5EE] border-[#4A556B] text-[#1A1F2E] scale-[1.01] shadow-lg"
+                        : "opacity-40 grayscale"
+                  )}
+                >
+                  <span className="text-sm md:text-base font-bold pr-4">{localiseText(choice.text)}</span>
+                  {selectedChoiceId === choice.id && (
+                    choice.isOptimal ? <CheckCircle2 className="h-6 w-6 text-primary shrink-0" /> : <XCircle className="h-6 w-6 text-[#2E7D5A] shrink-0" />
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
 
           {selectedChoiceId && activeChoice && (
             <div className="animate-in slide-in-from-top-4 duration-500 space-y-5 mt-4">

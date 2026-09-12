@@ -204,7 +204,13 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
   }, [gameState, timeLeft]);
 
   const handleFinish = async () => {
-    await endGame();
+    // NOTE (2026-09): same bug class as FinIQQuiz — this game has
+    // totalRounds: 1, so nextRound() is never called anywhere in this file,
+    // meaning the NEXT_ROUND reducer branch that adds xpPerWin (200) was
+    // completely unreachable. Per-question XP via correctAnswer() still
+    // worked, but the 200xp completion bonus was silently dropped every
+    // playthrough. Passing it directly into endGame() fixes it.
+    await endGame(gameConfig.xpPerWin);
     if (user && db) {
       const uid = user.uid;
       if (!uid || uid.trim() === '') return;

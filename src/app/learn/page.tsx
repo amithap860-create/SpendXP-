@@ -24,6 +24,17 @@ import { cn } from '@/lib/utils';
 import { useAuthContext } from '@/context/AuthContext';
 import { awardBadge } from '@/lib/badgeService';
 
+// lessons.ts's `relatedGame` values don't all match the games hub's actual
+// GameID strings (e.g. lessons use 'finIQ', the games hub uses 'finIQQuiz').
+// This maps lesson data -> the real game id/name so links + labels are correct.
+const GAME_INFO: Record<string, { id: string; name: string }> = {
+  budgetBlitz: { id: 'budgetBlitz', name: 'Budget Blitz' },
+  finIQ: { id: 'finIQQuiz', name: 'FinIQ Quiz' },
+  moneyMaze: { id: 'moneyMaze', name: 'Money Maze' },
+  stockMarketSim: { id: 'stockMarketSim', name: 'Stock Market Sim' },
+  creditScoreBuilder: { id: 'creditScoreBuilder', name: 'Credit Builder' },
+};
+
 export default function LearnHub() {
   const { user } = useAuthContext();
   const { tasks, ageGroup } = useUser();
@@ -33,8 +44,11 @@ export default function LearnHub() {
     document.title = 'Learn | SpendXP';
   }, []);
 
+  // Preserves lessons.ts's authored order — that order IS the intended
+  // learning path, so filtering (not resorting) keeps sequencing correct.
   const availableLessons = lessons.filter(l => l.ageGroups.includes((ageGroup || 'junior') as any));
-  const completedCount = lessons.filter(l => tasks.find(t => t.id === `lesson-${l.id}`)?.completed).length;
+  const isLessonComplete = (id: string) => !!tasks.find(t => t.id === `lesson-${id}`)?.completed;
+  const completedCount = lessons.filter(l => isLessonComplete(l.id)).length;
   const overallProgress = (completedCount / lessons.length) * 100;
 
   const handleLessonFinish = async (lessonId: string) => {
@@ -80,19 +94,37 @@ export default function LearnHub() {
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {lessons.map((lesson) => {
-              const isCompleted = tasks.find(t => t.id === `lesson-${lesson.id}`)?.completed;
+              const isCompleted = isLessonComplete(lesson.id);
               const xpReward = lesson.cards.reduce((acc, c) => acc + c.xpReward, 0);
-              const isAgeAppropriate = availableLessons.find(l => l.id === lesson.id);
-              
+              const isAgeAppropriate = !!availableLessons.find(l => l.id === lesson.id);
+
+              // Hard-locked linear path: within this user's age-appropriate
+              // lessons (in lessons.ts's authored order), a lesson is locked
+              // until the lesson before it is completed.
+              // BUG FIX (2026-09): this used to lock a lesson purely based on
+              // whether its predecessor was done, with no exemption for
+              // lessons the user had ALREADY completed (e.g. done out of
+              // order before this sequencing existed, or simply out of
+              // order). That meant a finished lesson could re-lock itself
+              // and become inaccessible for review — exactly the "still
+              // locked after completing" symptom reported. A completed
+              // lesson must never be treated as locked.
+              const sequenceIndex = availableLessons.findIndex(l => l.id === lesson.id);
+              const prevLesson = sequenceIndex > 0 ? availableLessons[sequenceIndex - 1] : null;
+              const isSequenceLocked = !isCompleted && isAgeAppropriate && !!prevLesson && !isLessonComplete(prevLesson.id);
+              const isLocked = !isCompleted && (!isAgeAppropriate || isSequenceLocked);
+
+              const game = GAME_INFO[lesson.relatedGame];
+
               return (
-                <Card 
-                  key={lesson.id} 
+                <Card
+                  key={lesson.id}
                   className={cn(
                     "group hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden flex flex-col",
                     isCompleted && "ring-2 ring-primary/20",
-                    !isAgeAppropriate && "opacity-50 grayscale"
+                    isLocked && "opacity-50 grayscale"
                   )}
-                  onClick={() => isAgeAppropriate && setActiveLesson(lesson)}
+                  onClick={() => !isLocked && setActiveLesson(lesson)}
                 >
                   <div className={cn(
                     "h-2",
@@ -111,7 +143,7 @@ export default function LearnHub() {
                         <Badge className="bg-[#C8E8D8] text-primary hover:bg-[#C8E8D8] border-none gap-1 font-black">
                           <CheckCircle2 className="h-3 w-3" /> DONE
                         </Badge>
-                      ) : !isAgeAppropriate ? (
+                      ) : isLocked ? (
                         <Badge variant="outline" className="text-[10px] uppercase font-black">LOCKED</Badge>
                       ) : (
                         <Badge variant="secondary" className="bg-slate-50 text-slate-500 border-none font-black">
@@ -123,7 +155,11 @@ export default function LearnHub() {
                       {lesson.title}
                     </CardTitle>
                     <CardDescription className="font-medium">
-                      {!isAgeAppropriate ? `Available for ${lesson.ageGroups.join('/')} level` : `Master the basics of ${lesson.topic}.`}
+                      {!isAgeAppropriate
+                        ? `Available for ${lesson.ageGroups.join('/')} level`
+                        : isSequenceLocked && prevLesson
+                          ? `Complete "${prevLesson.title}" first`
+                          : `Master the basics of ${lesson.topic}.`}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="mt-auto pt-4 space-y-4">
@@ -131,16 +167,25 @@ export default function LearnHub() {
                       <div className="flex items-center gap-1"><Clock className="h-3 w-3" /> {lesson.estimatedMinutes}m read</div>
                       <div className="flex items-center gap-1"><Trophy className="h-3 w-3" /> Strategy</div>
                     </div>
-                    <button 
+                    <button
                       className={cn(
                         "w-full h-12 flex items-center justify-center gap-2 font-black rounded-xl border-2 transition-all",
                         isCompleted ? "border-slate-200 text-slate-500" : "bg-primary text-white border-primary shadow-lg shadow-primary/20"
                       )}
-                      disabled={!isAgeAppropriate}
+                      disabled={isLocked}
                       suppressHydrationWarning
                     >
                       {isCompleted ? 'Review Lesson' : 'Start Learning'} <ArrowRight className="h-4 w-4" />
                     </button>
+                    {isCompleted && game && (
+                      <a
+                        href={`/games?game=${game.id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-full h-11 flex items-center justify-center gap-2 font-black rounded-xl bg-slate-50 text-primary hover:bg-primary/10 transition-colors text-sm"
+                      >
+                        <Zap className="h-4 w-4" /> Practice in {game.name}
+                      </a>
+                    )}
                   </CardContent>
                 </Card>
               );

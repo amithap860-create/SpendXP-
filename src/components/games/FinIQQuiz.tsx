@@ -30,6 +30,15 @@ import {
   X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useGameTutorial, GameTutorialModal, HowToPlayButton } from '@/components/games/GameTutorial';
+
+const FINIQ_TUTORIAL_STEPS = [
+  'You\'ll get 10 real-life money scenarios, one at a time.',
+  'Tap the answer you think is best before the timer runs out — younger players and harder questions get more time.',
+  'After you answer, you\'ll immediately see if you were right and why.',
+  'Answer correctly for XP, and answer several in a row quickly for a combo bonus.',
+  'After all 10 questions, see your total score and XP earned.',
+];
 
 interface FinIQQuizProps {
   isDailyChallenge?: boolean;
@@ -206,6 +215,7 @@ function getTimerForQuestion(ageGroup: string, difficulty: string): number {
 export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) {
   const { ageGroup } = useAgeAdapt();
   const { countryCode } = useCountry();
+  const tutorial = useGameTutorial('finIQQuiz');
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [roundQuestions, setRoundQuestions] = useState<ShuffledQuestion[]>([]);
@@ -302,7 +312,12 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
     setSelectedOption(null);
     setShowExplanation(false);
     if (currentRound < 10) nextRound();
-    else endGame(0);
+    // NOTE (2026-09): this explicitly passed 0, throwing away the 100xp
+    // completion bonus declared in xpPerWin above. Per-question XP (via
+    // correctAnswer() calls) still worked, so this game wasn't fully blank
+    // like StockMarketSim/CreditScoreBuilder — but the completion bonus was
+    // silently dropped every time. Passing xpPerWin restores it.
+    else endGame(gameConfig.xpPerWin);
   };
 
   useEffect(() => {
@@ -336,8 +351,10 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
 
   if (gameState === 'IDLE') {
     return (
+      <>
       <Card className="max-w-2xl mx-auto border-none shadow-2xl bg-white overflow-hidden">
         <div className="bg-primary p-8 md:p-10 text-white text-center relative">
+          <HowToPlayButton onClick={tutorial.reopen} position="right" />
           <Zap className="h-10 w-10 text-accent mx-auto mb-6" />
           <h2 className="text-3xl md:text-4xl font-black mb-2 tracking-tight">FinIQ CHALLENGE</h2>
           <p className="text-primary-foreground/80 text-base md:text-lg">{isDailyChallenge ? "Today's Global Scenario Quiz" : "Practice Real-Life Financial Decisions"}</p>
@@ -350,6 +367,13 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
           <Button onClick={startGame} className="w-full h-14 md:h-16 text-lg md:text-xl font-black rounded-2xl shadow-xl shadow-primary/20 min-h-[44px]" suppressHydrationWarning>START QUIZ</Button>
         </CardContent>
       </Card>
+      <GameTutorialModal
+        open={tutorial.open}
+        onClose={tutorial.dismiss}
+        title="FinIQ Challenge"
+        steps={FINIQ_TUTORIAL_STEPS}
+      />
+      </>
     );
   }
 
