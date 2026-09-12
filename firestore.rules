@@ -24,8 +24,16 @@ service cloud.firestore {
 
     // Fields that must only be written by server-side Admin SDK (e.g. Stripe webhook).
     // Clients are never allowed to set these directly — even on their own document.
+    // FIX (2026-09-12): 'parentUid' added. Confirmed via grep that the only code
+    // that ever writes this field is the Admin-SDK invite-accept routes
+    // (accept-invite/accept-child-invite) — nothing client-side legitimately
+    // sets it. Before this, a signed-in user could set parentUid on their own
+    // doc directly (no invite code, no consent, no verification), which let
+    // them bypass the whole invite/consent flow and grant read access to
+    // their own activity data (gameScores, lessonProgress, healthHistory,
+    // etc. — see the /users/{uid} read rule below) to any account they chose.
     function hasProtectedFields(data) {
-      return data.keys().hasAny(['isPremium', 'isAdmin', 'stripeCustomerId', 'stripeSubscriptionId']);
+      return data.keys().hasAny(['isPremium', 'isAdmin', 'stripeCustomerId', 'stripeSubscriptionId', 'parentUid']);
     }
 
     // User documents
@@ -57,7 +65,7 @@ service cloud.firestore {
                     || isStudioPreview();
 
       // Update: owner can update their doc, but cannot add/change protected fields
-      allow update: if (isOwner(uid) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isPremium', 'isAdmin', 'stripeCustomerId', 'stripeSubscriptionId']))
+      allow update: if (isOwner(uid) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isPremium', 'isAdmin', 'stripeCustomerId', 'stripeSubscriptionId', 'parentUid']))
                     || isStudioPreview();
 
       // Delete: disallow client-side account deletion (use Admin SDK / Cloud Function)
