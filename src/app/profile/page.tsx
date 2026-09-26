@@ -21,6 +21,7 @@ import {
   sendEmailVerification,
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
+import { useTheme } from '@/context/ThemeContext';
 import {
   User,
   Mail,
@@ -67,6 +68,8 @@ import {
   Medal,
   PiggyBank,
   Briefcase,
+  Moon,
+  Sun,
   Clock,
   HelpCircle,
 } from 'lucide-react';
@@ -324,6 +327,7 @@ export default function ProfilePage() {
   const { user, loading: authLoading, currentAgeGroup, logout } = useAuthContext();
   const router = useRouter();
   const { toast } = useToast();
+  const { theme, toggleTheme } = useTheme();
 
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [progression, setProgression] = useState<ProgressionData | null>(null);
@@ -970,6 +974,39 @@ export default function ProfilePage() {
             <p className="text-xs text-slate-400 leading-relaxed">
               Changing your country updates how virtual money amounts are displayed throughout the app. Your balance is not affected.
             </p>
+          </div>
+        </Section>
+
+        {/* ── Appearance ── */}
+        {/*
+          NOTE (2026-09-26): this toggle is fully real — it persists and
+          applies the `dark` class to <html> correctly. But most screens in
+          this app still use hardcoded light-only colors (bg-white,
+          text-slate-900, etc.) instead of the theme-aware classes, so
+          turning this on will currently only visibly change this Profile
+          page's own base background/text and any other screen already
+          using theme-aware classes — not the whole app yet. That's a
+          separate, larger migration, tracked as a known follow-up.
+        */}
+        <Section title="Appearance" icon={theme === 'dark' ? Moon : Sun} iconColor="text-primary">
+          <div className="pt-4 flex items-center justify-between">
+            <div>
+              <p className="font-black text-slate-800">{theme === 'dark' ? 'Dark mode' : 'Light mode'}</p>
+              <p className="text-xs text-slate-400 font-bold">Some screens haven&apos;t been updated for dark mode yet</p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="font-bold border-2"
+              onClick={toggleTheme}
+              suppressHydrationWarning
+            >
+              {theme === 'dark' ? (
+                <span className="flex items-center gap-1.5"><Sun className="h-4 w-4" /> Switch to light</span>
+              ) : (
+                <span className="flex items-center gap-1.5"><Moon className="h-4 w-4" /> Switch to dark</span>
+              )}
+            </Button>
           </div>
         </Section>
 

@@ -18,6 +18,7 @@ import { useNativeInit } from '@/hooks/useNativeInit';
 import { useAuthContext } from '@/context/AuthContext';
 import { useProgression } from '@/hooks/useProgression';
 import { FinEducatorChat } from '@/components/chat/FinEducatorChat';
+import { ThemeProvider } from '@/context/ThemeContext';
 
 const inter = Inter({ 
   subsets: ['latin'], 
@@ -262,22 +263,38 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         <link rel="apple-touch-startup-image" href="/icons/icon-512.png" />
+        {/*
+          Anti-flash theme script (2026-09-26): runs before React hydrates so
+          the page never paints light-then-flips-dark on load. Reads the same
+          localStorage key ThemeContext.tsx uses. Wrapped in try/catch because
+          localStorage can throw in some embedded/private-browsing contexts.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try {
+              var t = localStorage.getItem('spendxp_theme');
+              if (t === 'dark') document.documentElement.classList.add('dark');
+            } catch (e) {}`,
+          }}
+        />
       </head>
-      <body 
-        className={cn(inter.variable, "font-sans antialiased bg-slate-50 text-slate-900")}
+      <body
+        className={cn(inter.variable, "font-sans antialiased bg-background text-foreground")}
         suppressHydrationWarning
       >
-        <FirebaseClientProvider>
-          <AgeGroupProvider>
-            <AuthProvider>
-              <UserProvider>
-                <FirestoreErrorBoundary>
-                  <RootLayoutContent>{children}</RootLayoutContent>
-                </FirestoreErrorBoundary>
-              </UserProvider>
-            </AuthProvider>
-          </AgeGroupProvider>
-        </FirebaseClientProvider>
+        <ThemeProvider>
+          <FirebaseClientProvider>
+            <AgeGroupProvider>
+              <AuthProvider>
+                <UserProvider>
+                  <FirestoreErrorBoundary>
+                    <RootLayoutContent>{children}</RootLayoutContent>
+                  </FirestoreErrorBoundary>
+                </UserProvider>
+              </AuthProvider>
+            </AgeGroupProvider>
+          </FirebaseClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

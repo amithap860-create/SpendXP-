@@ -143,6 +143,27 @@ export const lessons: Lesson[] = [
           label: 'Growth over 20 years'
         },
         xpReward: 30
+      },
+      {
+        // NEW (2026-09-26): sourced from a real personal-finance Instagram post
+        // (@sanjanaa.aggarwal) — "buy less, buy better." Added here rather than
+        // as a standalone lesson since this lesson previously had only 1 card
+        // (thin compared to every other lesson's 4-6), and this is a natural
+        // next step after "what is investing."
+        id: 'i2',
+        title: 'Buy Less, Buy Better',
+        body: {
+          junior: "When you start investing, don't spread your money across too many different things at once. Pick one or two good places to put it, and focus on adding more over time — not on finding the 'perfect' option.",
+          teen: "When you're starting out, don't split a small amount across 5 different mutual funds hoping for 'diversification' — with a small amount, that usually just means owning tiny slices of everything and losing track. Pick 1–2 solid funds. As your income grows, increase how MUCH you invest — that matters far more than which fund you picked.",
+          senior: "Splitting a small SIP across many funds often creates overlapping holdings (most flexicap/large-cap funds hold the same top 20-30 stocks) rather than real diversification — just a cluttered, harder-to-track portfolio. Buy less, buy better: 1-2 funds that give genuine exposure. Then redirect your energy toward increasing your SIP amount as income grows — this has far more impact on your final corpus than optimising which fund outperforms by 1%."
+        },
+        example: {
+          junior: "Aman has ₹100. Instead of putting ₹20 into five different piggy banks, he puts it all in one and adds more each week. Simple beats scattered.",
+          teen: "Priya starts a SIP with ₹1,000/month split across 5 funds (₹200 each). A better move: put the full ₹1,000 into 1 solid fund. When her stipend rises to ₹1,500, she increases the SIP amount — not the number of funds.",
+          senior: "Investor A splits ₹5,000/month across 5 flexicap funds — most hold overlapping large-cap stocks, so the 'diversification' is mostly illusion. Investor B puts ₹5,000 into 1 solid flexicap fund, and raises it to ₹8,000 when their salary increases the next year. Investor B's SIP escalation compounds to a meaningfully larger corpus than Investor A's fund-hopping."
+        },
+        visual: 'none',
+        xpReward: 25
       }
     ],
     quizCard: {
@@ -202,7 +223,7 @@ export const lessons: Lesson[] = [
         visualData: {
           items: [
             { label: 'Market Index', value: 100, color: '#10b981' },
-            { label: 'Active Managers', value: 20, color: '#rose-500' }
+            { label: 'Active Managers', value: 20, color: '#f43f5e' }
           ]
         },
         xpReward: 30
@@ -598,6 +619,33 @@ export const lessons: Lesson[] = [
         },
         xpReward: 20,
       },
+      {
+        // NEW (2026-09-26): sourced from a real personal-finance Instagram post
+        // (@sanjanaa.aggarwal) on WHERE specifically to park an emergency fund.
+        // Added here since this lesson previously had only 1 card (thin
+        // compared to every other lesson), and it directly extends ef1's
+        // "keep it liquid" point with the actual how-to.
+        id: 'ef2',
+        title: 'Where to Actually Park It',
+        body: {
+          junior: "Don't just leave all your emergency money in one place doing nothing — but don't try to make it grow fast either, that's not what it's for! A couple of safe spots, used together, works best.",
+          teen: "Your emergency fund shouldn't just sit fully idle earning nothing — but it also shouldn't be chasing high returns. Both defeat the purpose. The best setup usually combines a few things: some money instantly accessible in a savings account, and some in safer, slightly-higher-return options like liquid mutual funds — so it's both safe AND not wasted.",
+          senior: "An emergency fund should balance three things: safety, liquidity, and reasonable (not maximum) returns. In practice this usually means a combination of instruments rather than one: a portion instantly accessible in a savings account or sweep-in FD, and a portion in liquid mutual funds for slightly better yield with T+1 accessibility. Splitting across instruments avoids both idle-cash waste and liquidity risk."
+        },
+        example: {
+          junior: "Meera keeps ₹50 in her piggy bank for right-now emergencies, and asks her mom to safely hold ₹150 for bigger ones. Two spots, both safe, both there when needed.",
+          teen: "Rahul keeps ₹3,000 of his ₹12,000 emergency fund in his savings account for instant access, and puts the other ₹9,000 in a liquid mutual fund earning a bit more — still accessible within a day if he really needs it.",
+          senior: "A ₹1.5L emergency fund split: ₹30K in a savings account/sweep-FD for instant access, ₹1.2L in a liquid fund earning ~6-7% with T+1 withdrawal. Better returns than pure savings, without sacrificing real accessibility."
+        },
+        visual: 'bar',
+        visualData: {
+          items: [
+            { label: 'Instant access (savings)', value: 20, color: '#3b82f6' },
+            { label: 'Liquid fund (T+1)', value: 80, color: '#10b981' },
+          ],
+        },
+        xpReward: 25,
+      },
     ],
     quizCard: {
       question: 'Where should you keep your emergency fund?',
@@ -828,13 +876,40 @@ export const lessons: Lesson[] = [
           senior: "PEG is most useful for steady-growth companies. It breaks down for cyclicals, financials, and pre-profit companies. Cross-reference with FCF yield and ROIC to avoid value traps where earnings are manipulated but cash flow tells the truth."
         },
         visual: 'comparison',
+        // FIX (2026-09-25): was { items: [...] } — the renderer's 'comparison'
+        // case (LessonViewer.tsx renderVisual) destructures { left, right }
+        // from visualData, same as every other lesson using this visual type.
+        // This one card was the sole exception, authored with a shape that
+        // matches the DIFFERENT 'bar' visual type instead. left/right came
+        // back undefined, and reading .value off undefined crashed the app
+        // on this, the final card of the lesson, right before the quiz.
         visualData: {
-          items: [
-            { label: 'Stock A (PEG 2.0)', value: 40, color: '#ef4444', note: 'Expensive' },
-            { label: 'Stock B (PEG 0.8)', value: 80, color: '#10b981', note: 'Potential value' }
-          ]
+          left: { label: 'Stock A (PEG 2.0, Expensive)', value: 40, color: '#ef4444' },
+          right: { label: 'Stock B (PEG 0.8, Value)', value: 80, color: '#10b981' }
         },
         xpReward: 30,
+      },
+      {
+        // NEW (2026-09-26): sourced from a real Instagram post (@sanjanaa.aggarwal)
+        // specifically correcting a misconception visible in that post's own
+        // comments — people were reading "promoter buying" as an automatic buy
+        // signal. sl-4 already mentions promoter buying as Lynch's Q4 in one
+        // line; this deepens it with the actual checklist, and directly sets
+        // up the new 'promoter-buying-trap' quest in quests.ts.
+        id: 'sl-5',
+        title: 'Promoter Buying: Signal, Not a Green Light',
+        body: {
+          junior: "If the people who run a company buy more of it with their own money, that's interesting — but it doesn't automatically mean you should buy too! Always check a few more things first.",
+          teen: "When a company's founders buy more shares with their own money, it's worth paying attention to — nobody understands a business better than the people running it. But promoter buying ALONE is never enough to invest. Always also check: is the business actually growing? Is the stock reasonably priced? Is the promoter buying a meaningful amount (not a token gesture)? Is there a real reason behind it (new orders, expansion, industry tailwind)?",
+          senior: "Promoter buying is a legitimate signal — insiders rarely buy without conviction. But it's a starting point for research, not a buy trigger. Cross-check: revenue/profit/cash-flow growth, valuation reasonability, whether the buying is a meaningful stake increase (not symbolic), and whether there's a genuine catalyst behind it. The strongest setups combine promoter buying with strong fundamentals AND reasonable valuation — never promoter buying alone."
+        },
+        example: {
+          junior: "Just because the owner of a candy shop buys more candy machines doesn't mean the shop is doing well — check if people are actually buying candy first!",
+          teen: "NovaTech's promoter just bought ₹50 lakh more shares — exciting! But before following: are NovaTech's sales actually growing? Is the stock already expensive? Is ₹50L a big deal for a promoter worth ₹500 crore, or is it symbolic? Check before you follow.",
+          senior: "Two companies both show promoter buying. Company A: strong revenue growth, reasonable P/E, promoter bought 2% of their existing holding (meaningful), clear expansion catalyst. Company B: flat revenue, high P/E, promoter bought 0.1% of their holding (symbolic), no stated reason. Same headline signal, very different quality — the checklist is what separates them."
+        },
+        visual: 'none',
+        xpReward: 25,
       },
     ],
     quizCard: {

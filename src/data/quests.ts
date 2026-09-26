@@ -2624,4 +2624,159 @@ export const quests: Quest[] = [
     ],
   },
 
+  {
+    // NEW (2026-09-26): sourced from a real Instagram post (@sanjanaa.aggarwal)
+    // on promoter buying — that post's own comments show people reading
+    // "promoter bought shares" as an automatic buy signal. This quest gives
+    // hands-on practice at the same correction the new 'sl-5' lesson card
+    // (lessons.ts, l-stock-analysis) now teaches. Pairs with 'stock-investigator'
+    // (also chapter 'Investing Decisions') but tests a distinct trap: sizing
+    // and contextualising a signal, not the core 4-question filter itself.
+    id: 'promoter-buying-trap',
+    title: 'The Promoter Buying Trap',
+    description: "Your investing group chat is buzzing: a company's promoter just bought ₹2 crore of shares. Everyone's calling it a guaranteed signal to buy. Is insider buying really a green light on its own — or is there a trap hiding in the excitement?",
+    category: 'investing',
+    difficulty: 'advanced',
+    ageGroups: ['teen', 'senior'],
+    chapterNumber: 20,
+    chapter: 'Investing Decisions',
+    estimatedMinutes: 6,
+    xpReward: 240,
+    startingBalance: 4000,
+    steps: [
+      {
+        id: 'pbt-1',
+        title: 'The Insider Buying Headline',
+        narrative: "Your investing group chat lights up: 'Vantage Textiles' promoter just bought ₹2 crore worth of shares! Insiders never buy without a reason — this is THE signal!' The stock trades at ₹145. You have ₹4,000 saved. What's your first move?",
+        ageGroups: ['teen', 'senior'],
+        choices: [
+          {
+            id: 'pbt-c1',
+            text: "Buy right away — promoter buying is the strongest signal there is",
+            consequence: "You invest ₹4,000 on the headline alone. Two months later Vantage Textiles reports flat revenue and the stock drops 18%. The promoter buying turns out to be a small, symbolic purchase — barely 0.3% of their existing holding.",
+            xpDelta: 10,
+            healthDelta: -15,
+            walletDelta: -720,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Promoter buying is a real signal — but on its own, it's incomplete. Insiders buy for many reasons, and a small symbolic purchase means something very different from a large, conviction-sized one.",
+            realLifeTip: "Never buy on a single headline. 'Promoter bought shares' is the start of research, not the end of it."
+          },
+          {
+            id: 'pbt-c2',
+            text: "Check if Vantage Textiles is actually growing before doing anything else",
+            consequence: "Good instinct. You pull up their last 3 quarters: revenue has grown just 2% while the sector average is 12%. The company looks like it's losing market share, not gaining it.",
+            xpDelta: 60,
+            healthDelta: 15,
+            walletDelta: 0,
+            nextStepId: 'pbt-2',
+            isOptimal: true,
+            explanation: "Promoter buying should be a prompt to research, not a shortcut around it. Checking growth first is exactly right — an insider can be optimistic about a company that's still fundamentally struggling.",
+            realLifeTip: "Before reacting to any single data point, ask: does the rest of the picture agree with it? One good signal surrounded by weak fundamentals is a red flag, not a green light."
+          },
+          {
+            id: 'pbt-c3',
+            text: "Ignore it completely — insider buying is just noise",
+            consequence: "You dismiss it outright. A month later you learn a different company's promoter bought 4% of their own holding right before a major expansion announcement, and that stock rose 30%. You would have caught that signal — if you'd looked instead of dismissing it.",
+            xpDelta: 20,
+            healthDelta: -5,
+            walletDelta: 0,
+            nextStepId: 'pbt-2',
+            isOptimal: false,
+            explanation: "Promoter buying isn't noise — insiders have information and incentives ordinary investors don't. Dismissing it entirely throws away a genuinely useful signal. The mistake isn't using it; it's using it alone.",
+            realLifeTip: "The two most common mistakes with any single signal are equally wrong: blindly following it, and blindly ignoring it. Investigating is usually right."
+          }
+        ]
+      },
+      {
+        id: 'pbt-2',
+        title: 'How Big Is the Buy, Really?',
+        narrative: "You've found Vantage Textiles' growth is weak. Curious, you check the promoter's total holding: they own shares worth ₹650 crore, and this ₹2 crore purchase is just 0.3% of that. Meanwhile, a different company, Brightline Foods, shows a promoter buying ₹3 crore — but their total holding is only ₹15 crore, meaning this purchase is a 20% increase in their stake.",
+        ageGroups: ['teen', 'senior'],
+        choices: [
+          {
+            id: 'pbt-c4',
+            text: "A 0.3% increase is symbolic, not real conviction — dig into Brightline instead",
+            consequence: "Sharp read. A purchase that barely moves the needle on a promoter's existing stake is often just optics — a press-friendly headline, not a genuine bet. Brightline's 20% stake increase is a completely different signal.",
+            xpDelta: 70,
+            healthDelta: 15,
+            walletDelta: 0,
+            nextStepId: 'pbt-3',
+            isOptimal: true,
+            explanation: "Size the purchase against the promoter's EXISTING holding, not the headline number. A ₹2 crore purchase sounds big in isolation, but relative to a ₹650 crore stake, it changes almost nothing about their exposure.",
+            realLifeTip: "Always ask: 'is this a meaningful % increase in what they already own?' A large-sounding rupee figure can still be a tiny, low-conviction move."
+          },
+          {
+            id: 'pbt-c5',
+            text: "₹2 crore is a big number regardless — that's still meaningful",
+            consequence: "You stick with Vantage Textiles based on the rupee figure alone. The stock stays flat for 6 months while Brightline Foods — the company with the truly meaningful promoter buy — rises 35% on strong fundamentals you never checked.",
+            xpDelta: 25,
+            healthDelta: -5,
+            walletDelta: 0,
+            nextStepId: 'pbt-3',
+            isOptimal: false,
+            explanation: "Absolute rupee amounts are misleading without context. A large promoter buying ₹2 crore is a rounding error; the same amount from a smaller promoter is a serious statement.",
+            realLifeTip: "Context turns a number into a signal. Always compare a purchase against the size of what the person already owns."
+          },
+          {
+            id: 'pbt-c6',
+            text: "Both are equally interesting — invest a little in each",
+            consequence: "You split ₹2,000 between both. Vantage Textiles goes nowhere for months. Brightline rises sharply — but your position there was too small to matter, since you treated a weak signal and a strong one as equally worth your money.",
+            xpDelta: 30,
+            healthDelta: 0,
+            walletDelta: 300,
+            nextStepId: 'pbt-3',
+            isOptimal: false,
+            explanation: "Spreading money evenly across a weak signal and a strong one dilutes your best idea. Once you can tell the difference in quality, your money should reflect that difference.",
+            realLifeTip: "Sizing a position isn't just about which stocks to own — it's about weighting the ones you have the most conviction in more heavily than the ones you don't."
+          }
+        ]
+      },
+      {
+        id: 'pbt-3',
+        title: 'The Full Checklist',
+        narrative: "You now have Brightline Foods: a meaningful promoter stake increase. Before deciding anything, you run the full checklist — growth, valuation, and catalyst. Growth: revenue up 22% this year, ahead of the sector. Valuation: P/E of 18 against 22% growth — a PEG well under 1. Catalyst: the company just announced a new distribution deal that explains the timing of the promoter's purchase. All three line up.",
+        ageGroups: ['teen', 'senior'],
+        choices: [
+          {
+            id: 'pbt-c7',
+            text: "All the checks now line up — add it to my research shortlist, not straight to my portfolio",
+            consequence: "Exactly right. You read Brightline's latest annual report before sizing a position, then invest ₹1,500 — meaningful, but sized to your actual conviction. Over the next year the stock rises 28% on the same fundamentals you'd already verified.",
+            xpDelta: 90,
+            healthDelta: 20,
+            walletDelta: 420,
+            nextStepId: 'end',
+            isOptimal: true,
+            explanation: "Promoter buying + real growth + reasonable valuation + a genuine catalyst is a strong combination — but 'strong combination' still means 'research shortlist,' not 'buy everything immediately.' The checklist finds the door; reading the actual report is still walking through it.",
+            realLifeTip: "Even when every check passes, read the underlying report before sizing a position. The checklist filters out the obvious mistakes — it doesn't replace due diligence entirely."
+          },
+          {
+            id: 'pbt-c8',
+            text: "All the checks pass — that's rare, put in the full ₹4,000 right now",
+            consequence: "You invest everything immediately. Brightline does rise 28% over the year — you were right about the company. But six months in, a working-capital issue you'd have caught by reading the annual report causes a scary 15% dip you weren't prepared for, and you sell early out of panic, missing most of the later gain.",
+            xpDelta: 40,
+            healthDelta: 0,
+            walletDelta: 200,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Passing every check tells you a stock deserves serious research — it doesn't replace that research. Going all-in without reading the annual report means you're unprepared for risks that were sitting in plain sight.",
+            realLifeTip: "The excitement of 'everything lines up' is exactly when it's easiest to skip the boring final step — actually reading the filing. Don't skip it."
+          },
+          {
+            id: 'pbt-c9',
+            text: "Still feels risky — walk away entirely despite everything checking out",
+            consequence: "You decide the whole exercise was too uncertain and skip it. Brightline rises 28% over the next year on the fundamentals you'd already confirmed yourself. You correctly built the case, then didn't trust your own research.",
+            xpDelta: 30,
+            healthDelta: -10,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "When your own research — done carefully, step by step — genuinely supports a decision, walking away anyway isn't caution, it's a missed opportunity to trust a process you followed correctly.",
+            realLifeTip: "Caution is valuable when you haven't done the work. Once you have, second-guessing a well-supported conclusion out of pure nervousness has its own cost."
+          }
+        ]
+      }
+    ],
+  },
+
 ];

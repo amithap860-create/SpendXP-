@@ -399,14 +399,26 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
                       ? "hover:border-primary hover:bg-primary/5 border-slate-100"
                       : choice.id === selectedChoiceId
                         ? choice.isOptimal
+                          // FIX (2026-09-12): the "wrong answer" branch below used to be
+                          // bg-[#E8F5EE] (same light-green background as this "right
+                          // answer" branch) with border-[#4A556B] — a muted slate that
+                          // reads as "green-ish" at a glance, not "wrong". Combined with
+                          // the icon bug below, players couldn't tell right from wrong.
+                          // Right answers now clearly own green; wrong answers clearly own red/rose.
                           ? "bg-[#E8F5EE] border-[#2E7D5A] text-[#1A1F2E] scale-[1.01] shadow-lg"
-                          : "bg-[#E8F5EE] border-[#4A556B] text-[#1A1F2E] scale-[1.01] shadow-lg"
+                          : "bg-rose-50 border-rose-500 text-[#1A1F2E] scale-[1.01] shadow-lg"
                         : "opacity-40 grayscale"
                   )}
                 >
                   <span className="text-sm md:text-base font-bold pr-4">{localiseText(choice.text)}</span>
                   {selectedChoiceId === choice.id && (
-                    choice.isOptimal ? <CheckCircle2 className="h-6 w-6 text-primary shrink-0" /> : <XCircle className="h-6 w-6 text-[#2E7D5A] shrink-0" />
+                    // FIX (2026-09-12): the X icon for a WRONG choice was colored
+                    // text-[#2E7D5A] — which is this app's --primary sage-green, the
+                    // exact same color used for the CheckCircle2 "correct" icon just
+                    // above. A right and a wrong answer were rendered in identical
+                    // green. Wrong answers now render in rose-600, unambiguously
+                    // distinct from the green checkmark at any size.
+                    choice.isOptimal ? <CheckCircle2 className="h-6 w-6 text-primary shrink-0" /> : <XCircle className="h-6 w-6 text-rose-600 shrink-0" />
                   )}
                 </button>
               ))}

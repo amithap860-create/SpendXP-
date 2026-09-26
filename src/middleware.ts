@@ -56,7 +56,10 @@ export function middleware(request: NextRequest) {
   response.headers.set('Content-Security-Policy',
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://apis.google.com https://checkout.razorpay.com",
+      // CONFIRMED (2026-09-26): 'unsafe-eval' removed and deployed, real
+      // Razorpay checkout tested live afterward — works fine. It was never
+      // needed; keep it out.
+      "script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com https://apis.google.com https://checkout.razorpay.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://checkout.razorpay.com",
       "img-src 'self' data: https:",
       "font-src 'self' data: https://fonts.gstatic.com",
