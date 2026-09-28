@@ -10,7 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import { XPWallet } from '@/components/XPWallet';
 import {
   Puzzle, TrendingUp, ShieldAlert, Landmark, Building2, Wallet,
-  ArrowDownUp, Trophy, RefreshCcw, Sparkles, Info, CheckCircle2, X, BookOpen, Target
+  ArrowDownUp, Trophy, RefreshCcw, Sparkles, Info, CheckCircle2, X, BookOpen, Target,
+  ChevronUp, ChevronDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useGameTutorial, GameTutorialModal, HowToPlayButton } from '@/components/games/GameTutorial';
@@ -228,7 +229,6 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
   const [scenarioIdx] = useState(() => Math.floor(Math.random() * debtScenarios.length));
   const scenario = debtScenarios[scenarioIdx];
   const [debts, setDebts] = useState<DebtItem[]>([]);
-  const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
   const [debtResult, setDebtResult] = useState<{ method: 'AVALANCHE' | 'SNOWBALL' | 'NONE'; saved: string } | null>(null);
 
   // Portfolio state
@@ -490,20 +490,20 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
             <p className="text-rose-100 text-sm">{scenario.description}</p>
           </div>
           <CardContent className="p-6 space-y-3">
-            <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-4">Drag to reorder — most urgent first</p>
+            {/*
+              FIX (2026-09-26): this list used HTML5 native drag-and-drop
+              (draggable + onDragStart/onDragOver). That API only fires from
+              mouse events — it has no touch equivalent on mobile browsers or
+              WebViews (which is what the Capacitor app actually runs in), so
+              on a real phone dragging never worked at all. Replaced with
+              Up/Down buttons, which use plain onClick and work identically
+              on every device, touch or mouse.
+            */}
+            <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-4">Reorder — most urgent first</p>
             {debts.map((debt, idx) => (
               <div
                 key={debt.id}
-                draggable
-                onDragStart={() => setDraggedIdx(idx)}
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  if (draggedIdx !== null && draggedIdx !== idx) {
-                    handleMove(draggedIdx, idx);
-                    setDraggedIdx(idx);
-                  }
-                }}
-                className="p-4 rounded-xl border-2 border-slate-100 flex items-center gap-4 bg-white shadow-sm cursor-grab active:cursor-grabbing hover:border-primary transition-colors"
+                className="p-4 rounded-xl border-2 border-slate-100 flex items-center gap-4 bg-white shadow-sm hover:border-primary transition-colors"
               >
                 <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center font-black text-sm shrink-0">{idx + 1}</div>
                 <div className="flex-1 min-w-0">
@@ -512,6 +512,26 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
                 </div>
                 <div className={cn("font-black text-sm shrink-0", debt.rate > 20 ? 'text-rose-600' : debt.rate > 0 ? 'text-[#2E7D5A]' : 'text-slate-400')}>
                   {debt.rate > 0 ? `${debt.rate}% APR` : '0% interest'}
+                </div>
+                <div className="flex flex-col gap-1 shrink-0">
+                  <button
+                    type="button"
+                    aria-label="Move up"
+                    disabled={idx === 0}
+                    onClick={() => handleMove(idx, idx - 1)}
+                    className="h-6 w-6 rounded-md border border-slate-200 flex items-center justify-center text-slate-500 disabled:opacity-30 disabled:cursor-not-allowed hover:border-primary hover:text-primary"
+                  >
+                    <ChevronUp className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Move down"
+                    disabled={idx === debts.length - 1}
+                    onClick={() => handleMove(idx, idx + 1)}
+                    className="h-6 w-6 rounded-md border border-slate-200 flex items-center justify-center text-slate-500 disabled:opacity-30 disabled:cursor-not-allowed hover:border-primary hover:text-primary"
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
             ))}

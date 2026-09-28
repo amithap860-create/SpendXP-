@@ -168,22 +168,33 @@ export function useGameEngine(config: GameConfig) {
     }
   }, [state.status, state.currentRound, config.timePerRound, startTimer]);
 
+  // FIX (2026-09-26): this effect's own tick handler calls clearInterval(interval)
+  // internally once a round's time hits 0 — but the effect only depended on
+  // [state.status], and status stays 'PLAYING' across round transitions (only
+  // currentRound changes via NEXT_ROUND). So after round 1 ended, the interval
+  // was cleared and NOTHING ever created a new one: round 2's timeLeft got
+  // reset to timePerRound (by the other effect above, which does depend on
+  // currentRound) but nothing was left ticking to count it back down. Any game
+  // with 2+ timed rounds that auto-advances on timeout (Stock Market Sim,
+  // FinIQQuiz, Credit Score Builder, Budget Blitz) would visibly freeze on
+  // round 2 forever. Adding state.currentRound here makes this effect tear
+  // down and recreate a fresh interval every time a new round actually starts.
   useEffect(() => {
     if (state.status !== 'PLAYING') return;
     const interval = setInterval(() => {
       const elapsed = Date.now() - timerStartRef.current;
       const remaining = Math.max(0, timerDurationRef.current - elapsed);
       const remainingSeconds = Math.ceil(remaining / 1000);
-      
+
       dispatch({ type: 'SET_TIME', payload: remainingSeconds });
-      
+
       if (remaining <= 0) {
         clearInterval(interval);
         dispatch({ type: 'TIMER_EXPIRED' });
       }
     }, 100);
     return () => clearInterval(interval);
-  }, [state.status]);
+  }, [state.status, state.currentRound]);
 
   useEffect(() => {
     if (state.status === 'COUNTDOWN') {
