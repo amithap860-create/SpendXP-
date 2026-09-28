@@ -111,13 +111,12 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
   const tutorial = useGameTutorial('stockMarketSim');
   const startingCash = useMemo(() => ageGroup === 'junior' ? 100 : ageGroup === 'senior' ? 5000 : 1000, [ageGroup]);
   const companies = useMemo(() => ageGroup === 'junior' ? STOCK_COMPANIES.slice(0, 3) : STOCK_COMPANIES, [ageGroup]);
-  // NOTE (2026-09): this used to be a flat 20s for every age group — the only
-  // timed game in the app that didn't scale its round length by age (compare
-  // FinIQQuiz: 22s junior / 15s teen / 12s senior). A "day" here means read a
-  // headline, check price direction, then a multi-tap Buy/Sell flow (tap
-  // Buy -> pick quantity -> confirm) — 20s is tight even for adults, and
-  // rushed for 8-12 year olds. Scaled to match the app's existing pattern.
-  const ROUND_TIME = ageGroup === 'junior' ? 35 : ageGroup === 'senior' ? 20 : 25;
+  // UPDATED (2026-09-30): user feedback — days were flying by in ~10-35s,
+  // too fast to actually read the headline and make a considered trade.
+  // Bumped to a flat 90s (1.5 min) per day for every age group, per explicit
+  // request. (Previously scaled 20-35s by age group; kept flat here since
+  // the ask was for a slower pace across the board, not age-tiered.)
+  const ROUND_TIME = 90;
 
   const gameConfig = useMemo(() => ({
     gameName: 'stockMarketSim' as const,
@@ -166,6 +165,16 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
   // price history from the same `next` snapshot the price update just
   // produced, inside the same functional setState — no need to read `prices`
   // from the outer closure or list it as a dependency at all.
+  // FIX (2026-09-30): `currentHeadline` used to stay in this effect's
+  // dependency array and get re-applied by EVERY tick (every 3-5s) for as
+  // long as that headline stayed on screen — a whole day, ~5-10 ticks. A
+  // single "positive" headline (e.g. multiplier 1.15) compounded 1.15 to
+  // the power of every tick that day, so prices could blow up into the
+  // trillions well before day 5. News should move a price ONCE, the moment
+  // it breaks — not keep shoving it in the same direction every few seconds
+  // for the rest of the day. The one-time jump now happens where the
+  // headline is chosen (below); this interval only does small random
+  // day-to-day drift.
   useEffect(() => {
     if (gameState !== 'PLAYING') return;
     const interval = ageGroup === 'junior' ? 5000 : 3000;
@@ -174,8 +183,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
         const next = { ...prev };
         companies.forEach(company => {
           const volFactor = company.volatility === 'high' ? 0.14 : company.volatility === 'medium' ? 0.07 : 0.03;
-          let multiplier = 1 + (Math.random() - 0.48) * volFactor;
-          if (currentHeadline && currentHeadline.ticker === company.symbol) multiplier *= currentHeadline.multiplier;
+          const multiplier = 1 + (Math.random() - 0.48) * volFactor;
           next[company.symbol] = Number(Math.max(1, prev[company.symbol] * multiplier).toFixed(2));
         });
         setPriceHistory(prevHist => {
@@ -190,12 +198,25 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
       });
     }, interval);
     return () => clearInterval(timer);
-  }, [gameState, ageGroup, companies, currentHeadline]);
+  }, [gameState, ageGroup, companies]);
 
   useEffect(() => {
     if (gameState === 'PLAYING' && timeLeft === 0) {
       if (currentRound < 5) {
-        setCurrentHeadline(NEWS_HEADLINES[Math.floor(Math.random() * NEWS_HEADLINES.length)]);
+        const headline = NEWS_HEADLINES[Math.floor(Math.random() * NEWS_HEADLINES.length)];
+        setCurrentHeadline(headline);
+        // Apply the news impact ONCE, right now, instead of letting the
+        // ticking interval reapply it every few seconds for the whole day.
+        setPrices(prev => {
+          const current = prev[headline.ticker];
+          if (current === undefined) return prev;
+          const next = { ...prev, [headline.ticker]: Number(Math.max(1, current * headline.multiplier).toFixed(2)) };
+          setPriceHistory(prevHist => {
+            const h = prevHist[headline.ticker] || [];
+            return { ...prevHist, [headline.ticker]: [...h, next[headline.ticker]].slice(-SPARKLINE_LEN) };
+          });
+          return next;
+        });
         nextRound();
       } else {
         // NOTE (2026-09-something): on the final round, this used to call

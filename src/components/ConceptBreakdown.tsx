@@ -6,6 +6,7 @@ import { conceptBreakdowns } from '@/data/conceptBreakdowns';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useCurrency } from '@/hooks/useCurrency';
+import { usdToInr } from '@/lib/formatCurrency';
 
 // FIX (2026-09): conceptBreakdowns.ts content is authored inconsistently —
 // the 12 core lesson-tied entries (budgeting-basics, emergency-fund, etc.)
@@ -19,8 +20,13 @@ import { useCurrency } from '@/hooks/useCurrency';
 // of breaking the internal math in sentences like "$5,000 trip could be
 // $50,000" if done as a rushed find/replace), both symbols are normalized
 // at render time using the same fixed educational rate the rest of the app
-// already uses (RATES_FROM_INR in formatCurrency.ts, ~₹83.33 = $1).
-const USD_TO_INR_RATE = 1 / 0.012; // mirrors RATES_FROM_INR.USD in lib/formatCurrency.ts
+// already uses.
+// FIX (2026-09-28): this used to hardcode its own copy of the USD rate
+// (1/0.012), separate from RATES_FROM_INR in formatCurrency.ts. When that
+// table got refreshed to current exchange rates, this file's copy would
+// have silently stayed stale unless someone remembered to update it here
+// too — exactly the kind of duplicated-constant bug that's easy to miss.
+// Now imports the conversion straight from the one source of truth.
 
 interface ConceptBreakdownProps {
   breakdownId: string;
@@ -49,7 +55,7 @@ export function ConceptBreakdown({
     });
     result = result.replace(/\$([\d,]+(?:\.\d+)?)/g, (_, numStr) => {
       const usdValue = parseFloat(numStr.replace(/,/g, ''));
-      return formatINR(usdValue * USD_TO_INR_RATE);
+      return formatINR(usdToInr(usdValue));
     });
     return result;
   }, [formatINR]);

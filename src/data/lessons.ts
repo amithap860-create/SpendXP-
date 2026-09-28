@@ -164,6 +164,34 @@ export const lessons: Lesson[] = [
         },
         visual: 'none',
         xpReward: 25
+      },
+      {
+        // NEW (2026-09-30): fills a real gap flagged from an external
+        // finance-101 resource roundup (Morning Brew's "financial
+        // instruments" guide) — this lesson covered stocks and (in l-etfs)
+        // ETFs, but never explicitly named bonds or mutual funds, or the
+        // core equity-vs-debt distinction that separates all three.
+        id: 'i3',
+        title: 'Stocks vs. Bonds vs. Mutual Funds',
+        body: {
+          junior: "There are 3 main baskets for investing money. A STOCK means you own a tiny piece of a company. A BOND means you lent money to a company or the government, and they pay you back with a bit extra. A MUTUAL FUND is a basket that holds many stocks or bonds at once, run by an expert.",
+          teen: "The 3 core building blocks of investing: a STOCK is equity — you own a slice of a company, so you profit if it grows (and lose if it shrinks). A BOND is debt — you're lending money to a company or government for a fixed interest rate, paid back on a schedule, regardless of how well the business does. A MUTUAL FUND pools money from many investors into a basket of stocks and/or bonds, managed by a professional fund manager.",
+          senior: "Equity vs. debt is the core split. Stocks (equity) give ownership and unlimited upside, but sit last in line if a company fails. Bonds (debt) are a contractual promise of fixed interest and principal repayment — lower expected return, but paid before equity holders in any liquidation. Mutual funds aren't a separate asset class; they're a wrapper that holds a basket of either (or both), professionally managed, priced once daily at NAV."
+        },
+        example: {
+          junior: "Stock: you own a slice of a chocolate factory — if it sells more chocolate, your slice is worth more. Bond: you lend the factory ₹100 and they promise to pay you ₹110 back next year, no matter what. Mutual fund: someone else picks 30 different chocolate factories for you, all in one basket.",
+          teen: "Buy 1 Reliance share = equity, you're a part-owner. Buy a Government of India bond = debt, you get a fixed 7% per year for lending money to the government. Buy an HDFC Flexicap mutual fund = your money is spread across ~50 stocks the fund manager picked.",
+          senior: "If a company goes bankrupt: bondholders get paid first (from whatever assets remain), and shareholders get whatever is left — often nothing. This is exactly why bonds are lower-risk/lower-return and stocks are higher-risk/higher-return. A mutual fund's risk depends entirely on what it holds — an equity mutual fund carries stock-like risk; a debt mutual fund carries bond-like risk."
+        },
+        visual: 'bar',
+        visualData: {
+          items: [
+            { label: 'Stocks (higher risk/return)', value: 90, color: '#10b981' },
+            { label: 'Mutual Funds (varies)', value: 60, color: '#3b82f6' },
+            { label: 'Bonds (lower risk/return)', value: 30, color: '#64748b' }
+          ]
+        },
+        xpReward: 25
       }
     ],
     quizCard: {
@@ -176,6 +204,7 @@ export const lessons: Lesson[] = [
       { emoji: '📈', fact: 'Global stock markets have historically returned 8–12% per year over long periods. ₹1 lakh invested in a broad market index 20 years ago would be worth ₹9L+ today — without touching it once.' },
       { emoji: '⏰', fact: 'If you invested ₹500/month from age 15 to age 60 at 12% annual returns, you would have over ₹2.6 crore at retirement — built almost entirely from compound growth, not contributions.' },
       { emoji: '🏠', fact: 'Historically, equities outperform real estate over 10+ year periods when adjusted for inflation — but most people still prefer property because it feels more "real" and tangible.' },
+      { emoji: '📚', fact: 'Want to go deeper on stocks, bonds, and mutual funds? Investopedia\'s free glossary and NerdWallet\'s "what are stocks" guide are two of the most trusted plain-English resources finance beginners use worldwide.' },
     ]
   },
   {
@@ -365,6 +394,35 @@ export const lessons: Lesson[] = [
         },
         xpReward: 20,
       },
+      {
+        // NEW (2026-09-29): genuine gap — nothing in the whole curriculum
+        // ever explained what a bank actually DOES with money you deposit,
+        // or why a savings account pays you interest at all. Flagged from
+        // an external finance-101 resource's "fundamentals" section
+        // ("what a bank actually does"). Placed in l-saving since that's
+        // where a user is most likely wondering this — right after opening
+        // or thinking about a savings account.
+        id: 'sv3',
+        title: "What Does a Bank Actually Do With Your Money?",
+        body: {
+          junior: "Your bank doesn't just lock your money in a safe and leave it there! It lends most of it to other people — like someone buying a house — and charges THEM interest. It then gives you a small slice of that interest for letting them borrow your money.",
+          teen: "A bank isn't a storage locker for your cash. When you deposit ₹1,000, the bank keeps a small portion aside and lends most of the rest to other people and businesses — home loans, car loans, business loans — charging them a higher interest rate than it pays you. That difference is how banks make money. This is also why your money isn't 'just sitting there' — it's actively being lent out.",
+          senior: "Banks run on a simple spread: they pay depositors a lower interest rate (say 3-4% on a savings account) and lend that same money out at a higher rate (say 9-12% on loans) — the gap is their profit. This is called fractional reserve banking: banks keep only a fraction of deposits on hand and lend out the rest. It's also why deposit insurance exists — in India, DICGC insures up to ₹5 lakh per depositor per bank, so if a bank fails, your money (up to that limit) is protected."
+        },
+        example: {
+          junior: "You put ₹500 in the bank. The bank lends ₹400 of it to a family buying a scooter, charging them extra. The bank gives you a little bit of that extra as a 'thank you' for letting them use your ₹500.",
+          teen: "You deposit ₹10,000 in a savings account earning 3.5% per year (₹350). The bank lends that same ₹10,000 as part of a car loan charging 10% (₹1,000). The bank keeps the ₹650 difference — that's the business model of every bank.",
+          senior: "A bank holds ₹1 crore in deposits, keeps ₹10 lakh in reserve (as required), and lends out ₹90 lakh as home and business loans at 9-10%. It pays depositors 3-4% on their balances. The spread between what it pays and what it earns, across millions of accounts, is how banks are consistently profitable — and why keeping large sums outside the ₹5L DICGC insurance limit across multiple banks is a genuine safety consideration."
+        },
+        visual: 'bar',
+        visualData: {
+          items: [
+            { label: 'What bank pays you (~3-4%)', value: 35, color: '#3b82f6' },
+            { label: 'What bank charges borrowers (~9-12%)', value: 100, color: '#10b981' }
+          ]
+        },
+        xpReward: 20,
+      },
     ],
     quizCard: {
       question: 'You just received ₹1,000. What does "pay yourself first" mean?',
@@ -381,6 +439,7 @@ export const lessons: Lesson[] = [
       { emoji: '💡', fact: 'Most young adults save far less than they think. Liquid savings (accessible cash) for under-25s is often less than 1 month of expenses — leaving no real buffer when something unexpected happens.' },
       { emoji: '🤖', fact: 'Automation is the #1 factor in savings success. People who automate savings save 3× more than those who save "what is left over" at month end.' },
       { emoji: '🏺', fact: 'Ancient Indians used the "kumbh" system — storing grain away before eating. Modern finance just replaced grain with money and earthen pots with savings accounts.' },
+      { emoji: '🏦', fact: 'DICGC (Deposit Insurance and Credit Guarantee Corporation) insures up to ₹5 lakh of your deposits per bank in India — automatically, at no cost to you. Worth knowing before choosing where to keep large sums.' },
     ],
   },
 
@@ -713,6 +772,32 @@ export const lessons: Lesson[] = [
         },
         xpReward: 25,
       },
+      {
+        // NEW (2026-09-29): genuine gap — "leverage" was named in passing
+        // nowhere in the curriculum despite being one of the fundamentals
+        // an external finance-101 resource explicitly calls out. It's the
+        // natural companion to short selling (both covered here as
+        // "advanced, handle with care" concepts) — leverage is what makes
+        // margin trading and short selling possible in the first place.
+        id: 'st3',
+        title: 'Leverage: Borrowing to Invest',
+        body: {
+          junior: "Leverage means borrowing money to buy more of something than you could afford with just your own money — hoping it grows enough to pay back the loan AND leave you extra. Sounds great when it works! But if the price falls instead, you can lose more money than you actually had to begin with.",
+          teen: "Leverage means using borrowed money to increase the size of an investment. If you have ₹10,000 and borrow another ₹10,000 to invest ₹20,000 total, any gain or loss is now doubled compared to investing just your own money. This is why leverage is often described as a 'double-edged sword' — it magnifies profits, but it magnifies losses by exactly the same amount.",
+          senior: "Leverage (margin trading) lets you control a larger position than your own capital would allow, by borrowing the rest from a broker. A 2x leveraged position doubles both gains and losses relative to price movement. The real danger is the margin call: if the position moves against you enough, the broker can force-sell your holdings to cover the loan — often at the worst possible time, locking in losses you might have recovered from if you'd simply waited it out unleveraged."
+        },
+        example: {
+          junior: "You have ₹100 and borrow ₹100 more to buy a ₹200 toy you plan to resell. If you sell it for ₹250, you pay back the ₹100 loan and keep ₹150 — more than double your original ₹100! But if you can only sell it for ₹150, you still owe ₹100 back — leaving you with just ₹50, half of what you started with.",
+          teen: "Without leverage: ₹10,000 invested, stock drops 20% → you lose ₹2,000 (20% of your money). With 2x leverage: ₹10,000 of your own + ₹10,000 borrowed = ₹20,000 invested, same 20% drop → you lose ₹4,000, which is 40% of YOUR original ₹10,000. The stock only moved 20%; your loss doubled.",
+          senior: "A trader puts up ₹1L margin to control a ₹5L leveraged position (5x). A 10% adverse move wipes out 50% of their actual capital. If it moves 20% against them, they're wiped out entirely and may owe the broker more — this is exactly how margin calls force liquidation at the bottom, turning a recoverable dip into a permanent loss."
+        },
+        visual: 'comparison',
+        visualData: {
+          left: { label: 'No leverage: -20% move = -20% loss', value: 20, color: '#10b981' },
+          right: { label: '2x leverage: -20% move = -40% loss', value: 40, color: '#ef4444' }
+        },
+        xpReward: 25,
+      },
     ],
     quizCard: {
       question: 'A trader shorts a stock at ₹300. The stock rises to ₹450. What happens?',
@@ -729,6 +814,7 @@ export const lessons: Lesson[] = [
       { emoji: '📊', fact: 'Studies across every major market show 75–90% of day traders lose money over a 3-year period. The few who profit consistently are usually institutions with speed, data, and capital advantages that retail traders cannot match.' },
       { emoji: '💸', fact: 'Tax treatment of trading profits varies by country — but short-term gains are almost always taxed at higher rates than long-term gains. Frequent trading also generates more taxable events, a hidden cost that compounds over years.' },
       { emoji: '📖', fact: '"The market can remain irrational longer than you can remain solvent." — John Maynard Keynes. This is the core risk of short selling: being right but running out of margin before the price corrects.' },
+      { emoji: '⚠️', fact: 'Leverage was a central cause of the 2008 financial crisis — banks and investors had borrowed so heavily that even a modest fall in housing prices wiped out entire firms. Leverage doesn\'t just multiply your risk; at scale, it multiplies everyone\'s.' },
     ],
   },
 
@@ -911,6 +997,32 @@ export const lessons: Lesson[] = [
         visual: 'none',
         xpReward: 25,
       },
+      {
+        // NEW (2026-09-30): fills a gap flagged from an external finance-101
+        // resource roundup's "value vs. growth investing" category — this
+        // lesson taught Lynch's PEG-ratio framework in detail (sl-4) but
+        // never named the two classic investing schools PEG is actually
+        // built to bridge. Placed last so it reframes everything just taught
+        // as "Lynch = GARP, a deliberate blend of both schools."
+        id: 'sl-6',
+        title: 'Value vs. Growth: Which School Is Lynch?',
+        body: {
+          junior: "There are two classic ways people pick stocks. VALUE investors look for good companies that are 'on sale' — cheap compared to how much they're really worth. GROWTH investors look for companies growing super fast, even if they cost more right now. Peter Lynch's method mixes both — cheap AND growing.",
+          teen: "Two classic investing styles: VALUE investing (made famous by Warren Buffett) hunts for solid, unglamorous companies trading below their real worth — patience over excitement. GROWTH investing chases companies with fast-rising revenue, often paying a high price today for a bigger future. Lynch's PEG ratio (which you just learned) is literally designed to combine both — it's called GARP: Growth At a Reasonable Price.",
+          senior: "Value investing (Graham, Buffett) targets a margin of safety — low P/E and P/B ratios, betting the market has mispriced a fundamentally sound business. Growth investing accepts high current valuations in exchange for a high expected future earnings trajectory (common in tech, biotech). These aren't opposing camps by accident — decades of market cycles have favoured each style in turns. Lynch's PEG ratio is the bridge: it explicitly prices growth relative to what you're paying, refusing to accept 'it's growing fast' as a reason to ignore valuation, and refusing to accept 'it's cheap' as a reason to ignore whether it's actually going anywhere."
+        },
+        example: {
+          junior: "Value investor: 'This toy is great and it's on sale — buying it!' Growth investor: 'This toy is popular and getting more popular every week — buying it even at full price!' Lynch: 'I want the toy that's popular AND still reasonably priced.'",
+          teen: "Value pick: a boring bank stock trading cheap relative to its steady profits. Growth pick: a fast-scaling startup with no profits yet, priced on hope for 2030. Lynch's PEG check would reject an overpriced growth stock (PEG > 2) just as fast as it would flag a 'cheap' stock that isn't actually growing (low P/E for a real reason — it's dying).",
+          senior: "Amazon in the early 2010s was a classic growth pick — high P/E, thin profits, priced on future dominance, and it worked. A regional bank trading at 0.8x book value with steady 12% ROE is a classic value pick. Neither approach is 'correct' in isolation; PEG-driven GARP investing (Lynch's actual method) tries to avoid both the value trap (cheap because it deserves to be) and the growth trap (priced for perfection with no room for error)."
+        },
+        visual: 'comparison',
+        visualData: {
+          left: { label: 'Value Investing', value: 70, color: '#3b82f6' },
+          right: { label: 'Growth Investing', value: 70, color: '#10b981' }
+        },
+        xpReward: 25,
+      },
     ],
     quizCard: {
       question: "After passing all 4 Lynch checks (clear business model, specific growth reason, PEG < 1, promoter buying), the stock should go:",
@@ -927,6 +1039,7 @@ export const lessons: Lesson[] = [
       { emoji: '📈', fact: 'Peter Lynch averaged 29.2% annual returns for 13 years at Magellan Fund — growing it from $18M to $14B. His edge? Only buying what he deeply understood, never what sounded impressive.' },
       { emoji: '🔍', fact: 'Lynch coined "invest in what you know." He found winning stocks like Hanes and Dunkin\' Donuts by noticing products his family used daily — months before Wall Street analysts noticed them.' },
       { emoji: '📊', fact: 'The PEG ratio Lynch popularised is now one of the most widely used stock screening metrics globally — 35 years after he introduced it to mainstream investors in his book One Up on Wall Street.' },
+      { emoji: '📖', fact: 'Curious about value vs. growth investing beyond Lynch? Warren Buffett\'s own 1992 shareholder letter and "The Intelligent Investor" by Benjamin Graham are the two most-cited starting points, even 30+ years later.' },
     ],
   },
 ];

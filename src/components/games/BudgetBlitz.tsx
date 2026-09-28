@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { useGameEngine } from '@/hooks/useGameEngine';
-import { useAgeAdapt } from '@/lib/ageAdaptProvider';
 import { budgetBlitzItems, BudgetCategory } from '@/data/budgetBlitzItems';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -99,7 +98,6 @@ function InlineCalculator() {
 }
 
 export function BudgetBlitz({ onExit }: { onExit: () => void }) {
-  const { difficultyConfig } = useAgeAdapt();
   const { formatValue, user } = useUser();
   const db = useFirestore();
 
@@ -190,13 +188,23 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
         const lost = next.find(c => c.y >= 90);
         if (lost) {
           wrongAnswer();
+          // FIX (2026-09-28): a card falling off the bottom (a miss) took a
+          // life via wrongAnswer() but never touched `stats` — only handleSort
+          // (an actual swipe) updated stats.total/correct. So missed cards
+          // were invisible to the accuracy score: sort 10/10 correctly, miss
+          // 3 entirely, and the end screen still showed 100% (10/10) instead
+          // of the real 10/13 (~77%). Missed cards now count toward total
+          // just like a wrong sort would.
+          if (!trialMode) {
+            setStats(prev => ({ ...prev, total: prev.total + 1 }));
+          }
           return next.filter(c => c.id !== lost.id);
         }
         return next;
       });
     }, 16);
     return () => clearInterval(loop);
-  }, [gameState, speedTier, wrongAnswer]);
+  }, [gameState, speedTier, wrongAnswer, trialMode]);
 
   useEffect(() => {
     if (gameState === 'PLAYING' && timeLeft <= 0) handleFinish();
@@ -575,7 +583,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
               style={{ left: `${card.x}%`, top: `${card.y}%`, transform: 'translateX(-50%)', touchAction: 'none' }}
             >
               <div className="font-bold text-slate-800 text-[10px] md:text-sm leading-tight mb-1 truncate">{card.item.name}</div>
-              <div className="text-xs md:text-base font-black text-primary">{formatValue(difficultyConfig.moneyAmounts[card.item.basePrice as keyof typeof difficultyConfig.moneyAmounts])}</div>
+              <div className="text-xs md:text-base font-black text-primary">{formatValue(card.item.priceINR)}</div>
             </div>
           ))}
         </div>
