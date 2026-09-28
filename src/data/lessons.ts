@@ -42,6 +42,28 @@ export type Lesson = {
   ageGroups: AgeGroup[];
 };
 
+// REORDERED (2026-09-29): the /learn page (src/app/learn/page.tsx) hard-locks
+// lessons in this exact array order — lesson N+1 stays locked until lesson N
+// is completed. The array used to be ordered budgeting → investing → ETFs →
+// crypto → saving → debt → credit → taxes → emergency → short-term trading →
+// insurance → stock analysis, which taught investing, ETFs and crypto BEFORE
+// saving basics and "what a bank does with your money" — backwards, and it
+// meant terms like "mutual fund" got used in later lessons before ever being
+// defined. Reordered to a genuine basics-to-advanced progression:
+//   1. Budgeting            — absolute foundation
+//   2. Saving               — incl. what a bank actually does with deposits
+//   3. Emergency Fund       — direct extension of saving
+//   4. Debt                 — good/bad debt, avalanche method
+//   5. Credit               — builds on debt (credit score sets your loan rate)
+//   6. Insurance            — risk protection, still no investing vocab needed
+//   7. Taxes                — standalone, no investing vocab needed
+//   8. Investing basics     — first place stocks/bonds/mutual funds are taught
+//   9. ETFs & Index Funds   — builds directly on investing basics
+//  10. Short-term trading   — intermediate/advanced (short selling, leverage)
+//  11. Crypto               — high-risk asset class, contrasted against stocks
+//  12. Stock analysis       — most advanced (PEG ratio, value vs growth) — last
+// If you add a new lesson, insert it where its required vocabulary is already
+// covered by everything before it — don't just append to the end.
 export const lessons: Lesson[] = [
   {
     id: 'l-budgeting',
@@ -62,7 +84,7 @@ export const lessons: Lesson[] = [
         example: {
           junior: "You get ₹200 pocket money. You plan: ₹50 for snacks, ₹50 for a notebook, and ₹100 for your piggy bank.",
           teen: "Your ₹2,000 monthly allowance: ₹1,000 for mobile/outings, ₹400 for books, and ₹600 for savings.",
-          senior: "Monthly stipend ₹15,000: ₹5,000 PG rent, ₹3,000 food, ₹2,000 travel, ₹5,000 for your SIP."
+          senior: "Monthly stipend ₹15,000: ₹5,000 PG rent, ₹3,000 food, ₹2,000 travel, ₹5,000 into savings."
         },
         visual: 'pie',
         visualData: {
@@ -85,7 +107,7 @@ export const lessons: Lesson[] = [
         example: {
           junior: "If you have ₹100, ₹50 goes to food (Need), ₹30 to a toy (Want), and ₹20 to Save.",
           teen: "From ₹1,000: ₹500 for bills, ₹300 for fun, and ₹200 for your future self.",
-          senior: "With a ₹20,000 salary: ₹10,000 rent/bills, ₹6,000 lifestyle, ₹4,000 into a Mutual Fund."
+          senior: "With a ₹20,000 salary: ₹10,000 rent/bills, ₹6,000 lifestyle, ₹4,000 into savings."
         },
         visual: 'bar',
         visualData: {
@@ -111,6 +133,462 @@ export const lessons: Lesson[] = [
     ]
   },
   {
+    id: 'l-saving',
+    topic: 'saving',
+    relatedGame: 'budgetBlitz',
+    title: 'The Art of Saving',
+    estimatedMinutes: 3,
+    ageGroups: ['junior', 'teen', 'senior'],
+    cards: [
+      {
+        id: 'sv1',
+        title: 'Why Save at All?',
+        body: {
+          junior: "Saving means keeping some of your money instead of spending it all. It protects you when something unexpected happens — like your phone breaking!",
+          teen: "Saving builds a buffer between you and financial emergencies. Without savings, any unexpected expense forces you into debt — which costs even more money.",
+          senior: "Savings serve three purposes: emergency fund (3–6 months of expenses), opportunity fund (take advantage of deals or investments), and goal fund (specific targets like education or travel).",
+        },
+        example: {
+          junior: "Priya saves ₹20 from her ₹100 pocket money every week. After 10 weeks she has ₹200 — enough for the toy she wanted without asking anyone.",
+          teen: "Rahul saves ₹500/month. When his laptop broke suddenly, he paid ₹3,000 from savings instead of asking his parents or taking a loan.",
+          senior: "Meera's 3-month emergency fund of ₹45,000 covered her rent and food when she was between jobs for 6 weeks — no stress, no debt.",
+        },
+        visual: 'bar',
+        visualData: {
+          items: [
+            { label: 'Emergency', value: 60, color: '#10b981' },
+            { label: 'Goals', value: 25, color: '#2e72db' },
+            { label: 'Opportunity', value: 15, color: '#f59e0b' },
+          ],
+        },
+        xpReward: 20,
+      },
+      {
+        id: 'sv2',
+        title: 'Pay Yourself First',
+        body: {
+          junior: "Pay yourself first means saving BEFORE you spend. When you get money, the first thing you do is put some in your piggy bank — then spend the rest!",
+          teen: "Automate your savings on payday — before you see the money, it is already saved. This removes the temptation to spend it and makes saving effortless.",
+          senior: "Set up an auto-transfer or standing instruction on your account to move money to savings the same day your salary arrives. What you don't see, you don't spend.",
+        },
+        example: {
+          junior: "Every time Arun gets pocket money, he immediately puts ₹30 in his piggy bank — before buying anything. He saves without even trying!",
+          teen: "Kavya set up a ₹500 auto-transfer to her savings account every 1st of the month. She never misses it because the money is gone before she checks her balance.",
+          senior: "₹5,000 auto-transfer on salary day = ₹60,000 saved per year — built entirely on autopilot, before it ever has a chance to be spent.",
+        },
+        visual: 'comparison',
+        visualData: {
+          left: { label: 'Spend-first', value: 30, color: '#ef4444' },
+          right: { label: 'Save-first', value: 95, color: '#10b981' },
+        },
+        xpReward: 20,
+      },
+      {
+        // NEW (2026-09-29): genuine gap — nothing in the whole curriculum
+        // ever explained what a bank actually DOES with money you deposit,
+        // or why a savings account pays you interest at all. Flagged from
+        // an external finance-101 resource's "fundamentals" section
+        // ("what a bank actually does"). Placed in l-saving since that's
+        // where a user is most likely wondering this — right after opening
+        // or thinking about a savings account. Also now the intentional,
+        // very first place "interest" is properly explained — everything
+        // in the investing lessons later builds on this.
+        id: 'sv3',
+        title: "What Does a Bank Actually Do With Your Money?",
+        body: {
+          junior: "Your bank doesn't just lock your money in a safe and leave it there! It lends most of it to other people — like someone buying a house — and charges THEM interest. It then gives you a small slice of that interest for letting them borrow your money.",
+          teen: "A bank isn't a storage locker for your cash. When you deposit ₹1,000, the bank keeps a small portion aside and lends most of the rest to other people and businesses — home loans, car loans, business loans — charging them a higher interest rate than it pays you. That difference is how banks make money. This is also why your money isn't 'just sitting there' — it's actively being lent out.",
+          senior: "Banks run on a simple spread: they pay depositors a lower interest rate (say 3-4% on a savings account) and lend that same money out at a higher rate (say 9-12% on loans) — the gap is their profit. This is called fractional reserve banking: banks keep only a fraction of deposits on hand and lend out the rest. It's also why deposit insurance exists — in India, DICGC insures up to ₹5 lakh per depositor per bank, so if a bank fails, your money (up to that limit) is protected."
+        },
+        example: {
+          junior: "You put ₹500 in the bank. The bank lends ₹400 of it to a family buying a scooter, charging them extra. The bank gives you a little bit of that extra as a 'thank you' for letting them use your ₹500.",
+          teen: "You deposit ₹10,000 in a savings account earning 3.5% per year (₹350). The bank lends that same ₹10,000 as part of a car loan charging 10% (₹1,000). The bank keeps the ₹650 difference — that's the business model of every bank.",
+          senior: "A bank holds ₹1 crore in deposits, keeps ₹10 lakh in reserve (as required), and lends out ₹90 lakh as home and business loans at 9-10%. It pays depositors 3-4% on their balances. The spread between what it pays and what it earns, across millions of accounts, is how banks are consistently profitable — and why keeping large sums outside the ₹5L DICGC insurance limit across multiple banks is a genuine safety consideration."
+        },
+        visual: 'bar',
+        visualData: {
+          items: [
+            { label: 'What bank pays you (~3-4%)', value: 35, color: '#3b82f6' },
+            { label: 'What bank charges borrowers (~9-12%)', value: 100, color: '#10b981' }
+          ]
+        },
+        xpReward: 20,
+      },
+    ],
+    quizCard: {
+      question: 'You just received ₹1,000. What does "pay yourself first" mean?',
+      options: [
+        'Buy what you want, save what is left',
+        'Save a set amount before spending anything',
+        'Give money to family first',
+        'Pay your bills first',
+      ],
+      correctIndex: 1,
+      explanation: '"Pay yourself first" means saving before you spend. It is the single most effective savings habit because it removes the decision entirely.',
+    },
+    briefs: [
+      { emoji: '💡', fact: 'Most young adults save far less than they think. Liquid savings (accessible cash) for under-25s is often less than 1 month of expenses — leaving no real buffer when something unexpected happens.' },
+      { emoji: '🤖', fact: 'Automation is the #1 factor in savings success. People who automate savings save 3× more than those who save "what is left over" at month end.' },
+      { emoji: '🏺', fact: 'Ancient Indians used the "kumbh" system — storing grain away before eating. Modern finance just replaced grain with money and earthen pots with savings accounts.' },
+      { emoji: '🏦', fact: 'DICGC (Deposit Insurance and Credit Guarantee Corporation) insures up to ₹5 lakh of your deposits per bank in India — automatically, at no cost to you. Worth knowing before choosing where to keep large sums.' },
+    ],
+  },
+  {
+    id: 'l-emergency',
+    topic: 'saving',
+    relatedGame: 'budgetBlitz',
+    title: 'Emergency Funds',
+    estimatedMinutes: 3,
+    ageGroups: ['junior', 'teen', 'senior'],
+    cards: [
+      {
+        id: 'ef1',
+        title: 'What is an Emergency Fund?',
+        body: {
+          junior: "An emergency fund is money saved for unexpected problems — like a broken toy, doctor visit, or something that isn't planned. It means you won't have to beg or borrow.",
+          teen: "An emergency fund is 3–6 months of your living expenses kept in a separate savings account. It protects you from unexpected events: job loss, medical bills, or urgent repairs.",
+          // FIX (2026-09-29): reordering the curriculum moved this lesson
+          // BEFORE the investing lessons that formally define "mutual fund"
+          // — so this can no longer casually say "liquid mutual fund" and
+          // assume the reader already knows what that is. Added a short
+          // inline gloss instead of a forward reference.
+          senior: "Emergency funds should cover 3–6 months of fixed + variable expenses — not income. For a freelancer or entrepreneur, aim for 9–12 months. Keep it liquid: a savings account, or a liquid mutual fund (a low-risk pooled fund that invests in very short-term debt and lets you withdraw within a day).",
+        },
+        example: {
+          junior: "Aryan saved ₹300 in a special envelope. When his cricket bat broke right before a match, he had the money to buy a new one — no problem!",
+          teen: "Sneha had ₹12,000 in an emergency account. When her phone screen cracked during exams, she replaced it the same day without asking her parents or skipping meals.",
+          senior: "Monthly expenses: ₹35,000 (rent ₹15K + food ₹8K + transport ₹5K + utilities ₹7K). Emergency fund target: ₹1.05–2.1L. Kept in a liquid fund at ~6% return.",
+        },
+        visual: 'bar',
+        visualData: {
+          items: [
+            { label: 'Junior (1 month)', value: 33, color: '#10b981' },
+            { label: 'Teen (3 months)', value: 66, color: '#3b82f6' },
+            { label: 'Senior (6 months)', value: 100, color: '#8b5cf6' },
+          ],
+        },
+        xpReward: 20,
+      },
+      {
+        // NEW (2026-09-26): sourced from a real personal-finance Instagram post
+        // (@sanjanaa.aggarwal) on WHERE specifically to park an emergency fund.
+        // Added here since this lesson previously had only 1 card (thin
+        // compared to every other lesson), and it directly extends ef1's
+        // "keep it liquid" point with the actual how-to.
+        id: 'ef2',
+        title: 'Where to Actually Park It',
+        body: {
+          junior: "Don't just leave all your emergency money in one place doing nothing — but don't try to make it grow fast either, that's not what it's for! A couple of safe spots, used together, works best.",
+          // FIX (2026-09-29): same forward-reference issue as ef1 — glossed
+          // "liquid mutual funds" inline since this lesson now comes before
+          // mutual funds are formally taught.
+          teen: "Your emergency fund shouldn't just sit fully idle earning nothing — but it also shouldn't be chasing high returns. Both defeat the purpose. The best setup usually combines a few things: some money instantly accessible in a savings account, and some in liquid mutual funds — low-risk funds that pool many people's money into safe, short-term investments and let you withdraw within a day — for a slightly better return, so it's both safe AND not wasted.",
+          senior: "An emergency fund should balance three things: safety, liquidity, and reasonable (not maximum) returns. In practice this usually means a combination of instruments rather than one: a portion instantly accessible in a savings account or sweep-in FD, and a portion in liquid mutual funds (low-risk funds investing in very short-term debt) for slightly better yield with T+1 accessibility. Splitting across instruments avoids both idle-cash waste and liquidity risk."
+        },
+        example: {
+          junior: "Meera keeps ₹50 in her piggy bank for right-now emergencies, and asks her mom to safely hold ₹150 for bigger ones. Two spots, both safe, both there when needed.",
+          teen: "Rahul keeps ₹3,000 of his ₹12,000 emergency fund in his savings account for instant access, and puts the other ₹9,000 in a liquid mutual fund earning a bit more — still accessible within a day if he really needs it.",
+          senior: "A ₹1.5L emergency fund split: ₹30K in a savings account/sweep-FD for instant access, ₹1.2L in a liquid fund earning ~6-7% with T+1 withdrawal. Better returns than pure savings, without sacrificing real accessibility."
+        },
+        visual: 'bar',
+        visualData: {
+          items: [
+            { label: 'Instant access (savings)', value: 20, color: '#3b82f6' },
+            { label: 'Liquid fund (T+1)', value: 80, color: '#10b981' },
+          ],
+        },
+        xpReward: 25,
+      },
+    ],
+    quizCard: {
+      question: 'Where should you keep your emergency fund?',
+      options: [
+        'Stock market (for high returns)',
+        'Fixed Deposit locked for 5 years',
+        'Savings account or liquid mutual fund',
+        'Cash under your mattress',
+      ],
+      correctIndex: 2,
+      explanation: 'Emergency funds must be liquid — accessible within 24 hours. Savings accounts or liquid mutual funds are ideal: safe, earning modest interest, and available immediately without penalties.',
+    },
+    briefs: [
+      { emoji: '🚑', fact: 'Globally, medical emergencies and sudden job loss are the top two triggers for household debt crises. An emergency fund is the one financial buffer that stands between stability and a debt spiral.' },
+      { emoji: '🔒', fact: 'Do NOT keep your emergency fund in a locked account or fixed-term deposit with early-withdrawal penalties. You need the money available within 24 hours — not in 3 business days with a penalty fee.' },
+      { emoji: '🎯', fact: 'The FIRST savings goal for anyone should be a 1-month emergency fund — even before starting investments. A crisis that forces you to sell investments at a bad time costs far more than delayed investing.' },
+    ],
+  },
+  {
+    id: 'l-debt',
+    topic: 'spending',
+    relatedGame: 'moneyMaze',
+    title: 'Understanding Debt',
+    estimatedMinutes: 4,
+    ageGroups: ['junior', 'teen', 'senior'],
+    cards: [
+      {
+        id: 'd1',
+        title: 'Good Debt vs Bad Debt',
+        body: {
+          junior: "Borrowing money isn't always bad. 'Good borrowing' helps you get something useful, like tools to earn more later. 'Bad borrowing' is for things you don't need — and you end up owing extra on top!",
+          teen: 'Not all debt is bad. "Good debt" helps you build wealth or skills — like a student loan. "Bad debt" buys things that lose value and costs you extra via interest.',
+          senior: 'Good debt has low interest rates and creates an asset or income: home loan, education loan, business loan. Bad debt is high-interest consumption: credit card revolving, personal loans for lifestyle, BNPL misuse.',
+        },
+        example: {
+          junior: "If you borrow ₹50 from your sister for school notebooks and pay her back, that's smart borrowing. If you borrow ₹50 for candy and now owe her ₹60, that's not so smart!",
+          teen: 'Education loan at 8%: returns 3× in higher salary. Credit card debt at 36% APR: you pay ₹360 every year on every ₹1,000 borrowed — just for the privilege of using money.',
+          senior: 'A ₹50L home loan at 8.5% builds equity. A ₹1L personal loan at 14% for a vacation builds nothing — just a ₹14,000/year interest bill.',
+        },
+        visual: 'comparison',
+        visualData: {
+          left: { label: 'Good Debt (8%)', value: 80, color: '#10b981' },
+          right: { label: 'Bad Debt (36%)', value: 30, color: '#ef4444' },
+        },
+        xpReward: 25,
+      },
+      {
+        id: 'd2',
+        title: 'The Debt Avalanche',
+        body: {
+          junior: "If you owe money to more than one person, pay back whoever charges you the most extra first — that way you stop losing extra money the fastest!",
+          teen: 'The avalanche method: list all debts by interest rate (highest first). Pay minimums on all — then throw every extra rupee at the highest-rate debt. Mathematically optimal.',
+          senior: 'Avalanche vs Snowball: Avalanche saves the most interest. Snowball (smallest balance first) provides psychological wins. Research shows snowball produces better completion rates despite higher cost — choose what keeps you motivated.',
+        },
+        example: {
+          junior: "You owe your brother ₹20 (no extra charge) and a friend ₹10 (he wants ₹2 extra every week). Pay your friend back first so the extra ₹2 stops piling up!",
+          teen: 'Credit card at 36%: ₹5,000 debt. Student loan at 10%: ₹30,000. Pay minimum on student loan; attack credit card first. Saves ₹1,800/year in interest.',
+          senior: 'With avalanche, a ₹3L mixed-debt portfolio gets cleared 8 months faster and saves ₹28,000 vs paying equal amounts on each.',
+        },
+        visual: 'bar',
+        visualData: {
+          items: [
+            { label: 'Credit Card (36%)', value: 100, color: '#ef4444' },
+            { label: 'Personal Loan (14%)', value: 50, color: '#f59e0b' },
+            { label: 'Education Loan (8%)', value: 25, color: '#10b981' },
+          ],
+        },
+        xpReward: 25,
+      },
+    ],
+    quizCard: {
+      question: 'You have two debts: credit card at 36% interest and a student loan at 9%. Using the avalanche method, which do you pay first?',
+      options: ['Student loan (smaller balance)', 'Credit card (higher interest)', 'Pay equal amounts on both', 'Neither — save first'],
+      correctIndex: 1,
+      explanation: 'Avalanche = highest interest rate first. The credit card at 36% is costing you 4× more per rupee than the student loan. Killing it first saves the most money.',
+    },
+    briefs: [
+      { emoji: '💳', fact: 'India has 60M+ credit cards in circulation. The average revolving balance costs ₹540/year per ₹1,500 in interest alone — paid to the bank for spending money that wasn\'t theirs.' },
+      { emoji: '📊', fact: 'A ₹10,000 credit card balance at 3% monthly interest takes 8+ years to repay with minimum payments — paying back ₹28,000 total on a ₹10,000 purchase.' },
+      { emoji: '⛓️', fact: 'Buy Now Pay Later (BNPL) apps advertise 0% interest — but only for 15–30 days. After that, annualised rates can reach 30–50%. Always read the repayment terms before splitting any payment.' },
+    ],
+  },
+  {
+    id: 'l-credit',
+    topic: 'credit',
+    relatedGame: 'creditScoreBuilder',
+    title: 'How Credit Scores Work',
+    estimatedMinutes: 4,
+    ageGroups: ['junior', 'teen', 'senior'],
+    cards: [
+      {
+        id: 'cr1',
+        title: 'What is a Credit Score?',
+        body: {
+          junior: "A credit score is like a trust score! It tells grown-ups whether someone pays back what they borrow, on time. The more you keep your promises to pay people back, the more they trust you with bigger things later.",
+          teen: 'Your credit score is a 3-digit number that banks use to decide whether to lend you money and at what interest rate. Higher = better loan terms and lower interest rates. Every country has its own credit bureau: CIBIL in India (300–900), FICO in the USA (300–850), Experian in the UK.',
+          senior: 'Credit bureaus compute your creditworthiness as a score: CIBIL in India (300–900), FICO in the USA (300–850), Experian in the UK. Scores above ~750 unlock the best loan rates. Scores below ~650 lead to rejections or high-risk premiums. Globally, the same five factors determine your score.',
+        },
+        example: {
+          junior: "If you always pay your friend back on time when you borrow money, they'll happily lend to you again. If you forget, they won't trust you next time!",
+          teen: 'Amit\'s credit score is 800. He gets a home loan at 8.5%. His friend with a score of 600 pays 11.5% — on a ₹50L loan, that\'s ₹15L extra in interest over 20 years.',
+          senior: 'On a ₹60L, 20-year home loan: 8.5% (score 800+) = EMI ₹52,118 = Total ₹1.25 crore. At 11.5% (score 600): EMI ₹63,879 = Total ₹1.53 crore. Score difference costs ₹28L.',
+        },
+        visual: 'bar',
+        visualData: {
+          items: [
+            { label: 'Payment History (35%)', value: 35, color: '#2e72db' },
+            { label: 'Utilisation (30%)', value: 30, color: '#10b981' },
+            { label: 'Credit Length (15%)', value: 15, color: '#f59e0b' },
+            { label: 'Credit Mix (10%)', value: 10, color: '#8b5cf6' },
+            { label: 'Inquiries (10%)', value: 10, color: '#ef4444' },
+          ],
+        },
+        xpReward: 25,
+      },
+      {
+        id: 'cr2',
+        title: 'Building Your Score',
+        body: {
+          junior: "You build trust by always paying back what you borrow, on time, and by not borrowing more than you can pay back. Small promises kept build big trust over time!",
+          teen: 'The fastest ways to build credit: always pay on time, keep your card balance below 30% of the limit, don\'t apply for many cards at once, and keep old accounts open.',
+          senior: 'Credit-building strategy for beginners: start with a secured credit card (deposit-backed), pay in full every month, never exceed 30% utilisation. After 12–18 months of clean history, upgrade to a rewards card.',
+        },
+        example: {
+          junior: "Ravi borrows ₹20 from his mom every week for the bus and always pays her back on Friday. After a few months, she trusts him enough to lend him more when he really needs it.",
+          teen: 'Neha started with a ₹10,000 limit card and always paid full balance. 18 months later, her score was 760 — she qualified for a ₹1L limit at a premium rate.',
+          senior: 'Secured card strategy: ₹20,000 fixed deposit → ₹20,000 credit limit. Spend ₹4,000/month (20%) and pay in full. Score goes from 0 to 720+ in 12 months.',
+        },
+        visual: 'line',
+        visualData: {
+          points: [
+            { x: 0, y: 0 },
+            { x: 6, y: 45 },
+            { x: 12, y: 62 },
+            { x: 18, y: 78 },
+            { x: 24, y: 90 },
+          ],
+          label: 'Score growth with clean credit habits (%)',
+        },
+        xpReward: 25,
+      },
+    ],
+    quizCard: {
+      question: 'Which factor has the BIGGEST impact on your credit score?',
+      options: ['Number of credit cards you own', 'Payment history', 'Total balance across all accounts', 'The type of bank you use'],
+      correctIndex: 1,
+      explanation: 'Payment history accounts for 35% of your score — the largest single factor. Even one missed payment can drop your score by 50–100 points instantly.',
+    },
+    briefs: [
+      { emoji: '📋', fact: 'You can usually check your credit score for free through your bank\'s app, your country\'s official credit bureau (CIBIL in India, Experian/Equifax in USA/UK), or many financial apps. Free checks are "soft inquiries" and do not affect your score.' },
+      { emoji: '🛡️', fact: 'Checking your OWN credit score is a "soft inquiry" — it does NOT lower your score. Only "hard inquiries" (when a lender checks for an application) have a small, temporary impact.' },
+      { emoji: '⚡', fact: 'Paying credit card dues 2 days BEFORE the billing cycle closes is a secret weapon: the bank reports a lower balance to the credit bureau, boosting your utilisation score even with the same spending.' },
+    ],
+  },
+  {
+    id: 'l-insurance',
+    topic: 'spending',
+    relatedGame: 'budgetBlitz',
+    title: 'Insurance: Protecting What You Build',
+    estimatedMinutes: 4,
+    ageGroups: ['junior', 'teen', 'senior'],
+    cards: [
+      {
+        id: 'ins1',
+        title: 'What Is Insurance?',
+        body: {
+          junior: "Insurance is when lots of people each pay a small amount into a shared pot, so that if something bad happens to ONE of them — like getting hurt or breaking something expensive — there's enough money to help them out.",
+          teen: 'Insurance is a risk-pooling system. Everyone pays a small regular amount (a "premium"), and the fund covers large unexpected costs for whoever needs it. You are essentially sharing financial risk with thousands of strangers.',
+          senior: 'Insurance transfers low-probability, high-impact financial risk to an insurer for a predictable cost. The insurer profits because most policyholders never claim — but for those who do, the payout far exceeds the premiums paid. It is the only financial product where the goal is to never "get your money\'s worth."',
+        },
+        example: {
+          junior: "Imagine you and 20 friends each put ₹10 into a jar every month. If one friend's bike breaks, the jar pays to fix it — even though that friend only put in ₹10 themselves!",
+          teen: '1,000 people each pay ₹3,000 per year for health insurance = ₹30L in the pool. When one person needs surgery costing ₹5L, the pool pays. Each person\'s small premium funds coverage that would otherwise be unaffordable.',
+          senior: 'Health insurance premium: ₹8,000/year. Hospitalisation claim: ₹2.5L. Effective "return" on the premium: 31×. But the value was never the return — it was eliminating the risk of a ₹2.5L expense with no savings to cover it.',
+        },
+        visual: 'comparison',
+        visualData: {
+          left: { label: 'Without insurance', value: 15, color: '#ef4444' },
+          right: { label: 'With insurance', value: 95, color: '#10b981' },
+        },
+        xpReward: 30,
+      },
+      {
+        id: 'ins2',
+        title: 'What Insurance Do You Actually Need?',
+        body: {
+          junior: "The most important insurance for anyone is health insurance — it helps pay for doctors and hospitals if you get sick or hurt, which can cost a LOT of money without it.",
+          teen: 'Start with health insurance — always. If you are on a parent\'s policy, understand what it covers and when you age off. After health: renters/contents insurance if you have valuables, and eventually life insurance if others depend on your income.',
+          senior: 'Priority order for most young adults: (1) Health insurance — non-negotiable. (2) Term life insurance — only if you have dependents or co-signed debt. (3) Disability insurance — often overlooked, but you are 3–4× more likely to be disabled for 3+ months than to die before 65. (4) Property insurance — renters or home. Skip whole-life and investment-linked policies as a rule: buy term, invest the difference.',
+        },
+        example: {
+          junior: "If Meera breaks her arm and the hospital bill is ₹20,000, her family's health insurance covers most of it — so they don't have to use all their savings at once.",
+          teen: 'Anaya, 19, pays ₹400/month for health insurance. Without it, a single ER visit or fracture could mean ₹50,000–₹2L in bills — a financial disaster on a student budget.',
+          // FIX (2026-09-29): reordering moved this lesson before ETFs/index
+          // funds are formally taught — softened the example so it no longer
+          // leans on a term ("index funds") not yet introduced at this point
+          // in the curriculum. The point of the example (term vs whole life)
+          // doesn't need that specific detail anyway.
+          senior: 'Rohan, 26, earns ₹8L/year. Term life at ₹500/month gives ₹1 crore cover — protecting his parents who depend on his income. Whole-life equivalent: ₹4,500/month for smaller cover. He invests the ₹4,000 difference instead — growing wealth on his own terms rather than paying for bundled, expensive coverage.',
+        },
+        visual: 'bar',
+        visualData: {
+          items: [
+            { label: 'Health (must-have)', value: 100, color: '#ef4444' },
+            { label: 'Disability (overlooked)', value: 75, color: '#f59e0b' },
+            { label: 'Term Life (if dependents)', value: 60, color: '#3b82f6' },
+            { label: 'Property (if you have valuables)', value: 45, color: '#10b981' },
+          ],
+        },
+        xpReward: 30,
+      },
+    ],
+    quizCard: {
+      question: 'Which type of insurance should a young adult prioritise above all others?',
+      options: ['Whole-life insurance', 'Health insurance', 'Car insurance (even without a car)', 'Travel insurance'],
+      correctIndex: 1,
+      explanation: 'Health insurance is universally the most important for a young adult — medical costs are unpredictable, potentially catastrophic, and happen at any age. No other insurance replaces it.',
+    },
+    briefs: [
+      { emoji: '🏥', fact: 'Medical bills are the #1 cause of personal bankruptcy in the USA, and a leading cause of debt crises worldwide. Health insurance doesn\'t feel necessary — until it is desperately necessary.' },
+      { emoji: '🔒', fact: 'Term life vs whole life: term covers you for a fixed period at low cost (₹500–800/month for ₹1 crore). Whole life mixes insurance and investment at high cost. Financial experts near-universally recommend: buy term, invest the difference.' },
+      { emoji: '⚠️', fact: 'Disability insurance is the most underrated protection: you are statistically 3–4× more likely to be unable to work for 3+ months due to illness or injury than to die before retirement. Yet most people never think about it.' },
+    ],
+  },
+  {
+    id: 'l-taxes',
+    topic: 'taxes',
+    relatedGame: 'finIQ',
+    title: 'Taxes Made Simple',
+    estimatedMinutes: 4,
+    ageGroups: ['junior', 'teen', 'senior'],
+    cards: [
+      {
+        id: 'tx1',
+        title: 'Progressive Tax: How Brackets Work',
+        body: {
+          junior: "When grown-ups earn money, the government takes a small part of it to pay for things everyone uses, like roads and schools. People who earn more give a bit more — but only on the EXTRA amount above a certain point, not on everything they earn!",
+          teen: 'Most countries use progressive income tax — you pay low rates on lower income and higher rates on higher income. The key insight: only the income in each "bracket" is taxed at that higher rate, not your entire income.',
+          senior: 'Progressive taxation means your effective tax rate (total tax ÷ total income) is always lower than your marginal rate (the rate on your top bracket). Standard deductions and retirement contributions reduce your taxable income before any bracket applies — that\'s the foundation of all legal tax optimisation.',
+        },
+        example: {
+          junior: "Imagine your parents earn ₹100. The first ₹50 isn't taxed at all. Only the next ₹50 gets a small tax — so they don't pay tax on everything, just the part above ₹50!",
+          teen: 'Two brackets: ₹0–3L = 0%, ₹3–8L = 5%. If you earn ₹6L: tax = ₹0 (first ₹3L) + ₹15,000 (next ₹3L × 5%) = ₹15,000. Not ₹6L × 5% = ₹30,000. Bracket math saves you money.',
+          senior: 'Income ₹10L: ₹0–3L at 0% = ₹0. ₹3–7L at 5% = ₹20,000. ₹7–10L at 10% = ₹30,000. Total = ₹50,000. Effective rate = 5%, even though the top bracket rate is 10%. Standard deduction reduces this further.',
+        },
+        visual: 'bar',
+        visualData: {
+          items: [
+            { label: 'Band 1 (0%)', value: 0, color: '#10b981' },
+            { label: 'Band 2 (5%)', value: 5, color: '#3b82f6' },
+            { label: 'Band 3 (10%)', value: 10, color: '#f59e0b' },
+            { label: 'Band 4 (20%)', value: 20, color: '#ef4444' },
+          ],
+        },
+        xpReward: 30,
+      },
+      {
+        id: 'tx2',
+        title: 'Legal Ways to Pay Less Tax',
+        body: {
+          junior: "There are smart, legal ways grown-ups can save some of the money they'd otherwise pay in tax — like putting money into special savings accounts for the future. It's like a reward for saving instead of spending!",
+          teen: 'Most countries allow deductions that reduce your taxable income before any brackets apply. The most powerful: contributions to retirement accounts (EPF, PPF, 401k, ISA, pension). Investing here is essentially earning a government discount on top of your investment returns.',
+          senior: 'Tax-advantaged accounts are the single biggest legal tax lever: employer pension matching (free money + deduction), retirement account contributions (deferred or exempt from tax), healthcare savings where available. Max these before any other investing — the combined tax benefit often delivers a higher return than the investment itself in year one.',
+        },
+        example: {
+          junior: "If your dad puts ₹1,000 into a special retirement savings account, the government might let him pay less tax that year — so saving for later also helps him save right now!",
+          teen: 'Investing ₹10,000 in a tax-saving account: if your marginal tax rate is 10%, you immediately owe ₹1,000 less in tax. Your effective cost is only ₹9,000 — an instant 11% return before the money even grows.',
+          senior: 'Salary ₹12L. Without planning: tax ~₹1.05L. With ₹1.5L in retirement savings + standard deduction (₹50K): taxable income drops to ~₹10L. Tax ~₹62,500. Annual saving: ~₹42,500 — just from using the right accounts.',
+        },
+        visual: 'comparison',
+        visualData: {
+          left: { label: 'No planning', value: 100, color: '#ef4444' },
+          right: { label: 'With deductions', value: 41, color: '#10b981' },
+        },
+        xpReward: 30,
+      },
+    ],
+    quizCard: {
+      question: 'You earn ₹8L. Brackets: ₹0–3L at 0%, ₹3–8L at 5%. How much total tax do you owe?',
+      options: ['₹25,000', '₹40,000', '₹8,000', '₹0'],
+      correctIndex: 0,
+      explanation: 'Progressive tax: ₹0 on first ₹3L + (₹5L × 5%) = ₹25,000. Not ₹8L × 5% = ₹40,000. Only the income in each bracket is taxed at that rate — never your full income.',
+    },
+    briefs: [
+      { emoji: '📝', fact: 'In most countries, tax is deducted from your salary before you receive it (called withholding, TDS, or PAYE). Your annual tax return reconciles what was withheld vs. what you actually owed — and you either get a refund or pay the difference.' },
+      { emoji: '🧮', fact: 'Your "marginal tax rate" (top bracket rate) is almost always higher than your "effective tax rate" (actual % of total income paid). On ₹8L income with standard deductions, an effective rate of 4–6% is common even with a 10% top bracket.' },
+      { emoji: '🏦', fact: '"Tax-advantaged" retirement accounts (EPF, 401k, ISA, pension) let your investments grow tax-free or tax-deferred. Over 30 years, this tax shelter effect alone can add lakhs to your final balance.' },
+    ],
+  },
+  {
     id: 'l-investing',
     topic: 'investing',
     relatedGame: 'stockMarketSim',
@@ -129,7 +607,7 @@ export const lessons: Lesson[] = [
         example: {
           junior: "If you save ₹100 in a bank, it stays ₹100. If you invest it, it could become ₹110 next year!",
           teen: "Buying 1 share of a company for ₹500. If the company grows, your share might be worth ₹600 later.",
-          senior: "Starting a SIP (Systematic Investment Plan) in a Nifty 50 Index Fund with ₹2,000 every month."
+          senior: "Starting a monthly investment plan (called a SIP — Systematic Investment Plan) in a Nifty 50 Index Fund with ₹2,000 every month."
         },
         visual: 'line',
         visualData: {
@@ -155,12 +633,12 @@ export const lessons: Lesson[] = [
         body: {
           junior: "When you start investing, don't spread your money across too many different things at once. Pick one or two good places to put it, and focus on adding more over time — not on finding the 'perfect' option.",
           teen: "When you're starting out, don't split a small amount across 5 different mutual funds hoping for 'diversification' — with a small amount, that usually just means owning tiny slices of everything and losing track. Pick 1–2 solid funds. As your income grows, increase how MUCH you invest — that matters far more than which fund you picked.",
-          senior: "Splitting a small SIP across many funds often creates overlapping holdings (most flexicap/large-cap funds hold the same top 20-30 stocks) rather than real diversification — just a cluttered, harder-to-track portfolio. Buy less, buy better: 1-2 funds that give genuine exposure. Then redirect your energy toward increasing your SIP amount as income grows — this has far more impact on your final corpus than optimising which fund outperforms by 1%."
+          senior: "Splitting a small monthly investment across many funds often creates overlapping holdings (most flexicap/large-cap funds hold the same top 20-30 stocks) rather than real diversification — just a cluttered, harder-to-track portfolio. Buy less, buy better: 1-2 funds that give genuine exposure. Then redirect your energy toward increasing your investment amount as income grows — this has far more impact on your final corpus than optimising which fund outperforms by 1%."
         },
         example: {
           junior: "Aman has ₹100. Instead of putting ₹20 into five different piggy banks, he puts it all in one and adds more each week. Simple beats scattered.",
-          teen: "Priya starts a SIP with ₹1,000/month split across 5 funds (₹200 each). A better move: put the full ₹1,000 into 1 solid fund. When her stipend rises to ₹1,500, she increases the SIP amount — not the number of funds.",
-          senior: "Investor A splits ₹5,000/month across 5 flexicap funds — most hold overlapping large-cap stocks, so the 'diversification' is mostly illusion. Investor B puts ₹5,000 into 1 solid flexicap fund, and raises it to ₹8,000 when their salary increases the next year. Investor B's SIP escalation compounds to a meaningfully larger corpus than Investor A's fund-hopping."
+          teen: "Priya starts investing ₹1,000/month split across 5 funds (₹200 each). A better move: put the full ₹1,000 into 1 solid fund. When her stipend rises to ₹1,500, she increases the amount — not the number of funds.",
+          senior: "Investor A splits ₹5,000/month across 5 flexicap funds — most hold overlapping large-cap stocks, so the 'diversification' is mostly illusion. Investor B puts ₹5,000 into 1 solid flexicap fund, and raises it to ₹8,000 when their salary increases the next year. Investor B's escalating contributions compound to a meaningfully larger corpus than Investor A's fund-hopping."
         },
         visual: 'none',
         xpReward: 25
@@ -170,7 +648,10 @@ export const lessons: Lesson[] = [
         // finance-101 resource roundup (Morning Brew's "financial
         // instruments" guide) — this lesson covered stocks and (in l-etfs)
         // ETFs, but never explicitly named bonds or mutual funds, or the
-        // core equity-vs-debt distinction that separates all three.
+        // core equity-vs-debt distinction that separates all three. This is
+        // also the first lesson to use the term "mutual fund" — every later
+        // lesson that references one (ETFs, emergency fund parking, short-
+        // term trading) now comes after this definition, not before it.
         id: 'i3',
         title: 'Stocks vs. Bonds vs. Mutual Funds',
         body: {
@@ -271,460 +752,6 @@ export const lessons: Lesson[] = [
     ]
   },
   {
-    id: 'l-crypto',
-    topic: 'investing',
-    relatedGame: 'stockMarketSim',
-    title: 'Crypto & High-Risk Assets',
-    estimatedMinutes: 3,
-    // FIX (2026-09): was senior-only with blank junior AND teen text — the
-    // only lesson missing two age tiers instead of one. Adding both closes
-    // the gap consistently rather than leaving teen stranded while junior
-    // gets access.
-    ageGroups: ['junior', 'teen', 'senior'],
-    cards: [
-      {
-        id: 'c1',
-        title: 'What is Cryptocurrency?',
-        body: {
-          junior: "Crypto is a kind of money that only exists on computers — no coins or notes! Its price can jump up or crash down A LOT, much more wildly than normal money, because no company or government stands behind it.",
-          teen: "Cryptocurrency (like Bitcoin) is digital money not controlled by any government or bank. Unlike a company's stock, there's no business behind it earning profits — its value comes purely from what other people are willing to pay for it.",
-          senior: "Crypto (Bitcoin, Ethereum etc.) is a digital currency with no government backing. Unlike stocks, crypto has no underlying business earnings to support its value — price is purely based on what someone else will pay for it."
-        },
-        example: {
-          junior: "It's like a rare digital trading card — some days everyone wants it and the price shoots up, other days nobody wants it and the price crashes.",
-          teen: "One Bitcoin might be worth a lot today and much less next month — its price depends entirely on demand, not on any factory or store making money.",
-          senior: "Buying a stock is like owning a piece of a pizza shop. Buying crypto is like owning a digital collectible where the price depends on hype."
-        },
-        visual: 'comparison',
-        visualData: {
-          left: { label: 'Stock (Earnings)', value: 80, color: '#2e72db' },
-          right: { label: 'Crypto (Demand)', value: 80, color: '#8B5CF6' }
-        },
-        xpReward: 25
-      },
-      {
-        id: 'c2',
-        title: 'Serious Risks',
-        body: {
-          junior: "Crypto prices can crash really fast — sometimes losing most of their value in just a few months. Never touch this without a trusted adult, and never with money you can't afford to lose.",
-          teen: "Crypto is extremely volatile — drops of 70-90% have happened more than once. There's little to no regulation, so if an exchange collapses or a wallet gets hacked, there's often no way to get your money back.",
-          senior: "Crypto is extremely volatile. Crashes of 70–90% are common. There is no regulation in India, meaning no legal recourse if an exchange collapses or your wallet is hacked."
-        },
-        example: {
-          junior: "Imagine a toy that was worth ₹500 last month and is only worth ₹100 today — that's how fast crypto prices can fall.",
-          teen: "Bitcoin dropped 83% in 2018 and 77% in 2022 — money invested could have shrunk to less than a fifth of its value in months.",
-          senior: "Bitcoin lost 83% of its value in 2018 and 77% in 2022. Only invest what you can afford to lose entirely."
-        },
-        visual: 'line',
-        visualData: {
-          points: [
-            { x: 0, y: 200 },
-            { x: 5, y: 800 },
-            { x: 10, y: 150 },
-            { x: 15, y: 400 }
-          ],
-          label: 'Typical Crypto Volatility'
-        },
-        xpReward: 25
-      }
-    ],
-    quizCard: {
-      question: "A friend says a new crypto coin will give 50% monthly returns. What should you do?",
-      options: ["Invest immediately", "Ask for a referral link", "Likely a scam — don't invest", "Invest only ₹1,000"],
-      correctIndex: 2,
-      explanation: "No legitimate investment guarantees 50% monthly returns. This pattern is typical of a Ponzi scheme."
-    },
-    briefs: [
-      { emoji: '📉', fact: 'Bitcoin lost 83% of its value in 2018 and 77% again in 2022. It recovered both times — but only those who held through the crash and had no urgent need for the money benefited.' },
-      { emoji: '🕵️', fact: 'Crypto scams cost the world over $8 billion in 2022 (Chainalysis report). Ponzi schemes disguised as "DeFi" and "staking" projects are the most common trap — promising yield that never materialises.' },
-      { emoji: '⚖️', fact: 'Crypto tax treatment varies by country but is generally unfavourable — gains are often taxed as income with limited or no ability to offset losses. Always check local tax rules before investing.' },
-    ]
-  },
-
-  // ─── NEW LESSONS ───────────────────────────────────────────────────────────
-
-  {
-    id: 'l-saving',
-    topic: 'saving',
-    relatedGame: 'budgetBlitz',
-    title: 'The Art of Saving',
-    estimatedMinutes: 3,
-    ageGroups: ['junior', 'teen', 'senior'],
-    cards: [
-      {
-        id: 'sv1',
-        title: 'Why Save at All?',
-        body: {
-          junior: "Saving means keeping some of your money instead of spending it all. It protects you when something unexpected happens — like your phone breaking!",
-          teen: "Saving builds a buffer between you and financial emergencies. Without savings, any unexpected expense forces you into debt — which costs even more money.",
-          senior: "Savings serve three purposes: emergency fund (3–6 months of expenses), opportunity fund (take advantage of deals or investments), and goal fund (specific targets like education or travel).",
-        },
-        example: {
-          junior: "Priya saves ₹20 from her ₹100 pocket money every week. After 10 weeks she has ₹200 — enough for the toy she wanted without asking anyone.",
-          teen: "Rahul saves ₹500/month. When his laptop broke suddenly, he paid ₹3,000 from savings instead of asking his parents or taking a loan.",
-          senior: "Meera's 3-month emergency fund of ₹45,000 covered her rent and food when she was between jobs for 6 weeks — no stress, no debt.",
-        },
-        visual: 'bar',
-        visualData: {
-          items: [
-            { label: 'Emergency', value: 60, color: '#10b981' },
-            { label: 'Goals', value: 25, color: '#2e72db' },
-            { label: 'Opportunity', value: 15, color: '#f59e0b' },
-          ],
-        },
-        xpReward: 20,
-      },
-      {
-        id: 'sv2',
-        title: 'Pay Yourself First',
-        body: {
-          junior: "Pay yourself first means saving BEFORE you spend. When you get money, the first thing you do is put some in your piggy bank — then spend the rest!",
-          teen: "Automate your savings on payday — before you see the money, it is already saved. This removes the temptation to spend it and makes saving effortless.",
-          senior: "Set up an auto-SIP or standing instruction on your account to transfer to savings or investments the same day your salary arrives. What you don't see, you don't spend.",
-        },
-        example: {
-          junior: "Every time Arun gets pocket money, he immediately puts ₹30 in his piggy bank — before buying anything. He saves without even trying!",
-          teen: "Kavya set up a ₹500 auto-transfer to her savings account every 1st of the month. She never misses it because the money is gone before she checks her balance.",
-          senior: "₹5,000 auto-SIP on salary day = ₹60,000 saved per year = ₹5.4L after 5 years at 9% — built entirely on autopilot.",
-        },
-        visual: 'comparison',
-        visualData: {
-          left: { label: 'Spend-first', value: 30, color: '#ef4444' },
-          right: { label: 'Save-first', value: 95, color: '#10b981' },
-        },
-        xpReward: 20,
-      },
-      {
-        // NEW (2026-09-29): genuine gap — nothing in the whole curriculum
-        // ever explained what a bank actually DOES with money you deposit,
-        // or why a savings account pays you interest at all. Flagged from
-        // an external finance-101 resource's "fundamentals" section
-        // ("what a bank actually does"). Placed in l-saving since that's
-        // where a user is most likely wondering this — right after opening
-        // or thinking about a savings account.
-        id: 'sv3',
-        title: "What Does a Bank Actually Do With Your Money?",
-        body: {
-          junior: "Your bank doesn't just lock your money in a safe and leave it there! It lends most of it to other people — like someone buying a house — and charges THEM interest. It then gives you a small slice of that interest for letting them borrow your money.",
-          teen: "A bank isn't a storage locker for your cash. When you deposit ₹1,000, the bank keeps a small portion aside and lends most of the rest to other people and businesses — home loans, car loans, business loans — charging them a higher interest rate than it pays you. That difference is how banks make money. This is also why your money isn't 'just sitting there' — it's actively being lent out.",
-          senior: "Banks run on a simple spread: they pay depositors a lower interest rate (say 3-4% on a savings account) and lend that same money out at a higher rate (say 9-12% on loans) — the gap is their profit. This is called fractional reserve banking: banks keep only a fraction of deposits on hand and lend out the rest. It's also why deposit insurance exists — in India, DICGC insures up to ₹5 lakh per depositor per bank, so if a bank fails, your money (up to that limit) is protected."
-        },
-        example: {
-          junior: "You put ₹500 in the bank. The bank lends ₹400 of it to a family buying a scooter, charging them extra. The bank gives you a little bit of that extra as a 'thank you' for letting them use your ₹500.",
-          teen: "You deposit ₹10,000 in a savings account earning 3.5% per year (₹350). The bank lends that same ₹10,000 as part of a car loan charging 10% (₹1,000). The bank keeps the ₹650 difference — that's the business model of every bank.",
-          senior: "A bank holds ₹1 crore in deposits, keeps ₹10 lakh in reserve (as required), and lends out ₹90 lakh as home and business loans at 9-10%. It pays depositors 3-4% on their balances. The spread between what it pays and what it earns, across millions of accounts, is how banks are consistently profitable — and why keeping large sums outside the ₹5L DICGC insurance limit across multiple banks is a genuine safety consideration."
-        },
-        visual: 'bar',
-        visualData: {
-          items: [
-            { label: 'What bank pays you (~3-4%)', value: 35, color: '#3b82f6' },
-            { label: 'What bank charges borrowers (~9-12%)', value: 100, color: '#10b981' }
-          ]
-        },
-        xpReward: 20,
-      },
-    ],
-    quizCard: {
-      question: 'You just received ₹1,000. What does "pay yourself first" mean?',
-      options: [
-        'Buy what you want, save what is left',
-        'Save a set amount before spending anything',
-        'Give money to family first',
-        'Pay your bills first',
-      ],
-      correctIndex: 1,
-      explanation: '"Pay yourself first" means saving before you spend. It is the single most effective savings habit because it removes the decision entirely.',
-    },
-    briefs: [
-      { emoji: '💡', fact: 'Most young adults save far less than they think. Liquid savings (accessible cash) for under-25s is often less than 1 month of expenses — leaving no real buffer when something unexpected happens.' },
-      { emoji: '🤖', fact: 'Automation is the #1 factor in savings success. People who automate savings save 3× more than those who save "what is left over" at month end.' },
-      { emoji: '🏺', fact: 'Ancient Indians used the "kumbh" system — storing grain away before eating. Modern finance just replaced grain with money and earthen pots with savings accounts.' },
-      { emoji: '🏦', fact: 'DICGC (Deposit Insurance and Credit Guarantee Corporation) insures up to ₹5 lakh of your deposits per bank in India — automatically, at no cost to you. Worth knowing before choosing where to keep large sums.' },
-    ],
-  },
-
-  {
-    id: 'l-debt',
-    topic: 'spending',
-    relatedGame: 'moneyMaze',
-    title: 'Understanding Debt',
-    estimatedMinutes: 4,
-    ageGroups: ['junior', 'teen', 'senior'],
-    cards: [
-      {
-        id: 'd1',
-        title: 'Good Debt vs Bad Debt',
-        body: {
-          junior: "Borrowing money isn't always bad. 'Good borrowing' helps you get something useful, like tools to earn more later. 'Bad borrowing' is for things you don't need — and you end up owing extra on top!",
-          teen: 'Not all debt is bad. "Good debt" helps you build wealth or skills — like a student loan. "Bad debt" buys things that lose value and costs you extra via interest.',
-          senior: 'Good debt has low interest rates and creates an asset or income: home loan, education loan, business loan. Bad debt is high-interest consumption: credit card revolving, personal loans for lifestyle, BNPL misuse.',
-        },
-        example: {
-          junior: "If you borrow ₹50 from your sister for school notebooks and pay her back, that's smart borrowing. If you borrow ₹50 for candy and now owe her ₹60, that's not so smart!",
-          teen: 'Education loan at 8%: returns 3× in higher salary. Credit card debt at 36% APR: you pay ₹360 every year on every ₹1,000 borrowed — just for the privilege of using money.',
-          senior: 'A ₹50L home loan at 8.5% builds equity. A ₹1L personal loan at 14% for a vacation builds nothing — just a ₹14,000/year interest bill.',
-        },
-        visual: 'comparison',
-        visualData: {
-          left: { label: 'Good Debt (8%)', value: 80, color: '#10b981' },
-          right: { label: 'Bad Debt (36%)', value: 30, color: '#ef4444' },
-        },
-        xpReward: 25,
-      },
-      {
-        id: 'd2',
-        title: 'The Debt Avalanche',
-        body: {
-          junior: "If you owe money to more than one person, pay back whoever charges you the most extra first — that way you stop losing extra money the fastest!",
-          teen: 'The avalanche method: list all debts by interest rate (highest first). Pay minimums on all — then throw every extra rupee at the highest-rate debt. Mathematically optimal.',
-          senior: 'Avalanche vs Snowball: Avalanche saves the most interest. Snowball (smallest balance first) provides psychological wins. Research shows snowball produces better completion rates despite higher cost — choose what keeps you motivated.',
-        },
-        example: {
-          junior: "You owe your brother ₹20 (no extra charge) and a friend ₹10 (he wants ₹2 extra every week). Pay your friend back first so the extra ₹2 stops piling up!",
-          teen: 'Credit card at 36%: ₹5,000 debt. Student loan at 10%: ₹30,000. Pay minimum on student loan; attack credit card first. Saves ₹1,800/year in interest.',
-          senior: 'With avalanche, a ₹3L mixed-debt portfolio gets cleared 8 months faster and saves ₹28,000 vs paying equal amounts on each.',
-        },
-        visual: 'bar',
-        visualData: {
-          items: [
-            { label: 'Credit Card (36%)', value: 100, color: '#ef4444' },
-            { label: 'Personal Loan (14%)', value: 50, color: '#f59e0b' },
-            { label: 'Education Loan (8%)', value: 25, color: '#10b981' },
-          ],
-        },
-        xpReward: 25,
-      },
-    ],
-    quizCard: {
-      question: 'You have two debts: credit card at 36% interest and a student loan at 9%. Using the avalanche method, which do you pay first?',
-      options: ['Student loan (smaller balance)', 'Credit card (higher interest)', 'Pay equal amounts on both', 'Neither — save first'],
-      correctIndex: 1,
-      explanation: 'Avalanche = highest interest rate first. The credit card at 36% is costing you 4× more per rupee than the student loan. Killing it first saves the most money.',
-    },
-    briefs: [
-      { emoji: '💳', fact: 'India has 60M+ credit cards in circulation. The average revolving balance costs ₹540/year per ₹1,500 in interest alone — paid to the bank for spending money that wasn\'t theirs.' },
-      { emoji: '📊', fact: 'A ₹10,000 credit card balance at 3% monthly interest takes 8+ years to repay with minimum payments — paying back ₹28,000 total on a ₹10,000 purchase.' },
-      { emoji: '⛓️', fact: 'Buy Now Pay Later (BNPL) apps advertise 0% interest — but only for 15–30 days. After that, annualised rates can reach 30–50%. Always read the repayment terms before splitting any payment.' },
-    ],
-  },
-
-  {
-    id: 'l-credit',
-    topic: 'credit',
-    relatedGame: 'creditScoreBuilder',
-    title: 'How Credit Scores Work',
-    estimatedMinutes: 4,
-    ageGroups: ['junior', 'teen', 'senior'],
-    cards: [
-      {
-        id: 'cr1',
-        title: 'What is a Credit Score?',
-        body: {
-          junior: "A credit score is like a trust score! It tells grown-ups whether someone pays back what they borrow, on time. The more you keep your promises to pay people back, the more they trust you with bigger things later.",
-          teen: 'Your credit score is a 3-digit number that banks use to decide whether to lend you money and at what interest rate. Higher = better loan terms and lower interest rates. Every country has its own credit bureau: CIBIL in India (300–900), FICO in the USA (300–850), Experian in the UK.',
-          senior: 'Credit bureaus compute your creditworthiness as a score: CIBIL in India (300–900), FICO in the USA (300–850), Experian in the UK. Scores above ~750 unlock the best loan rates. Scores below ~650 lead to rejections or high-risk premiums. Globally, the same five factors determine your score.',
-        },
-        example: {
-          junior: "If you always pay your friend back on time when you borrow money, they'll happily lend to you again. If you forget, they won't trust you next time!",
-          teen: 'Amit\'s credit score is 800. He gets a home loan at 8.5%. His friend with a score of 600 pays 11.5% — on a ₹50L loan, that\'s ₹15L extra in interest over 20 years.',
-          senior: 'On a ₹60L, 20-year home loan: 8.5% (score 800+) = EMI ₹52,118 = Total ₹1.25 crore. At 11.5% (score 600): EMI ₹63,879 = Total ₹1.53 crore. Score difference costs ₹28L.',
-        },
-        visual: 'bar',
-        visualData: {
-          items: [
-            { label: 'Payment History (35%)', value: 35, color: '#2e72db' },
-            { label: 'Utilisation (30%)', value: 30, color: '#10b981' },
-            { label: 'Credit Length (15%)', value: 15, color: '#f59e0b' },
-            { label: 'Credit Mix (10%)', value: 10, color: '#8b5cf6' },
-            { label: 'Inquiries (10%)', value: 10, color: '#ef4444' },
-          ],
-        },
-        xpReward: 25,
-      },
-      {
-        id: 'cr2',
-        title: 'Building Your Score',
-        body: {
-          junior: "You build trust by always paying back what you borrow, on time, and by not borrowing more than you can pay back. Small promises kept build big trust over time!",
-          teen: 'The fastest ways to build credit: always pay on time, keep your card balance below 30% of the limit, don\'t apply for many cards at once, and keep old accounts open.',
-          senior: 'Credit-building strategy for beginners: start with a secured credit card (deposit-backed), pay in full every month, never exceed 30% utilisation. After 12–18 months of clean history, upgrade to a rewards card.',
-        },
-        example: {
-          junior: "Ravi borrows ₹20 from his mom every week for the bus and always pays her back on Friday. After a few months, she trusts him enough to lend him more when he really needs it.",
-          teen: 'Neha started with a ₹10,000 limit card and always paid full balance. 18 months later, her score was 760 — she qualified for a ₹1L limit at a premium rate.',
-          senior: 'Secured card strategy: ₹20,000 fixed deposit → ₹20,000 credit limit. Spend ₹4,000/month (20%) and pay in full. Score goes from 0 to 720+ in 12 months.',
-        },
-        visual: 'line',
-        visualData: {
-          points: [
-            { x: 0, y: 0 },
-            { x: 6, y: 45 },
-            { x: 12, y: 62 },
-            { x: 18, y: 78 },
-            { x: 24, y: 90 },
-          ],
-          label: 'Score growth with clean credit habits (%)',
-        },
-        xpReward: 25,
-      },
-    ],
-    quizCard: {
-      question: 'Which factor has the BIGGEST impact on your credit score?',
-      options: ['Number of credit cards you own', 'Payment history', 'Total balance across all accounts', 'The type of bank you use'],
-      correctIndex: 1,
-      explanation: 'Payment history accounts for 35% of your score — the largest single factor. Even one missed payment can drop your score by 50–100 points instantly.',
-    },
-    briefs: [
-      { emoji: '📋', fact: 'You can usually check your credit score for free through your bank\'s app, your country\'s official credit bureau (CIBIL in India, Experian/Equifax in USA/UK), or many financial apps. Free checks are "soft inquiries" and do not affect your score.' },
-      { emoji: '🛡️', fact: 'Checking your OWN credit score is a "soft inquiry" — it does NOT lower your score. Only "hard inquiries" (when a lender checks for an application) have a small, temporary impact.' },
-      { emoji: '⚡', fact: 'Paying credit card dues 2 days BEFORE the billing cycle closes is a secret weapon: the bank reports a lower balance to the credit bureau, boosting your utilisation score even with the same spending.' },
-    ],
-  },
-
-  {
-    id: 'l-taxes',
-    topic: 'taxes',
-    relatedGame: 'finIQ',
-    title: 'Taxes Made Simple',
-    estimatedMinutes: 4,
-    ageGroups: ['junior', 'teen', 'senior'],
-    cards: [
-      {
-        id: 'tx1',
-        title: 'Progressive Tax: How Brackets Work',
-        body: {
-          junior: "When grown-ups earn money, the government takes a small part of it to pay for things everyone uses, like roads and schools. People who earn more give a bit more — but only on the EXTRA amount above a certain point, not on everything they earn!",
-          teen: 'Most countries use progressive income tax — you pay low rates on lower income and higher rates on higher income. The key insight: only the income in each "bracket" is taxed at that higher rate, not your entire income.',
-          senior: 'Progressive taxation means your effective tax rate (total tax ÷ total income) is always lower than your marginal rate (the rate on your top bracket). Standard deductions and retirement contributions reduce your taxable income before any bracket applies — that\'s the foundation of all legal tax optimisation.',
-        },
-        example: {
-          junior: "Imagine your parents earn ₹100. The first ₹50 isn't taxed at all. Only the next ₹50 gets a small tax — so they don't pay tax on everything, just the part above ₹50!",
-          teen: 'Two brackets: ₹0–3L = 0%, ₹3–8L = 5%. If you earn ₹6L: tax = ₹0 (first ₹3L) + ₹15,000 (next ₹3L × 5%) = ₹15,000. Not ₹6L × 5% = ₹30,000. Bracket math saves you money.',
-          senior: 'Income ₹10L: ₹0–3L at 0% = ₹0. ₹3–7L at 5% = ₹20,000. ₹7–10L at 10% = ₹30,000. Total = ₹50,000. Effective rate = 5%, even though the top bracket rate is 10%. Standard deduction reduces this further.',
-        },
-        visual: 'bar',
-        visualData: {
-          items: [
-            { label: 'Band 1 (0%)', value: 0, color: '#10b981' },
-            { label: 'Band 2 (5%)', value: 5, color: '#3b82f6' },
-            { label: 'Band 3 (10%)', value: 10, color: '#f59e0b' },
-            { label: 'Band 4 (20%)', value: 20, color: '#ef4444' },
-          ],
-        },
-        xpReward: 30,
-      },
-      {
-        id: 'tx2',
-        title: 'Legal Ways to Pay Less Tax',
-        body: {
-          junior: "There are smart, legal ways grown-ups can save some of the money they'd otherwise pay in tax — like putting money into special savings accounts for the future. It's like a reward for saving instead of spending!",
-          teen: 'Most countries allow deductions that reduce your taxable income before any brackets apply. The most powerful: contributions to retirement accounts (EPF, PPF, 401k, ISA, pension). Investing here is essentially earning a government discount on top of your investment returns.',
-          senior: 'Tax-advantaged accounts are the single biggest legal tax lever: employer pension matching (free money + deduction), retirement account contributions (deferred or exempt from tax), healthcare savings where available. Max these before any other investing — the combined tax benefit often delivers a higher return than the investment itself in year one.',
-        },
-        example: {
-          junior: "If your dad puts ₹1,000 into a special retirement savings account, the government might let him pay less tax that year — so saving for later also helps him save right now!",
-          teen: 'Investing ₹10,000 in a tax-saving account: if your marginal tax rate is 10%, you immediately owe ₹1,000 less in tax. Your effective cost is only ₹9,000 — an instant 11% return before the money even grows.',
-          senior: 'Salary ₹12L. Without planning: tax ~₹1.05L. With ₹1.5L in retirement savings + standard deduction (₹50K): taxable income drops to ~₹10L. Tax ~₹62,500. Annual saving: ~₹42,500 — just from using the right accounts.',
-        },
-        visual: 'comparison',
-        visualData: {
-          left: { label: 'No planning', value: 100, color: '#ef4444' },
-          right: { label: 'With deductions', value: 41, color: '#10b981' },
-        },
-        xpReward: 30,
-      },
-    ],
-    quizCard: {
-      question: 'You earn ₹8L. Brackets: ₹0–3L at 0%, ₹3–8L at 5%. How much total tax do you owe?',
-      options: ['₹25,000', '₹40,000', '₹8,000', '₹0'],
-      correctIndex: 0,
-      explanation: 'Progressive tax: ₹0 on first ₹3L + (₹5L × 5%) = ₹25,000. Not ₹8L × 5% = ₹40,000. Only the income in each bracket is taxed at that rate — never your full income.',
-    },
-    briefs: [
-      { emoji: '📝', fact: 'In most countries, tax is deducted from your salary before you receive it (called withholding, TDS, or PAYE). Your annual tax return reconciles what was withheld vs. what you actually owed — and you either get a refund or pay the difference.' },
-      { emoji: '🧮', fact: 'Your "marginal tax rate" (top bracket rate) is almost always higher than your "effective tax rate" (actual % of total income paid). On ₹8L income with standard deductions, an effective rate of 4–6% is common even with a 10% top bracket.' },
-      { emoji: '🏦', fact: '"Tax-advantaged" retirement accounts (EPF, 401k, ISA, pension) let your investments grow tax-free or tax-deferred. Over 30 years, this tax shelter effect alone can add lakhs to your final balance.' },
-    ],
-  },
-
-  {
-    id: 'l-emergency',
-    topic: 'saving',
-    relatedGame: 'budgetBlitz',
-    title: 'Emergency Funds',
-    estimatedMinutes: 3,
-    ageGroups: ['junior', 'teen', 'senior'],
-    cards: [
-      {
-        id: 'ef1',
-        title: 'What is an Emergency Fund?',
-        body: {
-          junior: "An emergency fund is money saved for unexpected problems — like a broken toy, doctor visit, or something that isn't planned. It means you won't have to beg or borrow.",
-          teen: "An emergency fund is 3–6 months of your living expenses kept in a separate savings account. It protects you from unexpected events: job loss, medical bills, or urgent repairs.",
-          senior: "Emergency funds should cover 3–6 months of fixed + variable expenses — not income. For a freelancer or entrepreneur, aim for 9–12 months. Keep it liquid: savings account or liquid mutual fund.",
-        },
-        example: {
-          junior: "Aryan saved ₹300 in a special envelope. When his cricket bat broke right before a match, he had the money to buy a new one — no problem!",
-          teen: "Sneha had ₹12,000 in an emergency account. When her phone screen cracked during exams, she replaced it the same day without asking her parents or skipping meals.",
-          senior: "Monthly expenses: ₹35,000 (rent ₹15K + food ₹8K + transport ₹5K + utilities ₹7K). Emergency fund target: ₹1.05–2.1L. Kept in liquid fund at ~6% return.",
-        },
-        visual: 'bar',
-        visualData: {
-          items: [
-            { label: 'Junior (1 month)', value: 33, color: '#10b981' },
-            { label: 'Teen (3 months)', value: 66, color: '#3b82f6' },
-            { label: 'Senior (6 months)', value: 100, color: '#8b5cf6' },
-          ],
-        },
-        xpReward: 20,
-      },
-      {
-        // NEW (2026-09-26): sourced from a real personal-finance Instagram post
-        // (@sanjanaa.aggarwal) on WHERE specifically to park an emergency fund.
-        // Added here since this lesson previously had only 1 card (thin
-        // compared to every other lesson), and it directly extends ef1's
-        // "keep it liquid" point with the actual how-to.
-        id: 'ef2',
-        title: 'Where to Actually Park It',
-        body: {
-          junior: "Don't just leave all your emergency money in one place doing nothing — but don't try to make it grow fast either, that's not what it's for! A couple of safe spots, used together, works best.",
-          teen: "Your emergency fund shouldn't just sit fully idle earning nothing — but it also shouldn't be chasing high returns. Both defeat the purpose. The best setup usually combines a few things: some money instantly accessible in a savings account, and some in safer, slightly-higher-return options like liquid mutual funds — so it's both safe AND not wasted.",
-          senior: "An emergency fund should balance three things: safety, liquidity, and reasonable (not maximum) returns. In practice this usually means a combination of instruments rather than one: a portion instantly accessible in a savings account or sweep-in FD, and a portion in liquid mutual funds for slightly better yield with T+1 accessibility. Splitting across instruments avoids both idle-cash waste and liquidity risk."
-        },
-        example: {
-          junior: "Meera keeps ₹50 in her piggy bank for right-now emergencies, and asks her mom to safely hold ₹150 for bigger ones. Two spots, both safe, both there when needed.",
-          teen: "Rahul keeps ₹3,000 of his ₹12,000 emergency fund in his savings account for instant access, and puts the other ₹9,000 in a liquid mutual fund earning a bit more — still accessible within a day if he really needs it.",
-          senior: "A ₹1.5L emergency fund split: ₹30K in a savings account/sweep-FD for instant access, ₹1.2L in a liquid fund earning ~6-7% with T+1 withdrawal. Better returns than pure savings, without sacrificing real accessibility."
-        },
-        visual: 'bar',
-        visualData: {
-          items: [
-            { label: 'Instant access (savings)', value: 20, color: '#3b82f6' },
-            { label: 'Liquid fund (T+1)', value: 80, color: '#10b981' },
-          ],
-        },
-        xpReward: 25,
-      },
-    ],
-    quizCard: {
-      question: 'Where should you keep your emergency fund?',
-      options: [
-        'Stock market (for high returns)',
-        'Fixed Deposit locked for 5 years',
-        'Savings account or liquid mutual fund',
-        'Cash under your mattress',
-      ],
-      correctIndex: 2,
-      explanation: 'Emergency funds must be liquid — accessible within 24 hours. Savings accounts or liquid mutual funds are ideal: safe, earning modest interest, and available immediately without penalties.',
-    },
-    briefs: [
-      { emoji: '🚑', fact: 'Globally, medical emergencies and sudden job loss are the top two triggers for household debt crises. An emergency fund is the one financial buffer that stands between stability and a debt spiral.' },
-      { emoji: '🔒', fact: 'Do NOT keep your emergency fund in a locked account or fixed-term deposit with early-withdrawal penalties. You need the money available within 24 hours — not in 3 business days with a penalty fee.' },
-      { emoji: '🎯', fact: 'The FIRST savings goal for anyone should be a 1-month emergency fund — even before starting investments. A crisis that forces you to sell investments at a bad time costs far more than delayed investing.' },
-    ],
-  },
-
-  {
     id: 'l-shortterm',
     topic: 'investing',
     relatedGame: 'stockMarketSim',
@@ -817,73 +844,76 @@ export const lessons: Lesson[] = [
       { emoji: '⚠️', fact: 'Leverage was a central cause of the 2008 financial crisis — banks and investors had borrowed so heavily that even a modest fall in housing prices wiped out entire firms. Leverage doesn\'t just multiply your risk; at scale, it multiplies everyone\'s.' },
     ],
   },
-
   {
-    id: 'l-insurance',
-    topic: 'spending',
-    relatedGame: 'budgetBlitz',
-    title: 'Insurance: Protecting What You Build',
-    estimatedMinutes: 4,
+    id: 'l-crypto',
+    topic: 'investing',
+    relatedGame: 'stockMarketSim',
+    title: 'Crypto & High-Risk Assets',
+    estimatedMinutes: 3,
+    // FIX (2026-09): was senior-only with blank junior AND teen text — the
+    // only lesson missing two age tiers instead of one. Adding both closes
+    // the gap consistently rather than leaving teen stranded while junior
+    // gets access.
     ageGroups: ['junior', 'teen', 'senior'],
     cards: [
       {
-        id: 'ins1',
-        title: 'What Is Insurance?',
+        id: 'c1',
+        title: 'What is Cryptocurrency?',
         body: {
-          junior: "Insurance is when lots of people each pay a small amount into a shared pot, so that if something bad happens to ONE of them — like getting hurt or breaking something expensive — there's enough money to help them out.",
-          teen: 'Insurance is a risk-pooling system. Everyone pays a small regular amount (a "premium"), and the fund covers large unexpected costs for whoever needs it. You are essentially sharing financial risk with thousands of strangers.',
-          senior: 'Insurance transfers low-probability, high-impact financial risk to an insurer for a predictable cost. The insurer profits because most policyholders never claim — but for those who do, the payout far exceeds the premiums paid. It is the only financial product where the goal is to never "get your money\'s worth."',
+          junior: "Crypto is a kind of money that only exists on computers — no coins or notes! Its price can jump up or crash down A LOT, much more wildly than normal money, because no company or government stands behind it.",
+          teen: "Cryptocurrency (like Bitcoin) is digital money not controlled by any government or bank. Unlike a company's stock, there's no business behind it earning profits — its value comes purely from what other people are willing to pay for it.",
+          senior: "Crypto (Bitcoin, Ethereum etc.) is a digital currency with no government backing. Unlike stocks, crypto has no underlying business earnings to support its value — price is purely based on what someone else will pay for it."
         },
         example: {
-          junior: "Imagine you and 20 friends each put ₹10 into a jar every month. If one friend's bike breaks, the jar pays to fix it — even though that friend only put in ₹10 themselves!",
-          teen: '1,000 people each pay ₹3,000 per year for health insurance = ₹30L in the pool. When one person needs surgery costing ₹5L, the pool pays. Each person\'s small premium funds coverage that would otherwise be unaffordable.',
-          senior: 'Health insurance premium: ₹8,000/year. Hospitalisation claim: ₹2.5L. Effective "return" on the premium: 31×. But the value was never the return — it was eliminating the risk of a ₹2.5L expense with no savings to cover it.',
+          junior: "It's like a rare digital trading card — some days everyone wants it and the price shoots up, other days nobody wants it and the price crashes.",
+          teen: "One Bitcoin might be worth a lot today and much less next month — its price depends entirely on demand, not on any factory or store making money.",
+          senior: "Buying a stock is like owning a piece of a pizza shop. Buying crypto is like owning a digital collectible where the price depends on hype."
         },
         visual: 'comparison',
         visualData: {
-          left: { label: 'Without insurance', value: 15, color: '#ef4444' },
-          right: { label: 'With insurance', value: 95, color: '#10b981' },
+          left: { label: 'Stock (Earnings)', value: 80, color: '#2e72db' },
+          right: { label: 'Crypto (Demand)', value: 80, color: '#8B5CF6' }
         },
-        xpReward: 30,
+        xpReward: 25
       },
       {
-        id: 'ins2',
-        title: 'What Insurance Do You Actually Need?',
+        id: 'c2',
+        title: 'Serious Risks',
         body: {
-          junior: "The most important insurance for anyone is health insurance — it helps pay for doctors and hospitals if you get sick or hurt, which can cost a LOT of money without it.",
-          teen: 'Start with health insurance — always. If you are on a parent\'s policy, understand what it covers and when you age off. After health: renters/contents insurance if you have valuables, and eventually life insurance if others depend on your income.',
-          senior: 'Priority order for most young adults: (1) Health insurance — non-negotiable. (2) Term life insurance — only if you have dependents or co-signed debt. (3) Disability insurance — often overlooked, but you are 3–4× more likely to be disabled for 3+ months than to die before 65. (4) Property insurance — renters or home. Skip whole-life and investment-linked policies as a rule: buy term, invest the difference.',
+          junior: "Crypto prices can crash really fast — sometimes losing most of their value in just a few months. Never touch this without a trusted adult, and never with money you can't afford to lose.",
+          teen: "Crypto is extremely volatile — drops of 70-90% have happened more than once. There's little to no regulation, so if an exchange collapses or a wallet gets hacked, there's often no way to get your money back.",
+          senior: "Crypto is extremely volatile. Crashes of 70–90% are common. There is no regulation in India, meaning no legal recourse if an exchange collapses or your wallet is hacked."
         },
         example: {
-          junior: "If Meera breaks her arm and the hospital bill is ₹20,000, her family's health insurance covers most of it — so they don't have to use all their savings at once.",
-          teen: 'Anaya, 19, pays ₹400/month for health insurance. Without it, a single ER visit or fracture could mean ₹50,000–₹2L in bills — a financial disaster on a student budget.',
-          senior: 'Rohan, 26, earns ₹8L/year. Term life at ₹500/month gives ₹1 crore cover — protecting his parents who depend on his income. Whole-life equivalent: ₹4,500/month for smaller cover. He invests the ₹4,000 difference in index funds.',
+          junior: "Imagine a toy that was worth ₹500 last month and is only worth ₹100 today — that's how fast crypto prices can fall.",
+          teen: "Bitcoin dropped 83% in 2018 and 77% in 2022 — money invested could have shrunk to less than a fifth of its value in months.",
+          senior: "Bitcoin lost 83% of its value in 2018 and 77% in 2022. Only invest what you can afford to lose entirely."
         },
-        visual: 'bar',
+        visual: 'line',
         visualData: {
-          items: [
-            { label: 'Health (must-have)', value: 100, color: '#ef4444' },
-            { label: 'Disability (overlooked)', value: 75, color: '#f59e0b' },
-            { label: 'Term Life (if dependents)', value: 60, color: '#3b82f6' },
-            { label: 'Property (if you have valuables)', value: 45, color: '#10b981' },
+          points: [
+            { x: 0, y: 200 },
+            { x: 5, y: 800 },
+            { x: 10, y: 150 },
+            { x: 15, y: 400 }
           ],
+          label: 'Typical Crypto Volatility'
         },
-        xpReward: 30,
-      },
+        xpReward: 25
+      }
     ],
     quizCard: {
-      question: 'Which type of insurance should a young adult prioritise above all others?',
-      options: ['Whole-life insurance', 'Health insurance', 'Car insurance (even without a car)', 'Travel insurance'],
-      correctIndex: 1,
-      explanation: 'Health insurance is universally the most important for a young adult — medical costs are unpredictable, potentially catastrophic, and happen at any age. No other insurance replaces it.',
+      question: "A friend says a new crypto coin will give 50% monthly returns. What should you do?",
+      options: ["Invest immediately", "Ask for a referral link", "Likely a scam — don't invest", "Invest only ₹1,000"],
+      correctIndex: 2,
+      explanation: "No legitimate investment guarantees 50% monthly returns. This pattern is typical of a Ponzi scheme."
     },
     briefs: [
-      { emoji: '🏥', fact: 'Medical bills are the #1 cause of personal bankruptcy in the USA, and a leading cause of debt crises worldwide. Health insurance doesn\'t feel necessary — until it is desperately necessary.' },
-      { emoji: '🔒', fact: 'Term life vs whole life: term covers you for a fixed period at low cost (₹500–800/month for ₹1 crore). Whole life mixes insurance and investment at high cost. Financial experts near-universally recommend: buy term, invest the difference.' },
-      { emoji: '⚠️', fact: 'Disability insurance is the most underrated protection: you are statistically 3–4× more likely to be unable to work for 3+ months due to illness or injury than to die before retirement. Yet most people never think about it.' },
-    ],
+      { emoji: '📉', fact: 'Bitcoin lost 83% of its value in 2018 and 77% again in 2022. It recovered both times — but only those who held through the crash and had no urgent need for the money benefited.' },
+      { emoji: '🕵️', fact: 'Crypto scams cost the world over $8 billion in 2022 (Chainalysis report). Ponzi schemes disguised as "DeFi" and "staking" projects are the most common trap — promising yield that never materialises.' },
+      { emoji: '⚖️', fact: 'Crypto tax treatment varies by country but is generally unfavourable — gains are often taxed as income with limited or no ability to offset losses. Always check local tax rules before investing.' },
+    ]
   },
-
   // ── Peter Lynch Stock Framework ──────────────────────────────────────────
   {
     id: 'l-stock-analysis',
