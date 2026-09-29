@@ -4,7 +4,7 @@ import { useAgeAdapt } from '@/lib/ageAdaptProvider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { ChevronRight, ChevronLeft, CheckCircle2, Zap, ArrowRight, Info } from 'lucide-react';
+import { ChevronRight, ChevronLeft, CheckCircle2, Zap, ArrowRight, Info, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUser } from '@/lib/store';
 import { LearnMoreLink } from '@/components/LearnMoreLink';
@@ -200,7 +200,12 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
           {isBriefStep && lesson.briefs?.length ? (
             <Card className="border-none shadow-2xl overflow-hidden animate-in fade-in slide-in-from-right-8 duration-500">
               <div className="bg-primary p-6 text-white text-center">
-                <div className="text-4xl mb-2">{lesson.briefs[briefIndex].emoji}</div>
+                {/* FIX (2026-09-29): was rendering the brief's raw emoji
+                    character at 4xl size — looked tacky and was the only
+                    place in the app using emoji instead of the consistent
+                    lucide-icon visual language used everywhere else (nav,
+                    badges, cards). Swapped for a plain icon. */}
+                <Lightbulb className="h-9 w-9 mx-auto mb-2" strokeWidth={2} />
                 <p className="text-xs font-black uppercase tracking-widest opacity-80">Did You Know?</p>
                 <p className="text-xs text-[#A8D5BC] mt-1">{briefIndex + 1} of {lesson.briefs.length}</p>
               </div>
