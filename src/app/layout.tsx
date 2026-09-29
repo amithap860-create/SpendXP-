@@ -40,6 +40,8 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
   useNativeInit({
     uid: user?.uid ?? null,
     streak: confirmedStreak,
+    reminderHour: progression.reminderHour,
+    reminderMinute: progression.reminderMinute,
   });
 
   useEffect(() => {

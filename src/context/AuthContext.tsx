@@ -142,16 +142,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Holds the Firestore onSnapshot unsubscribe so we can clean it up
     // when auth state changes (e.g. user logs out or switches accounts).
     let firestoreUnsub: (() => void) | null = null;
-    // Watchdog: Firestore's persistentLocalCache has a known failure mode
-    // (INTERNAL ASSERTION FAILED / ca9 / b815 — see firestoreSafe.ts) that can
-    // be triggered by backgrounding and foregrounding the app. When it hits,
-    // the onSnapshot listener can die silently without ever calling either
-    // callback below, which left `loading` stuck at true forever — the app
-    // would sit on the splash/loading screen indefinitely after being
-    // reopened. This timer guarantees loading resolves regardless of what
-    // Firestore's internals do, so the app always gets past the splash.
-    let loadingWatchdog: ReturnType<typeof setTimeout> | null = null;
 
+    // FIX (2026-09-30): `loading` used to stay true until the Firestore
+    // user-doc listener delivered its FIRST snapshot — not just until Auth
+    // itself resolved. Firestore here runs on memoryLocalCache (see
+    // firebase.ts — persistentLocalCache was previously removed because it
+    // triggered an INTERNAL ASSERTION crash), which means there is NO local
+    // cache to short-circuit that read: every single app open paid a full
+    // live network round-trip to Firestore before the splash/skeleton
+    // screen would clear, on top of whatever Firebase Auth itself took to
+    // resolve. That round-trip — not server capacity — is what testers were
+    // seeing as "login lag." Firebase Auth already persists its own session
+    // locally and resolves fast on repeat opens; there's no reason to make
+    // the ENTIRE app wait on a second, slower, uncached network call for
+    // fields (currency, isParent, premium) that already have safe defaults
+    // and update live moments later regardless. `loading` now resolves as
+    // soon as onAuthStateChanged fires; the Firestore listener still runs
+    // and still updates currency/country/isParent/premium reactively, it
+    // just no longer blocks the splash screen while doing it. The old
+    // 7-second watchdog (a failsafe for the listener dying silently on the
+    // known INTERNAL ASSERTION bug) is no longer needed for this, since
+    // nothing blocks on that listener anymore — that crash is still caught
+    // separately by FirestoreErrorBoundary.
     const authUnsub = onAuthStateChanged(
       auth,
       (firebaseUser) => {
@@ -160,19 +172,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           firestoreUnsub();
           firestoreUnsub = null;
         }
-        if (loadingWatchdog) {
-          clearTimeout(loadingWatchdog);
-          loadingWatchdog = null;
-        }
 
         if (firebaseUser) {
           setUser(mapFirebaseUser(firebaseUser));
           setEmailVerified(firebaseUser.emailVerified);
-
-          loadingWatchdog = setTimeout(() => {
-            console.warn('[SpendXP] Firestore user doc listener watchdog fired — forcing loading=false');
-            setLoading(false);
-          }, 7000);
+          // Auth has resolved — let the app render now. Profile-dependent
+          // fields below arrive shortly after and update reactively.
+          setLoading(false);
 
           // Real-time listener on the user's Firestore doc.
           // This fires immediately with the current value, then again on every change
@@ -180,10 +186,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           firestoreUnsub = onSnapshot(
             doc(db, 'users', firebaseUser.uid),
             (snap) => {
-              if (loadingWatchdog) {
-                clearTimeout(loadingWatchdog);
-                loadingWatchdog = null;
-              }
               if (snap.exists()) {
                 const data = snap.data();
 
@@ -216,15 +218,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   premiumPlan: data?.premiumPlan ?? null,
                 } : prev);
               }
-              setLoading(false);
             },
             (err) => {
               console.warn('[SpendXP] Firestore user doc listener error:', err);
-              if (loadingWatchdog) {
-                clearTimeout(loadingWatchdog);
-                loadingWatchdog = null;
-              }
-              setLoading(false);
             }
           );
         } else {
@@ -238,10 +234,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       },
       (authError) => {
         console.error('[SpendXP] onAuthStateChanged error:', authError);
-        if (loadingWatchdog) {
-          clearTimeout(loadingWatchdog);
-          loadingWatchdog = null;
-        }
         setUser(null);
         setLoading(false);
       }
@@ -250,7 +242,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       authUnsub();
       if (firestoreUnsub) firestoreUnsub();
-      if (loadingWatchdog) clearTimeout(loadingWatchdog);
     };
   }, []);
 

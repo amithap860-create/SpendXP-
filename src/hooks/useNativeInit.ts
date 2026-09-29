@@ -19,6 +19,9 @@ interface UseNativeInitOptions {
   uid: string | null;
   /** Current streak count — used to personalise the local reminder message. */
   streak?: number;
+  /** User's chosen daily reminder time (24-hour, local device time). Defaults to 19:00. */
+  reminderHour?: number;
+  reminderMinute?: number;
   /** Called when network connectivity changes. */
   onNetworkChange?: (connected: boolean) => void;
   /** Called when user taps a push notification. */
@@ -34,6 +37,8 @@ interface UseNativeInitOptions {
 export function useNativeInit({
   uid,
   streak = 0,
+  reminderHour = 19,
+  reminderMinute = 0,
   onNetworkChange: onNetChange,
   onPushMessage,
   onResume,
@@ -75,13 +80,13 @@ export function useNativeInit({
   }, [uid]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Local streak reminder (device-scheduled, no server needed) ────────
-  // Reschedules every time the user opens the app so the streak count
-  // and timing stay fresh. Fires at 7 PM local time if they haven't
-  // completed anything today.
+  // Reschedules every time the user opens the app, or changes their
+  // reminder time in Profile, so the streak count and timing stay fresh.
+  // Defaults to 7 PM local time if the user hasn't set their own.
   useEffect(() => {
     if (!uid || !isNative()) return;
-    scheduleStreakReminder(streak);
-  }, [uid, streak]);
+    scheduleStreakReminder(streak, reminderHour, reminderMinute);
+  }, [uid, streak, reminderHour, reminderMinute]);
 
   // ── Network status ─────────────────────────────────────────────────────
   useEffect(() => {

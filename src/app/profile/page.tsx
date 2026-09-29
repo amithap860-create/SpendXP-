@@ -79,6 +79,8 @@ import { COUNTRIES, getCountryConfig } from '@/config/currency';
 import { cn } from '@/lib/utils';
 import { getRankForXP, getRankProgress, getNextRank, getFogEnemy, getCurrentSaga } from '@/config/narrative';
 import Link from 'next/link';
+import { useProgression } from '@/hooks/useProgression';
+import { updateReminderTime } from '@/lib/progressionService';
 
 interface ProfileData {
   displayName: string;
@@ -332,6 +334,30 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [progression, setProgression] = useState<ProgressionData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // NEW (2026-09-30): user-assigned daily streak reminder time, requested
+  // in tester feedback — was hardcoded to 7 PM for everyone. Uses the live
+  // useProgression() hook (separate from this page's own manual `progression`
+  // fetch above) since it already reads the same doc and already defaults
+  // reminderHour/reminderMinute to 19/0 for anyone who hasn't set one.
+  const { data: liveProgression } = useProgression();
+  const [reminderTime, setReminderTime] = useState('19:00');
+  const [savingReminder, setSavingReminder] = useState(false);
+  useEffect(() => {
+    const h = liveProgression?.reminderHour ?? 19;
+    const m = liveProgression?.reminderMinute ?? 0;
+    setReminderTime(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
+  }, [liveProgression?.reminderHour, liveProgression?.reminderMinute]);
+
+  const handleReminderTimeChange = async (value: string) => {
+    setReminderTime(value);
+    const [h, m] = value.split(':').map(Number);
+    if (!user?.uid || Number.isNaN(h) || Number.isNaN(m)) return;
+    setSavingReminder(true);
+    await updateReminderTime(user.uid, h, m);
+    setSavingReminder(false);
+    toast({ title: 'Reminder time updated', description: `We'll remind you at ${value} if you haven't played yet today.` });
+  };
 
   // Edit name
   const [editingName, setEditingName] = useState(false);
@@ -1007,6 +1033,33 @@ export default function ProfilePage() {
                 <span className="flex items-center gap-1.5"><Moon className="h-4 w-4" /> Switch to dark</span>
               )}
             </Button>
+          </div>
+        </Section>
+
+        {/* ── Daily Reminder ── */}
+        {/* NEW (2026-09-30): tester feedback specifically asked for a
+            user-assigned reminder time instead of a fixed one for everyone.
+            Native's LocalNotifications only fires this when the app is
+            running as the Capacitor shell (see native.ts's isNative() guard)
+            — on web this just saves the preference silently for next time. */}
+        <Section title="Daily Reminder" icon={Clock} iconColor="text-primary">
+          <div className="pt-4 flex items-center justify-between gap-4">
+            <div>
+              <p className="font-black text-foreground">Remind me at</p>
+              <p className="text-xs text-muted-foreground font-bold">
+                We'll nudge you if you haven't played by this time and your streak is at risk.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <input
+                type="time"
+                value={reminderTime}
+                onChange={(e) => handleReminderTimeChange(e.target.value)}
+                disabled={savingReminder}
+                className="h-10 px-3 rounded-lg border-2 border-input bg-background text-foreground font-bold text-sm disabled:opacity-50"
+                suppressHydrationWarning
+              />
+            </div>
           </div>
         </Section>
 

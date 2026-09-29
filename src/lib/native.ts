@@ -297,13 +297,22 @@ export async function onAndroidBack(callback: () => boolean): Promise<() => void
 const STREAK_NOTIF_ID = 1001;
 
 /**
- * Schedules a daily local notification at 7 PM local time to remind the user
- * to maintain their streak. Safe to call on every app open — cancels the
- * previous schedule first so we don't stack duplicates.
+ * Schedules a daily local notification to remind the user to maintain their
+ * streak. Safe to call on every app open — cancels the previous schedule
+ * first so we don't stack duplicates.
  *
  * Pass streak=0 to cancel notifications (e.g. after the user completes a quest).
+ *
+ * FIX (2026-09-30): reminderHour/reminderMinute used to be hardcoded to 19:00
+ * (7 PM) for every single user with no way to change it — tester feedback
+ * specifically asked for a user-assigned time. Defaults preserve the exact
+ * old behavior for anyone who hasn't set a preference yet.
  */
-export async function scheduleStreakReminder(streak: number): Promise<void> {
+export async function scheduleStreakReminder(
+  streak: number,
+  reminderHour: number = 19,
+  reminderMinute: number = 0
+): Promise<void> {
   if (!isNative()) return;
   try {
     const { LocalNotifications } = await import('@capacitor/local-notifications');
@@ -320,12 +329,18 @@ export async function scheduleStreakReminder(streak: number): Promise<void> {
       if (granted !== 'granted') return;
     }
 
-    // Schedule at 7 PM today; if it's already past 7 PM, schedule for tomorrow
+    // Guard against garbage values (e.g. a stale/corrupt Firestore field)
+    // falling back silently to a broken schedule time.
+    const safeHour = Number.isFinite(reminderHour) && reminderHour >= 0 && reminderHour <= 23 ? reminderHour : 19;
+    const safeMinute = Number.isFinite(reminderMinute) && reminderMinute >= 0 && reminderMinute <= 59 ? reminderMinute : 0;
+
+    // Schedule at the user's chosen time today; if that time has already
+    // passed today, schedule for tomorrow instead.
     const now = new Date();
     const target = new Date(now);
-    target.setHours(19, 0, 0, 0);
+    target.setHours(safeHour, safeMinute, 0, 0);
     if (target <= now) {
-      target.setDate(target.getDate() + 1); // Tomorrow 7 PM
+      target.setDate(target.getDate() + 1); // Tomorrow at the same time
     }
 
     const title = streak > 1

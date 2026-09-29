@@ -38,6 +38,13 @@ export interface UserProgression {
   currentStreak?: number;
   longestStreak?: number;
   questsCompleted?: number;
+  /** NEW (2026-09-30): user-configurable daily streak reminder time — was
+   *  hardcoded to 7 PM for every user (see scheduleStreakReminder in
+   *  native.ts). Tester feedback asked for a way to set their own time.
+   *  24-hour format. Defaults to 19:00 (the old hardcoded behavior) when
+   *  unset, so existing users see no change until they actually set one. */
+  reminderHour?: number;
+  reminderMinute?: number;
 }
 
 export interface GameScoreData {
@@ -82,6 +89,8 @@ export const DEFAULT_PROGRESSION: UserProgression = {
   currentStreak: 0,
   longestStreak: 0,
   questsCompleted: 0,
+  reminderHour: 19,
+  reminderMinute: 0,
 };
 
 /**
@@ -143,6 +152,20 @@ export async function getProgression(uid: string | null | undefined): Promise<Us
     console.error("Error fetching progression:", error);
     return DEFAULT_PROGRESSION;
   }
+}
+
+/**
+ * Saves the user's chosen daily streak reminder time (24-hour, local device
+ * time). Read back by useNativeInit -> scheduleStreakReminder so the local
+ * notification fires whenever the user actually wants it, instead of the
+ * previously hardcoded 7 PM for everyone.
+ */
+export async function updateReminderTime(uid: string | null | undefined, hour: number, minute: number) {
+  if (!uid || typeof uid !== 'string' || uid.trim() === '') return;
+  if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return;
+  const ref = getProgressionRef(uid);
+  if (!ref) return;
+  await safeSetDoc(ref, { reminderHour: hour, reminderMinute: minute }, { merge: true });
 }
 
 /**
