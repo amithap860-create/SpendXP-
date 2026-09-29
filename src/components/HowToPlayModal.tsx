@@ -129,7 +129,7 @@ export function HowToPlayModal({ forceOpen = false, onClose }: HowToPlayModalPro
       style={{ background: 'rgba(15,20,30,0.6)', backdropFilter: 'blur(4px)' }}
       onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}
     >
-      <div className="w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden">
+      <div className="w-full max-w-sm bg-card rounded-3xl shadow-2xl overflow-hidden">
 
         {/* Header */}
         <div className="bg-[#1A1F2E] px-6 pt-6 pb-8 relative">
@@ -164,14 +164,14 @@ export function HowToPlayModal({ forceOpen = false, onClose }: HowToPlayModalPro
 
         {/* Body */}
         <div className="px-6 py-6">
-          <p className="text-sm text-slate-600 leading-relaxed mb-6">{current.body}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed mb-6">{current.body}</p>
 
           {/* Navigation */}
           <div className="flex items-center gap-3">
             {step > 0 && (
               <button
                 onClick={handlePrev}
-                className="w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:border-slate-300 transition-colors"
+                className="w-10 h-10 rounded-xl border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-border transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -191,7 +191,7 @@ export function HowToPlayModal({ forceOpen = false, onClose }: HowToPlayModalPro
           {!isLast && (
             <button
               onClick={handleClose}
-              className="w-full mt-3 text-center text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors py-1"
+              className="w-full mt-3 text-center text-xs font-bold text-muted-foreground hover:text-foreground transition-colors py-1"
             >
               Skip tutorial
             </button>

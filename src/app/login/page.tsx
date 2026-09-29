@@ -210,32 +210,32 @@ function LoginContent() {
             <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-lg">
               <Sparkles className="h-5 w-5" />
             </div>
-            <h1 className="text-3xl font-black tracking-tighter"><span className="text-slate-900">Spend</span><span style={{ color: "#2E7D5A" }}>XP</span></h1>
+            <h1 className="text-3xl font-black tracking-tighter"><span className="text-foreground">Spend</span><span style={{ color: "#2E7D5A" }}>XP</span></h1>
           </div>
-          <CardDescription className="text-slate-600 font-medium">
+          <CardDescription className="text-muted-foreground font-medium">
             Learn money. Earn XP. Level up your future.
           </CardDescription>
         </CardHeader>
 
         <CardContent className="pt-4 space-y-6">
           {!signupSuccess && !showReset && (
-            <div className="flex border-b border-slate-100">
-              <button 
+            <div className="flex border-b border-border">
+              <button
                 onClick={() => setActiveTab('signin')}
                 suppressHydrationWarning
                 className={cn(
                   "flex-1 py-3 text-sm font-bold transition-all border-b-2",
-                  activeTab === 'signin' ? "border-primary text-primary" : "border-transparent text-slate-400 hover:text-slate-600"
+                  activeTab === 'signin' ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
                 )}
               >
                 Sign in
               </button>
-              <button 
+              <button
                 onClick={() => setActiveTab('signup')}
                 suppressHydrationWarning
                 className={cn(
                   "flex-1 py-3 text-sm font-bold transition-all border-b-2",
-                  activeTab === 'signup' ? "border-primary text-primary" : "border-transparent text-slate-400 hover:text-slate-600"
+                  activeTab === 'signup' ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
                 )}
               >
                 Create account
@@ -248,11 +248,11 @@ function LoginContent() {
               <form onSubmit={handleSignIn} className="space-y-4 animate-in slide-in-from-left-4 duration-300">
                 <div className="space-y-4">
                   <div className="relative">
-                    <Mail className="absolute left-3 top-3.5 h-5 w-5 text-slate-400" />
-                    <Input 
-                      type="email" 
-                      placeholder="Email address" 
-                      className="pl-10 h-12 bg-slate-50/50 text-base" // Fix 4: text-base for 16px
+                    <Mail className="absolute left-3 top-3.5 h-5 w-5 text-muted-foreground" />
+                    <Input
+                      type="email"
+                      placeholder="Email address"
+                      className="pl-10 h-12 bg-muted/50 text-base" // Fix 4: text-base for 16px
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -261,20 +261,20 @@ function LoginContent() {
                   </div>
                   <div className="space-y-1">
                     <div className="relative">
-                      <Lock className="absolute left-3 top-3.5 h-5 w-5 text-slate-400" />
-                      <Input 
+                      <Lock className="absolute left-3 top-3.5 h-5 w-5 text-muted-foreground" />
+                      <Input
                         type={isPasswordVisible ? "text" : "password"}
-                        placeholder="Password" 
-                        className="pl-10 pr-10 h-12 bg-slate-50/50 text-base"
+                        placeholder="Password"
+                        className="pl-10 pr-10 h-12 bg-muted/50 text-base"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         suppressHydrationWarning
                       />
-                      <button 
+                      <button
                         type="button"
                         onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                        className="absolute right-3 top-3.5 text-slate-400 hover:text-slate-600 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                        className="absolute right-3 top-3.5 text-muted-foreground hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center"
                         suppressHydrationWarning
                       >
                         {isPasswordVisible ? 'Hide' : 'Show'}
@@ -336,37 +336,37 @@ function LoginContent() {
             {activeTab === 'signup' && !signupSuccess && (
               <form onSubmit={handleSignUp} className="space-y-4 animate-in slide-in-from-right-4 duration-300">
                 <div className="space-y-3">
-                  <Input 
-                    placeholder="Display name" 
-                    className="h-12 bg-slate-50/50 text-base" 
-                    value={displayName} 
-                    onChange={(e) => setDisplayName(e.target.value)} 
-                    required 
-                    suppressHydrationWarning 
+                  <Input
+                    placeholder="Display name"
+                    className="h-12 bg-muted/50 text-base"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    required
+                    suppressHydrationWarning
                   />
-                  <Input 
-                    type="email" 
-                    placeholder="Email address" 
-                    className="h-12 bg-slate-50/50 text-base" 
-                    value={email} 
-                    onChange={(e) => setEmail(e.target.value)} 
-                    required 
-                    suppressHydrationWarning 
+                  <Input
+                    type="email"
+                    placeholder="Email address"
+                    className="h-12 bg-muted/50 text-base"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    suppressHydrationWarning
                   />
-                  <Input 
-                    type="password" 
-                    placeholder="Password" 
-                    className="h-12 bg-slate-50/50 text-base" 
-                    value={password} 
-                    onChange={(e) => setPassword(e.target.value)} 
-                    required 
-                    suppressHydrationWarning 
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                    className="h-12 bg-muted/50 text-base"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    suppressHydrationWarning
                   />
-                  <Input 
-                    type="password" 
-                    placeholder="Confirm Password" 
-                    className="h-12 bg-slate-50/50 text-base" 
-                    value={confirmPassword} 
+                  <Input
+                    type="password"
+                    placeholder="Confirm Password"
+                    className="h-12 bg-muted/50 text-base"
+                    value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)} 
                     required 
                     suppressHydrationWarning 

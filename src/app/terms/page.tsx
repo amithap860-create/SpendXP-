@@ -7,18 +7,18 @@ export default function TermsOfServicePage() {
   const lastUpdated = 'April 27, 2026';
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-3xl mx-auto px-4 py-12 md:py-16">
         {/* Header */}
         <div className="mb-10">
           <a href="/dashboard" className="inline-flex items-center gap-2 text-sm font-bold text-primary mb-6 hover:underline">
             ← Back to SpendXP
           </a>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Terms of Service</h1>
-          <p className="text-slate-500 mt-2 font-medium">Last updated: {lastUpdated}</p>
+          <h1 className="text-4xl font-black text-foreground tracking-tight">Terms of Service</h1>
+          <p className="text-muted-foreground mt-2 font-medium">Last updated: {lastUpdated}</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 md:p-12 space-y-10 text-slate-700 leading-relaxed">
+        <div className="bg-card rounded-2xl shadow-sm border border-border p-8 md:p-12 space-y-10 text-foreground leading-relaxed">
 
           {/* Intro */}
           <section>
@@ -32,7 +32,7 @@ export default function TermsOfServicePage() {
 
           {/* 1 */}
           <section>
-            <h2 className="text-xl font-black text-slate-900 mb-3">1. Who Can Use SpendXP</h2>
+            <h2 className="text-xl font-black text-foreground mb-3">1. Who Can Use SpendXP</h2>
             <div className="space-y-3 text-sm">
               <p><span className="font-bold">Age 8+:</span> SpendXP is designed for users aged 8 and above. Users under 13 require verifiable parental consent before their account is activated.</p>
               <p><span className="font-bold">Parental responsibility:</span> If you allow your child to use SpendXP, you are responsible for supervising their use and ensuring they follow these Terms.</p>
@@ -43,7 +43,7 @@ export default function TermsOfServicePage() {
 
           {/* 2 */}
           <section>
-            <h2 className="text-xl font-black text-slate-900 mb-3">2. The SpendXP Service</h2>
+            <h2 className="text-xl font-black text-foreground mb-3">2. The SpendXP Service</h2>
             <div className="space-y-3 text-sm">
               <p>SpendXP provides educational content, simulated financial games, quests, a virtual market simulator, and financial literacy tools. All content is for educational and entertainment purposes only.</p>
               <p>SpendXP does not provide financial advice, investment advice, tax advice, or legal advice. Nothing in the app should be construed as a recommendation to make any real-world financial decision.</p>
@@ -53,7 +53,7 @@ export default function TermsOfServicePage() {
 
           {/* 3 */}
           <section>
-            <h2 className="text-xl font-black text-slate-900 mb-3">3. Virtual Currency &amp; In-App Items</h2>
+            <h2 className="text-xl font-black text-foreground mb-3">3. Virtual Currency &amp; In-App Items</h2>
             <div className="space-y-3 text-sm">
               <p>SpendXP uses virtual currencies including XP (experience points) and a virtual balance displayed in a local currency equivalent. These are purely educational tools:</p>
               <ul className="space-y-1 pl-4">
@@ -69,12 +69,12 @@ export default function TermsOfServicePage() {
 
           {/* 4 */}
           <section>
-            <h2 className="text-xl font-black text-slate-900 mb-3">4. SpendXP Pro — Subscription Terms</h2>
+            <h2 className="text-xl font-black text-foreground mb-3">4. SpendXP Pro — Subscription Terms</h2>
 
             <div className="space-y-4">
               <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
-                <p className="font-bold text-slate-800 mb-2">Current Plans (India)</p>
-                <div className="text-sm text-slate-600 space-y-1">
+                <p className="font-bold text-foreground mb-2">Current Plans (India)</p>
+                <div className="text-sm text-muted-foreground space-y-1">
                   <p>Monthly: ₹99–₹149 / month</p>
                   <p>Annual: ₹799 / year (best value)</p>
                   <p>Family: ₹199 / month (up to 3 child profiles)</p>
@@ -95,7 +95,7 @@ export default function TermsOfServicePage() {
 
           {/* 5 */}
           <section>
-            <h2 className="text-xl font-black text-slate-900 mb-3">5. Acceptable Use</h2>
+            <h2 className="text-xl font-black text-foreground mb-3">5. Acceptable Use</h2>
             <p className="text-sm mb-3">You agree not to:</p>
             <ul className="space-y-2 text-sm pl-4">
               <li>• Use SpendXP for any unlawful purpose</li>
@@ -110,50 +110,50 @@ export default function TermsOfServicePage() {
 
           {/* 6 */}
           <section>
-            <h2 className="text-xl font-black text-slate-900 mb-3">6. Intellectual Property</h2>
+            <h2 className="text-xl font-black text-foreground mb-3">6. Intellectual Property</h2>
             <p className="text-sm">All content in SpendXP — including lesson content, quest narratives, game mechanics, graphics, icons, and the SpendXP name and logo — is owned by SpendXP and protected by applicable intellectual property laws. You may not reproduce, distribute, or create derivative works from any SpendXP content without written permission.</p>
             <p className="mt-3 text-sm">Your account data (your progress, XP, choices) remains yours. You grant us a licence to store and process this data to operate the service.</p>
           </section>
 
           {/* 7 */}
           <section>
-            <h2 className="text-xl font-black text-slate-900 mb-3">7. Parent Dashboard &amp; Parental Controls</h2>
+            <h2 className="text-xl font-black text-foreground mb-3">7. Parent Dashboard &amp; Parental Controls</h2>
             <p className="text-sm">Parents who activate the Parent Dashboard can view their child&apos;s learning progress, XP, and activity. The Parent Dashboard does not allow parents to alter a child&apos;s virtual balance or XP — it is a read-only monitoring tool unless otherwise stated. Parents can request full data deletion of their child&apos;s account at any time by emailing <a href="mailto:privacy@spendxp.app" className="text-primary underline">privacy@spendxp.app</a>.</p>
           </section>
 
           {/* 8 */}
           <section>
-            <h2 className="text-xl font-black text-slate-900 mb-3">8. Disclaimer of Warranties</h2>
+            <h2 className="text-xl font-black text-foreground mb-3">8. Disclaimer of Warranties</h2>
             <p className="text-sm">SpendXP is provided &quot;as is&quot; and &quot;as available&quot; without warranties of any kind. We do not guarantee that the service will be uninterrupted, error-free, or completely secure. Educational content is provided in good faith but may contain inaccuracies — always verify important financial information with a qualified professional.</p>
           </section>
 
           {/* 9 */}
           <section>
-            <h2 className="text-xl font-black text-slate-900 mb-3">9. Limitation of Liability</h2>
+            <h2 className="text-xl font-black text-foreground mb-3">9. Limitation of Liability</h2>
             <p className="text-sm">To the maximum extent permitted by applicable law, SpendXP shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the service. Our total liability to you for any claim shall not exceed the amount you paid us in the 12 months preceding the claim.</p>
           </section>
 
           {/* 10 */}
           <section>
-            <h2 className="text-xl font-black text-slate-900 mb-3">10. Termination</h2>
+            <h2 className="text-xl font-black text-foreground mb-3">10. Termination</h2>
             <p className="text-sm">You may delete your account at any time from the Profile page. We may suspend or terminate your account if you violate these Terms. Upon termination, your access to SpendXP Pro ends immediately. Pro subscribers who are terminated for Terms violations are not entitled to a refund.</p>
           </section>
 
           {/* 11 */}
           <section>
-            <h2 className="text-xl font-black text-slate-900 mb-3">11. Governing Law &amp; Disputes</h2>
+            <h2 className="text-xl font-black text-foreground mb-3">11. Governing Law &amp; Disputes</h2>
             <p className="text-sm">These Terms are governed by the laws of India. Any disputes will be resolved by arbitration in accordance with the Arbitration and Conciliation Act, 1996. The seat of arbitration shall be Bengaluru, India. Users outside India may have additional rights under their local consumer protection laws, which are not affected by this clause.</p>
           </section>
 
           {/* 12 */}
           <section>
-            <h2 className="text-xl font-black text-slate-900 mb-3">12. Changes to These Terms</h2>
+            <h2 className="text-xl font-black text-foreground mb-3">12. Changes to These Terms</h2>
             <p className="text-sm">We may update these Terms as SpendXP grows. We will notify you by email at least 14 days before material changes take effect. Continued use after that date constitutes acceptance. If you do not agree to the updated Terms, you may cancel your subscription and delete your account before the changes take effect.</p>
           </section>
 
           {/* 13 */}
           <section>
-            <h2 className="text-xl font-black text-slate-900 mb-3">13. Contact</h2>
+            <h2 className="text-xl font-black text-foreground mb-3">13. Contact</h2>
             <div className="text-sm space-y-1">
               <p>Questions about these Terms?</p>
               <p>📧 <a href="mailto:support@spendxp.app" className="text-primary underline font-bold">support@spendxp.app</a></p>
@@ -164,7 +164,7 @@ export default function TermsOfServicePage() {
         </div>
 
         {/* Footer nav */}
-        <div className="mt-8 flex flex-wrap gap-4 text-sm font-bold text-slate-400">
+        <div className="mt-8 flex flex-wrap gap-4 text-sm font-bold text-muted-foreground">
           <a href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</a>
           <span>·</span>
           <a href="/dashboard" className="hover:text-primary transition-colors">Back to App</a>

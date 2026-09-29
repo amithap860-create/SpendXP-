@@ -116,21 +116,25 @@ export async function awardBadge(uid: string | null | undefined, badgeId: string
   const badge = BADGES.find(b => b.id === badgeId);
   if (!badge) return false;
 
-  const userRef = doc(db, 'users', uid);
   const progressionRef = doc(db, 'users', uid, 'progression', 'stats');
-  
-  const userSnap = await getDoc(userRef);
-  if (!userSnap.exists()) return false;
 
-  const currentBadges = userSnap.data().progression?.badges || [];
+  // FIX (2026-09-29): this used to check/write the badges array on the
+  // TOP-LEVEL users/{uid} doc ('progression.badges' field there), but every
+  // screen that displays badges (useProgression() hook, read by the Profile
+  // page and everywhere else) reads from this SEPARATE subcollection doc
+  // (users/{uid}/progression/stats). The XP reward below was already
+  // correctly targeting this doc, which is why totalXP looked right — only
+  // the badge ID itself was landing in a document nothing ever reads, so
+  // badges stayed stuck at 0 no matter how many were actually earned.
+  const progressionSnap = await getDoc(progressionRef);
+  if (!progressionSnap.exists()) return false;
+
+  const currentBadges = progressionSnap.data().badges || [];
   if (currentBadges.includes(badgeId)) return false;
 
-  // Award badge and XP
-  await safeUpdateDoc(userRef, {
-    'progression.badges': arrayUnion(badgeId)
-  });
-
+  // Award badge and XP — both to the doc that's actually read.
   await safeUpdateDoc(progressionRef, {
+    badges: arrayUnion(badgeId),
     totalXP: increment(badge.xpReward),
     lastActivityAt: serverTimestamp()
   });

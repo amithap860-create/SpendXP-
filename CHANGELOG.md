@@ -2,6 +2,12 @@
 
 Running log of real fixes and changes, kept so you have something concrete to paste into the Play Console readiness questionnaire or release notes. I'll keep adding to this as we go — tell me any time you want the latest entries read out or copied somewhere.
 
+## 2026-09-30
+
+- Fixed badges permanently stuck at 0: the code that awards a badge was writing it to a different Firestore document than the one every screen actually reads badges from. XP rewards landed correctly (which is why Total XP looked right), but the badge itself went nowhere visible. Already-earned badges should reappear next time the qualifying action is repeated.
+- Full dark mode pass across ~57 files (pages, games, tools, nav, lesson/quest viewers): converted hardcoded light-only colors to theme-aware ones so dark mode actually looks right almost everywhere, instead of just the Profile page with broken contrast. A handful of screens were deliberately left alone because they're permanently dark or permanently light by design (landing page, some admin/celebration screens) — converting them would have made things worse, not better.
+- Replaced the emoji icon on lesson "Did You Know?" cards with a plain icon, matching the rest of the app's visual style.
+
 ## 2026-09-29
 
 - Reordered the entire lesson curriculum (Learn tab) from budgeting → saving → emergency fund → debt → credit → insurance → taxes → investing → ETFs → short-term trading → crypto → stock analysis. Previously investing/ETFs/crypto were unlocked before saving and bank basics — backwards for a hard-locked linear path.

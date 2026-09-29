@@ -111,7 +111,7 @@ export function XPWallet() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       {/* XP & Level Section */}
-      <Card className="border-none shadow-xl bg-white overflow-hidden">
+      <Card className="border-none shadow-xl bg-card overflow-hidden">
         <div className="bg-primary p-6 text-white">
           <div className="flex justify-between items-end mb-4">
             <div className="flex items-center gap-3">
@@ -139,20 +139,20 @@ export function XPWallet() {
       </Card>
 
       {/* Virtual Wallet Section */}
-      <Card className="border-none shadow-lg bg-white">
+      <Card className="border-none shadow-lg bg-card">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <div className="h-8 w-8 rounded-full bg-accent/10 flex items-center justify-center text-accent">
                 <Coins className="h-5 w-5" />
               </div>
-              <span className="font-black text-slate-900 tracking-tight text-lg">XP Game Wallet</span>
+              <span className="font-black text-foreground tracking-tight text-lg">XP Game Wallet</span>
             </div>
             <div className="text-2xl font-black text-accent">{formatValue(data.walletBalance)} saved</div>
           </div>
-          <div className="p-4 rounded-xl bg-slate-50 border-2 border-dashed border-slate-200 flex items-start gap-3">
+          <div className="p-4 rounded-xl bg-muted border-2 border-dashed border-border flex items-start gap-3">
             <ArrowUpRight className="h-5 w-5 text-accent mt-0.5 shrink-0" />
-            <p className="text-sm font-medium text-slate-600 leading-tight">
+            <p className="text-sm font-medium text-muted-foreground leading-tight">
               <strong>Milestone:</strong> {walletMilestone}
             </p>
           </div>
@@ -160,9 +160,9 @@ export function XPWallet() {
       </Card>
 
       {/* Badges Grid */}
-      <Card className="border-none shadow-lg bg-white overflow-hidden">
-        <div className="bg-slate-50 px-6 py-3 border-b">
-          <div className="text-xs font-black uppercase text-slate-400 tracking-widest flex items-center gap-2">
+      <Card className="border-none shadow-lg bg-card overflow-hidden">
+        <div className="bg-muted px-6 py-3 border-b">
+          <div className="text-xs font-black uppercase text-muted-foreground tracking-widest flex items-center gap-2">
             <Trophy className="h-3 w-3" /> Achievements
           </div>
         </div>
@@ -174,15 +174,15 @@ export function XPWallet() {
                 <div key={badge.id} className="flex flex-col items-center gap-2 group">
                   <div className={cn(
                     "h-14 w-14 rounded-2xl flex items-center justify-center transition-all duration-500 border-2",
-                    isEarned 
-                      ? `bg-white border-slate-100 shadow-md ${badge.color}` 
-                      : "bg-slate-50 border-dashed border-slate-200 text-slate-300"
+                    isEarned
+                      ? `bg-card border-border shadow-md ${badge.color}`
+                      : "bg-muted border-dashed border-border text-slate-300"
                   )}>
                     {isEarned ? <badge.icon className="h-7 w-7" /> : <Lock className="h-5 w-5" />}
                   </div>
                   <span className={cn(
                     "text-[10px] font-black uppercase tracking-tight text-center leading-none",
-                    isEarned ? "text-slate-900" : "text-slate-400"
+                    isEarned ? "text-foreground" : "text-muted-foreground"
                   )}>
                     {badge.title}
                   </span>
@@ -196,7 +196,7 @@ export function XPWallet() {
       {/* New Badge Overlay */}
       {unlockedBadge && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-md animate-in fade-in zoom-in duration-300">
-          <Card className="max-w-sm w-full border-none shadow-2xl bg-white text-center overflow-hidden">
+          <Card className="max-w-sm w-full border-none shadow-2xl bg-card text-center overflow-hidden">
             <div className="bg-primary p-12 text-white relative">
               <PartyPopper className="h-20 w-20 mx-auto mb-6 animate-bounce" />
               <div className="absolute inset-0 opacity-10 flex items-center justify-center overflow-hidden pointer-events-none">
@@ -206,11 +206,11 @@ export function XPWallet() {
             </div>
             <CardContent className="p-8 space-y-6">
               <div className="space-y-2">
-                <div className={cn("h-24 w-24 rounded-3xl mx-auto flex items-center justify-center border-4 border-slate-50 shadow-xl bg-white mb-4", unlockedBadge.color)}>
+                <div className={cn("h-24 w-24 rounded-3xl mx-auto flex items-center justify-center border-4 border-slate-50 shadow-xl bg-card mb-4", unlockedBadge.color)}>
                   <unlockedBadge.icon className="h-12 w-12" />
                 </div>
-                <h3 className="text-2xl font-black text-slate-900">{unlockedBadge.title}</h3>
-                <p className="text-slate-500 font-medium italic">"You're mastering your financial destiny!"</p>
+                <h3 className="text-2xl font-black text-foreground">{unlockedBadge.title}</h3>
+                <p className="text-muted-foreground font-medium italic">"You're mastering your financial destiny!"</p>
               </div>
               <div className="flex gap-3">
                 <Button className="flex-1 h-14 text-lg font-black" onClick={() => setUnlockedBadge(null)}>Continue</Button>

@@ -31,14 +31,14 @@ export class SectionErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="p-6 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 text-center space-y-3">
-          <p className="text-sm font-bold text-slate-600">
+        <div className="p-6 rounded-2xl border-2 border-dashed border-border bg-muted text-center space-y-3">
+          <p className="text-sm font-bold text-muted-foreground">
             {this.props.sectionName} failed to load.
           </p>
           <button
             onClick={() => this.setState({ hasError: false })}
             suppressHydrationWarning
-            className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-black uppercase tracking-widest hover:bg-slate-100 transition-colors"
+            className="px-4 py-2 bg-card border border-border rounded-lg text-xs font-black uppercase tracking-widest hover:bg-muted transition-colors"
           >
             Retry Section
           </button>

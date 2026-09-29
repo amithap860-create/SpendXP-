@@ -72,12 +72,12 @@ export default function LearnHub() {
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-black uppercase mb-3">
                   <GraduationCap className="h-3 w-3" /> Academy Hub
                 </div>
-                <h2 className="text-4xl font-black text-slate-900 tracking-tight">Level Up Your Knowledge</h2>
-                <p className="text-slate-500 text-lg font-medium">Complete lessons to earn XP and master financial strategies.</p>
+                <h2 className="text-4xl font-black text-foreground tracking-tight">Level Up Your Knowledge</h2>
+                <p className="text-muted-foreground text-lg font-medium">Complete lessons to earn XP and master financial strategies.</p>
               </div>
-              <div className="w-full md:w-80 p-6 bg-white rounded-2xl shadow-xl space-y-4 border">
+              <div className="w-full md:w-80 p-6 bg-card rounded-2xl shadow-xl space-y-4 border">
                 <div className="flex justify-between items-end">
-                  <span className="text-xs font-black uppercase text-slate-400">Academy Completion</span>
+                  <span className="text-xs font-black uppercase text-muted-foreground">Academy Completion</span>
                   <span className="text-xl font-black text-primary">{completedCount}/{lessons.length}</span>
                 </div>
                 <Progress value={overallProgress} className="h-2" />
@@ -86,7 +86,7 @@ export default function LearnHub() {
                     <Star className="h-4 w-4 fill-current" /> Finance Scholar Badge Earned!
                   </div>
                 ) : (
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Complete all {lessons.length} to earn Scholar Badge</p>
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center">Complete all {lessons.length} to earn Scholar Badge</p>
                 )}
               </div>
             </div>
@@ -120,7 +120,7 @@ export default function LearnHub() {
                 <Card
                   key={lesson.id}
                   className={cn(
-                    "group hover:shadow-2xl transition-all cursor-pointer border-none bg-white overflow-hidden flex flex-col",
+                    "group hover:shadow-2xl transition-all cursor-pointer border-none bg-card overflow-hidden flex flex-col",
                     isCompleted && "ring-2 ring-primary/20",
                     isLocked && "opacity-50 grayscale"
                   )}
@@ -136,7 +136,7 @@ export default function LearnHub() {
                   )} />
                   <CardHeader>
                     <div className="flex justify-between items-start mb-2">
-                      <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                      <div className="h-12 w-12 rounded-xl bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                         <BookOpen className="h-6 w-6" />
                       </div>
                       {isCompleted ? (
@@ -146,7 +146,7 @@ export default function LearnHub() {
                       ) : isLocked ? (
                         <Badge variant="outline" className="text-[10px] uppercase font-black">LOCKED</Badge>
                       ) : (
-                        <Badge variant="secondary" className="bg-slate-50 text-slate-500 border-none font-black">
+                        <Badge variant="secondary" className="bg-muted text-muted-foreground border-none font-black">
                           +{xpReward} XP
                         </Badge>
                       )}
@@ -163,14 +163,14 @@ export default function LearnHub() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="mt-auto pt-4 space-y-4">
-                    <div className="flex items-center gap-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    <div className="flex items-center gap-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">
                       <div className="flex items-center gap-1"><Clock className="h-3 w-3" /> {lesson.estimatedMinutes}m read</div>
                       <div className="flex items-center gap-1"><Trophy className="h-3 w-3" /> Strategy</div>
                     </div>
                     <button
                       className={cn(
                         "w-full h-12 flex items-center justify-center gap-2 font-black rounded-xl border-2 transition-all",
-                        isCompleted ? "border-slate-200 text-slate-500" : "bg-primary text-white border-primary shadow-lg shadow-primary/20"
+                        isCompleted ? "border-border text-muted-foreground" : "bg-primary text-white border-primary shadow-lg shadow-primary/20"
                       )}
                       disabled={isLocked}
                       suppressHydrationWarning
@@ -181,7 +181,7 @@ export default function LearnHub() {
                       <a
                         href={`/games?game=${game.id}`}
                         onClick={(e) => e.stopPropagation()}
-                        className="w-full h-11 flex items-center justify-center gap-2 font-black rounded-xl bg-slate-50 text-primary hover:bg-primary/10 transition-colors text-sm"
+                        className="w-full h-11 flex items-center justify-center gap-2 font-black rounded-xl bg-muted text-primary hover:bg-primary/10 transition-colors text-sm"
                       >
                         <Zap className="h-4 w-4" /> Practice in {game.name}
                       </a>
@@ -202,22 +202,22 @@ export default function LearnHub() {
           )}
 
           {/* ── More to Explore ── */}
-          <div className="mt-12 pt-8 border-t border-slate-100 space-y-4">
-            <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">More to Explore</h3>
+          <div className="mt-12 pt-8 border-t border-border space-y-4">
+            <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground">More to Explore</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <a href="/tools" className="group flex items-center gap-4 bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+              <a href="/tools" className="group flex items-center gap-4 bg-card rounded-2xl border border-border p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
                 <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                     <path d="M14 3a3 3 0 0 1 0 6 3 3 0 0 1-2.45-1.26L5.7 13.6a1.5 1.5 0 1 1-2.12-2.12l5.86-5.87A3 3 0 0 1 14 3Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
                 <div>
-                  <p className="font-black text-slate-900 text-sm group-hover:text-primary transition-colors">Financial Tools</p>
-                  <p className="text-xs text-slate-400 font-medium mt-0.5">EMI, compound interest, SIP &amp; more calculators</p>
+                  <p className="font-black text-foreground text-sm group-hover:text-primary transition-colors">Financial Tools</p>
+                  <p className="text-xs text-muted-foreground font-medium mt-0.5">EMI, compound interest, SIP &amp; more calculators</p>
                 </div>
                 <span className="ml-auto text-xs font-black text-slate-300 group-hover:text-primary transition-colors">→</span>
               </a>
-              <a href="/resources" className="group flex items-center gap-4 bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+              <a href="/resources" className="group flex items-center gap-4 bg-card rounded-2xl border border-border p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
                 <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                     <path d="M2 5c0-1.1.9-2 2-2h4a2 2 0 0 1 2 2v10H4a2 2 0 0 1-2-2V5Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
@@ -227,12 +227,12 @@ export default function LearnHub() {
                   </svg>
                 </div>
                 <div>
-                  <p className="font-black text-slate-900 text-sm group-hover:text-primary transition-colors">Resource Library</p>
-                  <p className="text-xs text-slate-400 font-medium mt-0.5">Frameworks, budgeting methods &amp; curriculum map</p>
+                  <p className="font-black text-foreground text-sm group-hover:text-primary transition-colors">Resource Library</p>
+                  <p className="text-xs text-muted-foreground font-medium mt-0.5">Frameworks, budgeting methods &amp; curriculum map</p>
                 </div>
                 <span className="ml-auto text-xs font-black text-slate-300 group-hover:text-primary transition-colors">→</span>
               </a>
-              <a href="/flashcards" className="group flex items-center gap-4 bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+              <a href="/flashcards" className="group flex items-center gap-4 bg-card rounded-2xl border border-border p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
                 <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                     <rect x="3" y="5" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.8"/>
@@ -240,8 +240,8 @@ export default function LearnHub() {
                   </svg>
                 </div>
                 <div>
-                  <p className="font-black text-slate-900 text-sm group-hover:text-primary transition-colors">Flashcards</p>
-                  <p className="text-xs text-slate-400 font-medium mt-0.5">AI-generated quick-review cards for you</p>
+                  <p className="font-black text-foreground text-sm group-hover:text-primary transition-colors">Flashcards</p>
+                  <p className="text-xs text-muted-foreground font-medium mt-0.5">AI-generated quick-review cards for you</p>
                 </div>
                 <span className="ml-auto text-xs font-black text-slate-300 group-hover:text-primary transition-colors">→</span>
               </a>

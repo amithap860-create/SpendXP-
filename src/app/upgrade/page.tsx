@@ -305,7 +305,7 @@ export default function UpgradePage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 pb-24">
+    <main className="min-h-screen bg-background pb-24">
       {/* Hero */}
       <div className="bg-[#1A1F2E] text-white">
         <div className="max-w-2xl mx-auto px-4 pt-14 pb-12 text-center">
@@ -375,14 +375,14 @@ export default function UpgradePage() {
 
         {/* Premium features grid */}
         <div className="mt-10 mb-8">
-          <h2 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-4">What You Unlock</h2>
+          <h2 className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-4">What You Unlock</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {Object.entries(PREMIUM_FEATURES).map(([key, feat]) => (
-              <div key={key} className="flex items-start gap-3 bg-white rounded-xl p-4 border border-slate-100">
+              <div key={key} className="flex items-start gap-3 bg-card rounded-xl p-4 border border-border">
                 <div className="text-2xl flex-shrink-0">{feat.icon}</div>
                 <div>
-                  <div className="text-sm font-black text-slate-900">{feat.label}</div>
-                  <div className="text-xs text-slate-500 leading-relaxed mt-0.5">{feat.description}</div>
+                  <div className="text-sm font-black text-foreground">{feat.label}</div>
+                  <div className="text-xs text-muted-foreground leading-relaxed mt-0.5">{feat.description}</div>
                 </div>
               </div>
             ))}
@@ -391,11 +391,11 @@ export default function UpgradePage() {
 
         {/* Comparison table */}
         <div className="mb-10">
-          <h2 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-4">Free vs Agent</h2>
-          <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
-            <div className="grid grid-cols-[1fr_80px_80px] text-center bg-slate-50 border-b border-slate-100">
-              <div className="px-4 py-3 text-left text-xs font-black uppercase tracking-widest text-slate-400">Feature</div>
-              <div className="py-3 text-xs font-black uppercase tracking-widest text-slate-500">Explorer</div>
+          <h2 className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-4">Free vs Agent</h2>
+          <div className="bg-card rounded-2xl border border-border overflow-hidden">
+            <div className="grid grid-cols-[1fr_80px_80px] text-center bg-muted border-b border-border">
+              <div className="px-4 py-3 text-left text-xs font-black uppercase tracking-widest text-muted-foreground">Feature</div>
+              <div className="py-3 text-xs font-black uppercase tracking-widest text-muted-foreground">Explorer</div>
               <div className="py-3 text-xs font-black uppercase tracking-widest" style={{ color: '#2E7D5A' }}>Agent</div>
             </div>
             {FEATURE_ROWS.map((row, i) => (
@@ -406,7 +406,7 @@ export default function UpgradePage() {
                   i !== FEATURE_ROWS.length - 1 && 'border-b border-slate-50'
                 )}
               >
-                <div className="px-4 py-3 text-left text-xs font-bold text-slate-700">{row.label}</div>
+                <div className="px-4 py-3 text-left text-xs font-bold text-foreground">{row.label}</div>
                 <div className="py-3 flex items-center justify-center"><FeatureCell value={row.free} /></div>
                 <div className="py-3 flex items-center justify-center"><FeatureCell value={row.premium} /></div>
               </div>
@@ -482,16 +482,16 @@ export default function UpgradePage() {
             { icon: '↩', label: 'Cancel Anytime',  sub: 'No contracts' },
             { icon: '🛡', label: 'Data Private',    sub: 'Never sold' },
           ].map(item => (
-            <div key={item.label} className="bg-white rounded-xl p-4 border border-slate-100">
+            <div key={item.label} className="bg-card rounded-xl p-4 border border-border">
               <div className="text-xl mb-1">{item.icon}</div>
-              <div className="text-[11px] font-black text-slate-800">{item.label}</div>
-              <div className="text-[10px] text-slate-400 mt-0.5">{item.sub}</div>
+              <div className="text-[11px] font-black text-foreground">{item.label}</div>
+              <div className="text-[10px] text-muted-foreground mt-0.5">{item.sub}</div>
             </div>
           ))}
         </div>
 
         {/* Group Play Waitlist */}
-        <div className="mt-6 bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+        <div className="mt-6 bg-card rounded-2xl border border-border p-6 space-y-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -503,8 +503,8 @@ export default function UpgradePage() {
               </svg>
             </div>
             <div>
-              <p className="text-sm font-black text-slate-900">Group Play — Coming Soon</p>
-              <p className="text-xs text-slate-400 font-medium">Challenge friends and compete on leaderboards</p>
+              <p className="text-sm font-black text-foreground">Group Play — Coming Soon</p>
+              <p className="text-xs text-muted-foreground font-medium">Challenge friends and compete on leaderboards</p>
             </div>
             <span className="ml-auto text-[10px] font-black uppercase tracking-widest bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full shrink-0">In Development</span>
           </div>
@@ -524,7 +524,7 @@ export default function UpgradePage() {
                 value={waitlistEmail}
                 onChange={e => setWaitlistEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="flex-1 h-10 px-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="flex-1 h-10 px-3 rounded-xl border border-border text-sm font-medium text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
               />
               <button
                 onClick={handleWaitlist}

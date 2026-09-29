@@ -92,32 +92,32 @@ export function CompoundVisualiser() {
         {/* INPUTS */}
         <div className="lg:col-span-5 space-y-8">
           <div className="space-y-4">
-            <Label className="text-xs font-black uppercase text-slate-400">Initial Investment</Label>
+            <Label className="text-xs font-black uppercase text-muted-foreground">Initial Investment</Label>
             <Slider value={[initial]} max={1000000} step={1000} onValueChange={([v]) => setInitial(v)} />
             <div className="text-xl font-black text-primary">{formatValue(initial)}</div>
           </div>
 
           <div className="space-y-4">
-            <Label className="text-xs font-black uppercase text-slate-400">Monthly Contribution</Label>
+            <Label className="text-xs font-black uppercase text-muted-foreground">Monthly Contribution</Label>
             <Slider value={[sip]} max={100000} step={500} onValueChange={([v]) => setSip(v)} />
             <div className="text-xl font-black text-primary">{formatValue(sip)}</div>
           </div>
 
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-4">
-              <Label className="text-xs font-black uppercase text-slate-400">Return Rate (%)</Label>
+              <Label className="text-xs font-black uppercase text-muted-foreground">Return Rate (%)</Label>
               <Slider value={[rate]} min={1} max={30} step={0.5} onValueChange={([v]) => setRate(v)} />
               <div className="text-xl font-black text-primary">{rate}%</div>
             </div>
             <div className="space-y-4">
-              <Label className="text-xs font-black uppercase text-slate-400">Period (Years)</Label>
+              <Label className="text-xs font-black uppercase text-muted-foreground">Period (Years)</Label>
               <Slider value={[years]} min={1} max={40} onValueChange={([v]) => setYears(v)} />
               <div className="text-xl font-black text-primary">{years} yrs</div>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-xs font-black uppercase text-slate-400">Compounding Frequency</Label>
+            <Label className="text-xs font-black uppercase text-muted-foreground">Compounding Frequency</Label>
             <Select value={freq} onValueChange={setFreq}>
               <SelectTrigger className="h-12">
                 <SelectValue />
@@ -138,9 +138,9 @@ export function CompoundVisualiser() {
               <div className="text-[10px] font-black uppercase text-slate-500 mb-1">Final Wealth</div>
               <div className="text-4xl font-black text-[#4EA07A]">{formatCompact(stats.futureValue)}</div>
             </div>
-            <div className="p-4 bg-slate-50 rounded-2xl border text-center">
-              <div className="text-[10px] font-black uppercase text-slate-400 mb-1">Total Invested</div>
-              <div className="text-lg font-black text-slate-900">{formatCompact(stats.totalInvested)}</div>
+            <div className="p-4 bg-muted rounded-2xl border text-center">
+              <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Total Invested</div>
+              <div className="text-lg font-black text-foreground">{formatCompact(stats.totalInvested)}</div>
             </div>
             <div className="p-4 bg-[#E8F5EE] rounded-2xl border border-[#C8E8D8] text-center">
               <div className="text-[10px] font-black uppercase text-primary mb-1">Profit Made</div>
@@ -148,7 +148,7 @@ export function CompoundVisualiser() {
             </div>
           </div>
 
-          <div className="relative bg-white rounded-3xl border p-4 overflow-hidden">
+          <div className="relative bg-card rounded-3xl border p-4 overflow-hidden">
             <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} className="w-full h-auto overflow-visible">
               <path d={getAreaPath()} fill="rgba(20, 184, 166, 0.1)" />
               
@@ -176,7 +176,7 @@ export function CompoundVisualiser() {
               ))}
             </svg>
             <div className="flex justify-center gap-6 mt-4">
-              <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase">
+              <div className="flex items-center gap-2 text-[10px] font-black text-muted-foreground uppercase">
                 <div className="w-3 h-0.5 bg-slate-300 border-dashed border-t" /> Savings Account (3%)
               </div>
               <div className="flex items-center gap-2 text-[10px] font-black text-primary uppercase">
@@ -189,15 +189,15 @@ export function CompoundVisualiser() {
 
       <div className="grid md:grid-cols-3 gap-4 pt-4 border-t">
         <Button variant="ghost" onClick={() => setPreset(0, 500, 12, 20)} className="h-auto p-4 border rounded-2xl flex-col items-start gap-1" suppressHydrationWarning>
-          <span className="text-[10px] font-black text-slate-400 uppercase">Tiny Start</span>
+          <span className="text-[10px] font-black text-muted-foreground uppercase">Tiny Start</span>
           <span className="font-bold">{formatValue(500)}/mo for 20 yrs</span>
         </Button>
         <Button variant="ghost" onClick={() => setPreset(100000, 0, 15, 15)} className="h-auto p-4 border rounded-2xl flex-col items-start gap-1" suppressHydrationWarning>
-          <span className="text-[10px] font-black text-slate-400 uppercase">Lump Sum</span>
+          <span className="text-[10px] font-black text-muted-foreground uppercase">Lump Sum</span>
           <span className="font-bold">{formatValue(100000)} once for 15 yrs</span>
         </Button>
         <Button variant="ghost" onClick={() => setPreset(0, 2000, 12, 40)} className="h-auto p-4 border rounded-2xl flex-col items-start gap-1" suppressHydrationWarning>
-          <span className="text-[10px] font-black text-slate-400 uppercase">Legacy Path</span>
+          <span className="text-[10px] font-black text-muted-foreground uppercase">Legacy Path</span>
           <span className="font-bold">{formatValue(2000)}/mo for 40 yrs</span>
         </Button>
       </div>

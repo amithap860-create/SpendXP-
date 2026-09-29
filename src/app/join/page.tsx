@@ -92,7 +92,7 @@ function ParentAcceptsInvite({ code }: { code: string }) {
       {pageState === 'loading' && (
         <CardContent className="p-12 text-center space-y-4">
           <Loader2 className="h-10 w-10 text-primary mx-auto animate-spin" />
-          <p className="text-slate-500 font-bold">Loading invite…</p>
+          <p className="text-muted-foreground font-bold">Loading invite…</p>
         </CardContent>
       )}
 
@@ -106,15 +106,15 @@ function ParentAcceptsInvite({ code }: { code: string }) {
             </p>
           </div>
           <CardContent className="p-8 space-y-6">
-            <div className="bg-slate-50 rounded-xl p-5 space-y-1">
-              <p className="text-xs font-black uppercase tracking-wider text-slate-400">Connecting with</p>
-              <p className="text-2xl font-black text-slate-900">{invite.childName}</p>
-              <p className="text-slate-500 text-sm">{invite.childEmail}</p>
+            <div className="bg-muted rounded-xl p-5 space-y-1">
+              <p className="text-xs font-black uppercase tracking-wider text-muted-foreground">Connecting with</p>
+              <p className="text-2xl font-black text-foreground">{invite.childName}</p>
+              <p className="text-muted-foreground text-sm">{invite.childEmail}</p>
             </div>
 
             <div className="space-y-2">
-              <p className="text-sm font-black text-slate-700">As a linked parent you can:</p>
-              <ul className="space-y-2 text-sm text-slate-600">
+              <p className="text-sm font-black text-foreground">As a linked parent you can:</p>
+              <ul className="space-y-2 text-sm text-muted-foreground">
                 {[
                   "View your child's learning progress and XP",
                   "See which games and quests they've completed",
@@ -129,20 +129,20 @@ function ParentAcceptsInvite({ code }: { code: string }) {
               </ul>
             </div>
 
-            <p className="text-xs text-slate-400 text-center">Link expires {expiresFormatted}</p>
+            <p className="text-xs text-muted-foreground text-center">Link expires {expiresFormatted}</p>
 
             {user ? (
               <div className="space-y-3">
                 <Button onClick={handleAccept} className="w-full h-14 text-lg font-black">
                   Connect as Parent
                 </Button>
-                <p className="text-xs text-slate-400 text-center">
+                <p className="text-xs text-muted-foreground text-center">
                   Connecting as <strong>{user.displayName || user.email}</strong>
                 </p>
               </div>
             ) : (
               <div className="space-y-3">
-                <p className="text-sm text-slate-600 text-center font-bold">
+                <p className="text-sm text-muted-foreground text-center font-bold">
                   Sign in or create an account to connect:
                 </p>
                 <Link href={`/login?redirect=${encodeURIComponent(`/join?code=${code}`)}`}>
@@ -164,7 +164,7 @@ function ParentAcceptsInvite({ code }: { code: string }) {
       {pageState === 'linking' && (
         <CardContent className="p-12 text-center space-y-4">
           <Loader2 className="h-10 w-10 text-primary mx-auto animate-spin" />
-          <p className="text-slate-500 font-bold">Connecting accounts…</p>
+          <p className="text-muted-foreground font-bold">Connecting accounts…</p>
         </CardContent>
       )}
 
@@ -174,8 +174,8 @@ function ParentAcceptsInvite({ code }: { code: string }) {
             <CheckCircle2 className="h-10 w-10 text-green-600" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-black text-slate-900">You&apos;re Connected!</h2>
-            <p className="text-slate-600 text-sm leading-relaxed">
+            <h2 className="text-2xl font-black text-foreground">You&apos;re Connected!</h2>
+            <p className="text-muted-foreground text-sm leading-relaxed">
               You&apos;re now linked to <strong>{linkedChildName || invite?.childName}</strong>&apos;s SpendXP account.
               Head to your Parent Dashboard to see their progress.
             </p>
@@ -193,8 +193,8 @@ function ParentAcceptsInvite({ code }: { code: string }) {
             <CheckCircle2 className="h-10 w-10 text-blue-600" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-black text-slate-900">Already Connected</h2>
-            <p className="text-slate-600 text-sm">This invite has already been used to link accounts.</p>
+            <h2 className="text-2xl font-black text-foreground">Already Connected</h2>
+            <p className="text-muted-foreground text-sm">This invite has already been used to link accounts.</p>
           </div>
           <Link href="/parent"><Button className="w-full h-12 font-bold">Go to Parent Dashboard</Button></Link>
         </CardContent>
@@ -206,8 +206,8 @@ function ParentAcceptsInvite({ code }: { code: string }) {
             <AlertCircle className="h-10 w-10 text-amber-600" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-black text-slate-900">Link Expired</h2>
-            <p className="text-slate-600 text-sm leading-relaxed">
+            <h2 className="text-2xl font-black text-foreground">Link Expired</h2>
+            <p className="text-muted-foreground text-sm leading-relaxed">
               This invite link has expired (links last 7 days). Ask your child to generate a new one from their Profile page.
             </p>
           </div>
@@ -221,10 +221,10 @@ function ParentAcceptsInvite({ code }: { code: string }) {
             <AlertCircle className="h-10 w-10 text-red-500" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-black text-slate-900">
+            <h2 className="text-2xl font-black text-foreground">
               {pageState === 'invalid' ? 'Invalid Link' : 'Something Went Wrong'}
             </h2>
-            <p className="text-slate-600 text-sm">{errorMsg || 'Please check the link and try again.'}</p>
+            <p className="text-muted-foreground text-sm">{errorMsg || 'Please check the link and try again.'}</p>
           </div>
           <Link href="/"><Button variant="outline" className="w-full h-12 font-bold">Go to SpendXP</Button></Link>
         </CardContent>
@@ -302,7 +302,7 @@ function ChildAcceptsInvite({ code }: { code: string }) {
       {pageState === 'loading' && (
         <CardContent className="p-12 text-center space-y-4">
           <Loader2 className="h-10 w-10 text-primary mx-auto animate-spin" />
-          <p className="text-slate-500 font-bold">Loading invite…</p>
+          <p className="text-muted-foreground font-bold">Loading invite…</p>
         </CardContent>
       )}
 
@@ -316,15 +316,15 @@ function ChildAcceptsInvite({ code }: { code: string }) {
             </p>
           </div>
           <CardContent className="p-8 space-y-6">
-            <div className="bg-slate-50 rounded-xl p-5 space-y-1">
-              <p className="text-xs font-black uppercase tracking-wider text-slate-400">Parent requesting</p>
-              <p className="text-2xl font-black text-slate-900">{invite.parentName}</p>
-              <p className="text-slate-500 text-sm">{invite.parentEmail}</p>
+            <div className="bg-muted rounded-xl p-5 space-y-1">
+              <p className="text-xs font-black uppercase tracking-wider text-muted-foreground">Parent requesting</p>
+              <p className="text-2xl font-black text-foreground">{invite.parentName}</p>
+              <p className="text-muted-foreground text-sm">{invite.parentEmail}</p>
             </div>
 
             <div className="space-y-2">
-              <p className="text-sm font-black text-slate-700">When connected, they can:</p>
-              <ul className="space-y-2 text-sm text-slate-600">
+              <p className="text-sm font-black text-foreground">When connected, they can:</p>
+              <ul className="space-y-2 text-sm text-muted-foreground">
                 {[
                   'See your XP, badges, and learning progress',
                   'Watch which quests and games you complete',
@@ -339,20 +339,20 @@ function ChildAcceptsInvite({ code }: { code: string }) {
               </ul>
             </div>
 
-            <p className="text-xs text-slate-400 text-center">Link expires {expiresFormatted}</p>
+            <p className="text-xs text-muted-foreground text-center">Link expires {expiresFormatted}</p>
 
             {user ? (
               <div className="space-y-3">
                 <Button onClick={handleAccept} className="w-full h-14 text-lg font-black bg-amber-500 hover:bg-amber-600">
                   Accept & Connect
                 </Button>
-                <p className="text-xs text-slate-400 text-center">
+                <p className="text-xs text-muted-foreground text-center">
                   Connecting as <strong>{user.displayName || user.email}</strong>
                 </p>
               </div>
             ) : (
               <div className="space-y-3">
-                <p className="text-sm text-slate-600 text-center font-bold">
+                <p className="text-sm text-muted-foreground text-center font-bold">
                   Sign in to your SpendXP account to accept:
                 </p>
                 <Link href={`/login?redirect=${encodeURIComponent(`/join?parentCode=${code}`)}`}>
@@ -374,7 +374,7 @@ function ChildAcceptsInvite({ code }: { code: string }) {
       {pageState === 'linking' && (
         <CardContent className="p-12 text-center space-y-4">
           <Loader2 className="h-10 w-10 text-primary mx-auto animate-spin" />
-          <p className="text-slate-500 font-bold">Connecting accounts…</p>
+          <p className="text-muted-foreground font-bold">Connecting accounts…</p>
         </CardContent>
       )}
 
@@ -384,8 +384,8 @@ function ChildAcceptsInvite({ code }: { code: string }) {
             <CheckCircle2 className="h-10 w-10 text-green-600" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-black text-slate-900">You&apos;re Connected! 🎉</h2>
-            <p className="text-slate-600 text-sm leading-relaxed">
+            <h2 className="text-2xl font-black text-foreground">You&apos;re Connected! 🎉</h2>
+            <p className="text-muted-foreground text-sm leading-relaxed">
               <strong>{linkedParentName || invite?.parentName}</strong> can now see your SpendXP progress.
               Keep earning XP and levelling up!
             </p>
@@ -403,8 +403,8 @@ function ChildAcceptsInvite({ code }: { code: string }) {
             <CheckCircle2 className="h-10 w-10 text-blue-600" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-black text-slate-900">Already Connected</h2>
-            <p className="text-slate-600 text-sm">Your account is already linked to a parent.</p>
+            <h2 className="text-2xl font-black text-foreground">Already Connected</h2>
+            <p className="text-muted-foreground text-sm">Your account is already linked to a parent.</p>
           </div>
           <Link href="/dashboard"><Button className="w-full h-12 font-bold">My Dashboard</Button></Link>
         </CardContent>
@@ -416,8 +416,8 @@ function ChildAcceptsInvite({ code }: { code: string }) {
             <AlertCircle className="h-10 w-10 text-amber-600" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-black text-slate-900">Link Expired</h2>
-            <p className="text-slate-600 text-sm leading-relaxed">
+            <h2 className="text-2xl font-black text-foreground">Link Expired</h2>
+            <p className="text-muted-foreground text-sm leading-relaxed">
               This invite link has expired (links last 7 days). Ask your parent to generate a new one.
             </p>
           </div>
@@ -431,10 +431,10 @@ function ChildAcceptsInvite({ code }: { code: string }) {
             <AlertCircle className="h-10 w-10 text-red-500" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-black text-slate-900">
+            <h2 className="text-2xl font-black text-foreground">
               {pageState === 'invalid' ? 'Invalid Link' : 'Something Went Wrong'}
             </h2>
-            <p className="text-slate-600 text-sm">{errorMsg || 'Please check the link and try again.'}</p>
+            <p className="text-muted-foreground text-sm">{errorMsg || 'Please check the link and try again.'}</p>
           </div>
           <Link href="/"><Button variant="outline" className="w-full h-12 font-bold">Go to SpendXP</Button></Link>
         </CardContent>
@@ -463,10 +463,10 @@ function JoinContent() {
         {/* Logo */}
         <div className="text-center">
           <h1 className="text-3xl font-black">
-            <span className="text-slate-900">Spend</span>
+            <span className="text-foreground">Spend</span>
             <span style={{ color: '#2E7D5A' }}>XP</span>
           </h1>
-          <p className="text-slate-500 text-sm mt-1">Financial literacy for young learners</p>
+          <p className="text-muted-foreground text-sm mt-1">Financial literacy for young learners</p>
         </div>
 
         {/* Route to correct flow */}
@@ -480,8 +480,8 @@ function JoinContent() {
                 <AlertCircle className="h-10 w-10 text-red-500" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl font-black text-slate-900">Invalid Link</h2>
-                <p className="text-slate-600 text-sm">No invite code found. Please use the link exactly as shared with you.</p>
+                <h2 className="text-2xl font-black text-foreground">Invalid Link</h2>
+                <p className="text-muted-foreground text-sm">No invite code found. Please use the link exactly as shared with you.</p>
               </div>
               <Link href="/"><Button variant="outline" className="w-full h-12 font-bold">Go to SpendXP</Button></Link>
             </CardContent>

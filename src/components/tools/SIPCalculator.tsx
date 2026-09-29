@@ -67,7 +67,7 @@ export function SIPCalculator() {
         <div className="space-y-8">
           <div className="space-y-4">
             <div className="flex justify-between items-end">
-              <Label className="text-xs font-black uppercase text-slate-400">Monthly SIP</Label>
+              <Label className="text-xs font-black uppercase text-muted-foreground">Monthly SIP</Label>
               <span className="text-lg font-black text-primary">{formatValue(sip)}</span>
             </div>
             <Slider value={[sip]} min={100} max={100000} step={500} onValueChange={([v]) => setSip(v)} />
@@ -75,7 +75,7 @@ export function SIPCalculator() {
 
           <div className="space-y-4">
             <div className="flex justify-between items-end">
-              <Label className="text-xs font-black uppercase text-slate-400">Return Rate: {benchmark}</Label>
+              <Label className="text-xs font-black uppercase text-muted-foreground">Return Rate: {benchmark}</Label>
               <span className="text-lg font-black text-primary">{rate}%</span>
             </div>
             <Slider value={[rate]} min={1} max={30} step={0.5} onValueChange={([v]) => setRate(v)} />
@@ -83,7 +83,7 @@ export function SIPCalculator() {
 
           <div className="space-y-4">
             <div className="flex justify-between items-end">
-              <Label className="text-xs font-black uppercase text-slate-400">Time Period</Label>
+              <Label className="text-xs font-black uppercase text-muted-foreground">Time Period</Label>
               <span className="text-lg font-black text-primary">{years} yrs</span>
             </div>
             <Slider value={[years]} min={1} max={40} onValueChange={([v]) => setYears(v)} />
@@ -93,14 +93,14 @@ export function SIPCalculator() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label className="text-sm font-bold">Annual Step-Up</Label>
-                <p className="text-xs text-slate-400 font-medium italic">Increase my investment as I earn more</p>
+                <p className="text-xs text-muted-foreground font-medium italic">Increase my investment as I earn more</p>
               </div>
               <Switch checked={isStepUp} onCheckedChange={setIsStepUp} suppressHydrationWarning />
             </div>
 
             {isStepUp && (
               <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
-                <div className="flex justify-between text-xs font-black uppercase text-slate-400">
+                <div className="flex justify-between text-xs font-black uppercase text-muted-foreground">
                   <span>Increase by</span>
                   <span>{stepUpRate}% / year</span>
                 </div>
@@ -118,12 +118,12 @@ export function SIPCalculator() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 bg-white rounded-2xl shadow-sm border border-blue-100">
-              <div className="text-[10px] font-black uppercase text-slate-400 mb-1">Total Invested</div>
-              <div className="text-lg font-black text-slate-900">{formatCompact(results.invested)}</div>
+            <div className="p-4 bg-card rounded-2xl shadow-sm border border-blue-100">
+              <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Total Invested</div>
+              <div className="text-lg font-black text-foreground">{formatCompact(results.invested)}</div>
             </div>
-            <div className="p-4 bg-white rounded-2xl shadow-sm border border-blue-100">
-              <div className="text-[10px] font-black uppercase text-slate-400 mb-1">Total Wealth Gain</div>
+            <div className="p-4 bg-card rounded-2xl shadow-sm border border-blue-100">
+              <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Total Wealth Gain</div>
               <div className="text-lg font-black text-primary">+{formatCompact(results.corpus - results.invested)}</div>
             </div>
           </div>
@@ -134,9 +134,9 @@ export function SIPCalculator() {
           </div>
 
           {isStepUp && (
-            <div className="p-4 bg-white/50 rounded-xl border border-blue-200 flex items-center gap-3">
+            <div className="p-4 bg-card/50 rounded-xl border border-blue-200 flex items-center gap-3">
               <Zap className="h-5 w-5 text-primary" />
-              <p className="text-xs font-bold text-slate-900 italic">
+              <p className="text-xs font-bold text-foreground italic">
                 Stepping up adds an extra {formatCompact(results.corpus - normalResults.corpus)} to your final wealth!
               </p>
             </div>
@@ -144,7 +144,7 @@ export function SIPCalculator() {
         </div>
       </div>
 
-      <footer className="pt-6 border-t text-[10px] text-slate-400 font-medium italic text-center">
+      <footer className="pt-6 border-t text-[10px] text-muted-foreground font-medium italic text-center">
         Past performance is not a guarantee of future returns. These calculations are for educational purposes only. 
         Consult a qualified financial advisor before investing real money.
       </footer>

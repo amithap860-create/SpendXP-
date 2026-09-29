@@ -259,14 +259,14 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
   };
 
   return (
-    <div className="min-h-screen-safe bg-slate-50 flex flex-col">
+    <div className="min-h-screen-safe bg-background flex flex-col">
       <EmailVerificationBanner />
 
       {!activeGame ? (
         <main className="max-w-5xl mx-auto px-4 py-8 w-full space-y-8">
           <header>
-            <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Arcade</h1>
-            <p className="text-slate-500 font-medium">Learn by playing. Earn XP to level up.</p>
+            <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">Arcade</h1>
+            <p className="text-muted-foreground font-medium">Learn by playing. Earn XP to level up.</p>
           </header>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
@@ -314,7 +314,7 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
             {!showDailyBreakdown && (
               <button
                 onClick={() => { setActiveGame(null); setIsDaily(false); }}
-                className="mb-4 text-xs font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest flex items-center gap-2 h-11 px-4 rounded-xl hover:bg-slate-100 transition-colors"
+                className="mb-4 text-xs font-black text-muted-foreground hover:text-foreground uppercase tracking-widest flex items-center gap-2 h-11 px-4 rounded-xl hover:bg-muted transition-colors"
               >
                 Back to Arcade
               </button>
@@ -348,14 +348,14 @@ function GameCard({
       id={`game-card-${game.id}`}
       onClick={onClick}
       className={cn(
-        "bg-white rounded-3xl border-[0.5px] border-slate-200 p-6 md:p-8 shadow-sm transition-all text-left group overflow-hidden relative",
+        "bg-card rounded-3xl border-[0.5px] border-border p-6 md:p-8 shadow-sm transition-all text-left group overflow-hidden relative",
         "ring-offset-2 min-h-[160px] flex flex-col justify-between",
         isHighlighted ? "ring-2 ring-primary" : "ring-0 transition-all duration-1000",
         locked ? "opacity-80 hover:opacity-100 cursor-pointer" : "hover:shadow-xl hover:-translate-y-1"
       )}
     >
       {/* Left accent bar */}
-      <div className={cn("absolute top-0 left-0 w-2 h-full", locked ? "bg-slate-200" : game.accentColor)} />
+      <div className={cn("absolute top-0 left-0 w-2 h-full", locked ? "bg-muted" : game.accentColor)} />
 
       {/* Premium / Coming Soon / Lesson-locked badge */}
       {locked && (
@@ -365,7 +365,7 @@ function GameCard({
               Waitlist
             </span>
           ) : lockReason === 'lesson' ? (
-            <span className="text-[11px] font-black uppercase tracking-widest bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+            <span className="text-[11px] font-black uppercase tracking-widest bg-muted text-muted-foreground border border-border px-2 py-0.5 rounded-full flex items-center gap-1">
               <IconLock /> Lesson First
             </span>
           ) : (
@@ -380,17 +380,17 @@ function GameCard({
       <div>
         <div className={cn(
           "w-10 h-10 rounded-xl flex items-center justify-center mb-3",
-          locked ? "bg-slate-100 text-slate-400" : "bg-primary/10 text-primary"
+          locked ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary"
         )}>
           <Icon />
         </div>
         <h3 className={cn(
           "text-xl font-black mb-2 transition-colors",
-          locked ? "text-slate-400" : "text-slate-900 group-hover:text-primary"
+          locked ? "text-muted-foreground" : "text-foreground group-hover:text-primary"
         )}>
           {game.name}
         </h3>
-        <p className="text-sm text-slate-500 font-medium leading-snug">
+        <p className="text-sm text-muted-foreground font-medium leading-snug">
           {lockReason === 'lesson' && requiredLessonTitle
             ? `Complete "${requiredLessonTitle}" in Learn to unlock this game.`
             : game.desc}
@@ -399,11 +399,11 @@ function GameCard({
 
       <div className="flex justify-end pt-4">
         {locked ? (
-          <span className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
+          <span className="text-xs font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1">
             {game.comingSoon ? 'JOIN WAITLIST →' : lockReason === 'lesson' ? <><IconLock />GO TO LESSON</> : <><IconLock />UNLOCK</>}
           </span>
         ) : (
-          <span className="text-xs font-black text-slate-400 group-hover:text-primary transition-colors uppercase tracking-widest">
+          <span className="text-xs font-black text-muted-foreground group-hover:text-primary transition-colors uppercase tracking-widest">
             PLAY NOW →
           </span>
         )}

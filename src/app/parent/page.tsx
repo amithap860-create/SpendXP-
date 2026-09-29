@@ -83,7 +83,7 @@ export default function ParentDashboard() {
               <Users className="h-10 w-10" />
             </div>
             <CardTitle className="text-2xl font-black">Connect Your Child</CardTitle>
-            <p className="text-slate-500 text-sm leading-relaxed">
+            <p className="text-muted-foreground text-sm leading-relaxed">
               Link your child&apos;s SpendXP account to start tracking their learning progress, badges, and achievements.
             </p>
           </div>
@@ -95,7 +95,7 @@ export default function ParentDashboard() {
             >
               <UserPlus className="h-4 w-4 mr-2" /> Generate Invite Link
             </Button>
-            <p className="text-xs text-slate-400 text-center">
+            <p className="text-xs text-muted-foreground text-center">
               Generate a link or send an email — your child clicks it and you&apos;re connected.
             </p>
           </div>
@@ -131,7 +131,7 @@ export default function ParentDashboard() {
       <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto">
         <header className="mb-8 space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-3xl font-black text-slate-900 tracking-tight">Parent Portal</h2>
+            <h2 className="text-3xl font-black text-foreground tracking-tight">Parent Portal</h2>
             <Button variant="outline" onClick={() => setShowReport(true)} className="gap-2 font-bold border-2" suppressHydrationWarning>
               <FileText className="h-4 w-4" /> Weekly Report
             </Button>
@@ -146,8 +146,8 @@ export default function ParentDashboard() {
                 className={cn(
                   "flex items-center gap-3 px-6 py-3 rounded-2xl border-2 transition-all shrink-0",
                   selectedChildId === child.id 
-                    ? "bg-white border-primary shadow-lg ring-4 ring-primary/5" 
-                    : "bg-slate-50 border-transparent text-slate-500 hover:bg-slate-100"
+                    ? "bg-card border-primary shadow-lg ring-4 ring-primary/5"
+                    : "bg-muted border-transparent text-muted-foreground hover:bg-accent"
                 )}
               >
                 <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center font-black text-primary">
@@ -162,7 +162,7 @@ export default function ParentDashboard() {
             <button 
               onClick={() => window.location.href = '/parent/setup'}
               suppressHydrationWarning
-              className="px-6 py-3 rounded-2xl border-2 border-dashed border-slate-200 text-slate-400 hover:border-primary/40 hover:text-primary transition-all flex items-center gap-2"
+              className="px-6 py-3 rounded-2xl border-2 border-dashed border-border text-muted-foreground hover:border-primary/40 hover:text-primary transition-all flex items-center gap-2"
             >
               <UserPlus className="h-4 w-4" /> Add Child
             </button>
@@ -172,29 +172,29 @@ export default function ParentDashboard() {
         {selectedChild && (
           <div className="grid gap-8 lg:grid-cols-12">
             <div className="lg:col-span-12 grid gap-6 md:grid-cols-3">
-              <Card className="border-none shadow-md bg-white">
+              <Card className="border-none shadow-md bg-card">
                 <CardContent className="p-6 flex items-center gap-4">
                   <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary"><Zap className="h-6 w-6" /></div>
-                  <div><div className="text-[10px] font-bold text-slate-400 uppercase">Total XP Earned</div><div className="text-2xl font-black">{selectedChild.xp?.toLocaleString() || 0}</div></div>
+                  <div><div className="text-[10px] font-bold text-muted-foreground uppercase">Total XP Earned</div><div className="text-2xl font-black">{selectedChild.xp?.toLocaleString() || 0}</div></div>
                 </CardContent>
               </Card>
-              <Card className="border-none shadow-md bg-white">
+              <Card className="border-none shadow-md bg-card">
                 <CardContent className="p-6 flex items-center gap-4">
                   <div className="h-12 w-12 rounded-xl bg-[#E8F5EE] flex items-center justify-center text-[#2E7D5A]"><Trophy className="h-6 w-6" /></div>
-                  <div><div className="text-[10px] font-bold text-slate-400 uppercase">Current Rank</div><div className="text-2xl font-black">{getRankForXP(selectedChild.xp || 0).name}</div></div>
+                  <div><div className="text-[10px] font-bold text-muted-foreground uppercase">Current Rank</div><div className="text-2xl font-black">{getRankForXP(selectedChild.xp || 0).name}</div></div>
                 </CardContent>
               </Card>
-              <Card className="border-none shadow-md bg-white">
+              <Card className="border-none shadow-md bg-card">
                 <CardContent className="p-6 flex items-center gap-4">
                   <div className="h-12 w-12 rounded-xl bg-[#E8F5EE] flex items-center justify-center text-primary"><Gamepad2 className="h-6 w-6" /></div>
-                  <div><div className="text-[10px] font-bold text-slate-400 uppercase">Latest Session</div><div className="text-2xl font-black">{activityLog?.[0]?.gameName || 'None'}</div></div>
+                  <div><div className="text-[10px] font-bold text-muted-foreground uppercase">Latest Session</div><div className="text-2xl font-black">{activityLog?.[0]?.gameName || 'None'}</div></div>
                 </CardContent>
               </Card>
             </div>
 
             <div className="lg:col-span-8 space-y-8">
-              <Card className="border-none shadow-xl bg-white overflow-hidden">
-                <CardHeader className="bg-slate-50 border-b">
+              <Card className="border-none shadow-xl bg-card overflow-hidden">
+                <CardHeader className="bg-muted border-b">
                   <CardTitle className="text-xl font-black flex items-center gap-2">
                     <ShieldCheck className="h-5 w-5 text-primary" /> Concept Proficiency
                   </CardTitle>
@@ -206,7 +206,7 @@ export default function ParentDashboard() {
                       {isRadarEmpty ? (
                         <div className="flex flex-col items-center justify-center text-center space-y-4 max-w-sm">
                           <HelpCircle className="h-12 w-12 text-slate-300" />
-                          <p className="text-sm font-medium text-slate-500">No game data yet. {selectedChild.displayName} hasn't explored any topics. Share a game with them!</p>
+                          <p className="text-sm font-medium text-muted-foreground">No game data yet. {selectedChild.displayName} hasn't explored any topics. Share a game with them!</p>
                         </div>
                       ) : (
                         <div className="relative">
@@ -228,7 +228,7 @@ export default function ParentDashboard() {
                         {radarItems.map((d, i) => (
                           <div key={i} className="flex items-center gap-2">
                             <div className="h-2 w-2 rounded-full bg-primary" />
-                            <span className="text-xs font-bold text-slate-600 uppercase">{d.label}</span>
+                            <span className="text-xs font-bold text-muted-foreground uppercase">{d.label}</span>
                             <span className="text-xs font-black ml-auto">{strengths[d.label.toLowerCase() as keyof ConceptStrengths]}%</span>
                           </div>
                         ))}
@@ -242,16 +242,16 @@ export default function ParentDashboard() {
 
               <div className="grid gap-6 md:grid-cols-2">
                 {gameScores.map((game) => (
-                  <Card key={game.id} className="border-none shadow-md hover:shadow-lg transition-shadow bg-white overflow-hidden">
+                  <Card key={game.id} className="border-none shadow-md hover:shadow-lg transition-shadow bg-card overflow-hidden">
                     <div className="h-1.5 bg-primary/20" />
                     <CardContent className="p-5 space-y-4">
                       <div className="flex justify-between items-start">
                         <div>
-                          <h4 className="font-black text-slate-900 capitalize">{game.id.replace(/([A-Z])/g, ' $1').trim()}</h4>
-                          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Played {game.gamesPlayed || 0} times</div>
+                          <h4 className="font-black text-foreground capitalize">{game.id.replace(/([A-Z])/g, ' $1').trim()}</h4>
+                          <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">Played {game.gamesPlayed || 0} times</div>
                         </div>
                         <div className="text-right">
-                          <div className="text-xs font-bold text-slate-400 uppercase">Best</div>
+                          <div className="text-xs font-bold text-muted-foreground uppercase">Best</div>
                           <div className="font-black text-primary">{game.highScore}</div>
                         </div>
                       </div>
@@ -260,7 +260,7 @@ export default function ParentDashboard() {
                           const max = Math.max(...(game.scoreHistory || [1]), 1);
                           const h = (s / max) * 100;
                           return (
-                            <div key={i} className="flex-1 bg-slate-100 rounded-t-sm relative group overflow-hidden" style={{ height: `${Math.max(h, 10)}%` }}>
+                            <div key={i} className="flex-1 bg-muted rounded-t-sm relative group overflow-hidden" style={{ height: `${Math.max(h, 10)}%` }}>
                               <div className="absolute inset-0 bg-primary opacity-0 group-hover:opacity-40 transition-opacity" />
                             </div>
                           );
@@ -273,19 +273,19 @@ export default function ParentDashboard() {
             </div>
 
             <div className="lg:col-span-4 space-y-8">
-              <Card className="border-none shadow-xl bg-white overflow-hidden">
-                <CardHeader className="bg-slate-50 border-b"><CardTitle className="text-xl font-black flex items-center gap-2"><Activity className="h-5 w-5 text-primary" /> Recent Activity</CardTitle></CardHeader>
+              <Card className="border-none shadow-xl bg-card overflow-hidden">
+                <CardHeader className="bg-muted border-b"><CardTitle className="text-xl font-black flex items-center gap-2"><Activity className="h-5 w-5 text-primary" /> Recent Activity</CardTitle></CardHeader>
                 <div className="divide-y">
                   {activityLog?.map((act) => (
-                    <div key={act.id} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                    <div key={act.id} className="p-4 flex items-center justify-between hover:bg-muted transition-colors">
                       <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500"><Gamepad2 className="h-4 w-4" /></div>
+                        <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground"><Gamepad2 className="h-4 w-4" /></div>
                         <div>
-                          <div className="text-xs font-black text-slate-900 capitalize">{act.gameName.replace(/([A-Z])/g, ' $1').trim()}</div>
-                          <div className="text-[10px] font-bold text-slate-400 uppercase">{act.playedAt?.toDate().toLocaleDateString()}</div>
+                          <div className="text-xs font-black text-foreground capitalize">{act.gameName.replace(/([A-Z])/g, ' $1').trim()}</div>
+                          <div className="text-[10px] font-bold text-muted-foreground uppercase">{act.playedAt?.toDate().toLocaleDateString()}</div>
                         </div>
                       </div>
-                      <div className="text-right"><div className="text-xs font-black text-primary">+{act.xpEarned} XP</div><div className="text-[10px] font-bold text-slate-400">SCORE {act.score}</div></div>
+                      <div className="text-right"><div className="text-xs font-black text-primary">+{act.xpEarned} XP</div><div className="text-[10px] font-bold text-muted-foreground">SCORE {act.score}</div></div>
                     </div>
                   ))}
                 </div>

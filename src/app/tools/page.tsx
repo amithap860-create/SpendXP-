@@ -135,14 +135,14 @@ export default function ToolsHub() {
   const activeInfoTool = tools.find(t => t.id === infoTool);
 
   return (
-    <div className="min-h-screen-safe bg-slate-50 pb-24 md:pb-8">
+    <div className="min-h-screen-safe bg-background pb-24 md:pb-8">
       <main className="max-w-5xl mx-auto px-4 py-8 space-y-8">
         <header className="space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-black uppercase mb-2">
             <Wrench className="h-3 w-3" /> Financial Utilities
           </div>
-          <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Financial Tools</h1>
-          <p className="text-slate-500 text-sm md:text-lg font-medium">Real-world calculators to help you master your future money.</p>
+          <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">Financial Tools</h1>
+          <p className="text-muted-foreground text-sm md:text-lg font-medium">Real-world calculators to help you master your future money.</p>
         </header>
 
         {/* Tool cards grid */}
@@ -160,14 +160,14 @@ export default function ToolsHub() {
                     <tool.icon className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-black text-slate-900">{tool.name}</h3>
-                    <p className="text-xs text-slate-500 font-medium">{tool.description}</p>
+                    <h3 className="text-lg font-black text-foreground">{tool.name}</h3>
+                    <p className="text-xs text-muted-foreground font-medium">{tool.description}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={(e) => { e.stopPropagation(); setInfoTool(tool.id); }}
-                    className="h-8 w-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors text-slate-500 hover:text-primary"
+                    className="h-8 w-8 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors text-muted-foreground hover:text-primary"
                     aria-label={`Info about ${tool.name}`}
                     suppressHydrationWarning
                   >
@@ -206,7 +206,7 @@ export default function ToolsHub() {
                 </div>
                 <DialogTitle className="text-xl font-black">{activeInfoTool.name}</DialogTitle>
               </DialogHeader>
-              <p className="text-sm text-slate-600 leading-relaxed">{activeInfoTool.info}</p>
+              <p className="text-sm text-foreground leading-relaxed">{activeInfoTool.info}</p>
               <Button
                 onClick={() => { setInfoTool(null); handleOpenTool(activeInfoTool.id); }}
                 className="w-full mt-2"
@@ -231,7 +231,7 @@ export default function ToolsHub() {
                 </DialogTitle>
                 <p className="text-white/80 text-xs font-medium">{activeTool.description}</p>
               </DialogHeader>
-              <div className="bg-white rounded-b-2xl">
+              <div className="bg-card rounded-b-2xl">
                 {activeTool.component}
               </div>
             </>

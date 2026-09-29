@@ -180,13 +180,13 @@ export default function OnboardingOverlay() {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl bg-white shadow-2xl">
+      <Card className="w-full max-w-2xl bg-card shadow-2xl">
         <CardContent className="p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               Welcome to SpendXP! 🎯
             </h1>
-            <p className="text-slate-600">
+            <p className="text-muted-foreground">
               Complete your Day 1 checklist to start your financial journey
             </p>
           </div>
@@ -197,26 +197,26 @@ export default function OnboardingOverlay() {
                 key={step.id}
                 className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
                   step.completed 
-                    ? 'border-green-200 bg-[#E8F5EE]' 
-                    : 'border-slate-200 bg-white hover:border-slate-300'
+                    ? 'border-green-200 bg-[#E8F5EE]'
+                    : 'border-border bg-card hover:border-border'
                 }`}
               >
                 <div className="flex-shrink-0">
                   {step.completed ? (
                     <CheckCircle2 className="h-6 w-6 text-primary" />
                   ) : (
-                    <Circle className="h-6 w-6 text-slate-400" />
+                    <Circle className="h-6 w-6 text-muted-foreground" />
                   )}
                 </div>
-                
+
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-semibold text-slate-900">{step.title}</h3>
+                    <h3 className="font-semibold text-foreground">{step.title}</h3>
                     <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-full">
                       +{step.xp} XP
                     </span>
                   </div>
-                  <p className="text-sm text-slate-600">{step.description}</p>
+                  <p className="text-sm text-muted-foreground">{step.description}</p>
                 </div>
 
                 <div className="flex-shrink-0">
@@ -236,16 +236,16 @@ export default function OnboardingOverlay() {
             ))}
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+          <div className="flex items-center justify-between p-4 bg-muted rounded-xl">
             <div>
-              <p className="text-sm font-medium text-slate-600">Total XP Earned</p>
+              <p className="text-sm font-medium text-muted-foreground">Total XP Earned</p>
               <p className="text-2xl font-bold text-primary">{totalXP}</p>
             </div>
-            
+
             {allCompleted && (
               <div className="text-center">
                 <p className="text-lg font-bold text-primary mb-2">🎉 Onboarding Complete!</p>
-                <p className="text-sm text-slate-600">Redirecting to dashboard...</p>
+                <p className="text-sm text-muted-foreground">Redirecting to dashboard...</p>
               </div>
             )}
           </div>
@@ -254,7 +254,7 @@ export default function OnboardingOverlay() {
             <Button
               variant="outline"
               onClick={() => setShowOnboarding(false)}
-              className="text-slate-500"
+              className="text-muted-foreground"
             >
               Skip for now
             </Button>

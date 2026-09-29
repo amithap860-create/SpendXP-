@@ -152,7 +152,7 @@ export default function ParentSetup() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <div className="max-w-xl w-full space-y-6">
 
         {/* Progress dots */}
@@ -161,11 +161,11 @@ export default function ParentSetup() {
             <div key={i} className="flex items-center gap-2">
               <div className={cn(
                 "h-8 w-8 rounded-full flex items-center justify-center font-bold transition-colors text-sm",
-                step >= i ? "bg-primary text-white" : "bg-slate-100 text-slate-400"
+                step >= i ? "bg-primary text-white" : "bg-muted text-muted-foreground"
               )}>
                 {step > i ? <CheckCircle2 className="h-5 w-5" /> : i}
               </div>
-              {i < 3 && <div className={cn("h-1 w-12 md:w-20 rounded-full", step > i ? "bg-primary" : "bg-slate-100")} />}
+              {i < 3 && <div className={cn("h-1 w-12 md:w-20 rounded-full", step > i ? "bg-primary" : "bg-muted")} />}
             </div>
           ))}
         </div>
@@ -186,9 +186,9 @@ export default function ParentSetup() {
               <div className="p-5 rounded-2xl border-2 border-primary/20 bg-primary/5 space-y-4">
                 <div className="flex items-center gap-2">
                   <Share2 className="h-5 w-5 text-primary" />
-                  <h4 className="font-black text-slate-800">Share a link with your child</h4>
+                  <h4 className="font-black text-foreground">Share a link with your child</h4>
                 </div>
-                <p className="text-xs text-slate-500 leading-relaxed">
+                <p className="text-xs text-muted-foreground leading-relaxed">
                   Generate a link and send it to your child. When they open it and accept, you'll be connected instantly.
                 </p>
 
@@ -216,7 +216,7 @@ export default function ParentSetup() {
                         <Share2 className="h-4 w-4" /> Share
                       </Button>
                     </div>
-                    <p className="text-xs text-slate-400 text-center">Expires {inviteExpiry} · <button onClick={generateInvite} className="text-primary font-black hover:underline" suppressHydrationWarning>Refresh</button></p>
+                    <p className="text-xs text-muted-foreground text-center">Expires {inviteExpiry} · <button onClick={generateInvite} className="text-primary font-black hover:underline" suppressHydrationWarning>Refresh</button></p>
                   </div>
                 )}
                 {inviteState === 'error' && (
@@ -230,18 +230,18 @@ export default function ParentSetup() {
               {/* Divider */}
               <div className="relative">
                 <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
-                <div className="relative flex justify-center text-xs uppercase"><span className="bg-white px-2 text-slate-400">or</span></div>
+                <div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">or</span></div>
               </div>
 
               {/* Option B: send email to child */}
-              <div className="p-5 rounded-2xl border-2 border-dashed border-slate-200 space-y-4">
+              <div className="p-5 rounded-2xl border-2 border-dashed border-border space-y-4">
                 <div className="flex items-center gap-2">
-                  <Mail className="h-5 w-5 text-slate-500" />
-                  <h4 className="font-black text-slate-700">Email your child directly</h4>
+                  <Mail className="h-5 w-5 text-muted-foreground" />
+                  <h4 className="font-black text-foreground">Email your child directly</h4>
                 </div>
                 {!emailSent ? (
                   <div className="space-y-2">
-                    <p className="text-xs text-slate-400 leading-relaxed">
+                    <p className="text-xs text-muted-foreground leading-relaxed">
                       Enter your child's email — we'll send them a link to accept your connection request.
                     </p>
                     <div className="flex gap-2">
@@ -303,7 +303,7 @@ export default function ParentSetup() {
                   onValueChange={setTimeLimit}
                   className="py-4"
                 />
-                <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">
+                <div className="flex justify-between text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">
                   <span>15m</span><span>30m</span><span>45m</span><span>60m</span><span>Unlimited</span>
                 </div>
               </div>
@@ -326,10 +326,10 @@ export default function ParentSetup() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 rounded-xl border bg-slate-50">
+                <div className="flex items-center justify-between p-4 rounded-xl border bg-muted">
                   <div>
                     <Label className="text-base font-bold">Weekly Progress Report</Label>
-                    <p className="text-xs text-slate-500">A summary of XP, quests, and games.</p>
+                    <p className="text-xs text-muted-foreground">A summary of XP, quests, and games.</p>
                   </div>
                   <Switch
                     checked={notifs.report}
@@ -337,10 +337,10 @@ export default function ParentSetup() {
                     suppressHydrationWarning
                   />
                 </div>
-                <div className="flex items-center justify-between p-4 rounded-xl border bg-slate-50">
+                <div className="flex items-center justify-between p-4 rounded-xl border bg-muted">
                   <div>
                     <Label className="text-base font-bold">New Badge Alerts</Label>
-                    <p className="text-xs text-slate-500">Get notified when they master a new skill.</p>
+                    <p className="text-xs text-muted-foreground">Get notified when they master a new skill.</p>
                   </div>
                   <Switch
                     checked={notifs.badges}

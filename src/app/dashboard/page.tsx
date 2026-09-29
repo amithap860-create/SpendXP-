@@ -48,7 +48,7 @@ import { trackRankUp } from '@/lib/analytics';
 
 const RadarChart = dynamic(() => import('@/components/charts/RadarChart').then(mod => mod.RadarChart), {
   ssr: false,
-  loading: () => <div className="h-[220px] w-[220px] rounded-full bg-slate-100 animate-pulse" />
+  loading: () => <div className="h-[220px] w-[220px] rounded-full bg-muted animate-pulse" />
 });
 
 export default function DashboardPage() {
@@ -283,7 +283,7 @@ export default function DashboardPage() {
   if (loading) return <DashboardSkeleton />;
 
   return (
-    <div className="min-h-screen-safe bg-slate-50 pb-24 md:pb-8">
+    <div className="min-h-screen-safe bg-background pb-24 md:pb-8">
       {/* First-run intro slides */}
       {showIntroSlides && (
         <IntroSlides
@@ -318,19 +318,19 @@ export default function DashboardPage() {
       <main className="max-w-5xl mx-auto px-4 py-6 space-y-8 animate-in fade-in duration-700">
         
         {/* HERO HEADER */}
-        <section className="bg-white rounded-3xl border-[0.5px] border-slate-200 p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center gap-8 overflow-hidden relative">
+        <section className="bg-card rounded-3xl border-[0.5px] border-border p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center gap-8 overflow-hidden relative">
           <div className="space-y-4 text-center md:text-left flex-1">
             <div>
-              <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
+              <h1 className="text-2xl md:text-3xl font-black text-foreground tracking-tight">
                 {greeting}, {profile?.displayName?.split(' ')?.[0] ?? 'there'}!
               </h1>
-              <p className="text-slate-500 font-medium mt-1 text-sm md:text-base">{subtitle}</p>
+              <p className="text-muted-foreground font-medium mt-1 text-sm md:text-base">{subtitle}</p>
             </div>
             <div className="flex justify-center md:justify-start gap-2">
               <span className="px-3 py-1 bg-primary text-white rounded-full text-[10px] font-black uppercase tracking-widest">
                 {getRankForXP(progression?.totalXP ?? 0).name}
               </span>
-              <span className="px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-[10px] font-black uppercase tracking-widest">
+              <span className="px-3 py-1 bg-muted text-muted-foreground rounded-full text-[10px] font-black uppercase tracking-widest">
                 {profile?.ageGroup ?? 'Student'} • {profile?.birthYear != null ? (new Date().getFullYear() - profile.birthYear) : '8-20'}
               </span>
             </div>
@@ -353,12 +353,12 @@ export default function DashboardPage() {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-xl md:text-2xl font-black text-slate-900">{(progression?.totalXP || 0).toLocaleString()}</span>
-                <span className="text-[9px] font-bold text-slate-400 uppercase">XP</span>
+                <span className="text-xl md:text-2xl font-black text-foreground">{(progression?.totalXP || 0).toLocaleString()}</span>
+                <span className="text-[9px] font-bold text-muted-foreground uppercase">XP</span>
               </div>
             </div>
             <div className="mt-2 text-center">
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">
                 {nextLevelXP > 0
                   ? `/ ${nextLevelXP.toLocaleString()} XP to ${getNextRank(progression?.totalXP ?? 0)?.name ?? 'Next Rank'}`
                   : 'Max Rank Achieved!'}
@@ -378,17 +378,17 @@ export default function DashboardPage() {
           const saga = getCurrentSaga();
           const avatarCfg = getAvatar(profile?.avatarId ?? 'voss');
           return (
-            <section id="tour-storyline" className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+            <section id="tour-storyline" className="bg-card border border-border rounded-3xl overflow-hidden shadow-sm">
               {/* Top accent bar */}
               <div className={cn('h-1 w-full bg-gradient-to-r', avatarCfg.bgGradient)} />
 
               {/* Header row */}
-              <div className="px-5 pt-4 pb-3 flex items-center justify-between border-b border-slate-100">
+              <div className="px-5 pt-4 pb-3 flex items-center justify-between border-b border-border">
                 <div className="flex items-center gap-2">
                   <Scale className="h-3.5 w-3.5 text-primary" />
                   <span className="text-[10px] font-black uppercase tracking-widest text-primary">Order of the Golden Ledger</span>
                   {saga && (
-                    <span className="hidden md:inline text-[9px] font-bold text-slate-400 border border-slate-200 rounded-full px-2 py-0.5 flex items-center gap-1">
+                    <span className="hidden md:inline text-[9px] font-bold text-muted-foreground border border-border rounded-full px-2 py-0.5 flex items-center gap-1">
                       <Flame className="h-2.5 w-2.5 text-amber-500 inline" /> {saga.name}
                     </span>
                   )}
@@ -409,15 +409,15 @@ export default function DashboardPage() {
                       <div className="w-6 h-6 rounded-lg bg-[#E8F5EE] flex items-center justify-center shrink-0">
                         <Award className="h-3.5 w-3.5 text-[#2E7D5A]" />
                       </div>
-                      <span className="text-xl font-black text-slate-900">{rank.name}</span>
-                      <span className="text-xs font-bold text-slate-400 border border-slate-200 rounded-full px-2 py-0.5">{rank.district}</span>
+                      <span className="text-xl font-black text-foreground">{rank.name}</span>
+                      <span className="text-xs font-bold text-muted-foreground border border-border rounded-full px-2 py-0.5">{rank.district}</span>
                     </div>
                     {/* XP progress */}
                     <div className="mt-1.5 space-y-1">
-                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-2 bg-muted rounded-full overflow-hidden">
                         <div className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-700" style={{ width: `${rankPct}%` }} />
                       </div>
-                      <div className="flex justify-between text-[9px] font-bold text-slate-400">
+                      <div className="flex justify-between text-[9px] font-bold text-muted-foreground">
                         <span>{totalXP.toLocaleString()} XP</span>
                         {nextRank
                           ? <span>{(nextRank.minXP - totalXP).toLocaleString()} XP to {nextRank.name}</span>
@@ -429,12 +429,12 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Story brief */}
-                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                <div className="bg-muted rounded-2xl p-4 border border-border">
                   <div className="flex items-center gap-1.5 mb-1">
                     <BookOpen className="h-3 w-3 text-primary" />
                     <p className="text-[10px] font-black uppercase tracking-widest text-primary">Mission Brief</p>
                   </div>
-                  <p className="text-sm font-medium text-slate-700 leading-relaxed italic">"{rank.storyLine}"</p>
+                  <p className="text-sm font-medium text-foreground leading-relaxed italic">"{rank.storyLine}"</p>
                 </div>
 
                 {/* Active Fog enemy — description + weakness */}
@@ -446,17 +446,17 @@ export default function DashboardPage() {
                       </div>
                       <div>
                         <p className="text-[10px] font-black uppercase tracking-widest text-amber-600">Active Threat</p>
-                        <p className="text-sm font-black text-slate-800">{fog.name}</p>
+                        <p className="text-sm font-black text-foreground">{fog.name}</p>
                       </div>
                     </div>
-                    <p className="text-xs text-slate-600 leading-relaxed">{fog.description}</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{fog.description}</p>
                   </div>
                   <div className="bg-[#F0FAF5] border border-[#A8D5BC] rounded-2xl p-4">
                     <div className="flex items-center gap-1.5 mb-2">
                       <ShieldCheck className="h-3 w-3 text-primary" />
                       <p className="text-[9px] font-black uppercase tracking-widest text-primary">Counter</p>
                     </div>
-                    <p className="text-xs text-slate-700 leading-relaxed font-medium">{fog.weakness}</p>
+                    <p className="text-xs text-foreground leading-relaxed font-medium">{fog.weakness}</p>
                   </div>
                 </div>
 
@@ -470,7 +470,7 @@ export default function DashboardPage() {
                   </Link>
                   <Link
                     href="/story"
-                    className="h-10 px-4 border border-slate-200 text-slate-600 text-xs font-black uppercase tracking-widest rounded-xl flex items-center justify-center hover:bg-slate-50 transition-colors"
+                    className="h-10 px-4 border border-border text-muted-foreground text-xs font-black uppercase tracking-widest rounded-xl flex items-center justify-center hover:bg-muted transition-colors"
                   >
                     The Lore
                   </Link>
@@ -494,9 +494,9 @@ export default function DashboardPage() {
               label: 'Lessons Done', val: `${completedLessonsCount} / ${lessons.length}`
             },
           ].map((stat, i) => (
-            <div key={i} className="bg-white p-3 md:p-5 rounded-2xl border-[0.5px] border-slate-200 shadow-sm text-center space-y-1">
+            <div key={i} className="bg-card p-3 md:p-5 rounded-2xl border-[0.5px] border-border shadow-sm text-center space-y-1">
               <div className="flex items-center justify-center gap-2">
-                <span className={cn("font-black text-slate-900", stat.smallVal ? "text-lg md:text-xl" : "text-xl md:text-2xl")}>{stat.val}</span>
+                <span className={cn("font-black text-foreground", stat.smallVal ? "text-lg md:text-xl" : "text-xl md:text-2xl")}>{stat.val}</span>
                 {stat.icon && (
                   <div className="w-3 h-4 md:w-4 md:h-5 relative">
                     <div className="absolute bottom-0 left-0 w-full h-full bg-[#1A1F2E] rounded-t-full rounded-br-full -rotate-45" />
@@ -504,7 +504,7 @@ export default function DashboardPage() {
                   </div>
                 )}
               </div>
-              <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
+              <p className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest">{stat.label}</p>
             </div>
           ))}
         </section>
@@ -512,7 +512,7 @@ export default function DashboardPage() {
         {/* CONTINUE PLAYING */}
         <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base md:text-lg font-black text-slate-900 uppercase tracking-tight">Continue playing</h2>
+            <h2 className="text-base md:text-lg font-black text-foreground uppercase tracking-tight">Continue playing</h2>
             <Link href="/games" className="text-xs font-bold text-primary hover:underline">View all</Link>
           </div>
           <div className="flex overflow-x-auto pb-4 gap-4 no-scrollbar snap-x snap-mandatory md:grid md:grid-cols-3 md:overflow-visible">
@@ -520,11 +520,11 @@ export default function DashboardPage() {
               <Link 
                 key={game.id} 
                 href={`/games?game=${game.id}`}
-                className="flex-shrink-0 w-[160px] h-[120px] md:w-full md:h-[140px] bg-white rounded-2xl border-[0.5px] border-slate-200 p-4 md:p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group snap-start"
+                className="flex-shrink-0 w-[160px] h-[120px] md:w-full md:h-[140px] bg-card rounded-2xl border-[0.5px] border-border p-4 md:p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group snap-start"
               >
                 <div>
-                  <h3 className="font-bold text-slate-900 text-xs md:text-sm group-hover:text-primary transition-colors line-clamp-1">{game.name}</h3>
-                  <p className="text-[10px] md:text-xs text-slate-400 font-medium">
+                  <h3 className="font-bold text-foreground text-xs md:text-sm group-hover:text-primary transition-colors line-clamp-1">{game.name}</h3>
+                  <p className="text-[10px] md:text-xs text-muted-foreground font-medium">
                     Best: {gameScores?.[game.id as keyof GameScores]?.highScore || 'Not played'}
                   </p>
                 </div>
@@ -532,7 +532,7 @@ export default function DashboardPage() {
                   <div className="flex gap-1">
                     <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                     <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                    <div className="w-1.5 h-1.5 rounded-full bg-slate-200" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-muted" />
                   </div>
                   <span className="text-[10px] font-black text-primary group-hover:translate-x-1 transition-transform">Play →</span>
                 </div>
@@ -543,20 +543,20 @@ export default function DashboardPage() {
 
         <div className="grid md:grid-cols-2 gap-6 md:gap-8">
           {/* KNOWLEDGE RADAR */}
-          <section className="bg-white rounded-3xl border-[0.5px] border-slate-200 p-6 md:p-8 shadow-sm flex flex-col items-center">
-            <h2 className="w-full text-xs md:text-sm font-black text-slate-900 uppercase tracking-tight mb-6 md:mb-8">Financial knowledge</h2>
+          <section className="bg-card rounded-3xl border-[0.5px] border-border p-6 md:p-8 shadow-sm flex flex-col items-center">
+            <h2 className="w-full text-xs md:text-sm font-black text-foreground uppercase tracking-tight mb-6 md:mb-8">Financial knowledge</h2>
             {strengths ? (
               <>
                 <RadarChart scores={strengths} size={radarSize} />
                 <div className="w-full mt-6 md:mt-8 grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <p className="text-[10px] md:text-xs font-black text-slate-400 uppercase">Strongest</p>
+                    <p className="text-[10px] md:text-xs font-black text-muted-foreground uppercase">Strongest</p>
                     <span className="px-2 py-1 bg-primary/5 text-primary rounded-lg text-[10px] md:text-xs font-black uppercase">
                       {Object.entries(strengths).sort((a,b) => b[1]-a[1])[0][0]}
                     </span>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[10px] md:text-xs font-black text-slate-400 uppercase">Focus next</p>
+                    <p className="text-[10px] md:text-xs font-black text-muted-foreground uppercase">Focus next</p>
                     <span className="px-2 py-1 bg-rose-50 text-rose-600 rounded-lg text-[10px] md:text-xs font-black uppercase">
                       {Object.entries(strengths).sort((a,b) => a[1]-b[1])[0][0]}
                     </span>
@@ -570,25 +570,25 @@ export default function DashboardPage() {
 
           {/* DAILY CHALLENGE */}
           <section className="space-y-4">
-            <h2 className="text-xs md:text-sm font-black text-slate-900 uppercase tracking-tight">Today's challenge</h2>
-            <div className="bg-white rounded-3xl border-[0.5px] border-l-4 border-l-primary border-slate-200 p-6 md:p-8 shadow-sm space-y-6">
+            <h2 className="text-xs md:text-sm font-black text-foreground uppercase tracking-tight">Today's challenge</h2>
+            <div className="bg-card rounded-3xl border-[0.5px] border-l-4 border-l-primary border-border p-6 md:p-8 shadow-sm space-y-6">
               {dailyRank ? (
                 <div className="flex items-center gap-4">
                   <div className="h-10 w-10 md:h-12 md:w-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
                     <div className="w-5 h-5 md:w-6 md:h-6 border-4 border-primary rounded-full border-t-transparent -rotate-45" />
                   </div>
                   <div>
-                    <h3 className="font-black text-slate-900 text-sm md:text-base">Completed today!</h3>
-                    <p className="text-[10px] md:text-xs text-slate-500 font-medium">You scored {dailyRank.score} · Rank #{dailyRank.rank}</p>
+                    <h3 className="font-black text-foreground text-sm md:text-base">Completed today!</h3>
+                    <p className="text-[10px] md:text-xs text-muted-foreground font-medium">You scored {dailyRank.score} · Rank #{dailyRank.rank}</p>
                   </div>
                 </div>
               ) : (
                 <>
                   <div className="space-y-1">
-                    <h3 className="text-lg md:text-xl font-black text-slate-900">FinIQ Daily Blitz</h3>
-                    <p className="text-xs md:text-sm text-slate-500 font-medium leading-tight">Same questions for everyone — see how you rank against other users.</p>
+                    <h3 className="text-lg md:text-xl font-black text-foreground">FinIQ Daily Blitz</h3>
+                    <p className="text-xs md:text-sm text-muted-foreground font-medium leading-tight">Same questions for everyone — see how you rank against other users.</p>
                   </div>
-                  <div className="flex items-center justify-between text-[10px] md:text-xs font-bold text-slate-400">
+                  <div className="flex items-center justify-between text-[10px] md:text-xs font-bold text-muted-foreground">
                     <span className="flex items-center gap-1"><Flame className="h-3 w-3 text-rose-500" /> {dailyParticipantCount} players today</span>
                     <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {timeLeft} left</span>
                   </div>
@@ -613,14 +613,14 @@ export default function DashboardPage() {
 function DashboardSkeleton() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 space-y-8 animate-pulse">
-      <div className="h-40 md:h-48 bg-white rounded-3xl border border-slate-100" />
+      <div className="h-40 md:h-48 bg-card rounded-3xl border border-border" />
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[1,2,3,4].map(i => <div key={i} className="h-20 md:h-24 bg-white rounded-2xl border border-slate-100" />)}
+        {[1,2,3,4].map(i => <div key={i} className="h-20 md:h-24 bg-card rounded-2xl border border-border" />)}
       </div>
       <div className="space-y-4">
-        <div className="h-4 w-32 bg-slate-200 rounded" />
+        <div className="h-4 w-32 bg-muted rounded" />
         <div className="flex gap-4 overflow-hidden">
-          {[1,2,3].map(i => <div key={i} className="min-w-[160px] h-[120px] md:min-w-[200px] md:h-[140px] bg-white rounded-2xl border border-slate-100" />)}
+          {[1,2,3].map(i => <div key={i} className="min-w-[160px] h-[120px] md:min-w-[200px] md:h-[140px] bg-card rounded-2xl border border-border" />)}
         </div>
       </div>
     </div>

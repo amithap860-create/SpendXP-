@@ -134,9 +134,9 @@ function ResetPasswordContent() {
           <div className="w-9 h-9 bg-[#1A1F2E] rounded-xl flex items-center justify-center shadow-md">
             <span className="text-[16px] leading-none select-none" style={{ color: '#4EA07A' }}>⚖</span>
           </div>
-          <span className="font-black text-2xl tracking-tighter text-slate-900">Spend<span style={{ color: '#2E7D5A' }}>XP</span></span>
+          <span className="font-black text-2xl tracking-tighter text-foreground">Spend<span style={{ color: '#2E7D5A' }}>XP</span></span>
         </div>
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-8">
+        <div className="bg-card rounded-2xl border border-border shadow-sm p-8">
           {children}
         </div>
       </div>
@@ -148,10 +148,10 @@ function ResetPasswordContent() {
     return (
       <Shell>
         <div className="text-center space-y-3">
-          <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto animate-pulse">
-            <Lock className="w-6 h-6 text-slate-400" />
+          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto animate-pulse">
+            <Lock className="w-6 h-6 text-muted-foreground" />
           </div>
-          <p className="text-sm text-slate-500">Verifying your link…</p>
+          <p className="text-sm text-muted-foreground">Verifying your link…</p>
         </div>
       </Shell>
     );
@@ -165,8 +165,8 @@ function ResetPasswordContent() {
           <div className="w-14 h-14 rounded-full bg-[#E8F5EE] flex items-center justify-center mx-auto">
             <CheckCircle2 className="w-7 h-7 text-[#2E7D5A]" />
           </div>
-          <h1 className="text-xl font-black text-slate-900">Done!</h1>
-          <p className="text-sm text-slate-500 leading-relaxed">{message}</p>
+          <h1 className="text-xl font-black text-foreground">Done!</h1>
+          <p className="text-sm text-muted-foreground leading-relaxed">{message}</p>
           <Link href="/login" className="block w-full text-center py-3 rounded-xl bg-[#1A1F2E] text-white text-sm font-black uppercase tracking-widest hover:bg-[#252B3B] transition-colors mt-2">
             Go to Login
           </Link>
@@ -183,8 +183,8 @@ function ResetPasswordContent() {
           <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto">
             <AlertCircle className="w-7 h-7 text-red-500" />
           </div>
-          <h1 className="text-xl font-black text-slate-900">Link Invalid</h1>
-          <p className="text-sm text-slate-500 leading-relaxed">{error}</p>
+          <h1 className="text-xl font-black text-foreground">Link Invalid</h1>
+          <p className="text-sm text-muted-foreground leading-relaxed">{error}</p>
           <Link href="/forgot-password" className="block w-full text-center py-3 rounded-xl bg-[#1A1F2E] text-white text-sm font-black uppercase tracking-widest hover:bg-[#252B3B] transition-colors mt-2">
             Request New Link
           </Link>
@@ -198,9 +198,9 @@ function ResetPasswordContent() {
     <Shell>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 mb-1">New Password</h1>
+          <h1 className="text-2xl font-black text-foreground mb-1">New Password</h1>
           {email && (
-            <p className="text-xs text-slate-400">for <span className="font-bold text-slate-600">{email}</span></p>
+            <p className="text-xs text-muted-foreground">for <span className="font-bold text-foreground">{email}</span></p>
           )}
         </div>
 
@@ -213,7 +213,7 @@ function ResetPasswordContent() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
-            <Label htmlFor="pw" className="text-xs font-bold uppercase tracking-widest text-slate-500">
+            <Label htmlFor="pw" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
               New Password
             </Label>
             <div className="relative">
@@ -230,16 +230,16 @@ function ResetPasswordContent() {
               <button
                 type="button"
                 onClick={() => setShowPw(v => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
                 {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-            <p className="text-[10px] text-slate-400">Min 8 chars · uppercase · lowercase · number</p>
+            <p className="text-[10px] text-muted-foreground">Min 8 chars · uppercase · lowercase · number</p>
           </div>
 
           <div className="space-y-1">
-            <Label htmlFor="confirm" className="text-xs font-bold uppercase tracking-widest text-slate-500">
+            <Label htmlFor="confirm" className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
               Confirm Password
             </Label>
             <Input
@@ -263,7 +263,7 @@ function ResetPasswordContent() {
           </Button>
         </form>
 
-        <p className="text-center text-xs text-slate-400">
+        <p className="text-center text-xs text-muted-foreground">
           Remembered it?{' '}
           <Link href="/login" className="text-primary font-bold hover:underline">Sign in</Link>
         </p>

@@ -153,7 +153,7 @@ export default function SupportPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-3xl mx-auto px-4 py-12 md:py-16 space-y-16">
 
         {/* Header */}
@@ -161,8 +161,8 @@ export default function SupportPage() {
           <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm font-bold text-primary mb-6 hover:underline">
             ← Back to SpendXP
           </Link>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Help & Support</h1>
-          <p className="text-slate-500 mt-2 font-medium text-base">
+          <h1 className="text-4xl font-black text-foreground tracking-tight">Help & Support</h1>
+          <p className="text-muted-foreground mt-2 font-medium text-base">
             Find answers below or send us a message — we typically reply within 24 hours.
           </p>
         </div>
@@ -180,17 +180,17 @@ export default function SupportPage() {
             <Link
               key={link.href}
               href={link.href}
-              className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3 hover:border-primary hover:shadow-sm transition-all group"
+              className="bg-card border border-border rounded-2xl p-4 flex items-center gap-3 hover:border-primary hover:shadow-sm transition-all group"
             >
               <span className="text-xl">{link.emoji}</span>
-              <span className="text-sm font-bold text-slate-700 group-hover:text-primary transition-colors">{link.label}</span>
+              <span className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{link.label}</span>
             </Link>
           ))}
         </div>
 
         {/* FAQ */}
         <div className="space-y-8">
-          <h2 className="text-2xl font-black text-slate-900">Frequently Asked Questions</h2>
+          <h2 className="text-2xl font-black text-foreground">Frequently Asked Questions</h2>
           {FAQS.map(section => (
             <div key={section.category}>
               <h3 className="text-xs font-black uppercase tracking-widest text-primary mb-3">{section.category}</h3>
@@ -199,13 +199,13 @@ export default function SupportPage() {
                   const key = `${section.category}-${idx}`;
                   const isOpen = openItem === key;
                   return (
-                    <div key={key} className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+                    <div key={key} className="bg-card border border-border rounded-2xl overflow-hidden">
                       <button
                         onClick={() => toggle(key)}
-                        className="w-full px-6 py-4 text-left flex items-start justify-between gap-4 hover:bg-slate-50 transition-colors"
+                        className="w-full px-6 py-4 text-left flex items-start justify-between gap-4 hover:bg-muted transition-colors"
                       >
-                        <span className="text-sm font-bold text-slate-800">{item.q}</span>
-                        <span className={`text-slate-400 flex-shrink-0 transition-transform duration-200 mt-0.5 ${isOpen ? 'rotate-45' : ''}`}>
+                        <span className="text-sm font-bold text-foreground">{item.q}</span>
+                        <span className={`text-muted-foreground flex-shrink-0 transition-transform duration-200 mt-0.5 ${isOpen ? 'rotate-45' : ''}`}>
                           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                             <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                           </svg>
@@ -213,7 +213,7 @@ export default function SupportPage() {
                       </button>
                       {isOpen && (
                         <div className="px-6 pb-5">
-                          <p className="text-sm text-slate-600 leading-relaxed">{item.a}</p>
+                          <p className="text-sm text-muted-foreground leading-relaxed">{item.a}</p>
                         </div>
                       )}
                     </div>
@@ -225,10 +225,10 @@ export default function SupportPage() {
         </div>
 
         {/* Contact form */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-8 md:p-10 space-y-6">
+        <div className="bg-card border border-border rounded-3xl p-8 md:p-10 space-y-6">
           <div>
-            <h2 className="text-2xl font-black text-slate-900">Contact Us</h2>
-            <p className="text-slate-500 text-sm mt-1 font-medium">
+            <h2 className="text-2xl font-black text-foreground">Contact Us</h2>
+            <p className="text-muted-foreground text-sm mt-1 font-medium">
               Can&apos;t find your answer above? Send us a message and we&apos;ll get back to you.
             </p>
           </div>
@@ -236,40 +236,40 @@ export default function SupportPage() {
           {submitted ? (
             <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 text-center space-y-2">
               <div className="text-3xl">✅</div>
-              <p className="font-black text-slate-900">Message sent!</p>
-              <p className="text-sm text-slate-500">We typically reply within 24 hours. Check your email for a confirmation.</p>
+              <p className="font-black text-foreground">Message sent!</p>
+              <p className="text-sm text-muted-foreground">We typically reply within 24 hours. Check your email for a confirmation.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-widest text-slate-500">Name *</label>
+                  <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Name *</label>
                   <input
                     type="text"
                     value={formState.name}
                     onChange={e => setFormState(s => ({ ...s, name: e.target.value }))}
                     placeholder="Your name"
-                    className="w-full h-11 px-4 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-primary bg-slate-50 transition-colors"
+                    className="w-full h-11 px-4 rounded-xl border border-border text-sm text-foreground focus:outline-none focus:border-primary bg-muted transition-colors"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-widest text-slate-500">Email *</label>
+                  <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Email *</label>
                   <input
                     type="email"
                     value={formState.email}
                     onChange={e => setFormState(s => ({ ...s, email: e.target.value }))}
                     placeholder="your@email.com"
-                    className="w-full h-11 px-4 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-primary bg-slate-50 transition-colors"
+                    className="w-full h-11 px-4 rounded-xl border border-border text-sm text-foreground focus:outline-none focus:border-primary bg-muted transition-colors"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-widest text-slate-500">Category</label>
+                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Category</label>
                 <select
                   value={formState.category}
                   onChange={e => setFormState(s => ({ ...s, category: e.target.value }))}
-                  className="w-full h-11 px-4 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-primary bg-slate-50 transition-colors"
+                  className="w-full h-11 px-4 rounded-xl border border-border text-sm text-foreground focus:outline-none focus:border-primary bg-muted transition-colors"
                 >
                   <option value="">Select a category</option>
                   <option value="account">Account / Login</option>
@@ -282,13 +282,13 @@ export default function SupportPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-widest text-slate-500">Message *</label>
+                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Message *</label>
                 <textarea
                   value={formState.message}
                   onChange={e => setFormState(s => ({ ...s, message: e.target.value }))}
                   placeholder="Describe your issue or question in detail..."
                   rows={5}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-primary bg-slate-50 transition-colors resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-border text-sm text-foreground focus:outline-none focus:border-primary bg-muted transition-colors resize-none"
                 />
               </div>
 
@@ -304,7 +304,7 @@ export default function SupportPage() {
                 {submitting ? 'Sending…' : 'Send Message'}
               </button>
 
-              <p className="text-xs text-slate-400 text-center font-medium">
+              <p className="text-xs text-muted-foreground text-center font-medium">
                 Or email us directly at{' '}
                 <a href="mailto:support@spendxp.app" className="text-primary hover:underline font-bold">
                   support@spendxp.app
@@ -315,7 +315,7 @@ export default function SupportPage() {
         </div>
 
         {/* Footer note */}
-        <p className="text-xs text-slate-400 text-center font-medium pb-8">
+        <p className="text-xs text-muted-foreground text-center font-medium pb-8">
           SpendXP · Financial literacy for the next generation ·{' '}
           <Link href="/privacy" className="hover:underline">Privacy</Link> ·{' '}
           <Link href="/terms" className="hover:underline">Terms</Link>

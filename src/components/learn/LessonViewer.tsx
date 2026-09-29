@@ -97,7 +97,7 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
             {segments.map((s: any, i: number) => (
               <div key={i} className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: s.color }} />
-                <span className="text-xs font-bold uppercase text-slate-500">{s.label} ({s.value}%)</span>
+                <span className="text-xs font-bold uppercase text-muted-foreground">{s.label} ({s.value}%)</span>
               </div>
             ))}
           </div>
@@ -111,11 +111,11 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
         <div className="space-y-4 py-6 w-full max-w-sm mx-auto">
           {items.map((item: any, i: number) => (
             <div key={i} className="space-y-1">
-              <div className="flex justify-between text-xs font-black uppercase text-slate-400">
+              <div className="flex justify-between text-xs font-black uppercase text-muted-foreground">
                 <span>{item.label}</span>
                 <span>{item.value}%</span>
               </div>
-              <div className="h-4 w-full bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-4 w-full bg-muted rounded-full overflow-hidden">
                 <div 
                   className="h-full transition-all duration-1000" 
                   style={{ width: `${item.value}%`, backgroundColor: item.color }} 
@@ -132,7 +132,7 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
       const pathData = `M ${points.map((p: any) => `${p.x * 10},${100 - p.y / 8}`).join(' L ')}`;
       return (
         <div className="py-6 flex flex-col items-center">
-          <div className="relative w-full h-40 bg-slate-50 rounded-xl border p-4">
+          <div className="relative w-full h-40 bg-muted rounded-xl border p-4">
             <svg viewBox="0 0 200 100" className="w-full h-full overflow-visible">
               <path d={pathData} fill="none" stroke="#2e72db" strokeWidth="4" strokeLinecap="round" className="animate-draw" />
               {points.map((p: any, i: number) => (
@@ -140,7 +140,7 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
               ))}
             </svg>
           </div>
-          <p className="text-xs font-bold text-slate-400 mt-2 uppercase">{card.visualData.label}</p>
+          <p className="text-xs font-bold text-muted-foreground mt-2 uppercase">{card.visualData.label}</p>
         </div>
       );
     }
@@ -153,13 +153,13 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
             <div className="flex-1 w-full flex items-end justify-center">
               <div className="w-12 rounded-t-xl animate-in slide-in-from-bottom duration-1000" style={{ height: `${left.value}%`, backgroundColor: left.color }} />
             </div>
-            <div className="text-center font-black text-xs uppercase text-slate-500">{left.label}</div>
+            <div className="text-center font-black text-xs uppercase text-muted-foreground">{left.label}</div>
           </div>
           <div className="flex flex-col items-center gap-4">
             <div className="flex-1 w-full flex items-end justify-center">
               <div className="w-12 rounded-t-xl animate-in slide-in-from-bottom duration-1000" style={{ height: `${right.value}%`, backgroundColor: right.color }} />
             </div>
-            <div className="text-center font-black text-xs uppercase text-slate-500">{right.label}</div>
+            <div className="text-center font-black text-xs uppercase text-muted-foreground">{right.label}</div>
           </div>
         </div>
       );
@@ -170,10 +170,10 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
 
   return (
     <div className="fixed inset-0 z-[9999] bg-background flex flex-col">
-      <header className="p-4 border-b bg-white flex items-center justify-between">
+      <header className="p-4 border-b bg-card flex items-center justify-between">
         <Button variant="ghost" size="icon" onClick={onClose}><ChevronLeft className="h-6 w-6" /></Button>
         <div className="flex-1 px-8 space-y-2">
-          <div className="flex justify-between text-[10px] font-black uppercase text-slate-400">
+          <div className="flex justify-between text-[10px] font-black uppercase text-muted-foreground">
             <span>{lesson.title}</span>
             <span>{Math.round(progress)}%</span>
           </div>
@@ -195,7 +195,7 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
         </div>
       )}
 
-      <main className="flex-1 overflow-y-auto relative bg-slate-50 p-4 md:p-8 flex items-center justify-center">
+      <main className="flex-1 overflow-y-auto relative bg-background p-4 md:p-8 flex items-center justify-center">
         <div className="max-w-2xl w-full">
           {isBriefStep && lesson.briefs?.length ? (
             <Card className="border-none shadow-2xl overflow-hidden animate-in fade-in slide-in-from-right-8 duration-500">
@@ -210,7 +210,7 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
                 <p className="text-xs text-[#A8D5BC] mt-1">{briefIndex + 1} of {lesson.briefs.length}</p>
               </div>
               <CardContent className="p-8 space-y-6">
-                <p className="text-lg font-bold text-slate-800 leading-relaxed text-center">{lesson.briefs[briefIndex].fact}</p>
+                <p className="text-lg font-bold text-foreground leading-relaxed text-center">{lesson.briefs[briefIndex].fact}</p>
                 <div className="flex gap-3">
                   {briefIndex > 0 && (
                     <Button variant="outline" onClick={() => setBriefIndex(i => i - 1)} className="flex-none h-12 px-6 font-bold">Back</Button>
@@ -231,7 +231,7 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
                 </h2>
                 
                 <p className={cn(
-                  "text-slate-600 leading-relaxed",
+                  "text-muted-foreground leading-relaxed",
                   ageGroup === 'junior' ? "text-xl font-medium" : "text-lg"
                 )}>
                   {lesson.cards[currentStep].body[ageGroup]}
@@ -243,7 +243,7 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
                   <div className="text-[10px] font-black uppercase text-primary tracking-widest flex items-center gap-2">
                     <CheckCircle2 className="h-3 w-3" /> Real Life Example
                   </div>
-                  <p className="text-sm font-bold text-slate-700 leading-relaxed italic">
+                  <p className="text-sm font-bold text-foreground leading-relaxed italic">
                     "{lesson.cards[currentStep].example[ageGroup]}"
                   </p>
                 </div>
@@ -266,7 +266,7 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
                 <p className="text-primary-foreground/80">Confirm your knowledge to earn {lesson.cards.reduce((acc, c) => acc + c.xpReward, 0)} XP!</p>
               </div>
               <CardContent className="p-8 md:p-12 space-y-8">
-                <h3 className="text-2xl font-bold text-slate-900 leading-tight">
+                <h3 className="text-2xl font-bold text-foreground leading-tight">
                   {lesson.quizCard.question}
                 </h3>
 
@@ -279,7 +279,7 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
                       className={cn(
                         "w-full p-5 text-left rounded-xl border-2 transition-all flex items-center justify-between",
                         !showQuizResult 
-                          ? "hover:border-primary hover:bg-primary/5 border-slate-100" 
+                          ? "hover:border-primary hover:bg-primary/5 border-border"
                           : i === lesson.quizCard.correctIndex 
                             ? "bg-[#E8F5EE] border-[#2E7D5A] text-[#1A1F2E]"
                             : selectedQuizIndex === i 
@@ -295,12 +295,12 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
 
                 {showQuizResult && (
                   <div className="animate-in slide-in-from-top-4 duration-500 space-y-6">
-                    <div className="p-6 rounded-2xl bg-slate-50 border-2 border-slate-100 flex items-start gap-4">
-                      <div className="h-10 w-10 rounded-full bg-white shadow-sm flex items-center justify-center shrink-0">
+                    <div className="p-6 rounded-2xl bg-muted border-2 border-border flex items-start gap-4">
+                      <div className="h-10 w-10 rounded-full bg-card shadow-sm flex items-center justify-center shrink-0">
                         <Info className="h-5 w-5 text-primary" />
                       </div>
                       <div className="space-y-2">
-                        <p className="text-sm font-medium text-slate-600 leading-relaxed">
+                        <p className="text-sm font-medium text-muted-foreground leading-relaxed">
                           {lesson.quizCard.explanation}
                         </p>
                         <LearnMoreLink href="/learn" label="Explore more lessons" variant="chip" />

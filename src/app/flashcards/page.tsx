@@ -61,7 +61,7 @@ export default function Flashcards() {
     <div className="flex min-h-screen bg-background">
       <main className="flex-1 p-4 md:p-8 flex flex-col items-center justify-center max-w-4xl mx-auto">
         <div className="text-center mb-12 w-full">
-          <div className="inline-flex items-center gap-2 bg-white px-3 py-1 rounded-full border mb-4 text-xs font-bold text-accent">
+          <div className="inline-flex items-center gap-2 bg-card px-3 py-1 rounded-full border mb-4 text-xs font-bold text-accent">
             <Zap className="h-3 w-3" />
             AI-TAILORED FOR YOUR AGE ({age})
           </div>
@@ -82,7 +82,7 @@ export default function Flashcards() {
             >
               <div className={`relative w-full h-full transition-all duration-500 preserve-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
                 {/* Front */}
-                <Card className="absolute inset-0 w-full h-full backface-hidden flex flex-col items-center justify-center p-8 text-center shadow-xl border-none bg-white">
+                <Card className="absolute inset-0 w-full h-full backface-hidden flex flex-col items-center justify-center p-8 text-center shadow-xl border-none bg-card">
                   <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-6">Term</span>
                   <h3 className="text-3xl font-extrabold text-primary">{flashcards[currentIndex].term}</h3>
                   <p className="mt-8 text-sm text-accent font-bold">Click to flip</p>

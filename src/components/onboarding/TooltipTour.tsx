@@ -216,7 +216,7 @@ export function TooltipTour({ onComplete }: TooltipTourProps) {
       {/* Tooltip card */}
       <div
         className={cn(
-          'fixed z-[9002] bg-white rounded-2xl shadow-2xl border border-slate-100 p-5 transition-all duration-150',
+          'fixed z-[9002] bg-card rounded-2xl shadow-2xl border border-border p-5 transition-all duration-150',
           visible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
         )}
         style={{
@@ -240,7 +240,7 @@ export function TooltipTour({ onComplete }: TooltipTourProps) {
           </div>
           <button
             onClick={skip}
-            className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors"
+            className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
           >
             Skip
           </button>
@@ -250,8 +250,8 @@ export function TooltipTour({ onComplete }: TooltipTourProps) {
         <div className="flex items-start gap-3 mb-4">
           <span className="text-2xl">{currentStep.emoji}</span>
           <div>
-            <h3 className="text-sm font-black text-slate-900 mb-1">{currentStep.title}</h3>
-            <p className="text-xs text-slate-500 leading-relaxed">{currentStep.body}</p>
+            <h3 className="text-sm font-black text-foreground mb-1">{currentStep.title}</h3>
+            <p className="text-xs text-muted-foreground leading-relaxed">{currentStep.body}</p>
           </div>
         </div>
 

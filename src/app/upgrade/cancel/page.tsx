@@ -8,28 +8,28 @@ import { XCircle, ArrowLeft, Star } from 'lucide-react';
 export default function UpgradeCancelPage() {
   const router = useRouter();
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="max-w-md w-full text-center space-y-8">
 
-        <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto">
-          <XCircle className="h-10 w-10 text-slate-400" />
+        <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto">
+          <XCircle className="h-10 w-10 text-muted-foreground" />
         </div>
 
         <div className="space-y-3">
-          <h1 className="text-3xl font-black text-slate-900">No worries!</h1>
-          <p className="text-slate-500 text-base leading-relaxed">
+          <h1 className="text-3xl font-black text-foreground">No worries!</h1>
+          <p className="text-muted-foreground text-base leading-relaxed">
             Your subscription wasn't started and you haven't been charged.
             You can upgrade any time from the Games page.
           </p>
         </div>
 
         {/* Mini pitch */}
-        <div className="bg-white rounded-2xl shadow-md p-6 text-left space-y-4 border border-slate-100">
+        <div className="bg-card rounded-2xl shadow-md p-6 text-left space-y-4 border border-border">
           <div className="flex items-center gap-2">
             <Star className="h-5 w-5 text-amber-400 fill-amber-400" />
-            <span className="font-black text-slate-700 text-sm">Reminder — Premium unlocks:</span>
+            <span className="font-black text-foreground text-sm">Reminder — Premium unlocks:</span>
           </div>
-          <ul className="space-y-2 text-sm text-slate-600">
+          <ul className="space-y-2 text-sm text-muted-foreground">
             {[
               'Unlimited quests per day',
               'Stock Market Simulator & Credit Score Builder',
@@ -43,7 +43,7 @@ export default function UpgradeCancelPage() {
               </li>
             ))}
           </ul>
-          <p className="text-xs text-slate-400 text-center pt-1">
+          <p className="text-xs text-muted-foreground text-center pt-1">
             From ₹149/mo · Cancel anytime · No contracts
           </p>
         </div>

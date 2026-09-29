@@ -161,7 +161,7 @@ export function MiniCalc({ onInsert, className }: MiniCalcProps) {
           'h-8 w-8 rounded-lg flex items-center justify-center transition-colors',
           open
             ? 'bg-primary text-white'
-            : 'bg-slate-100 text-slate-500 hover:bg-primary/10 hover:text-primary'
+            : 'bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary'
         )}
         title="Open mini calculator"
         suppressHydrationWarning
@@ -170,7 +170,7 @@ export function MiniCalc({ onInsert, className }: MiniCalcProps) {
       </button>
 
       {open && (
-        <div className="absolute bottom-full right-0 mb-2 z-50 w-52 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in slide-in-from-bottom-2 duration-150">
+        <div className="absolute bottom-full right-0 mb-2 z-50 w-52 bg-card rounded-2xl shadow-2xl border border-border overflow-hidden animate-in slide-in-from-bottom-2 duration-150">
           {/* Header */}
           <div className="flex items-center justify-between px-3 py-2 bg-slate-900">
             <div className="flex items-center gap-1 text-white">
@@ -206,8 +206,8 @@ export function MiniCalc({ onInsert, className }: MiniCalcProps) {
                     isEq && 'bg-primary text-white hover:bg-primary/90',
                     isOp && 'bg-[#E8F5EE] text-[#2E7D5A] hover:bg-[#C8E8D8]',
                     isClear && 'bg-rose-50 text-rose-600 hover:bg-rose-100',
-                    isDel && 'bg-slate-100 text-slate-600 hover:bg-slate-200',
-                    !isOp && !isEq && !isClear && !isDel && 'bg-slate-50 text-slate-800 hover:bg-slate-100'
+                    isDel && 'bg-muted text-muted-foreground hover:bg-slate-200',
+                    !isOp && !isEq && !isClear && !isDel && 'bg-muted text-foreground hover:bg-slate-100'
                   )}
                   suppressHydrationWarning
                 >

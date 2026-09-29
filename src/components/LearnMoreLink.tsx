@@ -56,7 +56,7 @@ export function LearnMoreLink({ label = 'Learn more', href, description, variant
         href={href}
         {...linkProps}
         className={cn(
-          'flex items-center gap-3 p-3 rounded-xl border bg-white hover:shadow-md transition-shadow group',
+          'flex items-center gap-3 p-3 rounded-xl border bg-card hover:shadow-md transition-shadow group',
           className
         )}
       >
@@ -65,12 +65,12 @@ export function LearnMoreLink({ label = 'Learn more', href, description, variant
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-xs font-black text-primary">{label}</div>
-          {description && <div className="text-[10px] text-slate-500 truncate">{description}</div>}
+          {description && <div className="text-[10px] text-muted-foreground truncate">{description}</div>}
         </div>
         {isExternal ? (
-          <ExternalLink className="h-4 w-4 text-slate-400 group-hover:text-primary transition-colors shrink-0" />
+          <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
         ) : (
-          <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-primary transition-colors shrink-0" />
+          <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
         )}
       </Link>
     );

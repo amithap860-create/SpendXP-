@@ -154,7 +154,7 @@ export function SavingsGoalTracker() {
       </div>
 
       {isAdding && (
-        <Card className="p-6 border-2 border-dashed bg-slate-50">
+        <Card className="p-6 border-2 border-dashed bg-muted">
           <form onSubmit={handleAddGoal} className="space-y-6">
             <div className="grid md:grid-cols-3 gap-4">
               <div className="space-y-2">
@@ -184,7 +184,7 @@ export function SavingsGoalTracker() {
                     onClick={() => { setNewShape(p.shape); setNewColor(p.color); }}
                     className={cn(
                       "p-3 rounded-xl border-2 transition-all",
-                      newShape === p.shape ? "border-primary bg-white shadow-md scale-110" : "border-transparent bg-slate-100 grayscale opacity-50"
+                      newShape === p.shape ? "border-primary bg-card shadow-md scale-110" : "border-transparent bg-muted grayscale opacity-50"
                     )}
                     suppressHydrationWarning
                   >
@@ -209,13 +209,13 @@ export function SavingsGoalTracker() {
           const isLate = new Date(goal.targetDate) < new Date() && !isReached;
 
           return (
-            <Card key={goal.id} className="p-6 overflow-hidden relative border-none shadow-sm bg-white hover:shadow-md transition-shadow">
+            <Card key={goal.id} className="p-6 overflow-hidden relative border-none shadow-sm bg-card hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between mb-6">
                 <div className="flex items-center gap-4">
                   <ShapeIcon shape={goal.shape} color={goal.color} className="h-12 w-12" />
                   <div>
-                    <h4 className="text-xl font-black text-slate-900">{goal.name}</h4>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Target: {goal.targetDate}</p>
+                    <h4 className="text-xl font-black text-foreground">{goal.name}</h4>
+                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Target: {goal.targetDate}</p>
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -225,7 +225,7 @@ export function SavingsGoalTracker() {
 
               <div className="space-y-4">
                 <div className="flex justify-between items-end">
-                  <div className="text-2xl font-black text-primary">{formatValue(goal.savedAmount)} <span className="text-sm font-medium text-slate-400">/ {formatValue(goal.targetAmount)}</span></div>
+                  <div className="text-2xl font-black text-primary">{formatValue(goal.savedAmount)} <span className="text-sm font-medium text-muted-foreground">/ {formatValue(goal.targetAmount)}</span></div>
                   <div className={cn("text-lg font-black", isReached ? "text-primary" : "text-primary")}>{progress}%</div>
                 </div>
                 <Progress value={progress} className="h-2" />
@@ -236,7 +236,7 @@ export function SavingsGoalTracker() {
                   ) : isLate ? (
                     <div className="flex items-center gap-2 text-[#2E7D5A] bg-[#E8F5EE] px-3 py-1 rounded-full"><AlertTriangle className="h-3 w-3" /> Past target date</div>
                   ) : (
-                    <div className="text-slate-500">Need {formatValue(goal.monthlyContribution)} / month</div>
+                    <div className="text-muted-foreground">Need {formatValue(goal.monthlyContribution)} / month</div>
                   )}
                   
                   {!isReached && (

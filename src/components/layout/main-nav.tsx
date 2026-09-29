@@ -26,7 +26,7 @@ export function MainNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-[60] flex items-center justify-between border-t bg-white px-4 py-3 md:relative md:flex-col md:h-screen md:w-64 md:border-r md:border-t-0 md:justify-start md:gap-8 md:p-6">
+    <nav className="fixed bottom-0 left-0 right-0 z-[60] flex items-center justify-between border-t bg-card px-4 py-3 md:relative md:flex-col md:h-screen md:w-64 md:border-r md:border-t-0 md:justify-start md:gap-8 md:p-6">
       <div className="hidden md:flex flex-col gap-2 mb-8 w-full">
         <div className="flex items-center gap-2 mb-4">
           <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-lg">
@@ -34,9 +34,9 @@ export function MainNav() {
           </div>
           <h1 className="text-2xl font-black text-primary tracking-tighter">SpendXP</h1>
         </div>
-        <div className="bg-slate-50 p-4 rounded-2xl border-2 border-slate-100 shadow-inner">
-          <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-1">Game Balance</p>
-          <p className="text-xl font-black text-slate-900 truncate">{formatValue(balance)}</p>
+        <div className="bg-muted p-4 rounded-2xl border-2 border-border shadow-inner">
+          <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-1">Game Balance</p>
+          <p className="text-xl font-black text-foreground truncate">{formatValue(balance)}</p>
         </div>
       </div>
 
@@ -49,7 +49,7 @@ export function MainNav() {
               "flex flex-col items-center gap-1 rounded-xl px-3 py-2 text-[10px] font-black transition-all md:flex-row md:gap-4 md:text-sm md:px-5 md:py-4",
               pathname === item.href
                 ? "bg-primary text-white shadow-xl shadow-primary/20 scale-105"
-                : "text-slate-400 hover:bg-slate-50 hover:text-primary"
+                : "text-muted-foreground hover:bg-muted hover:text-primary"
             )}
           >
             <item.icon className="h-6 w-6 md:h-5 md:w-5" />

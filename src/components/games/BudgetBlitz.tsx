@@ -287,7 +287,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
   // ── IDLE ─────────────────────────────────────────────────────────────────────
   if (gameState === 'IDLE') {
     return (
-      <Card className="max-w-xl mx-auto border-none shadow-2xl bg-white overflow-hidden">
+      <Card className="max-w-xl mx-auto border-none shadow-2xl bg-card overflow-hidden">
         <div className="bg-primary p-8 text-white text-center relative">
           <div className="h-16 w-16 md:h-20 md:w-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-bounce">
             <Gamepad2 className="h-10 w-10 md:h-12 md:w-12" />
@@ -297,16 +297,16 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
         </div>
 
         {/* Rules panel — shown by default */}
-        <div className="bg-slate-50 border-b px-5 py-4 space-y-3 text-sm">
+        <div className="bg-muted border-b px-5 py-4 space-y-3 text-sm">
           <div className="flex items-center justify-between">
-            <div className="font-black text-slate-800 flex items-center gap-2"><Info className="h-4 w-4 text-primary" /> How to play</div>
-            <button onClick={() => setShowInfo(v => !v)} className="text-xs text-slate-400 font-bold" suppressHydrationWarning>
+            <div className="font-black text-foreground flex items-center gap-2"><Info className="h-4 w-4 text-primary" /> How to play</div>
+            <button onClick={() => setShowInfo(v => !v)} className="text-xs text-muted-foreground font-bold" suppressHydrationWarning>
               {showInfo ? 'Hide' : 'Show'}
             </button>
           </div>
           {showInfo && (
             <>
-              <p className="text-slate-600">Cards fall from the top. Sort each item into the right bucket before it hits the bottom. Miss a card = lose a life. 3 lives per game. Speed increases every 30 seconds. Your accuracy score at the end shows how well you know what actually counts as a Need vs. a Want.</p>
+              <p className="text-muted-foreground">Cards fall from the top. Sort each item into the right bucket before it hits the bottom. Miss a card = lose a life. 3 lives per game. Speed increases every 30 seconds. Your accuracy score at the end shows how well you know what actually counts as a Need vs. a Want.</p>
               <div className="grid grid-cols-3 gap-2 text-xs text-center">
                 {[
                   { icon: ShoppingBag, label: 'NEED', desc: 'Must-haves: food, rent, medicine', color: 'bg-[#E8F5EE] border-[#A8D5BC] text-primary' },
@@ -320,7 +320,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
                   </div>
                 ))}
               </div>
-              <p className="text-slate-500 text-xs">On mobile: swipe ← = NEED, → = SAVE, ↓ = WANT. Your accuracy report at the end shows how well you sorted each category.</p>
+              <p className="text-muted-foreground text-xs">On mobile: swipe ← = NEED, → = SAVE, ↓ = WANT. Your accuracy report at the end shows how well you sorted each category.</p>
             </>
           )}
         </div>
@@ -360,7 +360,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
 
     // Verdict based on categorisation accuracy
     const getVerdict = (): { label: string; msg: string; ok: boolean; color: string } => {
-      if (stats.total === 0) return { label: 'Keep going!', msg: 'Sort more items to see your results.', ok: false, color: 'bg-slate-50 border-slate-200' };
+      if (stats.total === 0) return { label: 'Keep going!', msg: 'Sort more items to see your results.', ok: false, color: 'bg-muted border-border' };
       if (accuracy >= 90) return { label: 'Sharp eye!', msg: 'You instantly know what\'s essential and what can wait. That instinct is worth more than any budget spreadsheet.', ok: true, color: 'bg-[#E8F5EE] border-[#A8D5BC]' };
       if (accuracy >= 75) return { label: 'Good instincts!', msg: 'You\'re getting the hang of separating needs from wants. A few close calls — but the priority order is clicking.', ok: true, color: 'bg-[#E8F5EE] border-[#A8D5BC]' };
       if (accuracy >= 55) return { label: 'Getting there!', msg: 'Some items tripped you up — that\'s normal. Remember: NEEDS first, then SAVE a slice, then WANTS with whatever\'s left.', ok: false, color: 'bg-amber-50 border-amber-200' };
@@ -377,7 +377,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
     return (
       <div className="grid lg:grid-cols-12 gap-6 max-w-6xl mx-auto">
         <div className="lg:col-span-7 space-y-4">
-          <Card className="border-none shadow-2xl bg-white overflow-hidden">
+          <Card className="border-none shadow-2xl bg-card overflow-hidden">
             <div className="bg-primary p-6 md:p-8 text-white text-center">
               <Trophy className="h-10 w-10 mx-auto mb-3 opacity-90" />
               <CardTitle className="text-3xl md:text-4xl font-black mb-1">
@@ -394,12 +394,12 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
               <div className="flex items-center justify-center gap-6 py-2">
                 <div className="text-center">
                   <div className={cn('text-5xl font-black', accuracy >= 75 ? 'text-primary' : accuracy >= 55 ? 'text-amber-500' : 'text-rose-500')}>{accuracy}%</div>
-                  <div className="text-xs font-black uppercase tracking-widest text-slate-400 mt-1">Accuracy</div>
+                  <div className="text-xs font-black uppercase tracking-widest text-muted-foreground mt-1">Accuracy</div>
                 </div>
-                <div className="h-14 w-px bg-slate-200" />
+                <div className="h-14 w-px bg-border" />
                 <div className="text-center">
-                  <div className="text-5xl font-black text-slate-800">{stats.correct}<span className="text-2xl text-slate-400">/{stats.total}</span></div>
-                  <div className="text-xs font-black uppercase tracking-widest text-slate-400 mt-1">Correct</div>
+                  <div className="text-5xl font-black text-foreground">{stats.correct}<span className="text-2xl text-muted-foreground">/{stats.total}</span></div>
+                  <div className="text-xs font-black uppercase tracking-widest text-muted-foreground mt-1">Correct</div>
                 </div>
               </div>
 
@@ -410,8 +410,8 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
               </div>
 
               {/* Priority order — the real lesson */}
-              <div className="bg-slate-50 rounded-xl border p-4 space-y-3">
-                <div className="text-xs font-black text-slate-500 uppercase tracking-widest">The Priority Order</div>
+              <div className="bg-muted rounded-xl border p-4 space-y-3">
+                <div className="text-xs font-black text-muted-foreground uppercase tracking-widest">The Priority Order</div>
                 {buckets.map(({ label, Icon, count, color, barColor, priority, tip }) => (
                   <div key={label} className="flex items-start gap-3">
                     <div className={cn('flex items-center justify-center h-8 w-8 rounded-lg border shrink-0 text-xs font-black', color)}>
@@ -419,15 +419,15 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <Icon className="h-3.5 w-3.5 text-slate-500 shrink-0" />
-                        <span className="text-sm font-black text-slate-800">{label}</span>
-                        <span className="text-xs text-slate-400 ml-auto">{count} sorted</span>
+                        <Icon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                        <span className="text-sm font-black text-foreground">{label}</span>
+                        <span className="text-xs text-muted-foreground ml-auto">{count} sorted</span>
                       </div>
-                      <p className="text-xs text-slate-500">{tip}</p>
+                      <p className="text-xs text-muted-foreground">{tip}</p>
                     </div>
                   </div>
                 ))}
-                <p className="text-[11px] text-slate-400 pt-1 border-t">The 50/30/20 rule is a guide, not a law. Every person's split looks different — what matters is that you always cover needs and save something before spending on wants.</p>
+                <p className="text-[11px] text-muted-foreground pt-1 border-t">The 50/30/20 rule is a guide, not a law. Every person's split looks different — what matters is that you always cover needs and save something before spending on wants.</p>
               </div>
 
               <div className="flex gap-3">
@@ -450,7 +450,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
   if (trialMode && trialDone) {
     const accuracy = TRIAL_MAX > 0 ? Math.round((trialCorrect / TRIAL_MAX) * 100) : 0;
     return (
-      <Card className="max-w-xl mx-auto border-none shadow-2xl bg-white overflow-hidden">
+      <Card className="max-w-xl mx-auto border-none shadow-2xl bg-card overflow-hidden">
         <div className="bg-primary/50 p-6 text-white text-center">
           <FlaskConical className="h-12 w-12 mx-auto mb-3 opacity-90" />
           <CardTitle className="text-2xl font-black mb-1">Trial Complete!</CardTitle>
@@ -459,7 +459,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
         <CardContent className="p-6 space-y-4">
           <div className="text-center">
             <div className="text-5xl font-black text-primary">{accuracy}%</div>
-            <div className="text-slate-500 text-sm mt-1">accuracy ({trialCorrect} of {TRIAL_MAX} correct)</div>
+            <div className="text-muted-foreground text-sm mt-1">accuracy ({trialCorrect} of {TRIAL_MAX} correct)</div>
           </div>
           <div className="grid grid-cols-3 gap-2 text-center text-xs">
             <div className="bg-[#E8F5EE] rounded-lg p-2"><div className="font-black text-primary">{trialStats.NEED}</div><div className="text-primary">Need</div></div>
@@ -542,9 +542,9 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
       )}
 
       {/* Game area */}
-      <div className="relative w-full h-[70dvh] md:h-[80dvh] bg-slate-100 rounded-3xl overflow-hidden border-4 border-white shadow-inner flex flex-col">
+      <div className="relative w-full h-[70dvh] md:h-[80dvh] bg-muted rounded-3xl overflow-hidden border-4 border-white shadow-inner flex flex-col">
         {/* HUD */}
-        <div className="p-3 md:p-4 bg-white/80 backdrop-blur-sm border-b flex items-center justify-between z-10">
+        <div className="p-3 md:p-4 bg-card/80 backdrop-blur-sm border-b flex items-center justify-between z-10">
           <div className="flex items-center gap-3">
             {trialMode
               ? <div className="flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-full text-primary font-black text-xs"><FlaskConical className="h-3 w-3" />{trialSorted}/{TRIAL_MAX}</div>
@@ -569,7 +569,7 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
               className="h-8 w-8 bg-slate-200 hover:bg-slate-300 rounded-full flex items-center justify-center transition-colors"
               suppressHydrationWarning
             >
-              <Pause className="h-3.5 w-3.5 text-slate-700" />
+              <Pause className="h-3.5 w-3.5 text-foreground" />
             </button>
           </div>
         </div>
@@ -579,17 +579,17 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
           {cards.map(card => (
             <div
               key={card.id}
-              className="absolute p-2 md:p-3 bg-white rounded-xl shadow-lg border-2 border-slate-200 select-none w-28 md:w-40 text-center animate-in fade-in zoom-in duration-300 min-h-[70px]"
+              className="absolute p-2 md:p-3 bg-card rounded-xl shadow-lg border-2 border-border select-none w-28 md:w-40 text-center animate-in fade-in zoom-in duration-300 min-h-[70px]"
               style={{ left: `${card.x}%`, top: `${card.y}%`, transform: 'translateX(-50%)', touchAction: 'none' }}
             >
-              <div className="font-bold text-slate-800 text-[10px] md:text-sm leading-tight mb-1 truncate">{card.item.name}</div>
+              <div className="font-bold text-foreground text-[10px] md:text-sm leading-tight mb-1 truncate">{card.item.name}</div>
               <div className="text-xs md:text-base font-black text-primary">{formatValue(card.item.priceINR)}</div>
             </div>
           ))}
         </div>
 
         {/* Bucket buttons */}
-        <div className="p-3 md:p-4 grid grid-cols-3 gap-3 z-10 bg-white/80 backdrop-blur-sm border-t">
+        <div className="p-3 md:p-4 grid grid-cols-3 gap-3 z-10 bg-card/80 backdrop-blur-sm border-t">
           <Button className="h-16 md:h-20 min-h-[44px] flex-col gap-1 bg-primary hover:bg-primary rounded-2xl shadow-lg w-full"
             onClick={() => cards.length > 0 && handleSort([...cards].sort((a, b) => b.y - a.y)[0].id, 'NEED')}>
             <ChevronLeft className="h-3 w-3 text-white/50" /><ShoppingBag className="h-5 w-5" /><span className="text-[10px] font-black uppercase">NEED</span>

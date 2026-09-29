@@ -293,7 +293,7 @@ function SignupContent() {
           <>
             <CardHeader className="text-center pb-2">
               <h1 className="text-4xl font-black mb-2">
-                <span className="text-slate-900">Spend</span>
+                <span className="text-foreground">Spend</span>
                 <span style={{ color: '#2E7D5A' }}>XP</span>
               </h1>
               <CardDescription className="text-base">First, tell us what year you were born.</CardDescription>
@@ -352,7 +352,7 @@ function SignupContent() {
                 </div>
               )}
               <h1 className="text-4xl font-black mb-1">
-                <span className="text-slate-900">Spend</span>
+                <span className="text-foreground">Spend</span>
                 <span style={{ color: '#2E7D5A' }}>XP</span>
               </h1>
               <CardDescription className="text-base">Create your account to start earning.</CardDescription>
@@ -377,7 +377,7 @@ function SignupContent() {
                   </Button>
                   <div className="relative">
                     <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
-                    <div className="relative flex justify-center text-xs uppercase"><span className="bg-white px-2 text-muted-foreground">or</span></div>
+                    <div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">or</span></div>
                   </div>
                 </>
               )}
@@ -458,7 +458,7 @@ function SignupContent() {
               </form>
 
               <div className="flex items-center justify-between">
-                <button onClick={() => setStep('age-gate')} className="text-xs text-slate-400 hover:text-slate-600 font-bold">
+                <button onClick={() => setStep('age-gate')} className="text-xs text-muted-foreground hover:text-foreground font-bold">
                   ← Back
                 </button>
                 {!isUnder13 && (
@@ -469,7 +469,7 @@ function SignupContent() {
                 )}
               </div>
 
-              <p className="text-center text-xs text-slate-400 leading-relaxed">
+              <p className="text-center text-xs text-muted-foreground leading-relaxed">
                 By signing up you agree to our{' '}
                 <Link href="/terms" className="underline hover:text-primary">Terms of Service</Link>
                 {' '}and{' '}
@@ -490,12 +490,12 @@ function SignupContent() {
               </p>
             </div>
             <CardContent className="p-8 space-y-6">
-              <p className="text-sm text-slate-600 text-center">
+              <p className="text-sm text-muted-foreground text-center">
                 We'll send an email to your parent or guardian. Once they approve, you'll be able to sign in and start playing!
               </p>
               <form onSubmit={handleSendConsentRequest} className="space-y-4">
                 <div>
-                  <Label className="text-sm font-black text-slate-700 mb-2 block">Parent or Guardian's Email</Label>
+                  <Label className="text-sm font-black text-foreground mb-2 block">Parent or Guardian's Email</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
                     <Input
@@ -520,7 +520,7 @@ function SignupContent() {
                   {loading ? 'Sending...' : 'Send Approval Request'}
                 </Button>
               </form>
-              <button onClick={() => setStep('signup-form')} className="w-full text-xs text-slate-400 hover:text-slate-600 font-bold">
+              <button onClick={() => setStep('signup-form')} className="w-full text-xs text-muted-foreground hover:text-foreground font-bold">
                 ← Back
               </button>
             </CardContent>
@@ -534,10 +534,10 @@ function SignupContent() {
               <CheckCircle2 className="h-10 w-10 text-green-600" />
             </div>
             <div className="space-y-2">
-              <h2 className="text-2xl font-black text-slate-900">Email Sent!</h2>
-              <p className="text-slate-600 text-sm leading-relaxed">
+              <h2 className="text-2xl font-black text-foreground">Email Sent!</h2>
+              <p className="text-muted-foreground text-sm leading-relaxed">
                 We've sent an approval request to{' '}
-                <span className="font-black text-slate-800">{parentEmail}</span>.
+                <span className="font-black text-foreground">{parentEmail}</span>.
                 <br /><br />
                 Ask your parent or guardian to check their email and click the approval link. Once they approve, you can sign in and start playing!
               </p>

@@ -76,7 +76,7 @@ export function GameTutorialModal({ open, onClose, title, steps }: GameTutorialM
                 <span className="shrink-0 h-6 w-6 rounded-full bg-primary/10 text-primary font-black text-xs flex items-center justify-center mt-0.5">
                   {i + 1}
                 </span>
-                <span className="text-sm font-medium text-slate-700 leading-snug">{step}</span>
+                <span className="text-sm font-medium text-foreground leading-snug">{step}</span>
               </li>
             ))}
           </ol>

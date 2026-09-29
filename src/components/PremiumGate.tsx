@@ -56,13 +56,13 @@ export function PremiumGate({ feature, children, variant = 'blur', className }: 
           {children}
         </div>
         {/* Lock overlay */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm p-6 text-center">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-card/80 backdrop-blur-sm p-6 text-center">
           <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-2xl mb-3">
             {info.icon}
           </div>
           <div className="text-xs font-black uppercase tracking-widest text-primary mb-1">Premium Feature</div>
-          <h3 className="text-lg font-black text-slate-900 mb-1">{info.label}</h3>
-          <p className="text-xs text-slate-500 leading-relaxed mb-4 max-w-[220px]">{info.description}</p>
+          <h3 className="text-lg font-black text-foreground mb-1">{info.label}</h3>
+          <p className="text-xs text-muted-foreground leading-relaxed mb-4 max-w-[220px]">{info.description}</p>
           <button
             onClick={() => router.push('/upgrade')}
             className="h-10 px-6 bg-primary text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-primary/90 transition-colors flex items-center gap-2"
@@ -82,13 +82,13 @@ export function PremiumGate({ feature, children, variant = 'blur', className }: 
         {children}
       </div>
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-lg px-4 py-3 flex items-center gap-3 max-w-[260px]">
+        <div className="bg-card border border-border rounded-2xl shadow-lg px-4 py-3 flex items-center gap-3 max-w-[260px]">
           <span className="text-xl">{info.icon}</span>
           <div className="flex-1 min-w-0">
             <div className="text-[10px] font-black uppercase tracking-widest text-primary">Premium</div>
-            <div className="text-sm font-black text-slate-900 truncate">{info.label}</div>
+            <div className="text-sm font-black text-foreground truncate">{info.label}</div>
           </div>
-          <IconLock size={18} className="text-slate-400 flex-shrink-0" />
+          <IconLock size={18} className="text-muted-foreground flex-shrink-0" />
         </div>
       </div>
     </div>

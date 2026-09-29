@@ -62,21 +62,21 @@ function VerifyEmailContent() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4 p-4">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4 p-4">
         <RefreshCw className="h-10 w-10 animate-spin text-primary" />
-        <p className="text-slate-500 font-bold">Verifying your email...</p>
+        <p className="text-muted-foreground font-bold">Verifying your email...</p>
       </div>
     )
   }
 
   if (status === 'success') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-8 text-center animate-in fade-in zoom-in duration-500">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background p-8 text-center animate-in fade-in zoom-in duration-500">
         <div className="h-20 w-20 bg-[#C8E8D8] text-primary rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
           <CheckCircle2 className="h-10 w-10" />
         </div>
-        <h1 className="text-3xl font-black text-slate-900 mb-2">Email verified!</h1>
-        <p className="text-slate-500 font-medium max-w-sm mx-auto mb-8">
+        <h1 className="text-3xl font-black text-foreground mb-2">Email verified!</h1>
+        <p className="text-muted-foreground font-medium max-w-sm mx-auto mb-8">
           Your SpendXP account is fully verified. You now have access to all features.
         </p>
         <Button onClick={() => router.push('/dashboard')} className="h-14 px-10 text-lg font-black rounded-2xl shadow-xl shadow-emerald-100" suppressHydrationWarning>
@@ -88,9 +88,9 @@ function VerifyEmailContent() {
 
   if (status === 'already_verified') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-8 text-center">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background p-8 text-center">
         <CheckCircle2 className="h-12 w-12 text-primary mx-auto mb-4" />
-        <p className="text-lg font-bold text-slate-900 mb-6">Your email is already verified.</p>
+        <p className="text-lg font-bold text-foreground mb-6">Your email is already verified.</p>
         <Button variant="outline" onClick={() => router.push('/dashboard')} className="h-12 px-8 font-black border-2" suppressHydrationWarning>
           Go to dashboard
         </Button>
@@ -103,7 +103,7 @@ function VerifyEmailContent() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-8 text-center gap-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-8 text-center gap-4">
       <AlertCircle className="h-12 w-12 text-rose-500 mx-auto" />
       <p className="text-lg font-bold text-rose-600">{errorMessage || 'Something went wrong.'}</p>
       <Button variant="ghost" onClick={() => router.push('/profile')} className="font-bold underline" suppressHydrationWarning>
@@ -142,12 +142,12 @@ function ExpiredLinkUI() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="h-20 w-20 bg-[#C8E8D8] text-[#2E7D5A] rounded-full flex items-center justify-center mx-auto mb-6">
         <Mail className="h-10 w-10" />
       </div>
-      <h1 className="text-3xl font-black text-slate-900 mb-2">Link Expired</h1>
-      <p className="text-slate-500 font-medium max-w-sm mx-auto mb-8">
+      <h1 className="text-3xl font-black text-foreground mb-2">Link Expired</h1>
+      <p className="text-muted-foreground font-medium max-w-sm mx-auto mb-8">
         Email verification links expire after 24 hours for security.
       </p>
       

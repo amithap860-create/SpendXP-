@@ -52,12 +52,12 @@ export function AvatarPickerCard({
         'flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all',
         selected
           ? `border-primary bg-primary/5 ring-2 ring-offset-1 ${avatar.ringColor}`
-          : 'border-slate-100 hover:border-slate-300 bg-white'
+          : 'border-border hover:border-border bg-card'
       )}
     >
       <AvatarDisplay avatar={avatar} size={56} />
-      <span className="text-[11px] font-black text-slate-700 truncate max-w-[60px]">{avatar.name}</span>
-      <span className="text-[9px] text-slate-400 truncate max-w-[60px] text-center">{avatar.archetype}</span>
+      <span className="text-[11px] font-black text-foreground truncate max-w-[60px]">{avatar.name}</span>
+      <span className="text-[9px] text-muted-foreground truncate max-w-[60px] text-center">{avatar.archetype}</span>
       {selected && (
         <span className="text-[9px] font-black uppercase tracking-wider text-primary">Selected</span>
       )}

@@ -71,8 +71,8 @@ export default function BugReportsAdminPage() {
         <div className="flex items-center gap-3">
           <Bug className="h-7 w-7 text-primary" />
           <div>
-            <h1 className="text-2xl font-black text-slate-900">Bug Reports</h1>
-            <p className="text-sm text-slate-500">{newCount} new · {reports.length} total</p>
+            <h1 className="text-2xl font-black text-foreground">Bug Reports</h1>
+            <p className="text-sm text-muted-foreground">{newCount} new · {reports.length} total</p>
           </div>
         </div>
         {newCount > 0 && (
@@ -84,7 +84,7 @@ export default function BugReportsAdminPage() {
 
       {reports.length === 0 && (
         <Card className="border-none shadow-md">
-          <CardContent className="py-16 text-center text-slate-400">
+          <CardContent className="py-16 text-center text-muted-foreground">
             <CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-[#4EA07A]" />
             <p className="font-bold">No bug reports yet.</p>
           </CardContent>
@@ -108,16 +108,16 @@ export default function BugReportsAdminPage() {
                   <div className="flex items-start gap-3 min-w-0">
                     <div className={cn('mt-0.5 h-2.5 w-2.5 rounded-full shrink-0', isNew ? 'bg-rose-500' : 'bg-[#4EA07A]')} />
                     <div className="min-w-0">
-                      <p className="font-bold text-slate-900 text-sm leading-snug truncate">{report.description}</p>
+                      <p className="font-bold text-foreground text-sm leading-snug truncate">{report.description}</p>
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
-                        <span className="flex items-center gap-1 text-xs text-slate-400">
+                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Monitor className="h-3 w-3" />{report.screen}
                         </span>
-                        <span className="flex items-center gap-1 text-xs text-slate-400">
+                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Clock className="h-3 w-3" />{dateStr}
                         </span>
                         {report.userEmail && (
-                          <span className="flex items-center gap-1 text-xs text-slate-400">
+                          <span className="flex items-center gap-1 text-xs text-muted-foreground">
                             <User className="h-3 w-3" />{report.userEmail}
                           </span>
                         )}
@@ -131,31 +131,31 @@ export default function BugReportsAdminPage() {
               </CardHeader>
 
               {isOpen && (
-                <CardContent className="px-5 pb-5 pt-0 space-y-4 border-t border-slate-100">
+                <CardContent className="px-5 pb-5 pt-0 space-y-4 border-t border-border">
                   <div>
-                    <p className="text-xs font-black uppercase text-slate-400 tracking-widest mb-1">Full description</p>
-                    <p className="text-sm text-slate-700 whitespace-pre-wrap">{report.description}</p>
+                    <p className="text-xs font-black uppercase text-muted-foreground tracking-widest mb-1">Full description</p>
+                    <p className="text-sm text-foreground whitespace-pre-wrap">{report.description}</p>
                   </div>
 
                   {report.userAgent && (
                     <div>
-                      <p className="text-xs font-black uppercase text-slate-400 tracking-widest mb-1">User agent</p>
-                      <p className="text-xs text-slate-500 break-all font-mono bg-slate-50 rounded-lg p-2">{report.userAgent}</p>
+                      <p className="text-xs font-black uppercase text-muted-foreground tracking-widest mb-1">User agent</p>
+                      <p className="text-xs text-muted-foreground break-all font-mono bg-muted rounded-lg p-2">{report.userAgent}</p>
                     </div>
                   )}
 
                   {report.uid && (
                     <div>
-                      <p className="text-xs font-black uppercase text-slate-400 tracking-widest mb-1">User ID</p>
-                      <p className="text-xs text-slate-500 font-mono">{report.uid}</p>
+                      <p className="text-xs font-black uppercase text-muted-foreground tracking-widest mb-1">User ID</p>
+                      <p className="text-xs text-muted-foreground font-mono">{report.uid}</p>
                     </div>
                   )}
 
                   {report.screenshot && (
                     <div>
-                      <p className="text-xs font-black uppercase text-slate-400 tracking-widest mb-2">Screenshot</p>
+                      <p className="text-xs font-black uppercase text-muted-foreground tracking-widest mb-2">Screenshot</p>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={report.screenshot} alt="Bug screenshot" className="max-w-full rounded-xl border border-slate-200 max-h-80 object-contain" />
+                      <img src={report.screenshot} alt="Bug screenshot" className="max-w-full rounded-xl border border-border max-h-80 object-contain" />
                     </div>
                   )}
 

@@ -139,9 +139,9 @@ export function ConceptBreakdown({
       </header>
 
       <div className="space-y-8 flex-1">
-        <section className="relative bg-white p-5 pl-6 rounded-xl border-l-[3px] border-primary shadow-sm overflow-hidden">
+        <section className="relative bg-card p-5 pl-6 rounded-xl border-l-[3px] border-primary shadow-sm overflow-hidden">
           <div className="quote-shape" />
-          <p className="relative z-10 text-[18px] font-medium text-slate-800 leading-relaxed">
+          <p className="relative z-10 text-[18px] font-medium text-foreground leading-relaxed">
             "{localiseCurrency(hook)}"
           </p>
         </section>

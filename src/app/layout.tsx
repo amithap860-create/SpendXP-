@@ -78,7 +78,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
       
       {/* TOP NAV (Desktop) */}
       {!isAuthPage && (
-        <header className="hidden md:block bg-white/80 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-50">
+        <header className="hidden md:block bg-card/80 backdrop-blur-md border-b border-border/80 sticky top-0 z-50">
           <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
             <Link href={isParent ? '/parent' : '/dashboard'} className="flex items-center gap-2 group">
               {/* Logo mark: navy foundation + amber scale accent */}
@@ -93,7 +93,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
                 </svg>
               </div>
               <div className="flex items-baseline gap-0.5">
-                <span className="font-black text-xl tracking-tighter text-slate-900">Spend</span>
+                <span className="font-black text-xl tracking-tighter text-foreground">Spend</span>
                 <span className="font-black text-xl tracking-tighter" style={{ color: '#2E7D5A' }}>XP</span>
               </div>
             </Link>
@@ -106,7 +106,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
                     "px-4 py-2 rounded-lg text-sm font-black uppercase tracking-widest transition-all duration-200",
                     pathname === link.href
                       ? "text-primary bg-primary/10"
-                      : "text-slate-400 hover:text-slate-700 hover:bg-slate-50"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   )}
                 >
                   {link.label}
@@ -124,7 +124,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
       {/* BOTTOM NAV (Mobile) — Golden Ledger edition */}
       {!isAuthPage && (
         <nav
-          className="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-100 flex items-center justify-around z-50"
+          className="md:hidden fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border flex items-center justify-around z-50"
           style={{
             height: 'calc(72px + env(safe-area-inset-bottom, 0px))',
             paddingBottom: 'env(safe-area-inset-bottom, 0px)',
@@ -147,7 +147,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
       <Toaster />
       {/* Legal footer — desktop only, hidden on auth pages */}
       {!isAuthPage && (
-        <footer className="hidden md:flex items-center justify-center gap-4 py-3 border-t border-slate-100 bg-white text-[11px] font-bold text-slate-500">
+        <footer className="hidden md:flex items-center justify-center gap-4 py-3 border-t border-border bg-card text-[11px] font-bold text-muted-foreground">
           <Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
           <span>·</span>
           <Link href="/terms" className="hover:text-primary transition-colors">Terms of Service</Link>
@@ -226,7 +226,7 @@ function NavLink({ href, label, active, isSmallScreen }: { href: string; label: 
   return (
     <Link href={href} id={tourId} className={cn(
       "flex flex-col items-center justify-center gap-1 flex-1 min-w-0 py-2 transition-all duration-200 relative",
-      active ? "text-primary" : "text-slate-300 hover:text-slate-400"
+      active ? "text-primary" : "text-slate-300 hover:text-muted-foreground"
     )}>
       {/* Gold active indicator dot above icon */}
       {active && (
@@ -241,7 +241,7 @@ function NavLink({ href, label, active, isSmallScreen }: { href: string; label: 
       {!isSmallScreen && (
         <span className={cn(
           "text-[10px] font-black uppercase tracking-wider truncate w-full text-center px-0.5 transition-colors",
-          active ? "text-primary" : "text-slate-400"
+          active ? "text-primary" : "text-muted-foreground"
         )}>
           {label}
         </span>

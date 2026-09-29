@@ -253,7 +253,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
   if (personalityStep !== null && personalityStep !== -1) {
     const q = PERSONALITY_QUESTIONS[personalityStep];
     return (
-      <Card className="max-w-xl mx-auto border-none shadow-2xl bg-white overflow-hidden">
+      <Card className="max-w-xl mx-auto border-none shadow-2xl bg-card overflow-hidden">
         <div className="bg-primary p-6 text-white">
           <div className="text-xs font-black uppercase tracking-widest text-white/60 mb-1">Question {personalityStep + 1} of {PERSONALITY_QUESTIONS.length}</div>
           <p className="text-xl font-bold leading-snug">{q.q}</p>
@@ -272,12 +272,12 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
                   setPersonalityStep(personalityStep + 1);
                 }
               }}
-              className="w-full text-left p-4 rounded-xl border-2 border-slate-100 hover:border-primary hover:bg-primary/5 transition-all font-bold text-slate-800 min-h-[52px]"
+              className="w-full text-left p-4 rounded-xl border-2 border-border hover:border-primary hover:bg-primary/5 transition-all font-bold text-foreground min-h-[52px]"
             >
               {opt}
             </button>
           ))}
-          <button onClick={() => setPersonalityStep(-1)} className="text-xs text-slate-400 hover:underline w-full text-center pt-2">Skip personalization</button>
+          <button onClick={() => setPersonalityStep(-1)} className="text-xs text-muted-foreground hover:underline w-full text-center pt-2">Skip personalization</button>
         </CardContent>
       </Card>
     );
@@ -287,7 +287,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
 
   if (gameState === 'IDLE') return (
     <>
-    <Card className="max-w-2xl mx-auto border-none shadow-2xl bg-white overflow-hidden">
+    <Card className="max-w-2xl mx-auto border-none shadow-2xl bg-card overflow-hidden">
       <div className="bg-primary p-10 text-white text-center relative">
         <HowToPlayButton onClick={tutorial.reopen} />
         <button
@@ -303,16 +303,16 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
       </div>
 
       {showInfo && (
-        <div className="bg-slate-50 border-b px-6 py-4 space-y-3 text-sm">
-          <div className="font-black text-slate-800 flex items-center gap-2"><Info className="h-4 w-4 text-primary" /> Investing Basics</div>
-          <ul className="space-y-2 text-slate-600 text-xs list-none">
+        <div className="bg-muted border-b px-6 py-4 space-y-3 text-sm">
+          <div className="font-black text-foreground flex items-center gap-2"><Info className="h-4 w-4 text-primary" /> Investing Basics</div>
+          <ul className="space-y-2 text-muted-foreground text-xs list-none">
             <li><span className="font-bold text-primary">Buy low, sell high</span> — buy when price is down, sell after it rises.</li>
             <li><span className="font-bold text-[#2E7D5A]">Diversify</span> — spread money across multiple stocks to reduce risk.</li>
             <li><span className="font-bold text-blue-700">News matters</span> — headlines change stock prices. Read them carefully each day.</li>
             <li><span className="font-bold text-primary">Volatility</span> — high-volatility stocks swing more. Higher risk = higher potential reward.</li>
             <li><span className="font-bold text-rose-700">Never invest what you can&apos;t afford to lose</span> — markets can go down.</li>
           </ul>
-          <p className="text-slate-400 text-xs">In this simulator: each &quot;day&quot; is {ROUND_TIME} seconds. News headlines appear between days and affect specific stocks.</p>
+          <p className="text-muted-foreground text-xs">In this simulator: each &quot;day&quot; is {ROUND_TIME} seconds. News headlines appear between days and affect specific stocks.</p>
         </div>
       )}
 
@@ -354,7 +354,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
   if (gameState === 'RESULTS') return (
     <div className="grid lg:grid-cols-12 gap-8 max-w-6xl mx-auto">
       <div className="lg:col-span-7">
-        <Card className="border-none shadow-2xl bg-white overflow-hidden">
+        <Card className="border-none shadow-2xl bg-card overflow-hidden">
           <div className="bg-primary p-10 text-white text-center">
             <Trophy className="h-16 w-16 mx-auto mb-4" />
             <CardTitle className="text-4xl font-black mb-2">Market Closed!</CardTitle>
@@ -369,7 +369,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
                 {totalWealth >= startingCash ? '+' : ''}{((totalWealth - startingCash) / startingCash * 100).toFixed(1)}% return
               </div>
             </div>
-            <p className="text-xs text-slate-500 text-center bg-slate-50 rounded-xl p-3">
+            <p className="text-xs text-muted-foreground text-center bg-muted rounded-xl p-3">
               {totalWealth > startingCash * 1.1
                 ? '🎯 Excellent! You beat the market. Diversifying and reading news headlines made the difference.'
                 : totalWealth >= startingCash
@@ -390,7 +390,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
     <div className="max-w-5xl mx-auto space-y-4 md:space-y-6">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         <Card className="p-3 md:p-4 flex flex-col items-center border-none shadow-sm">
-          <div className="text-[10px] md:text-xs font-black uppercase text-slate-400">Cash</div>
+          <div className="text-[10px] md:text-xs font-black uppercase text-muted-foreground">Cash</div>
           <div className="text-lg md:text-xl font-black text-primary">${cash.toFixed(2)}</div>
         </Card>
         <Card className="p-3 md:p-4 flex flex-col items-center border-none shadow-sm bg-primary text-white">
@@ -398,7 +398,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
           <div className="text-lg md:text-xl font-black">{currentRound} / 5</div>
         </Card>
         <Card className="p-3 md:p-4 flex flex-col items-center border-none shadow-sm">
-          <div className="text-[10px] md:text-xs font-black uppercase text-slate-400">Portfolio</div>
+          <div className="text-[10px] md:text-xs font-black uppercase text-muted-foreground">Portfolio</div>
           <div className="text-lg md:text-xl font-black text-primary">${portfolioValue.toFixed(2)}</div>
         </Card>
         <Card className={cn("p-3 md:p-4 flex flex-col items-center border-none shadow-sm", totalWealth >= startingCash ? 'bg-[#E8F5EE]' : 'bg-rose-50')}>
@@ -432,14 +432,14 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
           const ownedQty = portfolio[c.symbol] || 0;
 
           return (
-            <Card key={c.symbol} className={cn("p-3 md:p-4 border-2 shadow-sm bg-white", isRecommended ? 'border-[#A8D5BC]' : 'border-transparent')}>
+            <Card key={c.symbol} className={cn("p-3 md:p-4 border-2 shadow-sm bg-card", isRecommended ? 'border-[#A8D5BC]' : 'border-transparent')}>
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <div className="font-black text-sm md:text-base text-slate-900 truncate">{c.name}</div>
+                    <div className="font-black text-sm md:text-base text-foreground truncate">{c.name}</div>
                     {isRecommended && <Star className="h-3 w-3 text-primary shrink-0" />}
                   </div>
-                  <div className="text-[10px] font-bold text-slate-400 uppercase">{c.symbol} · {c.volatility} risk{ownedQty > 0 ? ` · ${ownedQty} owned` : ''}</div>
+                  <div className="text-[10px] font-bold text-muted-foreground uppercase">{c.symbol} · {c.volatility} risk{ownedQty > 0 ? ` · ${ownedQty} owned` : ''}</div>
                 </div>
                 {/* Sparkline */}
                 <div className="mx-3 hidden sm:block">
@@ -476,12 +476,12 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
             <SheetHeader><SheetTitle className="text-2xl font-black">Portfolio: ${portfolioValue.toFixed(2)}</SheetTitle></SheetHeader>
             <div className="py-6 space-y-4">
               {Object.entries(portfolio).map(([s, q]) => q > 0 && (
-                <div key={s} className="flex justify-between items-center p-4 bg-slate-50 rounded-xl border">
-                  <div><div className="font-black text-slate-900">{s}</div><div className="text-[10px] uppercase font-bold text-slate-400">{q} Shares</div></div>
+                <div key={s} className="flex justify-between items-center p-4 bg-muted rounded-xl border">
+                  <div><div className="font-black text-foreground">{s}</div><div className="text-[10px] uppercase font-bold text-muted-foreground">{q} Shares</div></div>
                   <div className="font-black text-primary">${(q * prices[s]).toFixed(2)}</div>
                 </div>
               ))}
-              {Object.values(portfolio).every(v => v === 0) && <p className="text-center text-slate-400 italic">No stocks owned yet.</p>}
+              {Object.values(portfolio).every(v => v === 0) && <p className="text-center text-muted-foreground italic">No stocks owned yet.</p>}
             </div>
           </SheetContent>
         </Sheet>
@@ -494,7 +494,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
               {tradeModal?.type} {tradeModal?.stock.name}
             </DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-slate-500">Current price: <span className="font-black text-primary">${tradeModal ? prices[tradeModal.stock.symbol] : 0}</span></p>
+          <p className="text-sm text-muted-foreground">Current price: <span className="font-black text-primary">${tradeModal ? prices[tradeModal.stock.symbol] : 0}</span></p>
           <div className="grid grid-cols-2 gap-3 py-4">
             {[1, 5, 10, 20].map(v => (
               <Button key={v} variant="outline" className="h-14 font-black min-h-[44px]" onClick={() => handleTrade(v)}>
@@ -502,7 +502,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
               </Button>
             ))}
           </div>
-          <p className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">Available Cash: ${cash.toFixed(2)}</p>
+          <p className="text-center text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Available Cash: ${cash.toFixed(2)}</p>
         </DialogContent>
       </Dialog>
     </div>

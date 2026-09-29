@@ -329,7 +329,7 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
   if (selectedMode === 'PORTFOLIO' && riskStep !== null && riskStep >= 0) {
     const q = RISK_QUESTIONS[riskStep];
     return (
-      <Card className="max-w-xl mx-auto border-none shadow-2xl bg-white overflow-hidden">
+      <Card className="max-w-xl mx-auto border-none shadow-2xl bg-card overflow-hidden">
         <div className="bg-primary p-6 text-white">
           <div className="text-xs font-black uppercase tracking-widest text-white/60 mb-1">Risk Profile · {riskStep + 1} of {RISK_QUESTIONS.length}</div>
           <p className="text-xl font-bold leading-snug">{q.q}</p>
@@ -351,7 +351,7 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
                   setRiskStep(riskStep + 1);
                 }
               }}
-              className="w-full text-left p-4 rounded-xl border-2 border-slate-100 hover:border-[#4EA07A] hover:bg-[#E8F5EE] transition-all font-bold text-slate-800 min-h-[52px]"
+              className="w-full text-left p-4 rounded-xl border-2 border-border hover:border-[#4EA07A] hover:bg-[#E8F5EE] transition-all font-bold text-foreground min-h-[52px]"
             >
               {opt}
             </button>
@@ -379,7 +379,7 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
             <CardHeader>
               <div className="flex items-center gap-3 mb-2"><ShieldAlert className="h-6 w-6 text-rose-500" /><CardTitle>Debt Domino</CardTitle></div>
               <CardDescription>Drag debts into the smartest payoff order. Master Avalanche vs Snowball strategy.</CardDescription>
-              <p className="text-xs text-slate-400 mt-2">Scenario: <span className="font-bold">{scenario.label}</span></p>
+              <p className="text-xs text-muted-foreground mt-2">Scenario: <span className="font-bold">{scenario.label}</span></p>
             </CardHeader>
           </Card>
           <Card
@@ -410,7 +410,7 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
     return (
       <div className="grid lg:grid-cols-12 gap-8 max-w-6xl mx-auto">
         <div className="lg:col-span-7">
-          <Card className="border-none shadow-2xl bg-white overflow-hidden">
+          <Card className="border-none shadow-2xl bg-card overflow-hidden">
             <div className="bg-primary p-10 text-white text-center">
               <Trophy className="h-16 w-16 mx-auto mb-4" />
               <CardTitle className="text-4xl font-black mb-2">Mission Complete!</CardTitle>
@@ -420,12 +420,12 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
               {selectedMode === 'DEBT' && debtResult && (
                 <div className="space-y-4">
                   <div className="text-center">
-                    <Badge className={cn("text-sm px-4 py-1 font-black", debtResult.method === 'AVALANCHE' ? 'bg-[#C8E8D8] text-primary' : debtResult.method === 'SNOWBALL' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-700')}>
+                    <Badge className={cn("text-sm px-4 py-1 font-black", debtResult.method === 'AVALANCHE' ? 'bg-[#C8E8D8] text-primary' : debtResult.method === 'SNOWBALL' ? 'bg-blue-100 text-blue-700' : 'bg-muted text-foreground')}>
                       {debtResult.method === 'AVALANCHE' ? '🔥 Avalanche Strategy' : debtResult.method === 'SNOWBALL' ? '❄️ Snowball Strategy' : 'Custom Order'}
                     </Badge>
                   </div>
                   <p className="font-black text-lg text-center text-primary">{debtResult.saved}</p>
-                  <div className="bg-slate-50 rounded-xl p-4 text-sm text-slate-700 space-y-2">
+                  <div className="bg-muted rounded-xl p-4 text-sm text-foreground space-y-2">
                     {debtResult.method === 'AVALANCHE'
                       ? <><p><strong>Avalanche</strong> = pay highest interest rate first. Mathematically saves the most money.</p><p>Best for: People who are motivated by saving the maximum amount.</p></>
                       : debtResult.method === 'SNOWBALL'
@@ -441,11 +441,11 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
                     <div className={cn("text-5xl font-black mb-1", portfolioScore >= 75 ? 'text-primary' : portfolioScore >= 50 ? 'text-[#2E7D5A]' : 'text-rose-600')}>
                       {portfolioScore}%
                     </div>
-                    <div className="text-slate-500 text-sm">alignment with your risk profile</div>
+                    <div className="text-muted-foreground text-sm">alignment with your risk profile</div>
                     {riskProfile && <Badge className={cn("mt-2 font-black", riskProfile.color)}>{riskProfile.label} Investor</Badge>}
                   </div>
                   {portfolioFeedback && (
-                    <div className="bg-slate-50 rounded-xl p-4 text-sm text-slate-700 whitespace-pre-line">
+                    <div className="bg-muted rounded-xl p-4 text-sm text-foreground whitespace-pre-line">
                       {portfolioFeedback}
                     </div>
                   )}
@@ -484,7 +484,7 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
   if (selectedMode === 'DEBT') {
     return (
       <div className="max-w-5xl mx-auto">
-        <Card className="border-none shadow-xl bg-white overflow-hidden">
+        <Card className="border-none shadow-xl bg-card overflow-hidden">
           <div className="bg-rose-600 p-6 text-white">
             <CardTitle className="text-2xl font-black mb-1">Debt Domino — {scenario.label}</CardTitle>
             <p className="text-rose-100 text-sm">{scenario.description}</p>
@@ -499,18 +499,18 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
               Up/Down buttons, which use plain onClick and work identically
               on every device, touch or mouse.
             */}
-            <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mb-4">Reorder — most urgent first</p>
+            <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest mb-4">Reorder — most urgent first</p>
             {debts.map((debt, idx) => (
               <div
                 key={debt.id}
-                className="p-4 rounded-xl border-2 border-slate-100 flex items-center gap-4 bg-white shadow-sm hover:border-primary transition-colors"
+                className="p-4 rounded-xl border-2 border-border flex items-center gap-4 bg-card shadow-sm hover:border-primary transition-colors"
               >
-                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center font-black text-sm shrink-0">{idx + 1}</div>
+                <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center font-black text-sm shrink-0">{idx + 1}</div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-bold text-slate-900 truncate">{debt.name}</div>
-                  <div className="text-xs text-slate-400">Balance: ₹{debt.balance.toLocaleString('en-IN')} · Min payment: ₹{debt.minPayment}</div>
+                  <div className="font-bold text-foreground truncate">{debt.name}</div>
+                  <div className="text-xs text-muted-foreground">Balance: ₹{debt.balance.toLocaleString('en-IN')} · Min payment: ₹{debt.minPayment}</div>
                 </div>
-                <div className={cn("font-black text-sm shrink-0", debt.rate > 20 ? 'text-rose-600' : debt.rate > 0 ? 'text-[#2E7D5A]' : 'text-slate-400')}>
+                <div className={cn("font-black text-sm shrink-0", debt.rate > 20 ? 'text-rose-600' : debt.rate > 0 ? 'text-[#2E7D5A]' : 'text-muted-foreground')}>
                   {debt.rate > 0 ? `${debt.rate}% APR` : '0% interest'}
                 </div>
                 <div className="flex flex-col gap-1 shrink-0">
@@ -519,7 +519,7 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
                     aria-label="Move up"
                     disabled={idx === 0}
                     onClick={() => handleMove(idx, idx - 1)}
-                    className="h-6 w-6 rounded-md border border-slate-200 flex items-center justify-center text-slate-500 disabled:opacity-30 disabled:cursor-not-allowed hover:border-primary hover:text-primary"
+                    className="h-6 w-6 rounded-md border border-border flex items-center justify-center text-muted-foreground disabled:opacity-30 disabled:cursor-not-allowed hover:border-primary hover:text-primary"
                   >
                     <ChevronUp className="h-4 w-4" />
                   </button>
@@ -528,7 +528,7 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
                     aria-label="Move down"
                     disabled={idx === debts.length - 1}
                     onClick={() => handleMove(idx, idx + 1)}
-                    className="h-6 w-6 rounded-md border border-slate-200 flex items-center justify-center text-slate-500 disabled:opacity-30 disabled:cursor-not-allowed hover:border-primary hover:text-primary"
+                    className="h-6 w-6 rounded-md border border-border flex items-center justify-center text-muted-foreground disabled:opacity-30 disabled:cursor-not-allowed hover:border-primary hover:text-primary"
                   >
                     <ChevronDown className="h-4 w-4" />
                   </button>
@@ -610,19 +610,19 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
 
       {/* Risk profile card */}
       {riskProfile && (
-        <div className={cn("bg-white border-2 rounded-xl p-4 flex items-start gap-3", riskProfile.label === 'Conservative' ? 'border-blue-200' : riskProfile.label === 'Moderate' ? 'border-[#A8D5BC]' : 'border-[#A8D5BC]')}>
+        <div className={cn("bg-card border-2 rounded-xl p-4 flex items-start gap-3", riskProfile.label === 'Conservative' ? 'border-blue-200' : riskProfile.label === 'Moderate' ? 'border-[#A8D5BC]' : 'border-[#A8D5BC]')}>
           <Info className={cn("h-4 w-4 shrink-0 mt-0.5", riskProfile.color)} />
           <div>
             <div className={cn("font-black text-sm", riskProfile.color)}>{riskProfile.label} Investor</div>
-            <p className="text-xs text-slate-600 mt-0.5">{riskProfile.desc}</p>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-muted-foreground mt-0.5">{riskProfile.desc}</p>
+            <p className="text-xs text-muted-foreground mt-1">
               Recommended: Cash {riskProfile.recommended.cash}% · Bonds {riskProfile.recommended.bonds}% · Stocks {riskProfile.recommended.stocks}% · Property {riskProfile.recommended.property}%
             </p>
           </div>
         </div>
       )}
 
-      <Card className="border-none shadow-xl bg-white overflow-hidden">
+      <Card className="border-none shadow-xl bg-card overflow-hidden">
         <div className="bg-primary p-6 text-white">
           <CardTitle className="text-2xl font-black">Portfolio Builder</CardTitle>
           <p className="text-[#C8E8D8] text-sm mt-1">Allocate 100% across four asset classes. All sliders are linked — total always equals 100%.</p>
@@ -656,7 +656,7 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
                 <div key={k} className="flex items-center gap-1.5">
                   <div className={cn("h-2 w-2 rounded-full shrink-0", ASSET_META[k].color)} />
                   <span className="font-bold capitalize">{k}</span>
-                  <span className="text-slate-500">{allocation[k]}%</span>
+                  <span className="text-muted-foreground">{allocation[k]}%</span>
                 </div>
               ))}
             </div>
@@ -669,9 +669,9 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
               <div key={key} className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Icon className="h-4 w-4 text-slate-600" />
+                    <Icon className="h-4 w-4 text-muted-foreground" />
                     <span className="font-bold capitalize">{meta.label}</span>
-                    <span className="text-xs text-slate-400">{meta.desc}</span>
+                    <span className="text-xs text-muted-foreground">{meta.desc}</span>
                   </div>
                   <span className="font-black text-primary w-10 text-right">{allocation[key]}%</span>
                 </div>

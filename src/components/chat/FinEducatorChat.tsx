@@ -133,7 +133,7 @@ export function FinEducatorChat() {
           />
 
           {/* Panel */}
-          <div className="relative w-full sm:max-w-lg h-[85vh] sm:h-[600px] bg-white sm:rounded-3xl flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom-4 duration-300">
+          <div className="relative w-full sm:max-w-lg h-[85vh] sm:h-[600px] bg-card sm:rounded-3xl flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom-4 duration-300">
 
             {/* Header */}
             <div className="flex items-center gap-3 px-5 py-4 bg-[#1A1F2E] flex-shrink-0">
@@ -167,24 +167,24 @@ export function FinEducatorChat() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 bg-slate-50">
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 bg-muted">
               {messages.length === 0 ? (
                 <div className="space-y-5">
                   <div className="text-center pt-4">
                     <div className="text-3xl mb-2">🎓</div>
-                    <p className="text-slate-700 font-bold text-sm">Hi! I'm your Fin Educator.</p>
-                    <p className="text-slate-500 text-xs mt-1 leading-relaxed max-w-xs mx-auto">
+                    <p className="text-foreground font-bold text-sm">Hi! I'm your Fin Educator.</p>
+                    <p className="text-muted-foreground text-xs mt-1 leading-relaxed max-w-xs mx-auto">
                       Ask me anything about money — budgeting, investing, credit, saving, or career finance. I'm here to help.
                     </p>
                   </div>
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 text-center">Try asking</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2 text-center">Try asking</p>
                     <div className="space-y-2">
                       {SUGGESTED_QUESTIONS.map(q => (
                         <button
                           key={q}
                           onClick={() => sendMessage(q)}
-                          className="w-full text-left text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-xl px-4 py-3 hover:border-[#2E7D5A] hover:bg-[#F0FAF4] transition-all"
+                          className="w-full text-left text-xs font-medium text-foreground bg-card border border-border rounded-xl px-4 py-3 hover:border-[#2E7D5A] hover:bg-[#F0FAF4] transition-all"
                         >
                           {q}
                         </button>
@@ -212,7 +212,7 @@ export function FinEducatorChat() {
                           'max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed',
                           msg.role === 'user'
                             ? 'bg-[#2E7D5A] text-white rounded-br-sm'
-                            : 'bg-white border border-slate-200 text-slate-800 rounded-bl-sm shadow-sm'
+                            : 'bg-card border border-border text-foreground rounded-bl-sm shadow-sm'
                         )}
                       >
                         {msg.content}
@@ -224,7 +224,7 @@ export function FinEducatorChat() {
                       <div className="w-7 h-7 rounded-full bg-[#1A1F2E] flex items-center justify-center text-sm mr-2 flex-shrink-0">
                         🎓
                       </div>
-                      <div className="bg-white border border-slate-200 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
+                      <div className="bg-card border border-border rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
                         <div className="flex gap-1 items-center h-4">
                           <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '0ms' }} />
                           <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -244,8 +244,8 @@ export function FinEducatorChat() {
             </div>
 
             {/* Input */}
-            <div className="flex-shrink-0 px-4 py-3 bg-white border-t border-slate-100">
-              <div className="flex gap-2 items-end bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 focus-within:border-[#2E7D5A] transition-colors">
+            <div className="flex-shrink-0 px-4 py-3 bg-card border-t border-border">
+              <div className="flex gap-2 items-end bg-muted border border-border rounded-2xl px-4 py-2.5 focus-within:border-[#2E7D5A] transition-colors">
                 <textarea
                   ref={inputRef}
                   value={input}
@@ -254,7 +254,7 @@ export function FinEducatorChat() {
                   placeholder="Ask anything about money…"
                   rows={1}
                   disabled={loading}
-                  className="flex-1 bg-transparent text-sm text-slate-800 placeholder-slate-400 outline-none resize-none max-h-32 disabled:opacity-60"
+                  className="flex-1 bg-transparent text-sm text-foreground placeholder-muted-foreground outline-none resize-none max-h-32 disabled:opacity-60"
                   style={{ minHeight: '24px' }}
                 />
                 <button
@@ -269,7 +269,7 @@ export function FinEducatorChat() {
                   </svg>
                 </button>
               </div>
-              <p className="text-[9px] text-slate-400 text-center mt-1.5 font-medium">
+              <p className="text-[9px] text-muted-foreground text-center mt-1.5 font-medium">
                 Powered by OpenAI · For educational purposes only
               </p>
             </div>

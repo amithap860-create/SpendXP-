@@ -115,20 +115,27 @@
 }
 
 @layer utilities {
-  .heading-page    { @apply text-3xl md:text-4xl font-black tracking-tight text-slate-900; }
-  .heading-section { @apply text-xl font-black tracking-tight text-slate-900; }
-  .heading-card    { @apply text-base font-black text-slate-900; }
+  /* FIX (2026-09-29): these shared utilities hardcoded text-slate-900/400/
+     500/600/800 — colors that DON'T change in .dark (only --background,
+     --foreground, --card, --muted-foreground etc. get redefined there).
+     Every component using .heading-page, .body-default, etc. was therefore
+     invisible-on-dark no matter what. Switched to the theme-aware tokens so
+     these utilities (and everything built on them) respond to dark mode
+     automatically, app-wide, from this one place. */
+  .heading-page    { @apply text-3xl md:text-4xl font-black tracking-tight text-foreground; }
+  .heading-section { @apply text-xl font-black tracking-tight text-foreground; }
+  .heading-card    { @apply text-base font-black text-foreground; }
 
-  .label-caps    { @apply text-[10px] font-black uppercase tracking-widest text-slate-400; }
+  .label-caps    { @apply text-[10px] font-black uppercase tracking-widest text-muted-foreground; }
   .label-sage    { @apply text-[10px] font-black uppercase tracking-widest; color: hsl(var(--sage-700)); }
-  .label-section { @apply text-xs font-black uppercase tracking-widest text-slate-500; }
+  .label-section { @apply text-xs font-black uppercase tracking-widest text-muted-foreground; }
 
-  .body-default { @apply text-sm font-medium text-slate-600 leading-relaxed; }
-  .body-strong  { @apply text-sm font-black text-slate-800; }
+  .body-default { @apply text-sm font-medium text-muted-foreground leading-relaxed; }
+  .body-strong  { @apply text-sm font-black text-foreground; }
 
-  .val-xl   { @apply text-3xl font-black text-slate-900; }
-  .val-lg   { @apply text-2xl font-black text-slate-900; }
-  .val-md   { @apply text-xl font-black text-slate-900; }
+  .val-xl   { @apply text-3xl font-black text-foreground; }
+  .val-lg   { @apply text-2xl font-black text-foreground; }
+  .val-md   { @apply text-xl font-black text-foreground; }
   .val-sage { @apply text-2xl font-black; color: hsl(var(--sage-700)); }
 
   .no-scrollbar::-webkit-scrollbar { display: none; }

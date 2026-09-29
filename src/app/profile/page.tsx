@@ -147,7 +147,7 @@ function getLevelInfo(xp: number) {
 
 function ProfileSkeleton() {
   return (
-    <div className="min-h-screen bg-slate-50 pb-20">
+    <div className="min-h-screen bg-background pb-20">
       <main className="max-w-2xl mx-auto px-4 py-8 space-y-4">
         <Skeleton className="h-40 rounded-2xl" />
         <div className="grid grid-cols-3 gap-4">
@@ -270,7 +270,7 @@ function InviteParentCard({ uid, idToken }: { uid: string; idToken: (() => Promi
             </Button>
           </div>
           <div className="flex items-center justify-between">
-            <p className="text-xs text-slate-400">Link expires {expiresAt}</p>
+            <p className="text-xs text-muted-foreground">Link expires {expiresAt}</p>
             <button onClick={generate} className="text-xs text-primary font-black hover:underline" suppressHydrationWarning>
               Generate new
             </button>
@@ -309,14 +309,14 @@ function Section({
     <Card className="border-none shadow-sm overflow-hidden">
       <button
         onClick={() => setOpen(v => !v)}
-        className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition-colors"
+        className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-muted transition-colors"
         suppressHydrationWarning
       >
-        <div className="flex items-center gap-2 font-black text-sm text-slate-800">
+        <div className="flex items-center gap-2 font-black text-sm text-foreground">
           <Icon className={cn('h-4 w-4', iconColor)} />
           {title}
         </div>
-        {open ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+        {open ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
       </button>
       {open && <div className="px-5 pb-5 border-t">{children}</div>}
     </Card>
@@ -701,7 +701,7 @@ export default function ProfilePage() {
   const countryCfg = getCountryConfig(profile.countryCode ?? 'IN');
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-24 md:pb-8">
+    <div className="min-h-screen bg-background pb-24 md:pb-8">
       <main className="max-w-2xl mx-auto px-4 py-8 space-y-4">
 
         {/* ── Header card ── */}
@@ -742,10 +742,10 @@ export default function ProfilePage() {
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 mt-2">
-                    <h1 className="text-xl font-black text-slate-900 truncate">{profile.displayName}</h1>
+                    <h1 className="text-xl font-black text-foreground truncate">{profile.displayName}</h1>
                     <button
                       onClick={() => { setNameInput(profile.displayName); setEditingName(true); }}
-                      className="text-slate-400 hover:text-primary transition-colors"
+                      className="text-muted-foreground hover:text-primary transition-colors"
                       suppressHydrationWarning
                     >
                       <Pencil className="h-3.5 w-3.5" />
@@ -774,17 +774,17 @@ export default function ProfilePage() {
                       suppressHydrationWarning
                     >
                       <Badge variant="secondary" className="text-xs font-bold group-hover:bg-primary/10 transition-colors">{ageLabel}</Badge>
-                      <Pencil className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <Pencil className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                     </button>
                   )}
-                  <span className="text-xs text-slate-400 font-medium">
+                  <span className="text-xs text-muted-foreground font-medium">
                     {countryCfg.flag} {countryCfg.name} · {profile.currencyCode}
                   </span>
                 </div>
-                <p className="text-xs text-slate-400 mt-0.5 italic">{avatarCfg.archetype} · &ldquo;{avatarCfg.tagline}&rdquo;</p>
+                <p className="text-xs text-muted-foreground mt-0.5 italic">{avatarCfg.archetype} · &ldquo;{avatarCfg.tagline}&rdquo;</p>
               </div>
             </div>
-            <div className="mt-3 flex items-center gap-2 text-sm text-slate-500">
+            <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
               <Mail className="h-3.5 w-3.5" />
               <span className="font-medium truncate">{profile.email}</span>
             </div>
@@ -795,18 +795,18 @@ export default function ProfilePage() {
         <div className="grid grid-cols-3 gap-3">
           <Card className="border-none shadow-sm text-center p-4">
             <Zap className="h-5 w-5 text-[#2E7D5A] mx-auto mb-1" />
-            <div className="text-2xl font-black text-slate-900">{progression.totalXP.toLocaleString('en-IN')}</div>
-            <div className="text-xs font-black uppercase text-slate-400 tracking-widest">Total XP</div>
+            <div className="text-2xl font-black text-foreground">{progression.totalXP.toLocaleString('en-IN')}</div>
+            <div className="text-xs font-black uppercase text-muted-foreground tracking-widest">Total XP</div>
           </Card>
           <Card className="border-none shadow-sm text-center p-4">
             <BarChart3 className="h-5 w-5 text-primary mx-auto mb-1" />
-            <div className="text-2xl font-black text-slate-900">{progression.totalGamesPlayed}</div>
-            <div className="text-xs font-black uppercase text-slate-400 tracking-widest">Games</div>
+            <div className="text-2xl font-black text-foreground">{progression.totalGamesPlayed}</div>
+            <div className="text-xs font-black uppercase text-muted-foreground tracking-widest">Games</div>
           </Card>
           <Card className="border-none shadow-sm text-center p-4">
             <Award className="h-5 w-5 text-primary mx-auto mb-1" />
-            <div className="text-2xl font-black text-slate-900">{progression.badges.length}</div>
-            <div className="text-xs font-black uppercase text-slate-400 tracking-widest">Badges</div>
+            <div className="text-2xl font-black text-foreground">{progression.badges.length}</div>
+            <div className="text-xs font-black uppercase text-muted-foreground tracking-widest">Badges</div>
           </Card>
         </div>
 
@@ -820,12 +820,12 @@ export default function ProfilePage() {
           <CardContent className="space-y-2 pt-0">
             <div className="flex justify-between items-center">
               <div className={cn('px-3 py-1 rounded-full text-white text-xs font-black', levelInfo.color)}>{levelInfo.name}</div>
-              {nextLevel && <div className="text-xs font-bold text-slate-400">{nextLevel.name} in {(nextLevel.min - progression.totalXP).toLocaleString('en-IN')} XP</div>}
+              {nextLevel && <div className="text-xs font-bold text-muted-foreground">{nextLevel.name} in {(nextLevel.min - progression.totalXP).toLocaleString('en-IN')} XP</div>}
             </div>
-            <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+            <div className="h-2.5 bg-muted rounded-full overflow-hidden">
               <div className={cn('h-full rounded-full transition-all duration-700', levelInfo.color)} style={{ width: `${progressPct}%` }} />
             </div>
-            <div className="text-xs text-slate-400 font-medium text-right">{xpIntoLevel.toLocaleString('en-IN')} / {xpForLevel.toLocaleString('en-IN')} XP</div>
+            <div className="text-xs text-muted-foreground font-medium text-right">{xpIntoLevel.toLocaleString('en-IN')} / {xpForLevel.toLocaleString('en-IN')} XP</div>
           </CardContent>
         </Card>
 
@@ -847,7 +847,7 @@ export default function ProfilePage() {
                   <div className="flex items-center gap-2">
                     <Scale className="h-4 w-4 text-primary shrink-0" />
                     <span className="text-xs font-black uppercase tracking-widest text-primary">Order of the Golden Ledger</span>
-                    {saga && <span className="hidden sm:inline text-[10px] text-slate-400 border border-slate-200 rounded-full px-2 py-0.5 font-bold">{saga.name}</span>}
+                    {saga && <span className="hidden sm:inline text-[10px] text-muted-foreground border border-border rounded-full px-2 py-0.5 font-bold">{saga.name}</span>}
                   </div>
                   <Link href="/story" className="text-xs font-black text-primary hover:underline uppercase tracking-widest">Lore →</Link>
                 </div>
@@ -859,22 +859,22 @@ export default function ProfilePage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2 mb-1">
-                      <span className="text-base font-black text-slate-900">{rank.name}</span>
-                      <span className="text-[11px] font-bold text-slate-400">{rank.district}</span>
+                      <span className="text-base font-black text-foreground">{rank.name}</span>
+                      <span className="text-[11px] font-bold text-muted-foreground">{rank.district}</span>
                     </div>
-                    <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden mb-1">
+                    <div className="h-1.5 bg-muted rounded-full overflow-hidden mb-1">
                       <div className="h-full bg-gradient-to-r from-primary to-primary/60 rounded-full" style={{ width: `${rankPct}%` }} />
                     </div>
-                    <p className="text-[11px] font-bold text-slate-400">
+                    <p className="text-[11px] font-bold text-muted-foreground">
                       {nextRank ? `${(nextRank.minXP - totalXP).toLocaleString()} XP to ${nextRank.name}` : 'Max Rank!'}
                     </p>
                   </div>
                 </div>
 
                 {/* Mission brief */}
-                <div className="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                <div className="bg-muted rounded-xl p-3 border border-border">
                   <p className="text-xs font-black uppercase tracking-widest text-primary mb-1 flex items-center gap-1"><BookOpen className="h-3.5 w-3.5" /> Current Mission</p>
-                  <p className="text-xs font-medium text-slate-600 italic">"{rank.storyLine}"</p>
+                  <p className="text-xs font-medium text-foreground italic">"{rank.storyLine}"</p>
                 </div>
 
                 {/* Fog threat compact */}
@@ -886,7 +886,7 @@ export default function ProfilePage() {
                   </div>
                   <div className="flex-1 bg-primary/5 border border-primary/10 rounded-xl p-3">
                     <p className="text-xs font-black uppercase tracking-widest text-primary mb-1 flex items-center gap-1"><ShieldCheck className="h-3.5 w-3.5" /> Counter</p>
-                    <p className="text-[10px] text-slate-700 leading-tight font-medium">{fog.weakness.slice(0, 70)}…</p>
+                    <p className="text-[10px] text-foreground leading-tight font-medium">{fog.weakness.slice(0, 70)}…</p>
                   </div>
                 </div>
 
@@ -902,7 +902,7 @@ export default function ProfilePage() {
         {(
           <Section title={`Badges (${progression.badges.length})`} icon={Trophy} iconColor="text-[#2E7D5A]" defaultOpen={true}>
             {progression.badges.length === 0 ? (
-              <p className="pt-4 text-xs text-slate-400 font-medium">Complete quests and lessons to earn your first badge.</p>
+              <p className="pt-4 text-xs text-muted-foreground font-medium">Complete quests and lessons to earn your first badge.</p>
             ) : (
               <div className="flex flex-wrap gap-2 pt-4">
                 {progression.badges.map(b => {
@@ -927,8 +927,8 @@ export default function ProfilePage() {
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{countryCfg.flag}</span>
                   <div>
-                    <p className="font-black text-slate-800">{countryCfg.name}</p>
-                    <p className="text-xs text-slate-400 font-bold">{profile.currencyCode}</p>
+                    <p className="font-black text-foreground">{countryCfg.name}</p>
+                    <p className="text-xs text-muted-foreground font-bold">{profile.currencyCode}</p>
                   </div>
                 </div>
                 <Button
@@ -943,7 +943,7 @@ export default function ProfilePage() {
               </div>
             ) : (
               <div className="space-y-3">
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Select your country</p>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Select your country</p>
                 <div className="grid grid-cols-2 gap-2">
                   {COUNTRIES.map(c => (
                     <button
@@ -954,13 +954,13 @@ export default function ProfilePage() {
                         'flex items-center gap-2 p-3 rounded-xl border-2 text-left transition-all text-sm font-bold',
                         pendingCountryCode === c.code
                           ? 'border-primary bg-primary/5 shadow-md'
-                          : 'border-slate-100 bg-white hover:border-slate-200'
+                          : 'border-border bg-card'
                       )}
                     >
                       <span className="text-lg">{c.flag}</span>
                       <div className="min-w-0">
-                        <p className="text-xs font-black text-slate-800 truncate">{c.name}</p>
-                        <p className="text-[10px] text-slate-400">{c.currency.code}</p>
+                        <p className="text-xs font-black text-foreground truncate">{c.name}</p>
+                        <p className="text-[10px] text-muted-foreground">{c.currency.code}</p>
                       </div>
                     </button>
                   ))}
@@ -971,7 +971,7 @@ export default function ProfilePage() {
                 </div>
               </div>
             )}
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className="text-xs text-muted-foreground leading-relaxed">
               Changing your country updates how virtual money amounts are displayed throughout the app. Your balance is not affected.
             </p>
           </div>
@@ -991,8 +991,8 @@ export default function ProfilePage() {
         <Section title="Appearance" icon={theme === 'dark' ? Moon : Sun} iconColor="text-primary">
           <div className="pt-4 flex items-center justify-between">
             <div>
-              <p className="font-black text-slate-800">{theme === 'dark' ? 'Dark mode' : 'Light mode'}</p>
-              <p className="text-xs text-slate-400 font-bold">Some screens haven&apos;t been updated for dark mode yet</p>
+              <p className="font-black text-foreground">{theme === 'dark' ? 'Dark mode' : 'Light mode'}</p>
+              <p className="text-xs text-muted-foreground font-bold">Some screens haven&apos;t been updated for dark mode yet</p>
             </div>
             <Button
               variant="outline"
@@ -1015,7 +1015,7 @@ export default function ProfilePage() {
           <Section title="Change Password" icon={Lock} iconColor="text-primary">
             <div className="space-y-3 pt-4">
               <div>
-                <Label className="text-xs font-bold text-slate-500 mb-1 block">Current Password</Label>
+                <Label className="text-xs font-bold text-muted-foreground mb-1 block">Current Password</Label>
                 <div className="relative">
                   <Input
                     type={showOldPw ? 'text' : 'password'}
@@ -1027,7 +1027,7 @@ export default function ProfilePage() {
                   />
                   <button
                     onClick={() => setShowOldPw(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     suppressHydrationWarning
                   >
                     {showOldPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -1035,7 +1035,7 @@ export default function ProfilePage() {
                 </div>
               </div>
               <div>
-                <Label className="text-xs font-bold text-slate-500 mb-1 block">New Password</Label>
+                <Label className="text-xs font-bold text-muted-foreground mb-1 block">New Password</Label>
                 <div className="relative">
                   <Input
                     type={showNewPw ? 'text' : 'password'}
@@ -1047,7 +1047,7 @@ export default function ProfilePage() {
                   />
                   <button
                     onClick={() => setShowNewPw(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     suppressHydrationWarning
                   >
                     {showNewPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -1055,7 +1055,7 @@ export default function ProfilePage() {
                 </div>
               </div>
               <div>
-                <Label className="text-xs font-bold text-slate-500 mb-1 block">Confirm New Password</Label>
+                <Label className="text-xs font-bold text-muted-foreground mb-1 block">Confirm New Password</Label>
                 <Input
                   type="password"
                   value={confirmPassword}
@@ -1081,10 +1081,10 @@ export default function ProfilePage() {
         <Section title="Family &amp; Linked Accounts" icon={Users} iconColor="text-primary">
           <div className="space-y-4 pt-4">
             {/* Parent toggle */}
-            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border">
+            <div className="flex items-center justify-between p-3 bg-muted rounded-xl border">
               <div>
-                <div className="font-bold text-sm text-slate-800">Parent account</div>
-                <div className="text-xs text-slate-500 mt-0.5">Turn this on if you are a parent monitoring a child</div>
+                <div className="font-bold text-sm text-foreground">Parent account</div>
+                <div className="text-xs text-muted-foreground mt-0.5">Turn this on if you are a parent monitoring a child</div>
               </div>
               <button
                 onClick={handleToggleParent}
@@ -1093,25 +1093,25 @@ export default function ProfilePage() {
               >
                 {profile.isParent
                   ? <ToggleRight className="h-8 w-8" />
-                  : <ToggleLeft className="h-8 w-8 text-slate-400" />}
+                  : <ToggleLeft className="h-8 w-8 text-muted-foreground" />}
               </button>
             </div>
 
             {/* Children list (parent only) */}
             {profile.isParent && (
               <div className="space-y-2">
-                <div className="text-xs font-black uppercase text-slate-400 tracking-widest">Linked Children</div>
+                <div className="text-xs font-black uppercase text-muted-foreground tracking-widest">Linked Children</div>
                 {linkedChildren.length === 0 ? (
-                  <p className="text-sm text-slate-500">No children linked yet. Send a link invitation below.</p>
+                  <p className="text-sm text-muted-foreground">No children linked yet. Send a link invitation below.</p>
                 ) : (
                   linkedChildren.map(child => (
-                    <div key={child.uid} className="flex items-center gap-3 p-3 bg-white rounded-xl border">
+                    <div key={child.uid} className="flex items-center gap-3 p-3 bg-card rounded-xl border">
                       <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-black text-sm">
                         {(child.displayName[0] ?? 'C').toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="font-bold text-sm truncate">{child.displayName}</div>
-                        <div className="text-xs text-slate-400 truncate">{child.email}</div>
+                        <div className="text-xs text-muted-foreground truncate">{child.email}</div>
                       </div>
                       <Badge variant="outline" className="text-[10px] capitalize shrink-0">{child.ageGroup}</Badge>
                     </div>
@@ -1120,7 +1120,7 @@ export default function ProfilePage() {
 
                 {/* Send link invitation via email */}
                 <div className="pt-2 border-t">
-                  <p className="text-xs text-slate-500 mb-2">
+                  <p className="text-xs text-muted-foreground mb-2">
                     To link a child&apos;s account, send them a verification link. They open it and it connects their account to yours.
                   </p>
                   {linkEmailSent ? (
@@ -1173,24 +1173,24 @@ export default function ProfilePage() {
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => router.push('/learn')}
-            className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border hover:shadow-md transition-shadow text-left"
+            className="flex items-center gap-3 p-4 bg-card rounded-2xl shadow-sm border hover:shadow-md transition-shadow text-left"
             suppressHydrationWarning
           >
             <BookOpen className="h-7 w-7 text-primary shrink-0" />
             <div>
-              <div className="font-black text-sm text-slate-900">Learn</div>
-              <div className="text-xs text-slate-400">Open Academy</div>
+              <div className="font-black text-sm text-foreground">Learn</div>
+              <div className="text-xs text-muted-foreground">Open Academy</div>
             </div>
           </button>
           <button
             onClick={() => router.push('/games')}
-            className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border hover:shadow-md transition-shadow text-left"
+            className="flex items-center gap-3 p-4 bg-card rounded-2xl shadow-sm border hover:shadow-md transition-shadow text-left"
             suppressHydrationWarning
           >
             <Zap className="h-7 w-7 text-[#2E7D5A] shrink-0" />
             <div>
-              <div className="font-black text-sm text-slate-900">Games</div>
-              <div className="text-xs text-slate-400">Earn more XP</div>
+              <div className="font-black text-sm text-foreground">Games</div>
+              <div className="text-xs text-muted-foreground">Earn more XP</div>
             </div>
           </button>
         </div>
@@ -1200,13 +1200,13 @@ export default function ProfilePage() {
             these two full-width buttons are all direct children of the same
             space-y-4 container, but flat buttons stacked with no card
             boundary read as visually cramped even at the same pixel gap. */}
-        <div className="pt-3 mt-1 border-t border-slate-100 space-y-3">
+        <div className="pt-3 mt-1 border-t border-border space-y-3">
         {isPremium ? (
           <Card className="border-primary/20 bg-primary/5">
             <CardContent className="p-4 flex items-center justify-between gap-3">
               <div>
                 <div className="font-black text-sm text-primary">SpendXP Premium ✦</div>
-                <div className="text-xs text-slate-500">
+                <div className="text-xs text-muted-foreground">
                   {expiryLabel
                     ? expiryLabel
                     : premiumPlan === 'quarterly' ? '3-Month Plan' : 'Monthly Plan'}
@@ -1236,7 +1236,7 @@ export default function ProfilePage() {
         {!logoutConfirm ? (
           <Button
             variant="outline"
-            className="w-full min-h-[44px] border-slate-300 text-slate-700 gap-2"
+            className="w-full min-h-[44px] border-border text-foreground gap-2"
             onClick={() => setLogoutConfirm(true)}
             suppressHydrationWarning
           >
@@ -1264,8 +1264,8 @@ export default function ProfilePage() {
           <div className="pt-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-black text-slate-800">Replay Welcome Tour</p>
-                <p className="text-xs text-slate-400 font-bold">See the intro slides and app walkthrough again</p>
+                <p className="font-black text-foreground">Replay Welcome Tour</p>
+                <p className="text-xs text-muted-foreground font-bold">See the intro slides and app walkthrough again</p>
               </div>
               <Button
                 variant="outline"
@@ -1288,7 +1288,7 @@ export default function ProfilePage() {
               <span>This is permanent. All your XP, badges, and progress will be deleted and cannot be recovered.</span>
             </div>
             <div>
-              <Label className="text-xs font-bold text-slate-500 mb-1 block">Type DELETE to confirm</Label>
+              <Label className="text-xs font-bold text-muted-foreground mb-1 block">Type DELETE to confirm</Label>
               <Input
                 value={deleteConfirmText}
                 onChange={e => setDeleteConfirmText(e.target.value)}
@@ -1299,7 +1299,7 @@ export default function ProfilePage() {
             </div>
             {isEmailUser && (
               <div>
-                <Label className="text-xs font-bold text-slate-500 mb-1 block">Enter your password</Label>
+                <Label className="text-xs font-bold text-muted-foreground mb-1 block">Enter your password</Label>
                 <Input
                   type="password"
                   value={deletePassword}
@@ -1331,15 +1331,15 @@ export default function ProfilePage() {
           onClick={() => setShowAvatarPicker(false)}
         >
           <div
-            className="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl p-6 space-y-5 max-h-[85vh] overflow-y-auto"
+            className="bg-card w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl p-6 space-y-5 max-h-[85vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-black text-slate-900">Change Operative</h2>
-                <p className="text-xs text-slate-400 font-medium">Pick your financial alter-ego</p>
+                <h2 className="text-lg font-black text-foreground">Change Operative</h2>
+                <p className="text-xs text-muted-foreground font-medium">Pick your financial alter-ego</p>
               </div>
-              <button onClick={() => setShowAvatarPicker(false)} className="text-slate-400 hover:text-slate-600" suppressHydrationWarning>
+              <button onClick={() => setShowAvatarPicker(false)} className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -1354,14 +1354,14 @@ export default function ProfilePage() {
                     'flex flex-col items-center gap-1.5 p-2 rounded-2xl border-2 transition-all duration-200',
                     avatarCfg.id === avatar.id
                       ? `border-primary bg-primary/5 scale-105 shadow-md`
-                      : 'border-slate-100 bg-white hover:border-slate-300'
+                      : 'border-border bg-card hover:border-border'
                   )}
                 >
                   <div className={cn('w-14 h-14 rounded-xl overflow-hidden bg-gradient-to-br', avatar.bgGradient)}>
                     <Image src={avatar.imagePath} alt={avatar.name} width={56} height={56} className="w-full h-full object-cover object-top scale-110" />
                   </div>
-                  <span className="text-[10px] font-black text-slate-600 truncate w-full text-center">{avatar.name}</span>
-                  <span className="text-[10px] text-slate-400 truncate w-full text-center">{avatar.archetype}</span>
+                  <span className="text-[10px] font-black text-muted-foreground truncate w-full text-center">{avatar.name}</span>
+                  <span className="text-[10px] text-muted-foreground truncate w-full text-center">{avatar.archetype}</span>
                   {avatarCfg.id === avatar.id && (
                     <span className="text-[10px] font-black uppercase tracking-wider text-primary">Active</span>
                   )}

@@ -153,11 +153,11 @@ function InlineCalculator({ question }: { question: string }) {
   return (
     <div className="space-y-3">
       {showSITab && (
-        <div className="flex rounded-xl overflow-hidden border border-slate-200">
+        <div className="flex rounded-xl overflow-hidden border border-border">
           {(['basic', 'si'] as const).map(m => (
             <button key={m} onClick={() => setMode(m)}
               className={cn('flex-1 py-2 text-xs font-black uppercase transition-colors',
-                mode === m ? 'bg-primary text-white' : 'bg-slate-50 text-slate-500 hover:bg-slate-100')}
+                mode === m ? 'bg-primary text-white' : 'bg-muted text-muted-foreground hover:bg-muted')}
               suppressHydrationWarning>
               {m === 'basic' ? 'Calculator' : '% Interest'}
             </button>
@@ -181,18 +181,18 @@ function InlineCalculator({ question }: { question: string }) {
           </div>
         </div>
       ) : (
-        <div className="space-y-2 bg-slate-50 rounded-2xl p-4 border">
-          <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2">Simple Interest = (P × R × T) ÷ 100</p>
+        <div className="space-y-2 bg-muted rounded-2xl p-4 border">
+          <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest mb-2">Simple Interest = (P × R × T) ÷ 100</p>
           {[
             { label: 'Principal (P) ₹', val: principal, set: setPrincipal, placeholder: '10000' },
             { label: 'Rate (R) % per year', val: rate, set: setRate, placeholder: '12' },
             { label: 'Time (T) in years', val: time, set: setTime, placeholder: '2' },
           ].map(({ label, val, set, placeholder }) => (
             <div key={label}>
-              <label className="text-[10px] font-bold text-slate-500 block mb-0.5">{label}</label>
+              <label className="text-[10px] font-bold text-muted-foreground block mb-0.5">{label}</label>
               <input type="number" value={val} onChange={e => { set(e.target.value); setSiResult(null); }}
                 placeholder={placeholder}
-                className="w-full border rounded-lg px-3 py-2 text-sm font-bold bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="w-full border rounded-lg px-3 py-2 text-sm font-bold bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
               />
             </div>
           ))}
@@ -352,7 +352,7 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
   if (gameState === 'IDLE') {
     return (
       <>
-      <Card className="max-w-2xl mx-auto border-none shadow-2xl bg-white overflow-hidden">
+      <Card className="max-w-2xl mx-auto border-none shadow-2xl bg-card overflow-hidden">
         <div className="bg-primary p-8 md:p-10 text-white text-center relative">
           <HowToPlayButton onClick={tutorial.reopen} position="right" />
           <Zap className="h-10 w-10 text-accent mx-auto mb-6" />
@@ -361,8 +361,8 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
         </div>
         <CardContent className="p-6 md:p-10 space-y-8">
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-3"><Calendar className="h-5 w-5 text-primary" /><div className="text-xs md:text-sm font-bold">10 Scenarios</div></div>
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-3"><Timer className="h-5 w-5 text-accent" /><div className="text-xs md:text-sm font-bold">15s Limit</div></div>
+            <div className="p-4 rounded-xl bg-muted border border-border flex items-center gap-3"><Calendar className="h-5 w-5 text-primary" /><div className="text-xs md:text-sm font-bold">10 Scenarios</div></div>
+            <div className="p-4 rounded-xl bg-muted border border-border flex items-center gap-3"><Timer className="h-5 w-5 text-accent" /><div className="text-xs md:text-sm font-bold">15s Limit</div></div>
           </div>
           <Button onClick={startGame} className="w-full h-14 md:h-16 text-lg md:text-xl font-black rounded-2xl shadow-xl shadow-primary/20 min-h-[44px]" suppressHydrationWarning>START QUIZ</Button>
         </CardContent>
@@ -389,7 +389,7 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
     return (
       <div className="grid lg:grid-cols-12 gap-8 max-w-6xl mx-auto">
         <div className="lg:col-span-7">
-          <Card className="border-none shadow-2xl bg-white overflow-hidden">
+          <Card className="border-none shadow-2xl bg-card overflow-hidden">
             <div className="bg-primary p-8 md:p-10 text-white text-center">
               <Trophy className="h-10 w-10 mx-auto mb-4" />
               <h2 className="text-3xl md:text-4xl font-black mb-2">Quiz Complete!</h2>
@@ -397,9 +397,9 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
             </div>
             <CardContent className="p-6 md:p-10 space-y-10">
               <div className="grid grid-cols-3 gap-3 md:gap-6">
-                <div className="p-4 md:p-6 rounded-2xl bg-slate-50 border text-center"><div className="text-xl md:text-3xl font-black text-primary mb-1">{score}/10</div><div className="text-[10px] md:text-xs font-bold uppercase text-muted-foreground">Score</div></div>
-                <div className="p-4 md:p-6 rounded-2xl bg-slate-50 border text-center"><div className="text-xl md:text-3xl font-black text-accent mb-1">{bestStreak}</div><div className="text-[10px] md:text-xs font-bold uppercase text-muted-foreground">Streak</div></div>
-                <div className="p-4 md:p-6 rounded-2xl bg-slate-50 border text-center"><div className="text-xl md:text-3xl font-black text-primary mb-1">{Math.round((score/10)*100)}%</div><div className="text-[10px] md:text-xs font-bold uppercase text-muted-foreground">Acc.</div></div>
+                <div className="p-4 md:p-6 rounded-2xl bg-muted border text-center"><div className="text-xl md:text-3xl font-black text-primary mb-1">{score}/10</div><div className="text-[10px] md:text-xs font-bold uppercase text-muted-foreground">Score</div></div>
+                <div className="p-4 md:p-6 rounded-2xl bg-muted border text-center"><div className="text-xl md:text-3xl font-black text-accent mb-1">{bestStreak}</div><div className="text-[10px] md:text-xs font-bold uppercase text-muted-foreground">Streak</div></div>
+                <div className="p-4 md:p-6 rounded-2xl bg-muted border text-center"><div className="text-xl md:text-3xl font-black text-primary mb-1">{Math.round((score/10)*100)}%</div><div className="text-[10px] md:text-xs font-bold uppercase text-muted-foreground">Acc.</div></div>
               </div>
               <div className="space-y-6">
                 <h3 className="font-black text-xl md:text-2xl flex items-center gap-2"><BarChart2 className="h-6 w-6 text-primary" /> Category Breakdown</h3>
@@ -486,11 +486,11 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
           </div>
           <div className="flex items-center gap-2">
             {comboActive && <Badge className="bg-accent animate-bounce font-black text-[10px] md:text-xs">+50 XP COMBO!</Badge>}
-            <span className="text-[10px] text-slate-400 font-mono">{questionTimerSeconds}s</span>
+            <span className="text-[10px] text-muted-foreground font-mono">{questionTimerSeconds}s</span>
             <button onClick={() => { pauseGame(); setPauseTab('glossary'); }}
               className="h-8 w-8 bg-slate-200 hover:bg-slate-300 rounded-full flex items-center justify-center transition-colors"
               suppressHydrationWarning>
-              <Pause className="h-3.5 w-3.5 text-slate-700" />
+              <Pause className="h-3.5 w-3.5 text-foreground" />
             </button>
           </div>
         </div>
@@ -504,13 +504,13 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
         </div>
 
         {/* Question card */}
-        <Card className="border-none shadow-xl bg-white overflow-hidden">
+        <Card className="border-none shadow-xl bg-card overflow-hidden">
           <div className="p-6 md:p-8 space-y-5 md:space-y-6">
 
             {/* Category + difficulty + ① info button */}
             <div className="flex items-center gap-2 flex-wrap">
               <Badge variant="outline" className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-primary">{currentQuestion.category}</Badge>
-              <Badge variant="outline" className="text-[10px] md:text-xs font-bold capitalize text-slate-400">{currentQuestion.difficulty}</Badge>
+              <Badge variant="outline" className="text-[10px] md:text-xs font-bold capitalize text-muted-foreground">{currentQuestion.difficulty}</Badge>
               <button
                 onClick={() => setShowQuestionInfo(v => !v)}
                 className="ml-auto h-7 w-7 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors"
@@ -523,23 +523,23 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
 
             {/* Per-question key terms popover */}
             {showQuestionInfo && (
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2 animate-in slide-in-from-top-2 duration-200">
+              <div className="bg-muted border border-border rounded-xl p-4 space-y-2 animate-in slide-in-from-top-2 duration-200">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{currentQuestion.category} — Key Terms</span>
-                  <button onClick={() => setShowQuestionInfo(false)} className="text-slate-400 hover:text-slate-600" suppressHydrationWarning>
+                  <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">{currentQuestion.category} — Key Terms</span>
+                  <button onClick={() => setShowQuestionInfo(false)} className="text-muted-foreground hover:text-foreground" suppressHydrationWarning>
                     <X className="h-3.5 w-3.5" />
                   </button>
                 </div>
                 {categoryTerms.map(({ term, def }) => (
                   <div key={term} className="flex items-start gap-2">
                     <span className="text-primary font-black text-xs mt-0.5 shrink-0">•</span>
-                    <div className="text-xs text-slate-700"><span className="font-black">{term}:</span> {def}</div>
+                    <div className="text-xs text-foreground"><span className="font-black">{term}:</span> {def}</div>
                   </div>
                 ))}
               </div>
             )}
 
-            <h2 className="text-xl md:text-2xl font-bold text-slate-900 leading-relaxed md:leading-tight">{currentQuestion.question}</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-foreground leading-relaxed md:leading-tight">{currentQuestion.question}</h2>
 
             <div className="grid gap-3">
               {currentQuestion.shuffledOptions.map((opt, i) => (
@@ -550,7 +550,7 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
                   className={cn(
                     "w-full min-h-[56px] p-4 md:p-5 text-left rounded-xl border-2 transition-all flex items-center justify-between group",
                     selectedOption === null
-                      ? "hover:border-primary hover:bg-primary/5 border-slate-100"
+                      ? "hover:border-primary hover:bg-primary/5 border-border"
                       : i === currentQuestion.shuffledCorrectIndex
                         ? "bg-[#E8F5EE] border-primary text-[#1A1F2E]"
                         : selectedOption === i

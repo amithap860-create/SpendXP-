@@ -81,7 +81,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
     // when currentBalance < 0 with a 0 starting balance, ratio was NaN and
     // fell through unpredictably. Guard the division explicitly.
     if (currentBalance > quest.startingBalance) return 'text-primary';
-    if (currentBalance === quest.startingBalance) return 'text-slate-600';
+    if (currentBalance === quest.startingBalance) return 'text-muted-foreground';
     if (quest.startingBalance === 0) return 'text-rose-600'; // any negative dip from a 0 base is a loss
     const ratio = currentBalance / quest.startingBalance;
     if (ratio > 0.5) return 'text-[#2E7D5A]';
@@ -119,7 +119,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
 
   if (state.status === 'INTRO') {
     return (
-      <div className="flex-1 flex flex-col p-4 md:p-6 animate-in fade-in zoom-in duration-500 bg-slate-50 min-h-screen-safe">
+      <div className="flex-1 flex flex-col p-4 md:p-6 animate-in fade-in zoom-in duration-500 bg-background min-h-screen-safe">
         <Card className="max-w-xl w-full mx-auto border-none shadow-xl overflow-hidden">
           <div className="bg-primary p-6 md:p-8 text-white text-center relative overflow-hidden">
             <div className="absolute top-0 right-0 p-6 opacity-10 rotate-12">
@@ -158,14 +158,14 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
   // ── Daily limit reached — free user used 3 quests today ─────────────────────
   if (state.status === 'LIMIT_REACHED') {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center min-h-screen-safe bg-slate-50">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center min-h-screen-safe bg-background">
         <div className="max-w-md w-full space-y-6">
           <div className="w-20 h-20 mx-auto rounded-full bg-amber-100 flex items-center justify-center">
             <Trophy className="h-10 w-10 text-amber-600" />
           </div>
           <div>
-            <h2 className="text-2xl font-black text-slate-900 mb-2">Daily Quest Limit Reached</h2>
-            <p className="text-slate-500 font-medium">
+            <h2 className="text-2xl font-black text-foreground mb-2">Daily Quest Limit Reached</h2>
+            <p className="text-muted-foreground font-medium">
               You've completed 3 quests today — great work, Strategist!
               Come back tomorrow for more missions, or upgrade to Premium for unlimited quests.
             </p>
@@ -179,7 +179,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
             </a>
             <button
               onClick={onComplete}
-              className="h-12 px-6 rounded-xl border border-slate-200 text-slate-600 font-black uppercase tracking-widest text-sm hover:bg-slate-50 transition-colors"
+              className="h-12 px-6 rounded-xl border border-border text-muted-foreground font-black uppercase tracking-widest text-sm hover:bg-muted transition-colors"
             >
               Back to Case Files
             </button>
@@ -199,7 +199,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
       : (state.serverResult?.xpAwarded ?? state.totalXPEarned + quest.xpReward);
 
     return (
-      <div className="flex-1 flex flex-col p-4 md:p-6 animate-in slide-in-from-bottom-8 duration-700 bg-slate-50 min-h-screen-safe overflow-y-auto">
+      <div className="flex-1 flex flex-col p-4 md:p-6 animate-in slide-in-from-bottom-8 duration-700 bg-background min-h-screen-safe overflow-y-auto">
         <Card className="max-w-3xl w-full mx-auto border-none shadow-xl overflow-hidden mb-6">
           <div className={cn("p-6 md:p-8 text-white text-center", isReplay ? "bg-slate-700" : "bg-primary")}>
             <Trophy className="h-10 w-10 mx-auto mb-4 animate-bounce" />
@@ -226,7 +226,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
               <ResultCard
                 label={isReplay ? 'XP (Replay)' : 'XP Gained'}
                 val={isReplay ? 'No XP' : `+${xpDisplay}`}
-                color={isReplay ? 'text-slate-400' : 'text-primary'}
+                color={isReplay ? 'text-muted-foreground' : 'text-primary'}
               />
             </div>
 
@@ -241,17 +241,17 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
                   const optimal = step?.choices.find(c => c.isOptimal);
 
                   return (entry && step && choice && optimal) ? (
-                    <div key={i} className="p-4 rounded-2xl border border-slate-100 bg-white space-y-3">
+                    <div key={i} className="p-4 rounded-2xl border border-border bg-card space-y-3">
                       <div className="flex justify-between items-start gap-4">
-                        <div className="font-bold text-slate-900 text-sm leading-tight">Step {i+1}: {step.title}</div>
+                        <div className="font-bold text-foreground text-sm leading-tight">Step {i+1}: {step.title}</div>
                         <Badge className={choice.isOptimal ? "bg-[#C8E8D8] text-primary text-[10px]" : "bg-amber-100 text-amber-700 text-[10px]"}>
                           {choice.isOptimal ? 'Optimal' : 'Sub-optimal'}
                         </Badge>
                       </div>
                       <div className="grid md:grid-cols-2 gap-4 text-xs">
                         <div className="space-y-1">
-                          <p className="text-slate-400 font-bold uppercase text-[9px]">Your Choice</p>
-                          <p className="font-medium text-slate-700">{localiseText(choice.text)}</p>
+                          <p className="text-muted-foreground font-bold uppercase text-[9px]">Your Choice</p>
+                          <p className="font-medium text-foreground">{localiseText(choice.text)}</p>
                         </div>
                         {!choice.isOptimal && (
                           <div className="space-y-1">
@@ -260,7 +260,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
                           </div>
                         )}
                       </div>
-                      <div className="p-3 bg-slate-50 rounded-xl text-xs font-medium text-slate-600 border border-slate-100">
+                      <div className="p-3 bg-muted rounded-xl text-xs font-medium text-muted-foreground border border-border">
                         {localiseText(choice.explanation)}
                       </div>
                     </div>
@@ -292,7 +292,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
             </div>
 
             <div className="flex flex-col md:flex-row gap-3">
-              <Button variant="outline" onClick={resetQuest} className="h-12 px-8 rounded-xl font-black text-slate-500 border-2 text-sm" suppressHydrationWarning>
+              <Button variant="outline" onClick={resetQuest} className="h-12 px-8 rounded-xl font-black text-muted-foreground border-2 text-sm" suppressHydrationWarning>
                 <RotateCcw className="h-4 w-4 mr-2" /> Replay Simulation
               </Button>
               <Button onClick={onComplete} className="flex-1 h-12 text-base font-black rounded-xl shadow-lg" suppressHydrationWarning>
@@ -309,13 +309,13 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
   // show a graceful error instead of rendering the literal string `""`.
   if (!currentStep && state.status === 'IN_PROGRESS') {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center min-h-screen-safe bg-slate-50">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center min-h-screen-safe bg-background">
         <div className="max-w-md w-full space-y-4">
-          <div className="w-16 h-16 mx-auto rounded-full bg-slate-100 flex items-center justify-center">
-            <Target className="h-8 w-8 text-slate-400" />
+          <div className="w-16 h-16 mx-auto rounded-full bg-muted flex items-center justify-center">
+            <Target className="h-8 w-8 text-muted-foreground" />
           </div>
-          <h2 className="text-xl font-black text-slate-700">Quest step not found</h2>
-          <p className="text-slate-400 text-sm">This step could not be loaded. Please restart the quest.</p>
+          <h2 className="text-xl font-black text-foreground">Quest step not found</h2>
+          <p className="text-muted-foreground text-sm">This step could not be loaded. Please restart the quest.</p>
           <button
             onClick={resetQuest}
             className="h-11 px-6 rounded-xl bg-primary text-white font-black uppercase tracking-widest text-sm hover:bg-primary/90 transition-colors"
@@ -328,24 +328,24 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
   }
 
   return (
-    <div className="flex-1 flex flex-col p-4 md:p-6 gap-6 md:gap-8 bg-slate-50 min-h-screen-safe overflow-y-auto">
+    <div className="flex-1 flex flex-col p-4 md:p-6 gap-6 md:gap-8 bg-background min-h-screen-safe overflow-y-auto">
       <div className="sticky top-4 z-50 animate-in slide-in-from-top-4 duration-500 space-y-1.5">
-        <div className="max-w-3xl mx-auto bg-white/90 backdrop-blur-md rounded-3xl border-2 border-slate-100 shadow-xl p-4 flex items-center justify-around">
+        <div className="max-w-3xl mx-auto bg-card/90 backdrop-blur-md rounded-3xl border-2 border-border shadow-xl p-4 flex items-center justify-around">
           <div className="flex flex-col items-center">
-            <span className="text-[10px] font-black uppercase text-slate-400">Balance ({activeCurrency.code})</span>
+            <span className="text-[10px] font-black uppercase text-muted-foreground">Balance ({activeCurrency.code})</span>
             <span className={cn("text-lg md:text-xl font-black transition-colors duration-500", getBalanceColor())}>
               {formatINR(currentBalance)}
             </span>
           </div>
-          <div className="w-px h-8 bg-slate-100" />
+          <div className="w-px h-8 bg-muted" />
           <div className="flex flex-col items-center">
-            <span className="text-[10px] font-black uppercase text-slate-400">Mission XP</span>
+            <span className="text-[10px] font-black uppercase text-muted-foreground">Mission XP</span>
             <span className="text-lg md:text-xl font-black text-primary">+{state.totalXPEarned}</span>
           </div>
-          <div className="w-px h-8 bg-slate-100" />
+          <div className="w-px h-8 bg-muted" />
           <div className="flex flex-col items-center">
-            <span className="text-[10px] font-black uppercase text-slate-400">Health</span>
-            <span className="text-lg md:text-xl font-black text-slate-900">{getHealthLabel(50 + state.totalHealthDelta)}</span>
+            <span className="text-[10px] font-black uppercase text-muted-foreground">Health</span>
+            <span className="text-lg md:text-xl font-black text-foreground">{getHealthLabel(50 + state.totalHealthDelta)}</span>
           </div>
         </div>
       </div>
@@ -357,9 +357,9 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
               <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                 <Target className="h-4 w-4" />
               </div>
-              <h2 className="text-lg md:text-xl font-black text-slate-900 tracking-tight">{currentStep?.title}</h2>
+              <h2 className="text-lg md:text-xl font-black text-foreground tracking-tight">{currentStep?.title}</h2>
             </div>
-            <div className="p-4 md:p-5 bg-slate-50 rounded-2xl border-l-4 border-primary italic text-sm md:text-base text-slate-700 leading-relaxed font-medium">
+            <div className="p-4 md:p-5 bg-muted rounded-2xl border-l-4 border-primary italic text-sm md:text-base text-foreground leading-relaxed font-medium">
               &ldquo;{localiseText(currentStep?.narrative ?? '')}&rdquo;
             </div>
           </div>
@@ -396,7 +396,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
                   className={cn(
                     "w-full min-h-[60px] p-4 md:p-5 text-left rounded-2xl border-2 transition-all duration-300 flex items-center justify-between group",
                     !selectedChoiceId
-                      ? "hover:border-primary hover:bg-primary/5 border-slate-100"
+                      ? "hover:border-primary hover:bg-primary/5 border-border"
                       : choice.id === selectedChoiceId
                         ? choice.isOptimal
                           // FIX (2026-09-12): the "wrong answer" branch below used to be
@@ -428,15 +428,15 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
           {selectedChoiceId && activeChoice && (
             <div className="animate-in slide-in-from-top-4 duration-500 space-y-5 mt-4">
               <div className="space-y-4">
-                <div className="p-4 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                  <p className="font-bold text-slate-800 text-sm md:text-base leading-relaxed">&ldquo;{localiseText(activeChoice.consequence)}&rdquo;</p>
+                <div className="p-4 bg-muted rounded-2xl border border-dashed border-border">
+                  <p className="font-bold text-foreground text-sm md:text-base leading-relaxed">&ldquo;{localiseText(activeChoice.consequence)}&rdquo;</p>
                 </div>
 
                 <div className="p-5 bg-primary/5 rounded-2xl border border-primary/10 space-y-2">
                   <div className="flex items-center gap-2 text-[10px] font-black uppercase text-primary tracking-widest">
                     <TrendingUp className="h-4 w-4" /> Intelligence Report
                   </div>
-                  <p className="text-sm font-medium text-slate-600 leading-relaxed italic">
+                  <p className="text-sm font-medium text-muted-foreground leading-relaxed italic">
                     {localiseText(activeChoice.explanation)}
                   </p>
                 </div>
@@ -463,10 +463,10 @@ function StatPill({ label, val }: { label: string; val: string }) {
   );
 }
 
-function ResultCard({ label, val, color = 'text-slate-900', icon: Icon }: { label: string; val: string; color?: string; icon?: any }) {
+function ResultCard({ label, val, color = 'text-foreground', icon: Icon }: { label: string; val: string; color?: string; icon?: any }) {
   return (
-    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center text-center">
-      <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</div>
+    <div className="p-4 rounded-2xl bg-muted border border-border flex flex-col items-center justify-center text-center">
+      <div className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">{label}</div>
       <div className={cn("text-lg md:text-xl font-black flex items-center gap-1.5", color)}>
         {Icon && <Icon className="h-4 w-4" />} {val}
       </div>

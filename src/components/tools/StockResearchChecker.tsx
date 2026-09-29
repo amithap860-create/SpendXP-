@@ -100,9 +100,9 @@ export function StockResearchChecker() {
       <div className="space-y-1">
         <div className="flex items-center gap-2">
           <span className="text-lg">📖</span>
-          <p className="text-xs font-black uppercase tracking-widest text-slate-500">Based on Peter Lynch's Framework</p>
+          <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">Based on Peter Lynch's Framework</p>
         </div>
-        <p className="text-sm text-slate-600 leading-relaxed">
+        <p className="text-sm text-muted-foreground leading-relaxed">
           Answer 4 questions about any stock. Lynch's filter eliminates 95% of listed companies — what's left is your <strong>research shortlist</strong>.
         </p>
       </div>
@@ -110,13 +110,13 @@ export function StockResearchChecker() {
       {/* Stock name input */}
       {!submitted && (
         <div>
-          <label className="block text-xs font-black uppercase tracking-widest text-slate-500 mb-1.5">Stock or company name</label>
+          <label className="block text-xs font-black uppercase tracking-widest text-muted-foreground mb-1.5">Stock or company name</label>
           <input
             type="text"
             value={stockName}
             onChange={e => setStockName(e.target.value)}
             placeholder="e.g. Tata Motors, Zomato, Infosys..."
-            className="w-full h-10 px-3 rounded-xl border border-slate-200 text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="w-full h-10 px-3 rounded-xl border border-border text-sm font-medium text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
         </div>
       )}
@@ -125,13 +125,13 @@ export function StockResearchChecker() {
       {!submitted ? (
         <div className="space-y-4">
           {LYNCH_QUESTIONS.map(q => (
-            <div key={q.id} className="bg-slate-50 rounded-2xl p-4 space-y-3">
+            <div key={q.id} className="bg-muted rounded-2xl p-4 space-y-3">
               <div>
                 <div className="flex items-start gap-2">
                   <span className="shrink-0 w-6 h-6 rounded-full bg-slate-200 text-slate-600 text-xs font-black flex items-center justify-center mt-0.5">{q.id}</span>
                   <div>
-                    <p className="text-sm font-black text-slate-900">{q.label}</p>
-                    <p className="text-xs text-slate-500 italic mt-0.5">{q.teaser}</p>
+                    <p className="text-sm font-black text-foreground">{q.label}</p>
+                    <p className="text-xs text-muted-foreground italic mt-0.5">{q.teaser}</p>
                   </div>
                 </div>
               </div>
@@ -142,7 +142,7 @@ export function StockResearchChecker() {
                     'flex-1 h-9 rounded-xl text-xs font-black uppercase tracking-widest transition-all',
                     answers[q.id] === 'yes'
                       ? 'bg-emerald-600 text-white shadow-sm'
-                      : 'bg-white border border-slate-200 text-slate-600 hover:border-emerald-400 hover:text-emerald-700'
+                      : 'bg-card border border-border text-muted-foreground hover:border-emerald-400 hover:text-emerald-700'
                   )}
                 >
                   ✓ Yes
@@ -153,7 +153,7 @@ export function StockResearchChecker() {
                     'flex-1 h-9 rounded-xl text-xs font-black uppercase tracking-widest transition-all',
                     answers[q.id] === 'no'
                       ? 'bg-red-500 text-white shadow-sm'
-                      : 'bg-white border border-slate-200 text-slate-600 hover:border-red-400 hover:text-red-600'
+                      : 'bg-card border border-border text-muted-foreground hover:border-red-400 hover:text-red-600'
                   )}
                 >
                   ✗ No
@@ -175,8 +175,8 @@ export function StockResearchChecker() {
         /* Results */
         <div className="space-y-4">
           {stockName && (
-            <p className="text-xs font-black uppercase tracking-widest text-slate-500">
-              Results for <span className="text-slate-900">{stockName}</span>
+            <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">
+              Results for <span className="text-foreground">{stockName}</span>
             </p>
           )}
 
@@ -192,7 +192,7 @@ export function StockResearchChecker() {
               />
             ))}
           </div>
-          <p className="text-center text-xs font-black text-slate-500">{score} / 4 checks passed</p>
+          <p className="text-center text-xs font-black text-muted-foreground">{score} / 4 checks passed</p>
 
           <ScoreBadge score={score} />
 
@@ -223,7 +223,7 @@ export function StockResearchChecker() {
 
           <button
             onClick={reset}
-            className="w-full h-11 rounded-xl text-sm font-black uppercase tracking-widest border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors"
+            className="w-full h-11 rounded-xl text-sm font-black uppercase tracking-widest border border-border text-foreground hover:bg-muted transition-colors"
           >
             Check Another Stock
           </button>

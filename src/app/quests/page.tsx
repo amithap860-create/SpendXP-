@@ -48,13 +48,13 @@ function CaseFileBriefing({ quest, index, fogEnemy, onAccept, onDecline }: {
   const caseId = getCaseFileId(index);
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-slate-50 flex flex-col overflow-y-auto">
+    <div className="fixed inset-0 z-[9999] bg-background flex flex-col overflow-y-auto">
       {/* Header */}
-      <div className="border-b border-slate-200 bg-white px-6 py-4 flex items-center justify-between">
-        <button onClick={onDecline} className="text-xs font-black uppercase tracking-widest text-slate-500 hover:text-slate-800 transition-colors">
+      <div className="border-b border-border bg-card px-6 py-4 flex items-center justify-between">
+        <button onClick={onDecline} className="text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">
           ← Back to HQ
         </button>
-        <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+        <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
           Order of the Golden Ledger · Intelligence Division
         </div>
       </div>
@@ -64,11 +64,11 @@ function CaseFileBriefing({ quest, index, fogEnemy, onAccept, onDecline }: {
         {/* Dossier stamp */}
         <div className="flex items-start justify-between">
           <div>
-            <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Case File</div>
+            <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Case File</div>
             <div className="text-3xl font-black text-primary tracking-tight font-mono">{caseId}</div>
           </div>
           <div className="text-right">
-            <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Classification</div>
+            <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Classification</div>
             <div className={cn(
               'text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full',
               quest.difficulty === 'beginner' ? 'bg-primary/10 text-primary' :
@@ -79,18 +79,18 @@ function CaseFileBriefing({ quest, index, fogEnemy, onAccept, onDecline }: {
         </div>
 
         {/* Divider */}
-        <div className="border border-dashed border-slate-300" />
+        <div className="border border-dashed border-border" />
 
         {/* Case title */}
         <div>
-          <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Investigation</div>
-          <h1 className="text-2xl md:text-3xl font-black text-slate-900 leading-tight">{quest.title}</h1>
+          <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">Investigation</div>
+          <h1 className="text-2xl md:text-3xl font-black text-foreground leading-tight">{quest.title}</h1>
         </div>
 
         {/* Situation report */}
-        <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-3 shadow-sm">
-          <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">Situation Report</div>
-          <p className="text-slate-700 text-sm leading-relaxed">{quest.description}</p>
+        <div className="bg-card border border-border rounded-xl p-5 space-y-3 shadow-sm">
+          <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Situation Report</div>
+          <p className="text-foreground text-sm leading-relaxed">{quest.description}</p>
         </div>
 
         {/* Fog enemy intel */}
@@ -109,27 +109,27 @@ function CaseFileBriefing({ quest, index, fogEnemy, onAccept, onDecline }: {
             </div>
           </div>
           <div className="border-t border-red-200 pt-3">
-            <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Weakness</div>
-            <p className="text-slate-600 text-xs leading-relaxed">{fogEnemy.weakness}</p>
+            <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Weakness</div>
+            <p className="text-muted-foreground text-xs leading-relaxed">{fogEnemy.weakness}</p>
           </div>
         </div>
 
         {/* Mission stats */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-white border border-slate-200 rounded-xl p-4 text-center shadow-sm">
-            <Clock className="h-4 w-4 text-slate-400 mx-auto mb-1" />
-            <div className="text-lg font-black text-slate-900">{quest.estimatedMinutes}m</div>
-            <div className="text-[9px] font-black uppercase text-slate-500">Duration</div>
+          <div className="bg-card border border-border rounded-xl p-4 text-center shadow-sm">
+            <Clock className="h-4 w-4 text-muted-foreground mx-auto mb-1" />
+            <div className="text-lg font-black text-foreground">{quest.estimatedMinutes}m</div>
+            <div className="text-[9px] font-black uppercase text-muted-foreground">Duration</div>
           </div>
-          <div className="bg-white border border-slate-200 rounded-xl p-4 text-center shadow-sm">
+          <div className="bg-card border border-border rounded-xl p-4 text-center shadow-sm">
             <Zap className="h-4 w-4 text-primary mx-auto mb-1" />
             <div className="text-lg font-black text-primary">+{quest.xpReward}</div>
-            <div className="text-[9px] font-black uppercase text-slate-500">Ledger Points</div>
+            <div className="text-[9px] font-black uppercase text-muted-foreground">Ledger Points</div>
           </div>
-          <div className="bg-white border border-slate-200 rounded-xl p-4 text-center shadow-sm">
+          <div className="bg-card border border-border rounded-xl p-4 text-center shadow-sm">
             <Shield className="h-4 w-4 text-primary mx-auto mb-1" />
-            <div className="text-lg font-black text-slate-900">{quest.steps.length}</div>
-            <div className="text-[9px] font-black uppercase text-slate-500">Decisions</div>
+            <div className="text-lg font-black text-foreground">{quest.steps.length}</div>
+            <div className="text-[9px] font-black uppercase text-muted-foreground">Decisions</div>
           </div>
         </div>
 
@@ -142,7 +142,7 @@ function CaseFileBriefing({ quest, index, fogEnemy, onAccept, onDecline }: {
           >
             Accept Case File <ArrowRight className="h-5 w-5" />
           </Button>
-          <p className="text-center text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+          <p className="text-center text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
             Your choices will affect SpendCity's stability
           </p>
         </div>
@@ -240,11 +240,11 @@ export default function QuestsHub() {
   }
 
   return (
-    <div className="min-h-screen-safe bg-slate-50 pb-24 md:pb-8">
+    <div className="min-h-screen-safe bg-background pb-24 md:pb-8">
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
 
         {/* ── ORDER HQ HERO ─────────────────────────────────────── */}
-        <section className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+        <section className="bg-card border border-border rounded-3xl overflow-hidden shadow-sm">
           <div className="grid md:grid-cols-12 gap-0">
 
             {/* Left — Rank & Status */}
@@ -260,68 +260,68 @@ export default function QuestsHub() {
 
               {/* Rank */}
               <div className="space-y-1.5">
-                <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">Your Rank</div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Your Rank</div>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-2xl bg-[#E8F5EE] flex items-center justify-center shrink-0">
                     <Award className="h-5 w-5 text-[#2E7D5A]" />
                   </div>
-                  <span className="text-3xl font-black text-slate-900">{rank.name}</span>
+                  <span className="text-3xl font-black text-foreground">{rank.name}</span>
                 </div>
-                <p className="text-slate-500 text-sm font-medium leading-relaxed">{rank.storyLine}</p>
+                <p className="text-muted-foreground text-sm font-medium leading-relaxed">{rank.storyLine}</p>
               </div>
 
               {/* XP bar */}
               <div className="space-y-2">
                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
-                  <span className="text-slate-400">Ledger Points</span>
+                  <span className="text-muted-foreground">Ledger Points</span>
                   <span className="text-[#2E7D5A]">{totalXP.toLocaleString()} XP</span>
                 </div>
-                <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-2.5 bg-muted rounded-full overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-[#2E7D5A] to-[#4EA07A] rounded-full transition-all duration-1000"
                     style={{ width: `${rankProgress * 100}%` }}
                   />
                 </div>
                 {nextRank && (
-                  <p className="text-[10px] text-slate-400 font-bold">
+                  <p className="text-[10px] text-muted-foreground font-bold">
                     {(nextRank.minXP - totalXP).toLocaleString()} XP to {nextRank.name}
                   </p>
                 )}
               </div>
 
               {/* District */}
-              <div className="flex items-center gap-2 text-sm font-bold text-slate-500">
+              <div className="flex items-center gap-2 text-sm font-bold text-muted-foreground">
                 <MapPin className="h-4 w-4 text-[#4EA07A]" />
-                Defending: <span className="text-slate-800">{rank.district}</span>
+                Defending: <span className="text-foreground">{rank.district}</span>
               </div>
             </div>
 
             {/* Right — Active Threat + City Stability */}
-            <div className="md:col-span-5 bg-[#F6FBF8] border-t md:border-t-0 md:border-l border-slate-100 p-6 md:p-10 space-y-5">
+            <div className="md:col-span-5 bg-[#F6FBF8] border-t md:border-t-0 md:border-l border-border p-6 md:p-10 space-y-5">
 
               {/* Threat header */}
-              <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+              <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                 <Flame className="h-3.5 w-3.5 text-amber-500" /> Active Threat
               </div>
 
               {/* Threat card */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-4 space-y-2 shadow-sm">
+              <div className="bg-card border border-border rounded-2xl p-4 space-y-2 shadow-sm">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0">
                     <AlertTriangle className="h-4.5 w-4.5 text-amber-500" />
                   </div>
                   <div>
-                    <div className="font-black text-slate-900 text-base leading-tight">{fogEnemy.name}</div>
-                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Gray Fog</div>
+                    <div className="font-black text-foreground text-base leading-tight">{fogEnemy.name}</div>
+                    <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Gray Fog</div>
                   </div>
                 </div>
-                <p className="text-slate-500 text-xs leading-relaxed">{fogEnemy.description}</p>
+                <p className="text-muted-foreground text-xs leading-relaxed">{fogEnemy.description}</p>
               </div>
 
               {/* City Stability */}
               <div className="space-y-2">
                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
-                  <div className="flex items-center gap-1.5 text-slate-400">
+                  <div className="flex items-center gap-1.5 text-muted-foreground">
                     <Activity className="h-3 w-3" /> City Stability
                   </div>
                   <span className={cn(
@@ -330,7 +330,7 @@ export default function QuestsHub() {
                     health.color === 'amber' ? 'text-amber-600' : 'text-rose-500'
                   )}>{progression?.financialHealth || 50}/100</span>
                 </div>
-                <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
                   <div
                     className={cn('h-full rounded-full transition-all duration-1000',
                       health.color === 'green' || health.color === 'teal' ? 'bg-[#4EA07A]' :
@@ -339,18 +339,18 @@ export default function QuestsHub() {
                     style={{ width: `${progression?.financialHealth || 50}%` }}
                   />
                 </div>
-                <p className="text-[10px] text-slate-400 font-medium">{health.description}</p>
+                <p className="text-[10px] text-muted-foreground font-medium">{health.description}</p>
               </div>
 
               {/* Seasonal saga */}
               {activeSaga && (
-                <div className="bg-white border border-[#A8D5BC] rounded-xl px-4 py-3 space-y-1">
+                <div className="bg-card border border-[#A8D5BC] rounded-xl px-4 py-3 space-y-1">
                   <div className="flex items-center gap-1.5">
                     <TrendingUp className="h-3 w-3 text-[#2E7D5A]" />
                     <div className="text-[10px] font-black uppercase tracking-widest text-[#2E7D5A]">Active Saga</div>
                   </div>
-                  <div className="text-sm font-black text-slate-800">{activeSaga.name}</div>
-                  <p className="text-[10px] text-slate-400">{activeSaga.tagline}</p>
+                  <div className="text-sm font-black text-foreground">{activeSaga.name}</div>
+                  <p className="text-[10px] text-muted-foreground">{activeSaga.tagline}</p>
                 </div>
               )}
             </div>
@@ -360,15 +360,15 @@ export default function QuestsHub() {
         {/* ── CASE FILES ─────────────────────────────────────────── */}
         <div>
           <div className="flex items-center gap-3 mb-5">
-            <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">Learning Path</div>
-            <div className="flex-1 h-px bg-slate-200" />
+            <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Learning Path</div>
+            <div className="flex-1 h-px bg-border" />
             {/* Daily quest counter for free users */}
             {!dailyStatus.isLoading && (
               <div className={cn(
                 "text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full",
                 dailyStatus.dailyLimitReached
                   ? "bg-amber-100 text-amber-700"
-                  : "text-slate-400"
+                  : "text-muted-foreground"
               )}>
                 {dailyStatus.dailyLimitReached
                   ? "Daily limit reached · Upgrade"
@@ -376,7 +376,7 @@ export default function QuestsHub() {
                 }
               </div>
             )}
-            <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+            <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
               {completedQuestIds.length}/{quests.length} Closed
             </div>
           </div>
@@ -395,7 +395,7 @@ export default function QuestsHub() {
                 <div className="flex items-center gap-3 mb-4">
                   <div className="text-[10px] font-black uppercase tracking-widest text-primary">{chapterName}</div>
                   <div className="flex-1 h-px bg-primary/20" />
-                  <div className="text-[10px] font-bold text-slate-400">
+                  <div className="text-[10px] font-bold text-muted-foreground">
                     {chapterQuests.filter(q => completedQuestIds.includes(q.id)).length}/{chapterQuests.length} done
                   </div>
                 </div>
@@ -412,7 +412,7 @@ export default function QuestsHub() {
                 <Card
                   key={quest.id}
                   className={cn(
-                    "group transition-all duration-300 border border-slate-200 bg-white shadow-sm hover:shadow-xl overflow-hidden flex flex-col",
+                    "group transition-all duration-300 border border-border bg-card shadow-sm hover:shadow-xl overflow-hidden flex flex-col",
                     isCompleted && "border-[#A8D5BC] bg-[#E8F5EE]/30",
                     isLocked && "opacity-60"
                   )}
@@ -430,7 +430,7 @@ export default function QuestsHub() {
                   <div className="p-5 md:p-6 flex flex-col flex-1">
                     {/* Case ID + status */}
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-[10px] font-black text-slate-400 tracking-widest font-mono">{caseId}</span>
+                      <span className="text-[10px] font-black text-muted-foreground tracking-widest font-mono">{caseId}</span>
                       {isCompleted ? (
                         <div className="flex items-center gap-1 text-primary text-[10px] font-black uppercase tracking-widest">
                           <CheckCircle2 className="h-3.5 w-3.5" /> Closed
@@ -457,14 +457,14 @@ export default function QuestsHub() {
 
                     <div className="mt-auto space-y-3">
                       {/* Meta row */}
-                      <div className="flex items-center gap-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                      <div className="flex items-center gap-3 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                         <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{quest.estimatedMinutes}m</span>
                         <span className="flex items-center gap-1"><Zap className="h-3 w-3 text-[#2E7D5A]" />+{quest.xpReward} XP</span>
                         <span className="flex items-center gap-1"><Shield className="h-3 w-3 text-primary" />{quest.steps.length} decisions</span>
                       </div>
 
                       {isLocked ? (
-                        <Button disabled className="w-full h-11 bg-slate-100 text-slate-400 border-none font-black" suppressHydrationWarning>
+                        <Button disabled className="w-full h-11 bg-muted text-muted-foreground border-none font-black" suppressHydrationWarning>
                           Complete prerequisite first
                         </Button>
                       ) : (

@@ -77,7 +77,7 @@ export default function ConsentPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="max-w-2xl w-full border-none shadow-2xl overflow-hidden">
         <div className="bg-primary p-8 text-white text-center">
           <ShieldCheck className="h-12 w-12 mx-auto mb-4" />
@@ -88,8 +88,8 @@ export default function ConsentPage() {
           {/* What we store */}
           <div className="grid md:grid-cols-2 gap-8">
             <div className="space-y-3">
-              <h3 className="font-black text-slate-900">What we store:</h3>
-              <ul className="space-y-2 text-sm text-slate-600">
+              <h3 className="font-black text-foreground">What we store:</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
                   Your name and birth year
@@ -105,8 +105,8 @@ export default function ConsentPage() {
               </ul>
             </div>
             <div className="space-y-3">
-              <h3 className="font-black text-slate-900">We never:</h3>
-              <ul className="space-y-2 text-sm text-slate-600">
+              <h3 className="font-black text-foreground">We never:</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-center gap-2">
                   <span className="text-green-600 font-black">✓</span>
                   Show ads on child accounts
@@ -128,13 +128,13 @@ export default function ConsentPage() {
             <div className="space-y-5 border-t pt-8">
               <div className="text-center space-y-1">
                 <h3 className="font-black text-xl">Parental Approval Required</h3>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-muted-foreground">
                   Because you're under 13, a parent or guardian must approve your account before you can play.
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-black text-slate-700">Parent or Guardian's Email</Label>
+                <Label className="text-sm font-black text-foreground">Parent or Guardian's Email</Label>
                 <div className="flex gap-2">
                   <Input
                     type="email"
@@ -161,7 +161,7 @@ export default function ConsentPage() {
                 </p>
               )}
 
-              <p className="text-xs text-slate-400 text-center">
+              <p className="text-xs text-muted-foreground text-center">
                 Your parent will receive an email from SpendXP with an approval link.
                 Your account will be ready once they approve.
               </p>
@@ -173,7 +173,7 @@ export default function ConsentPage() {
               </div>
               <div className="space-y-2">
                 <h3 className="text-2xl font-black">Request Sent!</h3>
-                <p className="text-slate-500 text-sm">
+                <p className="text-muted-foreground text-sm">
                   We've emailed <strong>{parentEmail}</strong>. Ask them to check their inbox and click the approval link.
                 </p>
               </div>

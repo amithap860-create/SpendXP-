@@ -123,7 +123,7 @@ export function BugReportButton() {
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setOpen(false)} />
 
-          <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
+          <div className="relative w-full max-w-md bg-card rounded-2xl shadow-2xl overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b bg-slate-900">
               <div className="flex items-center gap-2 text-white">
@@ -139,8 +139,8 @@ export function BugReportButton() {
               /* Thank-you state */
               <div className="p-8 text-center space-y-4">
                 <CheckCircle2 className="h-14 w-14 text-primary mx-auto" />
-                <h3 className="font-black text-xl text-slate-900">Thanks for the report!</h3>
-                <p className="text-sm text-slate-500">We&apos;ve logged the bug and will look into it. Your feedback helps make SpendXP better for everyone.</p>
+                <h3 className="font-black text-xl text-foreground">Thanks for the report!</h3>
+                <p className="text-sm text-muted-foreground">We&apos;ve logged the bug and will look into it. Your feedback helps make SpendXP better for everyone.</p>
                 <Button onClick={() => setOpen(false)} className="w-full min-h-[44px]" suppressHydrationWarning>Close</Button>
               </div>
             ) : (
@@ -148,7 +148,7 @@ export function BugReportButton() {
               <div className="p-5 space-y-4">
                 {/* Description */}
                 <div>
-                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest block mb-1.5">
+                  <label className="text-xs font-black text-muted-foreground uppercase tracking-widest block mb-1.5">
                     What went wrong? <span className="text-rose-500">*</span>
                   </label>
                   <textarea
@@ -156,17 +156,17 @@ export function BugReportButton() {
                     onChange={e => setDescription(e.target.value)}
                     placeholder="Describe what happened and what you expected instead…"
                     rows={4}
-                    className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    className="w-full border border-border rounded-xl px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
                   />
                 </div>
 
                 {/* Screen */}
                 <div>
-                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest block mb-1.5">Which screen?</label>
+                  <label className="text-xs font-black text-muted-foreground uppercase tracking-widest block mb-1.5">Which screen?</label>
                   <select
                     value={screen}
                     onChange={e => setScreen(e.target.value)}
-                    className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    className="w-full border border-border rounded-xl px-3 py-2.5 text-sm bg-card focus:outline-none focus:ring-2 focus:ring-primary/30"
                   >
                     {SCREEN_OPTIONS.map(s => <option key={s}>{s}</option>)}
                   </select>
@@ -174,16 +174,16 @@ export function BugReportButton() {
 
                 {/* Screenshot */}
                 <div>
-                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest block mb-1.5">Screenshot (optional, max 150 KB)</label>
+                  <label className="text-xs font-black text-muted-foreground uppercase tracking-widest block mb-1.5">Screenshot (optional, max 150 KB)</label>
                   <div
                     onClick={() => fileRef.current?.click()}
                     className={cn(
                       'flex items-center gap-3 border-2 border-dashed rounded-xl px-4 py-3 cursor-pointer transition-colors',
-                      screenshot ? 'border-[#4EA07A] bg-[#E8F5EE]' : 'border-slate-200 hover:border-primary/40 hover:bg-primary/5'
+                      screenshot ? 'border-[#4EA07A] bg-[#E8F5EE]' : 'border-border hover:border-primary/40 hover:bg-primary/5'
                     )}
                   >
-                    <ImagePlus className={cn('h-5 w-5 shrink-0', screenshot ? 'text-primary' : 'text-slate-400')} />
-                    <span className={cn('text-sm font-medium truncate', screenshot ? 'text-primary' : 'text-slate-400')}>
+                    <ImagePlus className={cn('h-5 w-5 shrink-0', screenshot ? 'text-primary' : 'text-muted-foreground')} />
+                    <span className={cn('text-sm font-medium truncate', screenshot ? 'text-primary' : 'text-muted-foreground')}>
                       {screenshot ? screenshotName : 'Tap to attach a screenshot'}
                     </span>
                     {screenshot && (

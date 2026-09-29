@@ -67,13 +67,13 @@ export function SWPCalculator() {
       <div className="rounded-2xl bg-blue-50 border border-blue-100 p-5 flex items-start gap-3">
         <Info className="h-5 w-5 text-primary shrink-0 mt-0.5" />
         <div className="space-y-1.5">
-          <p className="text-sm font-black text-slate-900">What is a Systematic Withdrawal Plan (SWP)?</p>
-          <p className="text-xs text-slate-700 leading-relaxed">
+          <p className="text-sm font-black text-foreground">What is a Systematic Withdrawal Plan (SWP)?</p>
+          <p className="text-xs text-foreground leading-relaxed">
             A SWP lets you withdraw a fixed amount from your investment corpus every month, like a self-managed pension.
             Your remaining money keeps growing at the fund's return rate, so the corpus lasts longer than a simple savings account.
             It is ideal for retirees, people on sabbatical, or anyone who needs regular income from their investments without selling everything at once.
           </p>
-          <p className="text-xs text-slate-600 font-semibold">Example: ₹50L corpus at 8% return → ₹25,000/month withdrawal can sustain for 35+ years.</p>
+          <p className="text-xs text-muted-foreground font-semibold">Example: ₹50L corpus at 8% return → ₹25,000/month withdrawal can sustain for 35+ years.</p>
         </div>
       </div>
 
@@ -82,7 +82,7 @@ export function SWPCalculator() {
         <div className="space-y-8">
           <div className="space-y-4">
             <div className="flex justify-between items-end">
-              <Label className="text-xs font-black uppercase text-slate-400">Starting Corpus</Label>
+              <Label className="text-xs font-black uppercase text-muted-foreground">Starting Corpus</Label>
               <span className="text-lg font-black text-primary">{formatCompact(corpus)}</span>
             </div>
             <Slider value={[corpus]} min={100000} max={10000000} step={100000} onValueChange={([v]) => setCorpus(v)} />
@@ -90,7 +90,7 @@ export function SWPCalculator() {
 
           <div className="space-y-4">
             <div className="flex justify-between items-end">
-              <Label className="text-xs font-black uppercase text-slate-400">Monthly Withdrawal</Label>
+              <Label className="text-xs font-black uppercase text-muted-foreground">Monthly Withdrawal</Label>
               <span className="text-lg font-black text-primary">{formatValue(withdrawal)}</span>
             </div>
             <Slider value={[withdrawal]} min={1000} max={100000} step={1000} onValueChange={([v]) => setWithdrawal(v)} />
@@ -98,7 +98,7 @@ export function SWPCalculator() {
 
           <div className="space-y-4">
             <div className="flex justify-between items-end">
-              <Label className="text-xs font-black uppercase text-slate-400">Expected Return Rate</Label>
+              <Label className="text-xs font-black uppercase text-muted-foreground">Expected Return Rate</Label>
               <span className="text-lg font-black text-primary">{rate}% p.a.</span>
             </div>
             <Slider value={[rate]} min={0} max={20} step={0.5} onValueChange={([v]) => setRate(v)} />
@@ -106,7 +106,7 @@ export function SWPCalculator() {
 
           <div className="space-y-4">
             <div className="flex justify-between items-end">
-              <Label className="text-xs font-black uppercase text-slate-400">Withdrawal Period</Label>
+              <Label className="text-xs font-black uppercase text-muted-foreground">Withdrawal Period</Label>
               <span className="text-lg font-black text-primary">{years} years</span>
             </div>
             <Slider value={[years]} min={1} max={40} onValueChange={([v]) => setYears(v)} />
@@ -129,25 +129,25 @@ export function SWPCalculator() {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <div className="p-4 bg-white rounded-2xl shadow-sm border border-blue-100">
-              <div className="text-[10px] font-black uppercase text-slate-400 mb-1">Total Withdrawn</div>
-              <div className="text-lg font-black text-slate-900">{formatCompact(results.totalWithdrawn)}</div>
+            <div className="p-4 bg-card rounded-2xl shadow-sm border border-blue-100">
+              <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Total Withdrawn</div>
+              <div className="text-lg font-black text-foreground">{formatCompact(results.totalWithdrawn)}</div>
             </div>
-            <div className="p-4 bg-white rounded-2xl shadow-sm border border-blue-100">
-              <div className="text-[10px] font-black uppercase text-slate-400 mb-1">Monthly Draw</div>
-              <div className="text-lg font-black text-slate-900">{formatValue(withdrawal)}</div>
+            <div className="p-4 bg-card rounded-2xl shadow-sm border border-blue-100">
+              <div className="text-[10px] font-black uppercase text-muted-foreground mb-1">Monthly Draw</div>
+              <div className="text-lg font-black text-foreground">{formatValue(withdrawal)}</div>
             </div>
           </div>
 
           {/* Sustainability bar */}
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-xs font-black uppercase text-slate-500">Plan Sustainability</span>
+              <span className="text-xs font-black uppercase text-muted-foreground">Plan Sustainability</span>
               <span className={cn('text-sm font-black', sustainabilityColor)}>
                 {results.corpusExhausted ? `${sustainabilityPct}% of period` : 'Fully Sustained ✓'}
               </span>
             </div>
-            <div className="h-3 bg-white rounded-full overflow-hidden border border-blue-100">
+            <div className="h-3 bg-card rounded-full overflow-hidden border border-blue-100">
               <div
                 className={cn('h-full rounded-full transition-all duration-700',
                   sustainabilityPct >= 100 ? 'bg-primary' : sustainabilityPct >= 60 ? 'bg-amber-400' : 'bg-rose-500'
@@ -170,7 +170,7 @@ export function SWPCalculator() {
         </div>
       </div>
 
-      <footer className="pt-6 border-t text-[10px] text-slate-400 font-medium italic text-center">
+      <footer className="pt-6 border-t text-[10px] text-muted-foreground font-medium italic text-center">
         Returns are assumed to be constant. Real fund returns vary. Consult a financial advisor before planning withdrawals from real investments.
       </footer>
     </div>

@@ -100,7 +100,7 @@ export function CreditScoreBuilder({ onExit }: { onExit: () => void }) {
 
   if (gameState === 'IDLE') return (
     <>
-    <Card className="max-w-2xl mx-auto border-none shadow-2xl bg-white text-center overflow-hidden">
+    <Card className="max-w-2xl mx-auto border-none shadow-2xl bg-card text-center overflow-hidden">
       <div className="bg-primary p-8 md:p-10 text-white relative">
         <HowToPlayButton onClick={tutorial.reopen} position="right" />
         <ShieldCheck className="h-12 w-12 mx-auto mb-6" />
@@ -141,7 +141,7 @@ export function CreditScoreBuilder({ onExit }: { onExit: () => void }) {
     return (
       <div className="grid lg:grid-cols-12 gap-8 max-w-6xl mx-auto">
         <div className="lg:col-span-7">
-          <Card className="border-none shadow-2xl bg-white overflow-hidden">
+          <Card className="border-none shadow-2xl bg-card overflow-hidden">
             <div className="bg-primary p-8 md:p-10 text-white text-center">
               <Trophy className="h-12 w-12 md:h-16 md:w-16 mx-auto mb-4" />
               <CardTitle className="text-3xl md:text-4xl font-black mb-2">Simulation Complete!</CardTitle>
@@ -150,7 +150,7 @@ export function CreditScoreBuilder({ onExit }: { onExit: () => void }) {
             <CardContent className="p-8 md:p-10 space-y-6 text-center">
               <div className={cn("text-6xl md:text-7xl font-black", band.color)}>{currentScore}</div>
               <Badge className={cn("text-sm px-4 py-1 font-black border-none", band.bg, band.color)}>{band.label}</Badge>
-              <p className="text-sm text-slate-600 bg-slate-50 rounded-xl p-4 text-left">{feedback}</p>
+              <p className="text-sm text-muted-foreground bg-muted rounded-xl p-4 text-left">{feedback}</p>
               <div className="flex flex-col md:flex-row gap-3 md:gap-4">
                 <Button variant="outline" onClick={startGame} className="flex-1 h-14 font-bold text-sm md:text-base">Try Again</Button>
                 <Button onClick={onExit} className="flex-1 h-14 font-bold text-sm md:text-lg">Return to Hub</Button>
@@ -171,13 +171,13 @@ export function CreditScoreBuilder({ onExit }: { onExit: () => void }) {
         <Card className="p-6 md:p-8 text-center flex flex-col items-center justify-center">
           <div className={cn("text-5xl md:text-6xl font-black", band.color)}>{currentScore}</div>
           <Badge className={cn("mt-2 border-none px-4 py-1 font-black", band.bg, band.color)}>{band.label}</Badge>
-          <p className="mt-3 text-xs font-black uppercase text-slate-400 tracking-widest">Month {currentRound} / {rounds}</p>
-          
+          <p className="mt-3 text-xs font-black uppercase text-muted-foreground tracking-widest">Month {currentRound} / {rounds}</p>
+
           <div className="w-full mt-6 space-y-3">
             {factors.map(f => (
               <div key={f.id} className="space-y-1">
-                <div className="flex justify-between text-[9px] font-black uppercase text-slate-400"><span>{f.name}</span><span>{f.currentValue}%</span></div>
-                <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                <div className="flex justify-between text-[9px] font-black uppercase text-muted-foreground"><span>{f.name}</span><span>{f.currentValue}%</span></div>
+                <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
                   <div className="h-full bg-primary transition-all duration-1000" style={{ width: `${f.currentValue}%` }} />
                 </div>
               </div>
@@ -189,7 +189,7 @@ export function CreditScoreBuilder({ onExit }: { onExit: () => void }) {
       <div className="lg:col-span-8">
         {currentChoice && (
           <Card className="p-6 md:p-8 flex flex-col min-h-[400px]">
-            <h2 className="text-xl md:text-2xl font-bold mb-6 text-slate-900 leading-tight">{currentChoice.scenario}</h2>
+            <h2 className="text-xl md:text-2xl font-bold mb-6 text-foreground leading-tight">{currentChoice.scenario}</h2>
             <div className="grid gap-3 md:gap-4">
               {currentChoice.options.map((opt, i) => (
                 <Button 

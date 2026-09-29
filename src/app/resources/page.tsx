@@ -57,7 +57,7 @@ const DailyChallengeCard: React.FC<{ featuredFramework: FrameworkId }> = ({ feat
       <CardContent className="p-4">
         <div className="flex items-center gap-2 mb-2">
           <Sparkles className="h-5 w-5 text-primary" />
-          <h3 className="font-bold text-slate-900">Today's Resource Challenge</h3>
+          <h3 className="font-bold text-foreground">Today's Resource Challenge</h3>
         </div>
         <p className="text-sm text-primary mb-2">
           Complete {framework.name} today for double XP!
@@ -223,7 +223,7 @@ const FrameworkCard: React.FC<{
                 key={level}
                 className={cn(
                   "h-2 w-2 fill-current",
-                  level <= framework.difficulty ? "text-slate-600" : "text-slate-200"
+                  level <= framework.difficulty ? "text-foreground" : "text-slate-200"
                 )}
               />
             ))}
@@ -233,13 +233,13 @@ const FrameworkCard: React.FC<{
         {/* Body */}
         <div className="mb-4">
           <h3 className="font-bold text-lg mb-2">{framework.name}</h3>
-          <p className="text-slate-600 text-sm mb-3">{framework.description}</p>
+          <p className="text-muted-foreground text-sm mb-3">{framework.description}</p>
           <div className="flex flex-wrap gap-2">
             {framework.topics.map((topic) => (
-              <Badge 
-                key={topic} 
-                variant="secondary" 
-                className="text-xs bg-slate-100 text-slate-700"
+              <Badge
+                key={topic}
+                variant="secondary"
+                className="text-xs bg-muted text-muted-foreground"
               >
                 {topic}
               </Badge>
@@ -249,7 +249,7 @@ const FrameworkCard: React.FC<{
 
         {/* Related Content */}
         <div className="mb-4">
-          <p className="text-xs font-semibold text-slate-500 mb-2">Related in SpendXP:</p>
+          <p className="text-xs font-semibold text-muted-foreground mb-2">Related in SpendXP:</p>
           <div className="flex flex-wrap gap-1">
             {CURRICULUM_MAP[framework.id].relatedGames.map((game) => (
               <Button
@@ -333,7 +333,7 @@ const FDICQuiz: React.FC<{
   };
 
   return (
-    <div className="p-4 bg-slate-50 rounded-lg">
+    <div className="p-4 bg-muted rounded-lg">
       <h4 className="font-semibold mb-3">Quick Check: Which age group are you learning for?</h4>
       <div className="space-y-2">
         {ageOptions.map((option) => (
@@ -349,7 +349,7 @@ const FDICQuiz: React.FC<{
       </div>
       {showTip && (
         <div className="mt-3 p-3 bg-[#E8F5EE] border border-[#A8D5BC] rounded-lg">
-          <p className="text-sm text-slate-800">
+          <p className="text-sm text-foreground">
             <strong>FDIC Tip:</strong> {ageOptions.find(opt => opt.value === selectedAge)?.tip}
           </p>
         </div>
@@ -380,9 +380,9 @@ const FDICSkills: React.FC<{
   const skillCount = Object.values(skills).filter(Boolean).length;
 
   return (
-    <div className="p-4 bg-slate-50 rounded-lg">
+    <div className="p-4 bg-muted rounded-lg">
       <h4 className="font-semibold mb-3">Real World Skill Check</h4>
-      <p className="text-sm text-slate-600 mb-4">
+      <p className="text-sm text-muted-foreground mb-4">
         Mark the skills you already know: {skillCount}/3
       </p>
       <div className="space-y-3">
@@ -441,7 +441,7 @@ const CFPBTimeline: React.FC<{
   const currentStage = getCurrentStage();
 
   return (
-    <div className="p-4 bg-slate-50 rounded-lg">
+    <div className="p-4 bg-muted rounded-lg">
       <h4 className="font-semibold mb-3">Financial Learning Journey</h4>
       <div className="space-y-4">
         {stages.map((stage, index) => (
@@ -449,20 +449,20 @@ const CFPBTimeline: React.FC<{
             key={stage.age}
             className={cn(
               "p-3 rounded-lg border-2 transition-all",
-              index === currentStage 
-                ? "border-primary bg-[#E8F5EE]" 
-                : "border-slate-200 bg-white"
+              index === currentStage
+                ? "border-primary bg-[#E8F5EE]"
+                : "border-border bg-card"
             )}
           >
             <div className="flex items-center justify-between mb-2">
               <h5 className="font-semibold text-sm">Ages {stage.age}</h5>
               {index === currentStage && (
-                <Badge className="bg-[#C8E8D8] text-slate-800">You are here</Badge>
+                <Badge className="bg-[#C8E8D8] text-foreground">You are here</Badge>
               )}
             </div>
             <div className="space-y-1">
               {stage.topics.map((topic) => (
-                <div key={topic} className="text-xs text-slate-600">
+                <div key={topic} className="text-xs text-muted-foreground">
                   • {topic}
                 </div>
               ))}
@@ -488,11 +488,11 @@ const CFPBTeachMissions: React.FC<{
   ];
 
   return (
-    <div className="p-4 bg-slate-50 rounded-lg">
+    <div className="p-4 bg-muted rounded-lg">
       <h4 className="font-semibold mb-3">Practice Missions</h4>
       <div className="space-y-2">
         {missions.map((mission, index) => (
-          <div key={index} className="flex items-center justify-between p-2 bg-white rounded border">
+          <div key={index} className="flex items-center justify-between p-2 bg-card rounded border">
             <span className="text-sm">{mission.title}</span>
             <Button
               size="sm"
@@ -536,7 +536,7 @@ const CFPBProgression: React.FC<{
   const currentLevel = getCurrentLevel();
 
   return (
-    <div className="p-4 bg-slate-50 rounded-lg">
+    <div className="p-4 bg-muted rounded-lg">
       <h4 className="font-semibold mb-3">Your Financial Capability Journey</h4>
       <div className="space-y-3">
         {levels.map((level, index) => (
@@ -544,11 +544,11 @@ const CFPBProgression: React.FC<{
             key={level.level}
             className={cn(
               "relative p-3 rounded-lg border transition-all",
-              index + 1 === currentLevel 
-                ? "border-primary bg-[#E8F5EE] ring-2 ring-primary/30" 
+              index + 1 === currentLevel
+                ? "border-primary bg-[#E8F5EE] ring-2 ring-primary/30"
                 : index + 1 < currentLevel
                 ? "border-green-200 bg-[#E8F5EE]"
-                : "border-slate-200 bg-white"
+                : "border-border bg-card"
             )}
           >
             {index + 1 === currentLevel && (
@@ -559,7 +559,7 @@ const CFPBProgression: React.FC<{
               {index + 1 < currentLevel && <CheckCircle2 className="h-4 w-4 text-primary" />}
               {index + 1 === currentLevel && <Circle className="h-4 w-4 text-primary fill-current" />}
             </div>
-            <div className="text-xs text-slate-600">
+            <div className="text-xs text-muted-foreground">
               {level.skills.join(' • ')}
             </div>
           </div>
@@ -647,7 +647,7 @@ const KhanExplorer: React.FC<{
   const topic = topics.find(t => t.id === selectedTopic);
 
   return (
-    <div className="p-4 bg-slate-50 rounded-lg">
+    <div className="p-4 bg-muted rounded-lg">
       <h4 className="font-semibold mb-3">Explore Financial Topics</h4>
       <div className="grid grid-cols-2 gap-2 mb-4">
         {topics.map((topic) => (
@@ -664,9 +664,9 @@ const KhanExplorer: React.FC<{
         ))}
       </div>
       {topic && (
-        <div className="p-3 bg-white rounded-lg border">
+        <div className="p-3 bg-card rounded-lg border">
           <h5 className="font-semibold mb-2">{topic.title}</h5>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-muted-foreground">
             {topic.explanations[ageGroup]}
           </p>
         </div>
@@ -711,10 +711,10 @@ const KhanBudget: React.FC<{
   const amounts = values.map(v => Math.round(income * v / 100));
 
   return (
-    <div className="p-4 bg-slate-50 rounded-lg">
+    <div className="p-4 bg-muted rounded-lg">
       <h4 className="font-semibold mb-3">Monthly Budget Planner</h4>
       <div className="mb-4">
-        <p className="text-sm text-slate-600 mb-2">
+        <p className="text-sm text-muted-foreground mb-2">
           Monthly Income: <strong>₹{income.toLocaleString('en-IN')}</strong>
         </p>
         <div className="space-y-3">
@@ -761,7 +761,7 @@ const KhanBudget: React.FC<{
             />
           </div>
         </div>
-        <div className="mt-3 text-sm text-slate-600">
+        <div className="mt-3 text-sm text-muted-foreground">
           Total: {values.reduce((a, b) => a + b, 0)}%
         </div>
       </div>
@@ -839,7 +839,7 @@ const OECDDomains: React.FC<{
   };
 
   return (
-    <div className="p-4 bg-slate-50 rounded-lg">
+    <div className="p-4 bg-muted rounded-lg">
       <h4 className="font-semibold mb-3">Financial Competence Domains</h4>
       <div className="grid grid-cols-2 gap-3">
         {domains.map((domain) => (
@@ -853,7 +853,7 @@ const OECDDomains: React.FC<{
               {exploredDomains.includes(domain.id) && <CheckCircle2 className="h-3 w-3 mt-1" />}
             </Button>
             {expandedDomain === domain.id && (
-              <div className="mt-2 p-2 bg-white rounded border text-xs">
+              <div className="mt-2 p-2 bg-card rounded border text-xs">
                 {domain.competencies[ageGroup].map((competency) => (
                   <div key={competency} className="py-1">• {competency}</div>
                 ))}
@@ -900,7 +900,7 @@ const OECDCompetency: React.FC<{
   const userCompetencies = competencyMap[ageGroup];
 
   return (
-    <div className="p-4 bg-slate-50 rounded-lg">
+    <div className="p-4 bg-muted rounded-lg">
       <h4 className="font-semibold mb-3">Your Financial Competency Map</h4>
       <div className="space-y-3">
         {Object.entries(userCompetencies).map(([domain, competencies]) => (
@@ -908,7 +908,7 @@ const OECDCompetency: React.FC<{
             <h5 className="font-semibold text-sm mb-2">{domain}</h5>
             <div className="grid grid-cols-1 gap-1">
               {competencies.map((competency) => (
-                <div key={competency} className="text-xs text-slate-600 flex items-center">
+                <div key={competency} className="text-xs text-muted-foreground flex items-center">
                   <CheckCircle2 className="h-3 w-3 text-primary mr-2" />
                   {competency}
                 </div>
@@ -954,9 +954,9 @@ const CFPBRating: React.FC<{
   };
 
   return (
-    <div className="p-4 bg-slate-50 rounded-lg">
+    <div className="p-4 bg-muted rounded-lg">
       <h4 className="font-semibold mb-3">Rate SpendXP's Financial Education</h4>
-      <p className="text-sm text-slate-600 mb-4">
+      <p className="text-sm text-muted-foreground mb-4">
         Help us improve by rating these key aspects:
       </p>
       <div className="space-y-3">
@@ -1077,10 +1077,10 @@ export default function ResourcesPage() {
     return (
       <div className="min-h-screen bg-background pb-20">
         <main className="max-w-5xl mx-auto px-4 py-6 space-y-8">
-          <div className="h-32 bg-slate-100 rounded-2xl animate-pulse" />
+          <div className="h-32 bg-muted rounded-2xl animate-pulse" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1,2,3,4,5,6].map(i => (
-              <div key={i} className="h-64 bg-slate-100 rounded-2xl animate-pulse" />
+              <div key={i} className="h-64 bg-muted rounded-2xl animate-pulse" />
             ))}
           </div>
         </main>
@@ -1114,16 +1114,16 @@ export default function ResourcesPage() {
       <main className="max-w-5xl mx-auto px-4 py-6">
         {/* Hero Section */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Your Financial Learning Library
           </h1>
-          <p className="text-lg text-slate-600 mb-6">
+          <p className="text-lg text-muted-foreground mb-6">
             {getSubtitle()}
           </p>
-          
+
           {/* Progress Bar */}
           <div className="max-w-md mx-auto mb-4">
-            <div className="flex justify-between text-sm text-slate-600 mb-2">
+            <div className="flex justify-between text-sm text-muted-foreground mb-2">
               <span>Resources Explored</span>
               <span>{resourceProgress.exploredCards.length}/10</span>
             </div>
@@ -1162,7 +1162,7 @@ export default function ResourcesPage() {
         {resourceProgress.exploredCards.length >= 10 && !resourceProgress.completedInteractions.includes('all_cards_explored') && (
           <div className="mt-8 p-6 bg-gradient-to-r from-primary/5 to-blue-50 border-2 border-[#A8D5BC] rounded-2xl text-center">
             <Award className="h-12 w-12 text-primary mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-slate-900 mb-2 flex items-center justify-center gap-2">
+            <h3 className="text-xl font-bold text-foreground mb-2 flex items-center justify-center gap-2">
               <Trophy className="h-5 w-5 text-primary" /> Framework Master Achievement!
             </h3>
             <p className="text-primary mb-4">

@@ -91,7 +91,7 @@ export function EMICalculator() {
         <div className="space-y-6 md:space-y-8">
           <div className="space-y-4">
             <div className="flex justify-between items-end">
-              <Label className="text-[10px] md:text-xs font-black uppercase text-slate-400">Loan Amount</Label>
+              <Label className="text-[10px] md:text-xs font-black uppercase text-muted-foreground">Loan Amount</Label>
               <span className="text-base md:text-lg font-black text-primary">{formatValue(principal)}</span>
             </div>
             <Slider 
@@ -106,14 +106,14 @@ export function EMICalculator() {
               type="number" 
               value={principal} 
               onChange={(e) => setPrincipal(Number(e.target.value))}
-              className="h-12 text-base md:text-lg font-bold bg-slate-50 border-none"
+              className="h-12 text-base md:text-lg font-bold bg-muted border-none"
               suppressHydrationWarning
             />
           </div>
 
           <div className="space-y-4">
             <div className="flex justify-between items-end">
-              <Label className="text-[10px] md:text-xs font-black uppercase text-slate-400">Rate (% p.a.)</Label>
+              <Label className="text-[10px] md:text-xs font-black uppercase text-muted-foreground">Rate (% p.a.)</Label>
               <span className="text-base md:text-lg font-black text-primary">{rate}%</span>
             </div>
             <Slider 
@@ -128,8 +128,8 @@ export function EMICalculator() {
 
           <div className="space-y-4">
             <div className="flex justify-between items-end">
-              <Label className="text-[10px] md:text-xs font-black uppercase text-slate-400">Tenure (Months)</Label>
-              <span className="text-base md:text-lg font-black text-primary">{tenure} <span className="text-xs text-slate-400">({Math.round(tenure/12)}y)</span></span>
+              <Label className="text-[10px] md:text-xs font-black uppercase text-muted-foreground">Tenure (Months)</Label>
+              <span className="text-base md:text-lg font-black text-primary">{tenure} <span className="text-xs text-muted-foreground">({Math.round(tenure/12)}y)</span></span>
             </div>
             <Slider 
               value={[tenure]} 
@@ -143,25 +143,25 @@ export function EMICalculator() {
         </div>
 
         {/* OUTPUTS */}
-        <div className="bg-slate-50 rounded-3xl p-6 md:p-8 space-y-6 md:space-y-8 flex flex-col justify-center">
+        <div className="bg-muted rounded-3xl p-6 md:p-8 space-y-6 md:space-y-8 flex flex-col justify-center">
           <div className="text-center space-y-1">
-            <div className="text-[10px] md:text-xs font-black uppercase text-slate-400 tracking-widest">Monthly EMI</div>
+            <div className="text-[10px] md:text-xs font-black uppercase text-muted-foreground tracking-widest">Monthly EMI</div>
             <div className="text-4xl md:text-5xl font-black text-primary">{formatValue(stats.emi)}</div>
           </div>
 
           <div className="grid grid-cols-2 gap-3 md:gap-4">
-            <div className="p-4 bg-white rounded-2xl shadow-sm border border-slate-100 text-center">
-              <div className="text-[10px] md:text-xs font-black uppercase text-slate-400 mb-1">Total Interest</div>
+            <div className="p-4 bg-card rounded-2xl shadow-sm border border-border text-center">
+              <div className="text-[10px] md:text-xs font-black uppercase text-muted-foreground mb-1">Total Interest</div>
               <div className="text-base md:text-lg font-black text-rose-500">{formatValue(stats.totalInterest)}</div>
             </div>
-            <div className="p-4 bg-white rounded-2xl shadow-sm border border-slate-100 text-center">
-              <div className="text-[10px] md:text-xs font-black uppercase text-slate-400 mb-1">Total Payable</div>
-              <div className="text-base md:text-lg font-black text-slate-900">{formatValue(stats.totalPayable)}</div>
+            <div className="p-4 bg-card rounded-2xl shadow-sm border border-border text-center">
+              <div className="text-[10px] md:text-xs font-black uppercase text-muted-foreground mb-1">Total Payable</div>
+              <div className="text-base md:text-lg font-black text-foreground">{formatValue(stats.totalPayable)}</div>
             </div>
           </div>
 
           <div className="space-y-3">
-            <div className="flex justify-between text-[10px] md:text-xs font-black uppercase text-slate-400">
+            <div className="flex justify-between text-[10px] md:text-xs font-black uppercase text-muted-foreground">
               <span>Principal ({Math.round(100 - stats.interestPercent)}%)</span>
               <span>Interest ({Math.round(stats.interestPercent)}%)</span>
             </div>
@@ -188,7 +188,7 @@ export function EMICalculator() {
 
       <div className="p-5 md:p-6 rounded-3xl bg-primary/5 border-2 border-primary/10 flex items-start gap-4">
         <Info className="h-5 w-5 md:h-6 md:w-6 text-primary mt-1 shrink-0" />
-        <p className="text-xs md:text-sm font-medium text-slate-600 leading-relaxed">
+        <p className="text-xs md:text-sm font-medium text-muted-foreground leading-relaxed">
           {rate < 10 ? (
             "This is a relatively low interest rate — likely a home loan or secured loan."
           ) : rate <= 18 ? (
@@ -210,10 +210,10 @@ export function EMICalculator() {
         </Button>
 
         {showBreakdown && (
-          <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white animate-in fade-in duration-300">
+          <div className="overflow-x-auto rounded-3xl border border-border bg-card animate-in fade-in duration-300">
             <div className="min-w-[400px]">
               <Table>
-                <TableHeader className="bg-slate-50">
+                <TableHeader className="bg-muted">
                   <TableRow>
                     <TableHead className="font-black text-[9px] uppercase">Year</TableHead>
                     <TableHead className="font-black text-[9px] uppercase">Principal</TableHead>
