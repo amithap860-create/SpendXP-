@@ -2439,7 +2439,15 @@ export const quests: Quest[] = [
     category: 'investing',
     difficulty: 'advanced',
     ageGroups: ['teen', 'senior'],
-    chapterNumber: 9,
+    // FIX (2026-09-29): was chapterNumber 9 — a duplicate of 'balanced-budget'
+    // (a beginner budgeting quest), and it meant this ADVANCED investing quest
+    // (Peter Lynch's 4-question filter) displayed sandwiched among beginner
+    // lifestyle/income quests near the top of the page instead of alongside
+    // the other advanced investing quests near the end. Moved to 21 — right
+    // after 'promoter-buying-trap' (20), which shares this quest's 'Investing
+    // Decisions' chapter group, so that whole chapter now correctly appears
+    // last instead of 9th.
+    chapterNumber: 21,
     chapter: 'Investing Decisions',
     estimatedMinutes: 7,
     xpReward: 280,
