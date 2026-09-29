@@ -383,3 +383,84 @@ export function getCurrentSaga(): SeasonalSaga | undefined {
 export function getCaseFileId(questIndex: number): string {
   return `CF-${String(questIndex + 1).padStart(3, '0')}`;
 }
+
+// ─── QUEST → DISTRICT / FOG ENEMY MAPPING ───────────────────────────────────
+// FIX (2026-09-30): the Case File briefing screen (src/app/quests/page.tsx)
+// already had a UI built for showing "here's the threat this quest fights" —
+// but it was wired to the PLAYER'S rank, not the quest's actual topic, so
+// every quest you opened showed the same threat as every other quest at your
+// current rank. A Credit quest and an Investing quest looked identical. This
+// table is the missing piece: which real district and fog enemy each quest
+// (by content, not just its chapter label) actually belongs to. Assigned by
+// reading each quest's description, not just its chapter/category field —
+// several quests (raise-trap, investment-trap) would have been mismapped by
+// category/chapter alone. Games get the same treatment below.
+export const QUEST_FOG_MAP: Record<string, { districtId: string; fogEnemyId: string }> = {
+  // The Neighbourhood — Impulse Storm (everyday spending impulses, peer pressure, lifestyle creep)
+  'two-piggy-banks':      { districtId: 'neighbourhood', fogEnemyId: 'impulse_storm' },
+  'birthday-loot':        { districtId: 'neighbourhood', fogEnemyId: 'impulse_storm' },
+  'pocket-money-puzzle':  { districtId: 'neighbourhood', fogEnemyId: 'impulse_storm' },
+  'lemonade-stand':       { districtId: 'neighbourhood', fogEnemyId: 'impulse_storm' },
+  'group-chat-dilemma':   { districtId: 'neighbourhood', fogEnemyId: 'impulse_storm' },
+  'raise-trap':           { districtId: 'neighbourhood', fogEnemyId: 'impulse_storm' }, // lifestyle inflation after a raise
+  'phone-plan-trap':      { districtId: 'neighbourhood', fogEnemyId: 'impulse_storm' },
+  'balanced-budget':      { districtId: 'neighbourhood', fogEnemyId: 'impulse_storm' },
+  'vacation-planning':    { districtId: 'neighbourhood', fogEnemyId: 'impulse_storm' },
+  'first-paycheck':       { districtId: 'neighbourhood', fogEnemyId: 'impulse_storm' },
+  'first-apartment':      { districtId: 'neighbourhood', fogEnemyId: 'impulse_storm' }, // overspending on lifestyle upgrade
+  'wants-vs-desires':     { districtId: 'neighbourhood', fogEnemyId: 'impulse_storm' }, // prioritizing needs/wants over unplanned desires
+
+  // Bank Row — Debt Web (credit, EMI, revolving debt)
+  'phone-emi':            { districtId: 'bank_row', fogEnemyId: 'debt_web' },
+  'first-credit-card':    { districtId: 'bank_row', fogEnemyId: 'debt_web' },
+  'net-worth-checkin':    { districtId: 'bank_row', fogEnemyId: 'debt_web' }, // Kabir's hidden debt vs. real net worth
+  'emi-affordability-check': { districtId: 'bank_row', fogEnemyId: 'debt_web' }, // FOIR before taking on another EMI
+
+  // The Order's Academy — The Procrastinator (starting later than you should have)
+  'first-side-hustle':    { districtId: 'academy', fogEnemyId: 'the_procrastinator' },
+  'lifestyle-design':     { districtId: 'academy', fogEnemyId: 'the_procrastinator' },
+  'emergency-expense':    { districtId: 'academy', fogEnemyId: 'the_procrastinator' }, // no fund built before crisis hit
+  'right-on-time':        { districtId: 'academy', fogEnemyId: 'the_procrastinator' }, // literally about starting now vs. "perfect timing"
+  'smart-goal-setting':   { districtId: 'academy', fogEnemyId: 'the_procrastinator' }, // vague "I'll try" vs a real, timed plan
+  'the-early-start':      { districtId: 'academy', fogEnemyId: 'the_procrastinator' }, // cost of delaying investing, Rule of 72
+
+  // The Central Hall — Inflation Spiral (purchasing power, real returns)
+  'calculations-quest':   { districtId: 'central_hall', fogEnemyId: 'inflation_spiral' },
+
+  // Market District — Market Madness (herd mentality, hot tips, chasing stocks)
+  'promoter-buying-trap': { districtId: 'market_district', fogEnemyId: 'market_madness' },
+  'stock-investigator':   { districtId: 'market_district', fogEnemyId: 'market_madness' },
+  'sell-now-or-wait':     { districtId: 'market_district', fogEnemyId: 'market_madness' }, // reacting to fear/impulse vs. a calculable tax fact
+
+  // The World Gate — The Scammer (fraud, too-good-to-be-true schemes)
+  'investment-trap':      { districtId: 'world_gate', fogEnemyId: 'the_scammer' }, // WhatsApp "guaranteed 30% returns" message
+};
+
+/** Look up a quest's district + fog enemy by id, with a Neighbourhood/Impulse
+ *  Storm fallback for any quest added later without an explicit mapping —
+ *  better than crashing, and Impulse Storm is the most broadly-applicable
+ *  everyday threat if nothing more specific is assigned yet. */
+export function getQuestFog(questId: string): { district: District; fogEnemy: FogEnemy } {
+  const mapping = QUEST_FOG_MAP[questId] ?? { districtId: 'neighbourhood', fogEnemyId: 'impulse_storm' };
+  const district = DISTRICTS.find(d => d.id === mapping.districtId) ?? DISTRICTS[0];
+  const fogEnemy = getFogEnemy(mapping.fogEnemyId);
+  return { district, fogEnemy };
+}
+
+// ─── GAME → FOG ENEMY MAPPING ────────────────────────────────────────────────
+// Which everyday financial threat each game is "training" to fight. moneyMaze
+// covers two distinct modes (Debt Domino, Portfolio Builder) that fight
+// different enemies, so it's keyed separately from the other four games.
+export const GAME_FOG_MAP: Record<string, string> = {
+  budgetBlitz: 'impulse_storm',
+  finIQ: 'impulse_storm', // spans multiple categories per question; impulse control is the most universal
+  moneyMazeDebt: 'debt_web',
+  moneyMazePortfolio: 'market_madness',
+  stockMarketSim: 'market_madness',
+  creditScoreBuilder: 'debt_web',
+};
+
+export function getGameFog(gameKey: string): FogEnemy {
+  const fogId = GAME_FOG_MAP[gameKey] ?? 'impulse_storm';
+  return getFogEnemy(fogId);
+}

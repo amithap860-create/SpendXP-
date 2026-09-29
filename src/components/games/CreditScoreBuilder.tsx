@@ -94,6 +94,7 @@ export function CreditScoreBuilder({ onExit }: { onExit: () => void }) {
       ageGroup={ageGroup}
       activityType="game"
       activityTitle="Credit Score Builder"
+      fogEnemyId="debt_web"
       onContinue={() => setShowBrief(false)}
     />
   );
@@ -199,7 +200,10 @@ export function CreditScoreBuilder({ onExit }: { onExit: () => void }) {
                   onClick={() => handleSelect(opt)} 
                   className={cn(
                     "h-auto p-4 md:p-6 flex justify-between items-center text-left whitespace-normal min-h-[60px]", 
-                    selectedOption === opt && (opt.isOptimal ? "border-[#2E7D5A] bg-[#E8F5EE]" : "border-rose-500 bg-rose-50"),
+                    // FIX (2026-09-30): fixed light-hex bg/border pair didn't adapt to
+                    // dark mode (a pale green/red box would sit oddly on a dark card).
+                    // Now uses the shared cat-correct/cat-wrong tokens.
+                    selectedOption === opt && (opt.isOptimal ? "border-cat-correct bg-cat-correct/10" : "border-cat-wrong bg-cat-wrong/10"),
                     selectedOption && selectedOption !== opt && "opacity-40"
                   )}
                 >

@@ -10,6 +10,18 @@ export interface UserProgression {
   totalXP: number;
   totalGamesPlayed: number;
   walletBalance: number;
+  /** FIX (2026-09-30): "Saved Virtually" on the dashboard was reading
+   *  walletBalance, but walletBalance is a realistic net-cash-flow figure —
+   *  most quests are spending scenarios (rent, birthday money, bills) where
+   *  even the mathematically OPTIMAL choice has a negative walletDelta, and
+   *  the balance is floored at 0 (Math.max(0, ...) in the quests/complete
+   *  route) so it can never go negative. Net effect: playing quests well
+   *  still showed "0 saved" for most users most of the time — not a missing
+   *  write path (that part was already fixed), but the wrong number being
+   *  displayed under that label. totalSaved only accumulates the POSITIVE
+   *  side of walletDelta — actual "you chose to save/gained money" moments —
+   *  so it only goes up, matching what the label promises. */
+  totalSaved: number;
   level: number;
   badges: string[];
   lastActivityAt: any;
@@ -54,6 +66,7 @@ export const DEFAULT_PROGRESSION: UserProgression = {
   totalXP: 0,
   totalGamesPlayed: 0,
   walletBalance: 0,
+  totalSaved: 0,
   level: 1,
   badges: [],
   lastActivityAt: null,

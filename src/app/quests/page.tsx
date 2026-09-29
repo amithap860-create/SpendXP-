@@ -28,7 +28,7 @@ import { cn } from '@/lib/utils';
 import { db } from '@/lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import dynamic from 'next/dynamic';
-import { getRankForXP, getRankProgress, getNextRank, getFogEnemy, getCaseFileId, getCurrentSaga } from '@/config/narrative';
+import { getRankForXP, getRankProgress, getNextRank, getFogEnemy, getCaseFileId, getCurrentSaga, getQuestFog } from '@/config/narrative';
 import { useDailyQuestStatus } from '@/hooks/useDailyQuestStatus';
 import { trackQuestStarted } from '@/lib/analytics';
 
@@ -38,14 +38,21 @@ const QuestViewer = dynamic(() => import('@/components/quests/QuestViewer'), {
 });
 
 // ── Case File dossier intro ───────────────────────────────────────────────────
-function CaseFileBriefing({ quest, index, fogEnemy, onAccept, onDecline }: {
+// FIX (2026-09-30): this used to receive a single `fogEnemy` prop that the
+// parent computed from the PLAYER'S rank — meaning every quest you opened
+// showed the identical "Active Threat" as every other quest at your current
+// rank, regardless of what the quest was actually about. A Credit quest and
+// an Investing quest looked the same. Now derives the threat from the quest
+// itself via getQuestFog(), which maps each quest to the district and fog
+// enemy its actual content fights (see narrative.ts).
+function CaseFileBriefing({ quest, index, onAccept, onDecline }: {
   quest: Quest;
   index: number;
-  fogEnemy: ReturnType<typeof getFogEnemy>;
   onAccept: () => void;
   onDecline: () => void;
 }) {
   const caseId = getCaseFileId(index);
+  const { district, fogEnemy } = getQuestFog(quest.id);
 
   return (
     <div className="fixed inset-0 z-[9999] bg-background flex flex-col overflow-y-auto">
@@ -93,22 +100,25 @@ function CaseFileBriefing({ quest, index, fogEnemy, onAccept, onDecline }: {
           <p className="text-foreground text-sm leading-relaxed">{quest.description}</p>
         </div>
 
-        {/* Fog enemy intel */}
-        <div className="bg-red-50 border border-red-200 rounded-xl p-5 space-y-3">
+        {/* Fog enemy intel — FIX (2026-09-30): fixed red-50/100/200 colors
+            didn't adapt to dark mode; now cat-wrong tokens, consistent with
+            the rest of the app's threat/danger indicators. Also now names
+            the actual district this quest is set in. */}
+        <div className="bg-cat-wrong/10 border border-cat-wrong/20 rounded-xl p-5 space-y-3">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 text-red-500" />
-            <div className="text-[10px] font-black uppercase tracking-widest text-red-600">Active Threat</div>
+            <AlertTriangle className="h-4 w-4 text-cat-wrong" />
+            <div className="text-[10px] font-black uppercase tracking-widest text-cat-wrong">Active Threat · {district.name}</div>
           </div>
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center shrink-0 mt-0.5">
-              <AlertTriangle className="h-4 w-4 text-red-500" />
+            <div className="w-8 h-8 rounded-lg bg-cat-wrong/15 flex items-center justify-center shrink-0 mt-0.5">
+              <AlertTriangle className="h-4 w-4 text-cat-wrong" />
             </div>
             <div>
-              <p className="font-black text-red-700 text-sm">{fogEnemy.name}</p>
-              <p className="text-red-500 text-xs mt-1 leading-relaxed">{fogEnemy.description}</p>
+              <p className="font-black text-cat-wrong text-sm">{fogEnemy.name}</p>
+              <p className="text-muted-foreground text-xs mt-1 leading-relaxed">{fogEnemy.description}</p>
             </div>
           </div>
-          <div className="border-t border-red-200 pt-3">
+          <div className="border-t border-cat-wrong/20 pt-3">
             <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Weakness</div>
             <p className="text-muted-foreground text-xs leading-relaxed">{fogEnemy.weakness}</p>
           </div>
@@ -224,7 +234,6 @@ export default function QuestsHub() {
       <CaseFileBriefing
         quest={briefingQuest.quest}
         index={briefingQuest.index}
-        fogEnemy={fogEnemy}
         onAccept={() => {
           trackQuestStarted({
             questId: briefingQuest.quest.id,
@@ -456,6 +465,21 @@ export default function QuestsHub() {
                     </CardDescription>
 
                     <div className="mt-auto space-y-3">
+                      {/* FIX (2026-09-30): added per-quest district/threat tag —
+                          chapter groups aren't a reliable stand-in for this (a
+                          couple of chapters, e.g. "Investing", mix quests that
+                          map to different fog enemies once you actually read
+                          the content), so this lives on the card itself rather
+                          than the chapter header. */}
+                      {(() => {
+                        const { district, fogEnemy } = getQuestFog(quest.id);
+                        return (
+                          <div className="flex items-center gap-1.5 text-[9px] font-bold text-muted-foreground">
+                            <MapPin className="h-3 w-3 shrink-0" />
+                            <span className="truncate">{district.name} · vs. {fogEnemy.name}</span>
+                          </div>
+                        );
+                      })()}
                       {/* Meta row */}
                       <div className="flex items-center gap-3 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
                         <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{quest.estimatedMinutes}m</span>

@@ -118,6 +118,27 @@ export const lessons: Lesson[] = [
           ]
         },
         xpReward: 20
+      },
+      {
+        // NEW (2026-09-29): sourced from a finance-basics resource's
+        // "intermediate budgeting" material. 50/30/20 is a fixed-ratio
+        // starting point, but the natural next step once someone has that
+        // habit down is assigning every rupee a specific job instead of
+        // leaving anything unaccounted for — "zero-based budgeting."
+        id: 'b3',
+        title: 'Give Every Rupee a Job',
+        body: {
+          junior: "Once you're used to splitting money into Needs/Wants/Savings, try this next-level trick: before you spend anything, decide EXACTLY where every single rupee is going — so ₹0 is left with 'no plan.'",
+          teen: "Zero-based budgeting means every rupee of income gets assigned a specific job — rent, food, savings, fun — before the month starts, until nothing is left unassigned. It's a step up from 50/30/20's fixed percentages: instead of one-size-fits-all ratios, you decide the exact amount for each category based on your actual life that month.",
+          senior: "Zero-based budgeting assigns every unit of income to a category — expenses, debt repayment, investments, savings — until income minus allocations equals zero. Unlike the 50/30/20 rule's fixed ratios, it adapts month to month: a month with a large one-off expense (say, a device repair) gets rebalanced deliberately, rather than blowing through a rigid 'Wants' percentage.",
+        },
+        example: {
+          junior: "₹500 pocket money: ₹200 to your snacks jar, ₹100 to a comic book, ₹200 to savings. Every rupee has a name — none is just 'floating around.'",
+          teen: "₹8,000 monthly allowance: ₹3,000 essentials, ₹2,000 savings, ₹1,500 fun, ₹1,000 a new phone case fund, ₹500 buffer. ₹8,000 in, ₹8,000 assigned, ₹0 left unaccounted for.",
+          senior: "₹40,000 take-home: ₹18,000 rent/bills, ₹6,000 groceries, ₹6,000 investments, ₹4,000 debt repayment, ₹4,000 lifestyle, ₹2,000 sinking fund for annual expenses. Every rupee assigned — nothing left to accidentally overspend.",
+        },
+        visual: 'none',
+        xpReward: 25,
       }
     ],
     quizCard: {
@@ -131,6 +152,146 @@ export const lessons: Lesson[] = [
       { emoji: '📅', fact: 'Warren Buffett started investing at age 11 with a strict personal budget. He says budgeting is the one habit that made everything else possible.' },
       { emoji: '🛒', fact: '"Lifestyle creep" is when your spending grows as fast as your income, leaving you no richer. A budget is the only defence against it.' },
     ]
+  },
+  {
+    // NEW (2026-09-29): sourced from SEBI Investor Education's "Understanding
+    // Our Needs, Wants and Desires" — a genuine gap. The Budgeting chapter's
+    // 50/30/20 rule already assumes a reader can sort spending into
+    // Needs/Wants/Savings, but nothing ever explicitly taught the 3-tier
+    // priority ladder (Needs > Wants > Desires) or named "Desires" as its
+    // own category — the exact thing Budget Blitz's NEED/WANT/SAVE buckets
+    // are built on. Placed right after Budgeting since it directly deepens
+    // that chapter's core idea before moving on.
+    id: 'l-needs-wants-desires',
+    topic: 'spending',
+    relatedGame: 'budgetBlitz',
+    title: 'Needs, Wants & Desires',
+    estimatedMinutes: 3,
+    ageGroups: ['junior', 'teen', 'senior'],
+    cards: [
+      {
+        id: 'nwd1',
+        title: 'The Three Buckets',
+        body: {
+          junior: "Every time you spend money, it falls into one of three buckets. Needs are things you MUST have to live — food, water, a place to sleep. Wants make life nicer but you could live without them — like games or eating out. Desires are big, exciting things you REALLY want but don't need at all — like the newest phone or a fancy bike.",
+          teen: "Needs are essential for survival — food, water, housing, clothing, healthcare. Wants aren't essential but improve your lifestyle — entertainment, dining out, trips. Desires are strong aspirations for big-ticket items — a dream gadget, a luxury item — that go beyond both needs and wants.",
+          senior: "The needs/wants/desires ladder extends the standard needs-vs-wants framework with a third, more dangerous tier: desires — strong aspirational purchases (a luxury car, the latest flagship phone) that carry real temptation to borrow money to fund them, precisely because they feel urgent even though nothing about them is.",
+        },
+        example: {
+          junior: "Food for dinner = Need. A movie with friends = Want. The newest gaming console that just launched = Desire.",
+          teen: "Rent and groceries = Needs. A weekend trip with friends = Want. The latest ₹1,50,000 flagship phone when your current one works fine = Desire.",
+          senior: "Health insurance premium = Need. A nicer apartment than strictly necessary = Want. A luxury watch financed on EMI = Desire — and the one most likely to derail a budget.",
+        },
+        visual: 'bar',
+        visualData: {
+          items: [
+            { label: 'Needs (survival)', value: 100, color: '#2e72db' },
+            { label: 'Wants (lifestyle)', value: 60, color: '#19c0ed' },
+            { label: 'Desires (aspiration)', value: 30, color: '#f59e0b' },
+          ],
+        },
+        xpReward: 20,
+      },
+      {
+        id: 'nwd2',
+        title: 'Why Desires Are the Dangerous One',
+        body: {
+          junior: "Desires are tricky because they can make you want to borrow money — like asking to pay later — just to get something you don't actually need. If you spend on Desires before covering your Needs and saving, you can run out of money fast.",
+          teen: "Desires are where budgets usually break. Because a desire isn't essential, satisfying it always competes directly with your savings — and it's also the #1 reason people turn to EMIs, BNPL (buy-now-pay-later), or credit cards for things they can't actually afford yet.",
+          senior: "The correct spending order is Needs → Wants → Savings/Goals → Desires — not Needs → Desires. When desires jump the queue, they're almost always funded by debt (EMI, BNPL, credit card revolve) rather than surplus income, which is how an aspirational purchase quietly becomes an interest-bearing liability.",
+        },
+        example: {
+          junior: "Aditi wants a ₹2,000 toy. Instead of skipping her savings, she waits and saves ₹200 a month for 10 months — no borrowing needed.",
+          teen: "Instead of putting a ₹40,000 phone on a 12-month EMI at high interest, Zara saved ₹4,000/month for 10 months and bought it outright — paying ₹0 in interest.",
+          senior: "A ₹1,20,000 gadget on a 24-month EMI at 15% effectively costs ₹1,38,000+ once interest is included. The same amount saved over 12 months first, then bought outright, costs exactly ₹1,20,000 — the 'desire tax' avoided entirely.",
+        },
+        visual: 'comparison',
+        visualData: {
+          left: { label: 'Bought on EMI/BNPL', value: 115, color: '#ef4444' },
+          right: { label: 'Saved first, bought outright', value: 100, color: '#10b981' },
+        },
+        xpReward: 25,
+      },
+    ],
+    quizCard: {
+      question: "Which of these is a 'Desire' rather than a 'Need' or a 'Want'?",
+      options: ['Groceries for the week', 'Dinner out with friends', 'A ₹1,50,000 flagship phone when your current one works fine', 'Your monthly rent'],
+      correctIndex: 2,
+      explanation: "Groceries and rent are Needs. Dinner out is a Want. An expensive upgrade you don't actually need — bought mostly for the aspiration — is a Desire, and the category most likely to be funded by debt.",
+    },
+    briefs: [
+      { emoji: '🎯', fact: 'The correct spending priority is Needs → Wants → Savings → Desires. When "Desires" jump ahead of savings, budgets break — that\'s the single most common budgeting failure pattern.' },
+      { emoji: '💳', fact: 'BNPL (buy-now-pay-later) usage in India has grown fastest among 18-25 year olds — and it is overwhelmingly used to fund Desires, not Needs.' },
+      { emoji: '⏳', fact: 'Studies on impulse spending show the urge to buy an aspirational item fades within 72 hours in most cases. Waiting 3 days before a "Desire" purchase filters out most regretted buys.' },
+    ],
+  },
+  {
+    // NEW (2026-09-29): sourced from SEBI Investor Education's "Financial
+    // Goal and Budgeting" — the app taught HOW to split money (50/30/20)
+    // but never taught how to set the goal that budget is working toward.
+    // Uses SEBI's own SMART framework (Specific, Measurable, Achievable,
+    // Realistic, Time-bound), adapted to youth-relevant examples in place
+    // of the source's grandchild's-birthday/daughter's-marriage examples.
+    id: 'l-smart-goals',
+    topic: 'budgeting',
+    relatedGame: 'budgetBlitz',
+    title: 'Setting SMART Financial Goals',
+    estimatedMinutes: 3,
+    ageGroups: ['junior', 'teen', 'senior'],
+    cards: [
+      {
+        id: 'sg1',
+        title: 'What Makes a Goal SMART?',
+        body: {
+          junior: "A good money goal isn't just 'I want to save money' — that's too fuzzy! A SMART goal is Specific (exactly what), Measurable (exactly how much), Achievable (actually possible), Realistic (fits your real pocket money), and Time-bound (by when).",
+          teen: "A SMART goal is Specific, Measurable, Achievable, Realistic, and Time-bound. 'I'll save some money' isn't a plan — 'I'll save ₹500 a month for 6 months to buy a ₹3,000 pair of headphones' is, because you can check your progress against it every single month.",
+          senior: "SMART goal-setting (Specific, Measurable, Achievable, Realistic, Time-bound) turns a vague intention into a trackable plan. Without all five elements, a goal can't be monitored — and goals that can't be monitored are rarely met.",
+        },
+        example: {
+          junior: "Vague: 'I want a new cricket bat someday.' SMART: 'I will save ₹50 a week for 10 weeks to buy a ₹500 cricket bat.'",
+          teen: "Vague: 'I should save more.' SMART: 'I will save ₹800/month for 6 months to buy a ₹4,800 bicycle by March.'",
+          senior: "Vague: 'I'll pay off most of my credit card soon.' SMART: 'I will pay ₹6,000/month for 5 months to clear my ₹30,000 credit card balance by February, and stop using the card until then.'",
+        },
+        visual: 'comparison',
+        visualData: {
+          left: { label: 'Vague goal', value: 20, color: '#ef4444' },
+          right: { label: 'SMART goal', value: 90, color: '#10b981' },
+        },
+        xpReward: 20,
+      },
+      {
+        id: 'sg2',
+        title: 'Turning a Wish Into a Plan',
+        body: {
+          junior: "To make your own SMART goal, answer 5 quick questions: What EXACTLY do I want? How will I count my progress? Can I actually do this? Does it fit what I really earn or get? And by WHEN will I do it?",
+          teen: "Build any SMART goal by filling in this template: 'I will save/pay ₹___ every [week/month] for ___ [weeks/months] to [buy/achieve] ___ by [date].' If you can't fill in every blank with a real number, the goal isn't SMART yet.",
+          senior: "The SMART template works for saving, debt payoff, or investing goals equally: '₹[amount] every [period] for [duration] to [outcome] by [date].' Each blank forces a decision you'd otherwise skip — which is exactly why vague goals fail and specific ones don't.",
+        },
+        example: {
+          junior: "'I will save ₹30 a week for 8 weeks to buy a ₹240 storybook set by my birthday.'",
+          teen: "'I will save ₹1,200 a month for 5 months to buy a ₹6,000 gaming headset by December.'",
+          senior: "'I will invest ₹5,000 a month for 24 months to build a ₹1,20,000+ down payment fund by the end of next year.'",
+        },
+        visual: 'none',
+        xpReward: 20,
+      },
+    ],
+    quizCard: {
+      question: 'Which of these is a SMART financial goal?',
+      options: [
+        'I want to save money',
+        'I will try to spend less on snacks',
+        'I will save ₹500 every month for 8 months to buy a ₹4,000 bicycle by June',
+        'I want to be rich someday',
+      ],
+      correctIndex: 2,
+      explanation: 'This is the only option with a specific amount, a measurable monthly target, a realistic timeframe, and a clear deadline — all five SMART elements are present.',
+    },
+    briefs: [
+      { emoji: '✍️', fact: 'People who write down a specific, measurable goal are significantly more likely to follow through than people who set only a general intention like "save more."' },
+      { emoji: '📆', fact: 'A goal with no deadline has no urgency — and no way to tell if you\'re on track or falling behind until it\'s too late to fix.' },
+      { emoji: '🧮', fact: 'The fastest way to check if a goal is SMART: try to fill in an exact number and an exact date. If you can\'t, it\'s still a wish, not a goal.' },
+    ],
   },
   {
     id: 'l-saving',
@@ -318,6 +479,108 @@ export const lessons: Lesson[] = [
     ],
   },
   {
+    // NEW (2026-09-29): sourced from SEBI Investor Education's "Grow Your
+    // Money with Power of Compounding" — a genuine gap. Nothing in the
+    // curriculum ever explained WHY starting early matters mathematically,
+    // even though "start investing earlier" gets said constantly in the
+    // Investing chapter that follows. Placed right after Emergency Funds
+    // and before Debt: it's the mathematical foundation for both — the
+    // same compounding that grows savings also grows debt against you,
+    // so this directly sets up the Debt Avalanche lesson next.
+    id: 'l-compounding',
+    topic: 'investing',
+    relatedGame: 'finIQ',
+    title: 'The Power of Compounding',
+    estimatedMinutes: 3,
+    ageGroups: ['junior', 'teen', 'senior'],
+    cards: [
+      {
+        id: 'cp1',
+        title: 'Interest on Interest',
+        body: {
+          junior: "Compounding means you earn extra money not just on what you first saved, but ALSO on the extra money it already earned! It's like your money makes a baby, and then that baby grows up and makes its own money too.",
+          teen: "Compound interest means you earn interest on your original amount PLUS on all the interest it has already earned — not just on the original amount, like simple interest does. Over many years, this difference becomes huge.",
+          senior: "Compounding is interest earned on both the principal and all previously accumulated interest. Albert Einstein reportedly called it \"the eighth wonder of the world\": he who understands it, earns it; he who doesn't, pays it.",
+        },
+        example: {
+          junior: "₹100 growing at 10% a year with compounding: Year 1 → ₹110. Year 2 → ₹121 (extra ₹1 because last year's ₹10 also earned interest!). Small, but it adds up a LOT over many years.",
+          teen: "₹1,00,000 at 10% per year for 20 years: with SIMPLE interest, you'd have ₹3,00,000. With COMPOUND interest, you'd have ₹6,72,000 — more than double, for the exact same starting amount and rate.",
+          senior: "₹1,00,000 @ 10% p.a. over 20 years: simple interest grows it to ₹3,00,000 (₹10,000/year, flat). Compound interest grows it to ₹6,72,000 — because each year's interest is calculated on an ever-growing base, not the original ₹1,00,000.",
+        },
+        visual: 'comparison',
+        visualData: {
+          left: { label: 'Simple interest (20yr)', value: 300000, color: '#94a3b8' },
+          right: { label: 'Compound interest (20yr)', value: 672000, color: '#10b981' },
+        },
+        xpReward: 25,
+      },
+      {
+        id: 'cp2',
+        title: 'The Rule of 72',
+        body: {
+          junior: "Want a quick trick to guess how long it takes your money to DOUBLE? Divide 72 by your interest rate! At 9% a year, that's 72 ÷ 9 = 8 years to double your money.",
+          teen: "The Rule of 72 is a shortcut: divide 72 by your annual return rate to estimate how many years it takes to double your money. At 9%, that's 72 ÷ 9 = 8 years. At 12%, it's just 6 years. Higher returns don't just add up — they compound the timeline too.",
+          senior: "Rule of 72 (years to double) = 72 ÷ rate. Related shortcuts: Rule of 114 (years to triple) = 114 ÷ rate, and Rule of 144 (years to quadruple) = 144 ÷ rate. At 9%: double in 8 years, triple in ~12.7 years, quadruple in 16 years — the same money, purely from starting earlier.",
+        },
+        example: {
+          junior: "At 9% a year, ₹1,000 becomes ₹2,000 in about 8 years — without adding a single extra rupee.",
+          teen: "Two friends both invest ₹50,000 at 9%. Priya starts at 18, Rohan starts at 26. By age 34, Priya's money has doubled TWICE (8 years, then 8 more) to ₹2,00,000. Rohan's has only doubled once, to ₹1,00,000 — same rate, same amount, just 8 years earlier.",
+          senior: "At a 9% return: money doubles in 8 years, triples in ~12.7, quadruples in 16. An investor starting at 22 sees their money quadruple by 38 with zero additional contributions — purely a function of time in the market, which is precisely why 'start early' is repeated so often in investing advice.",
+        },
+        visual: 'bar',
+        visualData: {
+          items: [
+            { label: 'Double (Rule of 72)', value: 8, color: '#3b82f6' },
+            { label: 'Triple (Rule of 114)', value: 12.7, color: '#f59e0b' },
+            { label: 'Quadruple (Rule of 144)', value: 16, color: '#10b981' },
+          ],
+        },
+        xpReward: 25,
+      },
+      {
+        // NEW (2026-09-29): sourced from a finance-basics resource's
+        // "advanced" material on real returns. Everything above shows
+        // headline returns (9%, 10%) — but nothing in the curriculum yet
+        // subtracts inflation and tax to show what you actually keep.
+        // Placed last in this chapter since it directly builds on both
+        // cp1/cp2 (compounding) and the separate Inflation content already
+        // covered in the SEBI-sourced curriculum work.
+        id: 'cp3',
+        title: "What Return Are You Really Keeping?",
+        body: {
+          junior: "If your money grows by 9% in a year, but prices also went up by 6% that year, you didn't really get richer by 9% — some of that growth just kept up with things costing more. What's left after that is your REAL gain.",
+          teen: "The return you see advertised (say, 9%) is your 'nominal' return. But if inflation was 6% that year, your money's actual buying power only grew by roughly 9% − 6% = 3%. That 3% is your 'real return' — the part that actually made you richer, not just kept pace with rising prices.",
+          senior: "Real return ≈ nominal return − inflation − tax paid on the gain. A 9% investment return in a 6% inflation year, further reduced by tax on the gain, might leave a real return of just 1-2%. This is why comparing raw percentage returns across different investments or time periods without adjusting for inflation and tax can be seriously misleading.",
+        },
+        example: {
+          junior: "Your ₹100 grows to ₹109 (9% return). But things that cost ₹100 last year now cost ₹106. Your real gain is only about ₹3 of actual extra buying power, not ₹9.",
+          teen: "₹1,00,000 grows to ₹1,09,000 (9% return) in a year with 6% inflation. In today's buying power, that ₹1,09,000 is worth roughly what ₹1,03,000 would have been worth last year — a real return of about 3%, not 9%.",
+          senior: "₹1,00,000 at 9% nominal return = ₹9,000 gain. At 6% inflation, ~₹6,000 of that gain is just offsetting rising prices. If the gain is also taxed (say 12.5% LTCG on the ₹9,000 = ₹1,125), the real, after-tax, after-inflation gain is closer to ₹1,875 — a real return of under 2%, not the 9% headline figure.",
+        },
+        visual: 'bar',
+        visualData: {
+          items: [
+            { label: 'Nominal return', value: 9, color: '#94a3b8' },
+            { label: 'Minus inflation', value: 3, color: '#f59e0b' },
+            { label: 'Minus tax on gain', value: 1.9, color: '#10b981' },
+          ],
+        },
+        xpReward: 25,
+      },
+    ],
+    quizCard: {
+      question: 'Using the Rule of 72, roughly how many years will it take to double your money at an 8% annual return?',
+      options: ['6 years', '9 years', '14 years', '20 years'],
+      correctIndex: 1,
+      explanation: '72 ÷ 8 = 9 years. The Rule of 72 gives a fast estimate of doubling time for any steady annual return — no calculator needed.',
+    },
+    briefs: [
+      { emoji: '🧙', fact: 'Einstein is widely (though perhaps apocryphally) credited with calling compound interest "the eighth wonder of the world" — because unlike simple interest, it grows faster the longer you leave it alone.' },
+      { emoji: '⚖️', fact: 'Compounding cuts both ways: the same math that grows your savings also grows credit card debt left unpaid. A 36% APR credit card balance compounds against you exactly as powerfully as a good investment compounds for you.' },
+      { emoji: '🐣', fact: 'Starting 8 years earlier at the same rate of return can mean your money doubles one extra time before you need it — often worth more than contributing extra money later ever could.' },
+    ],
+  },
+  {
     id: 'l-debt',
     topic: 'spending',
     relatedGame: 'moneyMaze',
@@ -364,6 +627,37 @@ export const lessons: Lesson[] = [
             { label: 'Credit Card (36%)', value: 100, color: '#ef4444' },
             { label: 'Personal Loan (14%)', value: 50, color: '#f59e0b' },
             { label: 'Education Loan (8%)', value: 25, color: '#10b981' },
+          ],
+        },
+        xpReward: 25,
+      },
+      {
+        // NEW (2026-09-29): sourced from a finance-basics resource's "Debt
+        // & Asset Management" material on the DTI (Debt-to-Income) ratio —
+        // adapted to India's actual lending heuristic, FOIR (Fixed
+        // Obligation to Income Ratio), rather than the US mortgage industry's
+        // 36% DTI figure, which Indian lenders don't use. Placed last in
+        // this chapter since it builds on both cards above (good vs bad
+        // debt, and interest rates) to answer a very practical question:
+        // how much EMI is actually safe to take on.
+        id: 'd3',
+        title: 'How Much EMI Can You Actually Afford?',
+        body: {
+          junior: "Before you promise to pay back money bit by bit (an EMI), always check: after paying it, will you still have enough left for the things you actually need? If EMIs eat up almost everything, that's a warning sign.",
+          teen: "Lenders in India look at your FOIR (Fixed Obligation to Income Ratio) — the share of your monthly take-home pay that goes toward all EMIs and fixed debt payments combined. As a personal rule of thumb, keeping total EMIs under 40% of your take-home pay leaves enough room for living expenses and savings without getting stretched thin.",
+          senior: "FOIR (Fixed Obligation to Income Ratio) = total monthly EMI/debt obligations ÷ net take-home pay. Indian lenders commonly cap this around 40-50% when approving loans, but 'what a bank will approve' and 'what's actually comfortable' aren't the same thing — a personal ceiling closer to 35-40% leaves realistic room for an emergency fund and savings alongside every EMI you're already committed to.",
+        },
+        example: {
+          junior: "If your total weekly EMI-style commitment is ₹40 out of ₹100 you get, that's 40% — right at the edge of comfortable. Any more and you'd struggle with everything else.",
+          teen: "Take-home pay ₹20,000/month. A ₹6,000 EMI (phone + bike loan combined) = 30% FOIR — manageable. Add a ₹3,000 EMI for something else and you're at 45% — likely to feel tight every single month.",
+          senior: "Take-home pay ₹60,000/month. Existing home loan EMI ₹18,000 (30% FOIR). Considering a car loan EMI of ₹12,000 would push FOIR to 50% — at or above what most lenders' own limits allow, and past the point where a job disruption or emergency becomes genuinely dangerous.",
+        },
+        visual: 'bar',
+        visualData: {
+          items: [
+            { label: 'Comfortable (<40% FOIR)', value: 40, color: '#10b981' },
+            { label: 'Lender max (~40-50%)', value: 50, color: '#f59e0b' },
+            { label: 'Stretched thin (>50%)', value: 70, color: '#ef4444' },
           ],
         },
         xpReward: 25,
@@ -524,6 +818,79 @@ export const lessons: Lesson[] = [
     ],
   },
   {
+    // NEW (2026-09-29): sourced from a finance-basics resource's
+    // "intermediate budgeting" material — "base your calculations on
+    // take-home pay, not gross salary." A genuine gap: every quest and
+    // lesson so far has just handed the reader a clean number to budget
+    // with, without ever explaining that a payslip's headline number
+    // (CTC/gross) isn't what actually lands in a bank account. Placed
+    // right before Taxes since "what gets deducted and why" is the
+    // natural bridge into "how income tax brackets work" next.
+    id: 'l-takehome',
+    topic: 'budgeting',
+    relatedGame: 'finIQ',
+    title: 'Take-Home Pay: What You Actually Get',
+    estimatedMinutes: 3,
+    ageGroups: ['teen', 'senior'],
+    cards: [
+      {
+        id: 'th1',
+        title: 'CTC Is Not Your Salary',
+        body: {
+          junior: "When someone gets a job, the number they're offered (like '₹5,00,000 a year!') isn't the amount that actually lands in their bank account. Some of it gets set aside automatically for things like tax and retirement savings before they ever see it.",
+          teen: "The number in an Indian job offer — your CTC (Cost to Company) — is NOT what lands in your bank account. Before you get paid, deductions come out: income tax (TDS), your own PF (retirement savings) contribution, and sometimes professional tax. What's left is your 'take-home' or 'net' pay — often noticeably less than the CTC number that got you excited.",
+          senior: "CTC includes your full cost to the employer: base salary, HRA, allowances, employer's PF contribution, and sometimes bonuses or insurance premiums that never touch your bank account at all. Take-home pay = Gross salary − TDS (tax deducted at source) − employee PF contribution − professional tax (where applicable). Budgeting off the CTC headline number instead of actual take-home pay is one of the most common first-job financial mistakes.",
+        },
+        example: {
+          junior: "A job offer says '₹40,000 a month!' But after some is set aside automatically, only about ₹34,000 actually shows up in the bank account.",
+          teen: "A ₹6,00,000 CTC offer sounds like ₹50,000/month. After TDS and PF deductions, take-home might be closer to ₹42,000/month — a ₹8,000 gap between the exciting headline number and what you can actually budget with.",
+          senior: "₹8,00,000 CTC breaks down as: ₹6,40,000 base + allowances, ₹64,000 employer PF (never hits your account), ₹96,000 bonus/other. Of the ₹6,40,000 you do receive, TDS (~₹35,000) and employee PF (~₹38,000) come out before it reaches your bank — leaving roughly ₹5,67,000/year, or ~₹47,250/month take-home, well under the ₹66,667/month the ₹8L CTC headline implies.",
+        },
+        visual: 'bar',
+        visualData: {
+          items: [
+            { label: 'CTC headline', value: 100, color: '#94a3b8' },
+            { label: 'Gross salary (excl. employer PF/bonus)', value: 88, color: '#3b82f6' },
+            { label: 'Actual take-home (after TDS + PF)', value: 71, color: '#10b981' },
+          ],
+        },
+        xpReward: 25,
+      },
+      {
+        id: 'th2',
+        title: 'Budget Off Take-Home, Not the Offer Letter',
+        body: {
+          junior: "Always plan your spending using the amount that actually shows up, not the bigger number from the offer — otherwise you'll plan to spend money you'll never actually see.",
+          teen: "Every budgeting rule you've learned — 50/30/20, zero-based budgeting — only works correctly if you apply it to take-home pay. Apply it to CTC or gross salary instead, and you'll systematically over-plan every single category, because a chunk of that 'income' was never coming to your account at all.",
+          senior: "Any financial plan built on gross or CTC figures overstates available cash by the exact size of TDS + PF deductions — often 15-25% of CTC for a salaried employee. This is precisely why the first step of any real budget is checking an actual payslip, not the offer letter, before assigning a single rupee to any category.",
+        },
+        example: {
+          junior: "If ₹40,000 was promised but only ₹34,000 shows up, and you already planned to spend ₹38,000 based on the bigger number, you're already ₹4,000 short before the month even starts.",
+          teen: "Planning 50/30/20 on a ₹50,000 'salary' (CTC/12) means ₹10,000 planned for savings. But real take-home is ₹42,000 — 20% of that is only ₹8,400. Budgeting off the wrong number means starting every month already ₹1,600 short of the savings goal.",
+          senior: "A new hire budgets rent (₹15,000), lifestyle (₹15,000), and savings (₹10,000) — ₹40,000 total — based on a ₹50,000/month CTC-derived figure. Actual take-home is ₹42,500. The plan is ₹2,500/month short before any unplanned expense even happens, purely from budgeting off the wrong number.",
+        },
+        visual: 'none',
+        xpReward: 25,
+      },
+    ],
+    quizCard: {
+      question: "You're offered a job with a CTC of ₹6,00,000/year. What should you use to plan your monthly budget?",
+      options: [
+        '₹6,00,000 ÷ 12 = ₹50,000/month',
+        'Your actual monthly take-home pay, after TDS and PF deductions',
+        'Whatever number sounds easiest to plan with',
+        "Wait until you've spent a year at the job to find out",
+      ],
+      correctIndex: 1,
+      explanation: "CTC includes deductions and employer contributions you'll never see in your bank account. Always budget off actual take-home pay — check a real payslip, not the offer letter.",
+    },
+    briefs: [
+      { emoji: '💼', fact: "The gap between CTC and take-home pay in India is often 15-25%, made up of employee PF contribution, TDS, and sometimes professional tax — all of it invisible in the headline offer number." },
+      { emoji: '📄', fact: "A payslip's 'Gross Salary' and a job offer's 'CTC' are usually two different, smaller numbers — and 'Net Pay' (take-home) is smaller again. Three different figures, and only the last one is what you can actually spend." },
+      { emoji: '🏦', fact: "Employer PF contributions are real money — they're just locked away for retirement, not sitting in your bank account today. It's genuinely yours, just not yet spendable." },
+    ],
+  },
+  {
     id: 'l-taxes',
     topic: 'taxes',
     relatedGame: 'finIQ',
@@ -586,6 +953,76 @@ export const lessons: Lesson[] = [
       { emoji: '📝', fact: 'In most countries, tax is deducted from your salary before you receive it (called withholding, TDS, or PAYE). Your annual tax return reconciles what was withheld vs. what you actually owed — and you either get a refund or pay the difference.' },
       { emoji: '🧮', fact: 'Your "marginal tax rate" (top bracket rate) is almost always higher than your "effective tax rate" (actual % of total income paid). On ₹8L income with standard deductions, an effective rate of 4–6% is common even with a 10% top bracket.' },
       { emoji: '🏦', fact: '"Tax-advantaged" retirement accounts (EPF, 401k, ISA, pension) let your investments grow tax-free or tax-deferred. Over 30 years, this tax shelter effect alone can add lakhs to your final balance.' },
+    ],
+  },
+  {
+    // NEW (2026-09-29): sourced from finance-basics resources' "Net Worth
+    // Tracking" material. Placed right before Investing as a deliberate
+    // capstone: by this point the curriculum has covered assets (saving,
+    // emergency fund) and liabilities (debt, credit) separately, but
+    // nothing has ever zoomed out to combine them into the one number that
+    // actually measures financial progress — which is also the natural
+    // motivation for why the Investing chapter that follows matters at all.
+    id: 'l-networth',
+    topic: 'saving',
+    relatedGame: 'finIQ',
+    title: 'Net Worth: The Real Scoreboard',
+    estimatedMinutes: 3,
+    ageGroups: ['teen', 'senior'],
+    cards: [
+      {
+        id: 'nw1',
+        title: 'What You Own Minus What You Owe',
+        body: {
+          junior: "Net worth is a simple idea: add up everything you own that's worth money (savings, valuable things), then subtract anything you owe someone else. What's left over is your real financial score.",
+          teen: "Net worth = Assets (everything you own of value: savings, investments, a phone you could resell) minus Liabilities (everything you owe: loans, credit card balances). It's a far better measure of financial health than income alone — someone earning a lot but owing more can have a LOWER net worth than someone earning less who owes nothing.",
+          senior: "Net worth = total assets (cash, investments, home equity, other valuables) − total liabilities (loans, credit card debt, any other obligations). Unlike income, which measures cash flow in a given month, net worth measures accumulated financial position — and it's the number that actually tracks whether you're getting ahead over time, regardless of how much you earn.",
+        },
+        example: {
+          junior: "You have ₹2,000 in savings and a bike worth ₹1,000 (assets: ₹3,000). You owe your brother ₹500 (liability). Net worth = ₹3,000 − ₹500 = ₹2,500.",
+          teen: "Priya has ₹40,000 in savings, ₹20,000 in investments (assets: ₹60,000) and a ₹15,000 outstanding phone EMI (liability). Net worth = ₹60,000 − ₹15,000 = ₹45,000.",
+          senior: "A 24-year-old has ₹3L in mutual funds, ₹1.5L in savings (assets: ₹4.5L) and a ₹2L outstanding personal loan plus a ₹40,000 credit card balance (liabilities: ₹2.4L). Net worth = ₹4.5L − ₹2.4L = ₹2.1L — a real number to track year over year, regardless of what their monthly salary is.",
+        },
+        visual: 'comparison',
+        visualData: {
+          left: { label: 'Assets', value: 450000, color: '#10b981' },
+          right: { label: 'Liabilities', value: 240000, color: '#ef4444' },
+        },
+        xpReward: 25,
+      },
+      {
+        id: 'nw2',
+        title: 'Why Two People With the Same Salary Can Have Very Different Net Worth',
+        body: {
+          junior: "Two people can get the exact same pocket money every week, but if one saves it and the other spends every bit plus borrows more, they'll end up in very different places — even though they started with the same amount coming in.",
+          teen: "Income tells you how much comes in. Net worth tells you what actually happened to it over time. A high earner who spends everything and carries debt can have a lower — even negative — net worth than a modest earner who saves consistently and avoids bad debt. Income is a flow; net worth is the result.",
+          senior: "This is precisely the trap of lifestyle inflation: rising income with proportionally rising spending and debt produces income growth without net worth growth. Tracking net worth yearly — not just watching your salary go up — is the only way to know if you're actually building wealth or just spending more expensively.",
+        },
+        example: {
+          junior: "Two kids both get ₹100/week. One saves ₹30 every week. The other spends it all and sometimes borrows ₹20 from a friend. After a year, their piggy banks look very different — even though they got the exact same amount.",
+          teen: "Two friends both earn ₹30,000/month. Zara saves ₹5,000/month and has ₹0 debt — after 2 years, net worth ≈ ₹1,20,000. Dev spends everything and has a ₹40,000 credit card balance — after 2 years, net worth ≈ −₹40,000. Same income, ₹1,60,000 difference.",
+          senior: "Two 28-year-olds both earn ₹12L/year. One has consistently invested 20% and avoided high-interest debt: net worth ≈ ₹18L after 5 years. The other upgraded their lifestyle with every raise and carries revolving credit card debt: net worth ≈ −₹2L after the same 5 years, despite identical income the entire time.",
+        },
+        visual: 'bar',
+        visualData: {
+          items: [
+            { label: 'Saver (same income)', value: 120000, color: '#10b981' },
+            { label: 'Spender (same income)', value: -40000, color: '#ef4444' },
+          ],
+        },
+        xpReward: 25,
+      },
+    ],
+    quizCard: {
+      question: "Someone has ₹5,00,000 in savings and investments, and owes ₹1,50,000 across a personal loan and credit card. What is their net worth?",
+      options: ['₹5,00,000', '₹1,50,000', '₹3,50,000', '₹6,50,000'],
+      correctIndex: 2,
+      explanation: 'Net worth = Assets − Liabilities = ₹5,00,000 − ₹1,50,000 = ₹3,50,000. Income never enters this calculation — only what you own minus what you owe.',
+    },
+    briefs: [
+      { emoji: '📈', fact: "Financial advisors recommend recalculating net worth once a year, on the same date every year — it turns an abstract feeling of 'doing okay' or 'struggling' into an actual trackable number." },
+      { emoji: '⚠️', fact: "Negative net worth (owing more than you own) is common right after taking on a student loan or starting a first job with debt — it's a starting point to improve from, not a permanent verdict." },
+      { emoji: '🎯', fact: "Net worth, not salary, is what most 'financial independence' targets are actually built around — because it's the number that determines how long you could sustain yourself without any income at all." },
     ],
   },
   {
@@ -822,6 +1259,35 @@ export const lessons: Lesson[] = [
         visualData: {
           left: { label: 'No leverage: -20% move = -20% loss', value: 20, color: '#10b981' },
           right: { label: '2x leverage: -20% move = -40% loss', value: 40, color: '#ef4444' }
+        },
+        xpReward: 25,
+      },
+      {
+        // NEW (2026-09-29): sourced from finance-basics resources' capital
+        // gains material — genuine gap. Everything else in this chapter
+        // compares trading vs investing on RISK; nothing compared them on
+        // the actual TAX consequence, even though senior-track cards above
+        // already gesture at "long-term gets a lower rate" without ever
+        // stating what that rate is. Uses verified current (2026) Indian
+        // equity capital gains rates rather than guessing — confirm these
+        // are still current before reusing this content in future years,
+        // since these rates do change with the Union Budget.
+        id: 'st4',
+        title: 'The Tax Difference Between Trading and Investing',
+        body: {
+          junior: "The government also takes a small cut when you sell an investment for a profit. If you sell something you've held for less than a year, it takes a bigger cut than if you'd held it for over a year. That's one more reason patience pays.",
+          teen: "When you sell an investment for a profit, that profit (called a 'capital gain') is taxed differently depending on how long you held it. Sell within 12 months and it's a Short-Term Capital Gain (STCG), taxed at a flat rate. Hold for over 12 months and it becomes a Long-Term Capital Gain (LTCG), which gets a lower rate — and a yearly tax-free allowance on top.",
+          senior: "For equity and equity mutual funds in India (rates as of 2026 — these are set by the Union Budget and do change): STCG (held under 12 months) is taxed at 20%. LTCG (held 12+ months) is taxed at 12.5%, with the first ₹1.25 lakh of LTCG gains in a financial year completely tax-free. The same profit, purely by waiting past the 12-month mark, can move from a 20% tax rate to a 12.5% rate with a tax-free allowance — a real, legal reward for holding rather than trading.",
+        },
+        example: {
+          junior: "Sell a ₹100 profit after 6 months, and the government's cut is bigger. Wait past a year to sell the same ₹100 profit, and the cut is smaller.",
+          teen: "₹50,000 profit from shares sold after 8 months (STCG): taxed at 20% = ₹10,000 tax. The same ₹50,000 profit from shares sold after 14 months (LTCG): taxed at 12.5%, and if it's your only gain that year, the first ₹1,25,000 is tax-free — so you might owe ₹0.",
+          senior: "An investor books ₹2,00,000 in gains after 10 months (STCG): tax = 20% × ₹2,00,000 = ₹40,000. The same ₹2,00,000 gain after 13 months (LTCG): the first ₹1,25,000 is exempt, leaving ₹75,000 taxed at 12.5% = ₹9,375. Same trade, same profit — an ₹30,625 tax difference purely from a 3-month wait.",
+        },
+        visual: 'comparison',
+        visualData: {
+          left: { label: 'STCG (<12mo): 20% tax', value: 40000, color: '#ef4444' },
+          right: { label: 'LTCG (12mo+): 12.5%, ₹1.25L exempt', value: 9375, color: '#10b981' },
         },
         xpReward: 25,
       },

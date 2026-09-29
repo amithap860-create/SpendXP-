@@ -2787,4 +2787,454 @@ export const quests: Quest[] = [
     ],
   },
 
+  // NEW (2026-09-29): three quests built from the SEBI Investor Education
+  // content used for the matching new lessons (l-needs-wants-desires,
+  // l-smart-goals, l-compounding). Appended with chapterNumber 22-24 rather
+  // than inserted into the existing 1-21 sequence — quest unlock is gated
+  // per-quest via unlockRequirement, not a strict chapterNumber walk like
+  // lessons.ts, so appending doesn't lock anything that wasn't already
+  // reachable. Each is a single-step, four-choice quest (like several
+  // existing quests) rather than a multi-step branch, since the point of
+  // each is a single, clear prioritization decision.
+  {
+    id: 'wants-vs-desires',
+    title: 'The Festival Shopping List',
+    description: "You've got ₹1,000 in festival money. Your shoes are falling apart (a real Need), your friends are all going to the new movie together (a Want), and a limited-edition collectible you've wanted for months just dropped (a Desire). All three together cost more than you have. What gets priority?",
+    category: 'lifestyle',
+    difficulty: 'beginner',
+    ageGroups: ['junior', 'teen'],
+    chapterNumber: 22,
+    chapter: 'Needs, Wants & Desires',
+    estimatedMinutes: 3,
+    xpReward: 110,
+    startingBalance: 1000,
+    steps: [
+      {
+        id: 'fs-1',
+        title: 'Shoes, Movie, or Collectible?',
+        narrative: "Your school shoes have holes in them and your teacher already warned you about it — new ones cost ₹400 (a Need). Your friends are all going to see the new movie this weekend — ₹200 (a Want). And the limited-edition collectible figure you've wanted for months just came back in stock — ₹600 (a Desire). ₹400 + ₹200 + ₹600 = ₹1,200. You only have ₹1,000. What do you do?",
+        ageGroups: ['junior', 'teen'],
+        choices: [
+          {
+            id: 'fs-c1',
+            text: 'New shoes (₹400) + movie with friends (₹200) — save the remaining ₹400 toward the collectible next month',
+            consequence: "You get the shoes your teacher was on your case about, still go to the movie with everyone, and put ₹400 aside. The collectible is still there next month — you buy it guilt-free with money you actually have.",
+            xpDelta: 110,
+            healthDelta: 20,
+            walletDelta: -600,
+            nextStepId: 'end',
+            isOptimal: true,
+            explanation: "This is the correct priority order: Needs first, then Wants, then Desires — with Desires funded by saving, not by skipping something more important or borrowing. Nothing here required going without a real need or going into debt for something aspirational.",
+            realLifeTip: "When a Desire doesn't fit your budget this month, the answer is almost never 'skip a Need' or 'borrow for it' — it's 'save toward it and buy it next month.' The collectible isn't going anywhere; your shoes and your friendships matter now."
+          },
+          {
+            id: 'fs-c2',
+            text: 'Skip the movie entirely — get the shoes AND the collectible right now (₹400 + ₹600 = ₹1,000)',
+            consequence: "You get your shoes and the collectible, but you skip out on your friends' movie plans and end the week with ₹0 saved — nothing left for whatever comes up next.",
+            xpDelta: 45,
+            healthDelta: 0,
+            walletDelta: -1000,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "The Need was covered, which matters — but a Desire (the collectible) got funded ahead of building any buffer at all, and you spent every rupee you had. Wants don't have to lose every time, and a Desire funded by zeroing out your entire balance leaves you with nothing if anything unexpected comes up.",
+            realLifeTip: "Covering your Need is non-negotiable — good instinct. But funding a Desire with 100% of your money, leaving ₹0 spare, is exactly the kind of spending that turns a fun purchase into a stressful week."
+          },
+          {
+            id: 'fs-c3',
+            text: "Ask a friend to lend you ₹200 so you can get all three right now",
+            consequence: "Your friend lends you ₹200. You get the shoes, the movie, and the collectible — but now you owe your friend money, and things get awkward when they ask for it back sooner than you expected.",
+            xpDelta: 10,
+            healthDelta: -15,
+            walletDelta: -1000,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Borrowing to fund a Desire — even from a friend, even a small amount — is exactly the trap SMART spenders avoid. If the only way to afford something is to borrow for it, it means you can't actually afford it yet.",
+            realLifeTip: "'I can afford it if I borrow a little' almost always means 'I can't afford it yet.' Desires are the single most common thing people go into debt for, precisely because they don't feel urgent enough to say no to but also aren't essential enough to already be budgeted."
+          },
+          {
+            id: 'fs-c4',
+            text: "Skip the shoes for now — get the movie ticket and the collectible instead (₹200 + ₹600 = ₹800)",
+            consequence: "You have a great weekend and a new collectible, but your shoes are still falling apart. A week later, your teacher sends a note home about it, and your parents aren't happy you had ₹800 to spend on other things but didn't fix the actual problem.",
+            xpDelta: -10,
+            healthDelta: -20,
+            walletDelta: -800,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "This flips the priority order entirely — a Want and a Desire got funded while a real Need went unmet. Needs always come first, no matter how tempting the Want or Desire in front of you is.",
+            realLifeTip: "If a Need is sitting unresolved while you're spending on Wants or Desires, that's the clearest sign your priority order needs fixing before your spending does."
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    id: 'smart-goal-setting',
+    title: 'The Concert Ticket Countdown',
+    description: "Tickets for a concert you're desperate to see go on sale in 6 months, priced at ₹4,800. You currently have ₹0 saved and just a vague feeling that you \"really want to go.\" A vague feeling isn't a plan — what's yours?",
+    category: 'lifestyle',
+    difficulty: 'intermediate',
+    ageGroups: ['teen', 'senior'],
+    chapterNumber: 23,
+    chapter: 'Setting Goals',
+    estimatedMinutes: 3,
+    xpReward: 160,
+    startingBalance: 0,
+    steps: [
+      {
+        id: 'sgs-1',
+        title: 'Turning "I Want to Go" Into a Plan',
+        narrative: "The concert is 6 months away. Tickets are ₹4,800 and will likely sell out. Right now your entire plan is \"I really want to go.\" That's not a plan — it's a wish. What do you actually do?",
+        ageGroups: ['teen', 'senior'],
+        choices: [
+          {
+            id: 'sgs-c1',
+            text: 'Set a SMART goal: "I will save ₹800 every month for 6 months to buy the ₹4,800 ticket before it sells out."',
+            consequence: "You set a calendar reminder for the 1st of every month and transfer ₹800 the moment you have spare cash. Five months in, you already have ₹4,000 saved — one more month and you're covered, with zero last-minute panic.",
+            xpDelta: 160,
+            healthDelta: 20,
+            walletDelta: 800,
+            nextStepId: 'end',
+            isOptimal: true,
+            explanation: "This goal is Specific (₹4,800 ticket), Measurable (₹800/month), Achievable, Realistic, and Time-bound (6 months, before it sells out). Because you can check your progress every single month, you know by month 3 whether you're on track or need to adjust — instead of finding out in month 6 that you're short.",
+            realLifeTip: "The SMART template works for any goal: 'I will save/pay ₹___ every [period] for ___ to [outcome] by [date].' If you can fill in every blank with a real number, you have a plan. If you can't, you have a wish."
+          },
+          {
+            id: 'sgs-c2',
+            text: '"I\'ll just try to cut back on snacks and see how it goes"',
+            consequence: "Two months pass. You've cut back on snacks some weeks, not others. You genuinely have no idea how much you've saved because you never set an amount. Month 5 arrives and you check — you have ₹600. The ticket sells out before you get close.",
+            xpDelta: 30,
+            healthDelta: -10,
+            walletDelta: 100,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "\"Try to cut back and see how it goes\" has no specific amount and no way to measure progress — you can't know if you're on track because you never defined what 'on track' means. Vague goals fail quietly, and you usually don't notice until it's too late to fix.",
+            realLifeTip: "If your goal doesn't have a number and a date attached, you can't actually check your progress against it — which means you won't know you're behind until the deadline has already passed."
+          },
+          {
+            id: 'sgs-c3',
+            text: 'Ask your parents to just buy the ticket for you',
+            consequence: "They say maybe, if you do well this term — but give no actual commitment. Five months later, nothing has been decided, and the ticket sells out while you were waiting on someone else's decision.",
+            xpDelta: 10,
+            healthDelta: -10,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "This isn't a financial goal at all — it's outsourcing the decision to someone else's uncertain timeline. A real goal is something you can act on yourself, starting today, without waiting for anyone else's yes.",
+            realLifeTip: "Asking for help is fine — but it isn't a substitute for having your own plan. If the ask doesn't come through, you should still be on track without it."
+          },
+          {
+            id: 'sgs-c4',
+            text: 'Buy the ticket right now on a "pay later" plan and figure out the ₹4,800 later',
+            consequence: "You get the ticket immediately — but now you owe ₹4,800 plus fees, due before you've saved anything toward it. The next few months are spent scrambling to repay a debt for something you could have simply saved for at no extra cost.",
+            xpDelta: -20,
+            healthDelta: -25,
+            walletDelta: -4800,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "This is a Desire funded by debt instead of a plan — exactly the trap that turns an exciting purchase into a stressful repayment. Six months was enough time to save the full amount at ₹800/month; borrowing traded that manageable plan for a repayment deadline plus fees.",
+            realLifeTip: "If you have months of lead time before you need the money, that's exactly when a SMART savings goal works best — \"pay later\" plans exist for when you have no other option, not when you already had 6 months of runway."
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    id: 'the-early-start',
+    title: 'Two Friends, Same ₹50,000, Different Timing',
+    description: "You just received ₹50,000 as a graduation gift. A friend got the same amount 8 years ago and invested it at a steady ~9% return — theirs has already doubled to ₹1,00,000, purely from time. Yours is sitting in your account right now, undecided. What do you do with it?",
+    category: 'investing',
+    difficulty: 'intermediate',
+    ageGroups: ['teen', 'senior'],
+    chapterNumber: 24,
+    chapter: 'Time & Compounding',
+    estimatedMinutes: 3,
+    xpReward: 220,
+    startingBalance: 50000,
+    steps: [
+      {
+        id: 'tes-1',
+        title: 'The ₹50,000 Decision',
+        narrative: "You can't get back the 8 years your friend already has invested. But you have ₹50,000 right now, and a decision to make about what happens to it starting today. At a steady 9% annual return, the Rule of 72 says any amount roughly doubles every 8 years. What do you do?",
+        ageGroups: ['teen', 'senior'],
+        choices: [
+          {
+            id: 'tes-c1',
+            text: "Invest the full ₹50,000 now at a similar ~9% return and leave it alone",
+            consequence: "You invest it and set a reminder to check in — not to trade, just to track. Eight years from now, at the same 9% average return your friend got, your ₹50,000 has become roughly ₹1,00,000 too. You couldn't recover the 8 years you didn't have it invested, but every year you wait from today only pushes that doubling further away.",
+            xpDelta: 220,
+            healthDelta: 20,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: true,
+            explanation: "You can't change when you got the money, but you can control when you start letting it compound. Investing all of it today, at a steady rate, gives it the maximum number of years to double — the single biggest lever you have left.",
+            realLifeTip: "You'll never recover money-that-wasn't-invested-yet. The only lever you control is today — every year you delay is a year permanently removed from your compounding timeline."
+          },
+          {
+            id: 'tes-c2',
+            text: "Spend ₹30,000 on a new phone you've wanted (a Desire) and invest the remaining ₹20,000",
+            consequence: "You get the phone and invest what's left. Eight years later, at 9%, your ₹20,000 has grown to roughly ₹40,000 — real growth, but a fraction of what the full ₹50,000 would have become.",
+            xpDelta: 60,
+            healthDelta: -5,
+            walletDelta: -30000,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Investing something is better than investing nothing — but compounding works on whatever principal you actually put in. Shrinking the principal by 60% doesn't just cost you ₹30,000 today, it costs you 60% of everything that ₹30,000 would have become over the next 8+ years.",
+            realLifeTip: "A rupee spent today isn't just a rupee — it's that rupee plus everything it would have doubled into. Before a big Desire purchase, ask what that same money would be worth in 8 years if left alone."
+          },
+          {
+            id: 'tes-c3',
+            text: "Wait a year to research and find the 'perfect' investment before doing anything",
+            consequence: "A year passes. You've read a lot but still haven't picked anything, worried about picking wrong. Your ₹50,000 sat in a near-0% account the entire time. You've permanently lost a full year of compounding you can never get back — for the exact same ₹50,000 you already had.",
+            xpDelta: -10,
+            healthDelta: -15,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "There's no such thing as a perfect moment to start — only a cost to waiting. A 'good enough' steady investment started today beats a 'perfect' one started a year from now, because compounding rewards time far more than it rewards precision.",
+            realLifeTip: "Research matters, but it has a deadline. If a year of 'more research' has cost you a full year of compounding on money you already have, the research itself became the expensive choice."
+          },
+          {
+            id: 'tes-c4',
+            text: "Keep it all in a regular savings account earning ~3.5% — investing feels too risky",
+            consequence: "Your money is completely safe — but at 3.5%, the Rule of 72 says it takes roughly 20 years to double, not 8. Eight years from now, your friend's investment has doubled to ₹1,00,000. Yours has grown to only about ₹65,000.",
+            xpDelta: 20,
+            healthDelta: 0,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Safety isn't free — the rate you accept directly sets how long doubling takes. 72 ÷ 3.5 ≈ 20 years versus 72 ÷ 9 ≈ 8 years: the same ₹50,000, the same 8-year wait, but a very different outcome purely because of the rate chosen.",
+            realLifeTip: "A savings account isn't wrong — it's the right place for money you need soon (like an emergency fund). But money you won't need for 8+ years pays a real, calculable cost for staying that safe."
+          }
+        ]
+      }
+    ]
+  },
+
+  // NEW (2026-09-29): three more quests matching the second batch of new
+  // lesson content (l-networth, the capital-gains card in l-shortterm, and
+  // the FOIR card in l-debt). Appended as chapters 25-27 for the same
+  // reason as the 22-24 batch above — per-quest unlockRequirement gating,
+  // not a strict chapterNumber walk, so appending is safe. Skipped writing
+  // dedicated quests for the take-home-pay chapter and the two single-card
+  // additions (zero-based budgeting, real return) since they reinforce
+  // existing quests' math (first-paycheck, balanced-budget, calculations-quest)
+  // rather than needing a new standalone scenario.
+  {
+    id: 'net-worth-checkin',
+    title: 'The Net Worth Check-In',
+    description: "Your friend Kabir just got a raise and bought a new bike on EMI. \"I'm doing way better than you now,\" he says. You have ₹60,000 saved and no debt. He has ₹15,000 saved and a ₹1,20,000 bike loan. Who's actually ahead — and how would you even check?",
+    category: 'investing',
+    difficulty: 'intermediate',
+    ageGroups: ['teen', 'senior'],
+    chapterNumber: 25,
+    chapter: 'Net Worth',
+    estimatedMinutes: 3,
+    xpReward: 150,
+    startingBalance: 60000,
+    steps: [
+      {
+        id: 'nwc-1',
+        title: '"I\'m Doing Better Than You Now"',
+        narrative: "Kabir shows off his new bike, bought on a ₹1,20,000 EMI plan, and mentions his new salary is higher than what you make. He has ₹15,000 saved. You have ₹60,000 saved and zero debt. He seems certain he's ahead financially. Is he?",
+        ageGroups: ['teen', 'senior'],
+        choices: [
+          {
+            id: 'nwc-c1',
+            text: 'Actually calculate it: mine is ₹60,000 assets − ₹0 debt = ₹60,000 net worth. His is ₹15,000 − ₹1,20,000 = −₹1,05,000.',
+            consequence: "You don't say it out loud, but you do the math for yourself. Despite his bigger salary and newer bike, your actual financial position is over ₹1,65,000 better than his. Income and spending told a completely different story than net worth does.",
+            xpDelta: 150,
+            healthDelta: 20,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: true,
+            explanation: "Net worth (assets minus liabilities) is the number that actually measures financial position — not salary, not what someone just bought, not how confident they sound. Kabir's higher income and newer bike say nothing about whether he's ahead; the math does.",
+            realLifeTip: "Whenever someone's spending makes you feel behind, the actual question isn't 'who earns more' or 'who bought what' — it's 'who has more assets minus liabilities.' Those are very often different answers."
+          },
+          {
+            id: 'nwc-c2',
+            text: "He makes more money and has a nicer bike, so he's probably right that he's doing better",
+            consequence: "You take his word for it and start feeling behind, even though you have zero debt and real savings. Months later, Kabir is stressed about EMI payments eating his 'higher' salary, while your ₹60,000 has grown further — but you spent that whole time feeling like you were losing.",
+            xpDelta: 20,
+            healthDelta: -10,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Higher income and newer purchases feel like winning, but they say nothing about actual financial position without knowing the debt behind them. Assuming someone is 'ahead' based on visible spending is exactly how net worth gets confused with income.",
+            realLifeTip: "What someone owns is visible. What they owe almost never is. Never judge financial position — yours or anyone else's — off visible spending alone."
+          },
+          {
+            id: 'nwc-c3',
+            text: "Feel the pressure and take an EMI on something nice yourself to keep up",
+            consequence: "You put ₹50,000 of new debt on something you didn't need, purely because Kabir's spending made you feel behind. Your actual net worth just dropped by more than his entire net worth already was.",
+            xpDelta: -20,
+            healthDelta: -25,
+            walletDelta: -50000,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Reacting to someone else's visible spending by taking on debt yourself is lifestyle inflation triggered by a false signal — you were already financially ahead, and this choice made that no longer true.",
+            realLifeTip: "'Keeping up' with someone's visible spending, when you don't know their actual liabilities, can turn a real financial lead into a real financial loss — purely for the appearance of parity."
+          },
+          {
+            id: 'nwc-c4',
+            text: "Don't bother calculating anything — just assume you're probably fine since you have savings",
+            consequence: "You brush off the comment and move on. You're not wrong to feel okay — your instinct is correct — but you never actually build the habit of checking your real numbers, and a year later you still don't know your own net worth.",
+            xpDelta: 40,
+            healthDelta: 0,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "The instinct not to panic was right, but skipping the actual calculation means you never build the habit that matters — checking your real net worth periodically, whether or not someone's comment prompts it.",
+            realLifeTip: "Being right by instinct once is fine. Being able to check the actual number, every time, is the habit worth building — it works even when your instinct might be wrong."
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    id: 'sell-now-or-wait',
+    title: 'Sell Now or Wait It Out?',
+    description: "You bought shares 10 months ago. They're up ₹2,00,000. You don't need the cash for anything urgent. Sell now and it's taxed as a Short-Term Capital Gain at 20%. Wait 2 more months to cross the 12-month mark, and it becomes a Long-Term Capital Gain — taxed at 12.5%, with the first ₹1,25,000 exempt. What do you do?",
+    category: 'investing',
+    difficulty: 'intermediate',
+    ageGroups: ['teen', 'senior'],
+    chapterNumber: 26,
+    chapter: 'Capital Gains Tax',
+    estimatedMinutes: 3,
+    xpReward: 180,
+    startingBalance: 200000,
+    steps: [
+      {
+        id: 'snw-1',
+        title: 'Two Months Away From a Better Tax Rate',
+        narrative: "Your shares are up ₹2,00,000 after 10 months. You still believe in the company and don't need this money for anything right now. Selling today means Short-Term Capital Gains: 20% tax = ₹40,000. Waiting until you cross 12 months means Long-Term Capital Gains: the first ₹1,25,000 is tax-free, and the remaining ₹75,000 is taxed at 12.5% = ₹9,375 — a ₹30,625 difference, purely from timing. The stock could also fall in those 2 months. What do you do?",
+        ageGroups: ['teen', 'senior'],
+        choices: [
+          {
+            id: 'snw-c1',
+            text: "I don't need the cash and I'm still confident in the stock — wait 2 months to qualify for LTCG treatment",
+            consequence: "You wait. Two months later, the stock has moved only slightly, and you sell — banking ₹2,00,000 in gains with just ₹9,375 in tax instead of ₹40,000. Same investment, same profit, ₹30,625 more in your pocket purely from timing the tax rule correctly.",
+            xpDelta: 180,
+            healthDelta: 20,
+            walletDelta: 190625,
+            nextStepId: 'end',
+            isOptimal: true,
+            explanation: "With no urgent need for the cash and genuine confidence in the position, the tax math alone favors waiting: a guaranteed ₹30,625 difference for a 2-month wait is a real, calculable return that has nothing to do with predicting the stock's price.",
+            realLifeTip: "When you have no real reason to sell now, check the calendar before you check the ticker. A 2-month wait for a lower, well-defined tax rate is often the single highest 'return' decision available — with none of the market's uncertainty."
+          },
+          {
+            id: 'snw-c2',
+            text: "Sell now anyway — I'd rather lock in the gain even with the higher tax",
+            consequence: "You sell today and pay ₹40,000 in tax, keeping ₹1,60,000. Two months later, the stock is roughly where it was — meaning the only thing that changed by selling early was paying ₹30,625 more in tax than you needed to.",
+            xpDelta: 60,
+            healthDelta: 0,
+            walletDelta: 160000,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Locking in a gain is a reasonable instinct when there's real uncertainty or an actual need for the cash — but here, neither was true. Selling early with no real reason to converted a knowable, guaranteed tax saving into an unnecessary cost.",
+            realLifeTip: "'Locking in gains' is a real strategy when you have a reason to. Without one, it's just giving up a scheduled tax discount for no benefit."
+          },
+          {
+            id: 'snw-c3',
+            text: "Sell immediately, worried the price might fall before the 2 months are up",
+            consequence: "Fear of a drop pushes you to sell today, paying the higher ₹40,000 tax. The stock doesn't fall in the next 2 months — it barely moves. The only thing your fear actually cost you was the ₹30,625 tax difference.",
+            xpDelta: 40,
+            healthDelta: -10,
+            walletDelta: 160000,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Fear of a price drop is a legitimate reason to sell when you actually believe the risk is real — but reacting to a vague 'what if' rather than an actual concern about the company meant giving up a guaranteed, calculable tax benefit for a risk that never materialized.",
+            realLifeTip: "Separate 'I have a real, specific concern about this company' from 'I feel nervous in general.' Only the first is a good reason to override a known tax benefit; the second usually isn't."
+          },
+          {
+            id: 'snw-c4',
+            text: "Don't think about the tax rules at all — just go with whatever feels right in the moment",
+            consequence: "Without weighing the numbers, you end up selling on a whim. It happens to be before the 12-month mark, and you pay the full ₹40,000 in tax — ₹30,625 more than necessary, for a decision that was never actually informed by the one calculable fact available.",
+            xpDelta: 10,
+            healthDelta: -15,
+            walletDelta: 160000,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "This wasn't a bad outcome because of bad luck — it's a guaranteed, knowable ₹30,625 difference that simply never got factored into the decision at all.",
+            realLifeTip: "Capital gains tax timing is one of the few investing decisions that's completely knowable in advance — no market prediction required. Not checking it before selling is leaving a certain amount of money on the table."
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    id: 'emi-affordability-check',
+    title: 'How Much Loan Can You Actually Handle?',
+    description: "Your take-home pay is ₹40,000/month. You already pay ₹8,000/month on a bike loan EMI (20% of your income). A friend says you could 'easily' also take a ₹10,000/month EMI for a new laptop. That would push your total EMI load to ₹18,000 — 45% of everything you make. Can you actually handle it?",
+    category: 'debt',
+    difficulty: 'intermediate',
+    ageGroups: ['teen', 'senior'],
+    chapterNumber: 27,
+    chapter: 'EMI Affordability',
+    estimatedMinutes: 3,
+    xpReward: 190,
+    startingBalance: 40000,
+    steps: [
+      {
+        id: 'eac-1',
+        title: 'The Laptop EMI Offer',
+        narrative: "You take home ₹40,000/month. Your existing bike loan EMI is ₹8,000/month — 20% of your income. A friend suggests a new laptop on EMI: ₹10,000/month for 12 months. Adding it would bring your total EMI load to ₹18,000/month — 45% of your take-home pay. Your friend says it's 'totally manageable.' What do you do?",
+        ageGroups: ['teen', 'senior'],
+        choices: [
+          {
+            id: 'eac-c1',
+            text: "Check the actual math first: ₹8,000 + ₹10,000 = ₹18,000 of ₹40,000 is 45% FOIR — right at the edge of what lenders even allow, with no buffer. Skip the EMI and save for the laptop instead.",
+            consequence: "You save ₹4,000/month instead and buy the laptop in cash 3 months later — no interest, no added monthly obligation, and your FOIR stays at a comfortable 20% the entire time.",
+            xpDelta: 190,
+            healthDelta: 20,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: true,
+            explanation: "45% FOIR sits right at or above what most lenders themselves consider the safe ceiling — meaning there's zero room left for a job disruption, medical cost, or any other emergency. Doing the actual math before saying yes is exactly what your friend's reassurance skipped.",
+            realLifeTip: "'It's totally manageable' from someone who isn't looking at your actual numbers is not a substitute for doing the FOIR math yourself. A 5-minute calculation beats a confident guess every time."
+          },
+          {
+            id: 'eac-c2',
+            text: "Your friend says it's easily manageable — take the EMI without checking the numbers yourself",
+            consequence: "Three months in, an unexpected expense comes up. With 45% of your income already committed to EMIs, you have almost no flexibility left, and you end up missing a payment — hurting your credit score right when you can least afford it.",
+            xpDelta: -20,
+            healthDelta: -25,
+            walletDelta: -10000,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Taking on debt based on someone else's reassurance, without checking your own FOIR, is exactly how a manageable-sounding EMI turns into a real problem the moment anything unexpected happens.",
+            realLifeTip: "Nobody else's opinion of what you can 'easily' afford accounts for your actual numbers. Always run your own FOIR before adding any EMI on top of existing ones."
+          },
+          {
+            id: 'eac-c3',
+            text: "Take a smaller EMI (₹5,000/month) for a more basic laptop, keeping FOIR closer to 32%",
+            consequence: "You get a laptop that does the job, and your FOIR lands at 32% — safer than 45%, though still an added monthly obligation you didn't strictly need to take on at all.",
+            xpDelta: 90,
+            healthDelta: 5,
+            walletDelta: -5000,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Downsizing the EMI is a real improvement over the original offer and shows you understood the FOIR problem — but it still adds a fixed monthly obligation on top of an existing one without ever asking whether saving up instead was the better option entirely.",
+            realLifeTip: "Reducing an EMI's size is better than ignoring the math, but the first question is always whether you need the EMI at all — not just how to make it smaller."
+          },
+          {
+            id: 'eac-c4',
+            text: "Decide you don't trust loans in general, so skip both the laptop and ever taking any EMI",
+            consequence: "You skip the laptop EMI, which works out fine here — but a few months later you turn down a genuinely low-interest, clearly affordable education loan too, out of the same blanket discomfort, missing an opportunity that would have easily fit your budget.",
+            xpDelta: 60,
+            healthDelta: 10,
+            walletDelta: 0,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "Avoiding this EMI worked out, but avoiding EMIs on principle rather than by checking the actual FOIR math means you'll also turn down loans that would have been genuinely fine — the goal is knowing the number, not avoiding debt entirely.",
+            realLifeTip: "The goal isn't 'never borrow' — it's 'know your FOIR before you decide.' Blanket avoidance and blanket comfort with debt are both worse than actually checking."
+          }
+        ]
+      }
+    ]
+  },
+
 ];

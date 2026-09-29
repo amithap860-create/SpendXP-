@@ -11,10 +11,11 @@ import { XPWallet } from '@/components/XPWallet';
 import {
   Puzzle, TrendingUp, ShieldAlert, Landmark, Building2, Wallet,
   ArrowDownUp, Trophy, RefreshCcw, Sparkles, Info, CheckCircle2, X, BookOpen, Target,
-  ChevronUp, ChevronDown
+  ChevronUp, ChevronDown, Flame, Snowflake
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useGameTutorial, GameTutorialModal, HowToPlayButton } from '@/components/games/GameTutorial';
+import { ConceptBreakdown } from '@/components/ConceptBreakdown';
 
 const MONEY_MAZE_TUTORIAL_STEPS = [
   'Debt Domino: drag the debts into your preferred payoff order, most urgent at the top.',
@@ -222,7 +223,7 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
     xpPerCorrectAnswer: 50,
   }), []);
 
-  const { gameState, xpEarned, startGame, endGame } = useGameEngine(gameConfig);
+  const { gameState, startGame, endGame } = useGameEngine(gameConfig);
 
   // Debt state
   const debtScenarios = ageGroup === 'junior' ? DEBT_SCENARIOS_JUNIOR : ageGroup === 'senior' ? DEBT_SCENARIOS_SENIOR : DEBT_SCENARIOS_TEEN;
@@ -230,6 +231,16 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
   const scenario = debtScenarios[scenarioIdx];
   const [debts, setDebts] = useState<DebtItem[]>([]);
   const [debtResult, setDebtResult] = useState<{ method: 'AVALANCHE' | 'SNOWBALL' | 'NONE'; saved: string } | null>(null);
+  // FIX (2026-09-30): the results screen was showing useGameEngine's
+  // `xpEarned` state, which is only ever incremented by CORRECT_ANSWER
+  // dispatches or the NEXT_ROUND reducer case — neither of which this game
+  // ever triggers (Debt Domino and Portfolio Builder both call endGame()
+  // directly with a one-off bonus, never correctAnswer()/nextRound()). So
+  // xpEarned stayed 0 forever regardless of what was actually awarded,
+  // showing "+0 XP earned" even after a perfect Avalanche match that DID
+  // award XP server-side. Tracking the real awarded amount locally so the
+  // screen shows what actually happened.
+  const [xpAwarded, setXpAwarded] = useState<number>(0);
 
   // Portfolio state
   const [riskStep, setRiskStep] = useState<number | null>(null); // null = not started, -1 = done
@@ -241,12 +252,52 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
   const [showGlossary, setShowGlossary] = useState(false);
   const [showGoals, setShowGoals] = useState(false);
   const [goalTarget, setGoalTarget] = useState('');
+  // FIX (2026-09-30): neither mode in this game ever showed which lesson it
+  // ties back to before play — unlike FinIQQuiz/BudgetBlitz, which both open
+  // on a ConceptBreakdown brief. The content already existed and was even
+  // pre-tagged for this ('emi-and-debt' already lists 'moneyMaze-debt' in its
+  // relatedActivityIds, and 'investing-basics' lists 'stockMarketSim') — it
+  // just was never wired into the component. Mode selection now shows the
+  // brief before startGame() actually fires.
+  const [showBreakdown, setShowBreakdown] = useState(false);
 
   // Start debt mode
   const startDebt = () => {
     const s = debtScenarios[scenarioIdx];
     setDebts([...s.debts].sort(() => Math.random() - 0.5));
     setSelectedMode('DEBT');
+    setShowBreakdown(true);
+  };
+
+  // FIX (2026-09-30): "Try Another" used to reset selectedMode to null and
+  // call startGame(). startGame() immediately moves the shared game engine
+  // past 'IDLE' (into COUNTDOWN/PLAYING) — but with selectedMode null, NONE
+  // of this component's render branches matched anymore (not the IDLE mode
+  // picker, since gameState wasn't IDLE; not DEBT, since selectedMode wasn't
+  // 'DEBT'), so it fell all the way through to this file's last, unguarded
+  // return statement — which is the Portfolio Builder allocation screen.
+  // That happened regardless of which mode you'd actually just played,
+  // which is why finishing Debt Domino and hitting "Try Another" always
+  // landed on Portfolio Builder. These two retry functions restart the SAME
+  // mode that was just played, keeping selectedMode intact so the correct
+  // render branch matches. They also skip re-showing the concept brief on a
+  // replay — you've already seen it, same behavior as FinIQQuiz's "Try Again".
+  const retryDebt = () => {
+    const s = debtScenarios[scenarioIdx];
+    setDebts([...s.debts].sort(() => Math.random() - 0.5));
+    setDebtResult(null);
+    setXpAwarded(0);
+    startGame();
+  };
+
+  const retryPortfolio = () => {
+    setRiskStep(0);
+    setRiskAnswers([]);
+    setRiskProfile(null);
+    setAllocation({ cash: 40, bonds: 30, stocks: 20, property: 10 });
+    setPortfolioScore(null);
+    setPortfolioFeedback('');
+    setXpAwarded(0);
     startGame();
   };
 
@@ -256,6 +307,32 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
     next.splice(toIdx, 0, moved);
     setDebts(next);
   };
+
+  // FIX (2026-09-30): "what should correct feel like" pass — this game had a
+  // real correct answer (Avalanche or Snowball order) but ZERO feedback
+  // while actually dragging, only a verdict at the very end. Rather than
+  // inventing a new scoring heuristic that could disagree with the strategy
+  // check below, this measures the SAME thing checkDebtStrategy checks —
+  // pairwise concordance with a strict rate-descending (Avalanche) or
+  // balance-ascending (Snowball) order — just as a live percentage instead
+  // of a final pass/fail. It mathematically reaches 100% on exactly the same
+  // orderings checkDebtStrategy would call a match, so the live meter can
+  // never contradict the final verdict.
+  const strategyMatch = useMemo(() => {
+    if (debts.length < 2) return { avalanche: 100, snowball: 100 };
+    let avalanchePairs = 0, snowballPairs = 0, totalPairs = 0;
+    for (let i = 0; i < debts.length; i++) {
+      for (let j = i + 1; j < debts.length; j++) {
+        totalPairs++;
+        if (debts[i].rate >= debts[j].rate) avalanchePairs++;
+        if (debts[i].balance <= debts[j].balance) snowballPairs++;
+      }
+    }
+    return {
+      avalanche: Math.round((avalanchePairs / totalPairs) * 100),
+      snowball: Math.round((snowballPairs / totalPairs) * 100),
+    };
+  }, [debts]);
 
   const checkDebtStrategy = async () => {
     const isAvalanche = debts.every((d, i) => i === 0 || debts[i - 1].rate >= d.rate);
@@ -269,6 +346,7 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
     setDebtResult({ method, saved: savedEst });
     // Only award bonus XP for a correct strategy — 'NONE' gets base end-game XP only
     const bonusXp = method === 'AVALANCHE' ? 250 : method === 'SNOWBALL' ? 200 : 0;
+    setXpAwarded(bonusXp);
     await endGame(bonusXp);
   };
 
@@ -316,13 +394,44 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
     if (goalTarget && riskProfile) {
       const isGrowthGoal = /retire|house|car|abroad|wealth|crore|lakh/i.test(goalTarget);
       if (isGrowthGoal && riskProfile.label === 'Conservative') {
-        lines.push(`⚠️ Goal mismatch: "${goalTarget}" requires growth, but your risk profile is Conservative. Consider stepping up to at least Moderate.`);
+        lines.push(`Goal mismatch: "${goalTarget}" requires growth, but your risk profile is Conservative. Consider stepping up to at least Moderate.`);
       }
     }
 
     setPortfolioFeedback(lines.join('\n\n'));
-    await endGame();
+    // FIX (2026-09-30): this called endGame() with NO bonus argument at all —
+    // meaning Portfolio Builder awarded exactly 0 XP every single time,
+    // regardless of getting a perfect 100% risk-aligned allocation. Debt
+    // Domino already scored its bonus XP off the quality of the answer
+    // (250/200/0); Portfolio Builder needs the same treatment instead of a
+    // flat zero every playthrough.
+    const bonusXp = s >= 90 ? 250 : s >= 75 ? 150 : s >= 50 ? 75 : 0;
+    setXpAwarded(bonusXp);
+    await endGame(bonusXp);
   };
+
+  // ─── Concept Brief ──────────────────────────────────────────────────────────
+
+  if (showBreakdown && selectedMode) {
+    return (
+      <ConceptBreakdown
+        breakdownId={selectedMode === 'DEBT' ? 'emi-and-debt' : 'investing-basics'}
+        ageGroup={ageGroup}
+        activityType="game"
+        activityTitle={selectedMode === 'DEBT' ? 'Debt Domino' : 'Portfolio Builder'}
+        fogEnemyId={selectedMode === 'DEBT' ? 'debt_web' : 'market_madness'}
+        onContinue={() => {
+          setShowBreakdown(false);
+          if (selectedMode === 'DEBT') {
+            startGame();
+          } else {
+            setRiskStep(0);
+            startGame();
+          }
+        }}
+      />
+    );
+  }
 
   // ─── Risk Assessment ────────────────────────────────────────────────────────
 
@@ -384,7 +493,7 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
           </Card>
           <Card
             className="hover:shadow-2xl cursor-pointer border-none border-t-4 border-t-emerald-500 transition-shadow"
-            onClick={() => { setSelectedMode('PORTFOLIO'); setRiskStep(0); startGame(); }}
+            onClick={() => { setSelectedMode('PORTFOLIO'); setShowBreakdown(true); }}
           >
             <div className="h-2 bg-primary rounded-t-xl" />
             <CardHeader>
@@ -414,17 +523,22 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
             <div className="bg-primary p-10 text-white text-center">
               <Trophy className="h-16 w-16 mx-auto mb-4" />
               <CardTitle className="text-4xl font-black mb-2">Mission Complete!</CardTitle>
-              <p className="text-[#E8F5EE] text-xl">+{xpEarned} XP earned</p>
+              <p className="text-[#E8F5EE] text-xl">+{xpAwarded} XP earned</p>
             </div>
             <CardContent className="p-8 space-y-6">
               {selectedMode === 'DEBT' && debtResult && (
                 <div className="space-y-4">
+                  {/* FIX (2026-09-30): fixed light-hex/blue-100 badges didn't adapt to
+                      dark mode, and used raw emoji instead of icons. Now uses
+                      cat-correct (Avalanche) / cat-save (Snowball, fittingly cool-toned)
+                      / cat-wrong (no match) — the same tokens the live meter above uses,
+                      so the verdict visually confirms what the meter was already showing. */}
                   <div className="text-center">
-                    <Badge className={cn("text-sm px-4 py-1 font-black", debtResult.method === 'AVALANCHE' ? 'bg-[#C8E8D8] text-primary' : debtResult.method === 'SNOWBALL' ? 'bg-blue-100 text-blue-700' : 'bg-muted text-foreground')}>
-                      {debtResult.method === 'AVALANCHE' ? '🔥 Avalanche Strategy' : debtResult.method === 'SNOWBALL' ? '❄️ Snowball Strategy' : 'Custom Order'}
+                    <Badge className={cn("text-sm px-4 py-1 font-black gap-1.5", debtResult.method === 'AVALANCHE' ? 'bg-cat-correct/15 text-cat-correct' : debtResult.method === 'SNOWBALL' ? 'bg-cat-save/15 text-cat-save' : 'bg-cat-wrong/10 text-cat-wrong')}>
+                      {debtResult.method === 'AVALANCHE' ? <><Flame className="h-3.5 w-3.5" />Avalanche Strategy</> : debtResult.method === 'SNOWBALL' ? <><Snowflake className="h-3.5 w-3.5" />Snowball Strategy</> : 'Custom Order'}
                     </Badge>
                   </div>
-                  <p className="font-black text-lg text-center text-primary">{debtResult.saved}</p>
+                  <p className={cn("font-black text-lg text-center", debtResult.method !== 'NONE' ? 'text-cat-correct' : 'text-muted-foreground')}>{debtResult.saved}</p>
                   <div className="bg-muted rounded-xl p-4 text-sm text-foreground space-y-2">
                     {debtResult.method === 'AVALANCHE'
                       ? <><p><strong>Avalanche</strong> = pay highest interest rate first. Mathematically saves the most money.</p><p>Best for: People who are motivated by saving the maximum amount.</p></>
@@ -438,7 +552,12 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
               {selectedMode === 'PORTFOLIO' && portfolioScore !== null && (
                 <div className="space-y-4">
                   <div className="text-center">
-                    <div className={cn("text-5xl font-black mb-1", portfolioScore >= 75 ? 'text-primary' : portfolioScore >= 50 ? 'text-[#2E7D5A]' : 'text-rose-600')}>
+                    {/* FIX (2026-09-30): the >=75 and >=50 branches resolved to the
+                        exact same sage color (text-primary and text-[#2E7D5A] are
+                        the same hex), so the 3-tier scoring never actually looked
+                        3-tier. Now uses cat-correct/cat-want/cat-wrong for a real
+                        visual gradient, and it's dark-mode safe. */}
+                    <div className={cn("text-5xl font-black mb-1", portfolioScore >= 75 ? 'text-cat-correct' : portfolioScore >= 50 ? 'text-cat-want' : 'text-cat-wrong')}>
                       {portfolioScore}%
                     </div>
                     <div className="text-muted-foreground text-sm">alignment with your risk profile</div>
@@ -450,7 +569,7 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
                     </div>
                   )}
                   {riskProfile && (
-                    <div className="text-xs text-slate-500 bg-blue-50 rounded-xl p-3">
+                    <div className="text-xs text-muted-foreground bg-muted rounded-xl p-3">
                       <strong>Your ideal allocation:</strong> Cash {riskProfile.recommended.cash}% · Bonds {riskProfile.recommended.bonds}% · Stocks {riskProfile.recommended.stocks}% · Property {riskProfile.recommended.property}%
                     </div>
                   )}
@@ -458,14 +577,8 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
               )}
               <div className="flex gap-4">
                 <Button variant="outline" onClick={() => {
-                  setSelectedMode(null);
-                  setRiskStep(null);
-                  setRiskAnswers([]);
-                  setRiskProfile(null);
-                  setPortfolioScore(null);
-                  setPortfolioFeedback('');
-                  setDebtResult(null);  // clear stale debt result so it doesn't bleed into next session
-                  startGame();
+                  if (selectedMode === 'DEBT') retryDebt();
+                  else if (selectedMode === 'PORTFOLIO') retryPortfolio();
                 }} className="flex-1 h-14 font-bold">
                   Try Another
                 </Button>
@@ -499,39 +612,78 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
               Up/Down buttons, which use plain onClick and work identically
               on every device, touch or mouse.
             */}
+            {/* FIX (2026-09-30): live feedback while dragging — previously this
+                screen gave no signal at all until "Confirm Priority Order" was
+                clicked. Shows how close the CURRENT arrangement is to each
+                named strategy, updating on every move. */}
+            <div className="mb-5 p-3 rounded-xl bg-muted border border-border grid grid-cols-2 gap-3">
+              <div>
+                <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest mb-1.5">
+                  <span className="flex items-center gap-1 text-cat-correct"><Flame className="h-3 w-3" />Avalanche</span>
+                  <span className={cn(strategyMatch.avalanche === 100 ? "text-cat-correct" : "text-muted-foreground")}>{strategyMatch.avalanche}%</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-border overflow-hidden">
+                  <div className="h-full bg-cat-correct transition-all duration-300" style={{ width: `${strategyMatch.avalanche}%` }} />
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest mb-1.5">
+                  <span className="flex items-center gap-1 text-cat-save"><Snowflake className="h-3 w-3" />Snowball</span>
+                  <span className={cn(strategyMatch.snowball === 100 ? "text-cat-save" : "text-muted-foreground")}>{strategyMatch.snowball}%</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-border overflow-hidden">
+                  <div className="h-full bg-cat-save transition-all duration-300" style={{ width: `${strategyMatch.snowball}%` }} />
+                </div>
+              </div>
+            </div>
+
             <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest mb-4">Reorder — most urgent first</p>
+            {/* FIX (2026-09-30): the old single-row layout crammed a number
+                circle, the debt name, balance/min-payment text, an APR badge,
+                AND up/down buttons into one flex row — on a real phone width
+                there wasn't enough room left for the name, so it got cut off
+                with "..." (e.g. "Friend L…", "Education …"), hiding exactly
+                the info the player needs to make this decision. Restructured
+                into two rows: the name now gets the full card width and wraps
+                instead of truncating; balance/min-payment/APR moved to a
+                second row underneath. */}
             {debts.map((debt, idx) => (
               <div
                 key={debt.id}
-                className="p-4 rounded-xl border-2 border-border flex items-center gap-4 bg-card shadow-sm hover:border-primary transition-colors"
+                className="p-4 rounded-xl border-2 border-border bg-card shadow-sm hover:border-primary transition-colors"
               >
-                <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center font-black text-sm shrink-0">{idx + 1}</div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-bold text-foreground truncate">{debt.name}</div>
-                  <div className="text-xs text-muted-foreground">Balance: ₹{debt.balance.toLocaleString('en-IN')} · Min payment: ₹{debt.minPayment}</div>
-                </div>
-                <div className={cn("font-black text-sm shrink-0", debt.rate > 20 ? 'text-rose-600' : debt.rate > 0 ? 'text-[#2E7D5A]' : 'text-muted-foreground')}>
-                  {debt.rate > 0 ? `${debt.rate}% APR` : '0% interest'}
-                </div>
-                <div className="flex flex-col gap-1 shrink-0">
-                  <button
-                    type="button"
-                    aria-label="Move up"
-                    disabled={idx === 0}
-                    onClick={() => handleMove(idx, idx - 1)}
-                    className="h-6 w-6 rounded-md border border-border flex items-center justify-center text-muted-foreground disabled:opacity-30 disabled:cursor-not-allowed hover:border-primary hover:text-primary"
-                  >
-                    <ChevronUp className="h-4 w-4" />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="Move down"
-                    disabled={idx === debts.length - 1}
-                    onClick={() => handleMove(idx, idx + 1)}
-                    className="h-6 w-6 rounded-md border border-border flex items-center justify-center text-muted-foreground disabled:opacity-30 disabled:cursor-not-allowed hover:border-primary hover:text-primary"
-                  >
-                    <ChevronDown className="h-4 w-4" />
-                  </button>
+                <div className="flex items-start gap-3">
+                  <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center font-black text-sm shrink-0">{idx + 1}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-foreground leading-snug">{debt.name}</div>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1">
+                      <span className="text-xs text-muted-foreground">Balance: ₹{debt.balance.toLocaleString('en-IN')}</span>
+                      <span className="text-xs text-muted-foreground">· Min: ₹{debt.minPayment}</span>
+                      <span className={cn("font-black text-xs", debt.rate > 20 ? 'text-cat-wrong' : debt.rate > 0 ? 'text-cat-correct' : 'text-muted-foreground')}>
+                        {debt.rate > 0 ? `${debt.rate}% APR` : '0% interest'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1 shrink-0">
+                    <button
+                      type="button"
+                      aria-label="Move up"
+                      disabled={idx === 0}
+                      onClick={() => handleMove(idx, idx - 1)}
+                      className="h-7 w-7 rounded-md border border-border flex items-center justify-center text-muted-foreground disabled:opacity-30 disabled:cursor-not-allowed hover:border-primary hover:text-primary"
+                    >
+                      <ChevronUp className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Move down"
+                      disabled={idx === debts.length - 1}
+                      onClick={() => handleMove(idx, idx + 1)}
+                      className="h-7 w-7 rounded-md border border-border flex items-center justify-center text-muted-foreground disabled:opacity-30 disabled:cursor-not-allowed hover:border-primary hover:text-primary"
+                    >
+                      <ChevronDown className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

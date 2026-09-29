@@ -438,23 +438,32 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Active Fog enemy — description + weakness */}
+                {/* FIX (2026-09-30): both boxes used fixed light-only colors
+                    (bg-amber-50/100, #F0FAF5/#A8D5BC) — the earlier dark-mode
+                    pass deliberately left "semantic" warning/success colors
+                    alone rather than guessing at them, but that meant this
+                    card kept a pale amber/mint card sitting on an otherwise
+                    dark screen, same washed-out-on-dark bug found elsewhere
+                    this session (ConceptBreakdown, quiz explanation panel).
+                    Now uses the shared cat-want/cat-correct tokens, which
+                    already have proper dark-mode variants. */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4">
+                  <div className="bg-cat-want/10 border border-cat-want/20 rounded-2xl p-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
-                        <AlertTriangle className="h-4 w-4 text-amber-600" />
+                      <div className="w-7 h-7 rounded-lg bg-cat-want/15 flex items-center justify-center shrink-0">
+                        <AlertTriangle className="h-4 w-4 text-cat-want" />
                       </div>
                       <div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-amber-600">Active Threat</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-cat-want">Active Threat</p>
                         <p className="text-sm font-black text-foreground">{fog.name}</p>
                       </div>
                     </div>
                     <p className="text-xs text-muted-foreground leading-relaxed">{fog.description}</p>
                   </div>
-                  <div className="bg-[#F0FAF5] border border-[#A8D5BC] rounded-2xl p-4">
+                  <div className="bg-cat-correct/10 border border-cat-correct/20 rounded-2xl p-4">
                     <div className="flex items-center gap-1.5 mb-2">
-                      <ShieldCheck className="h-3 w-3 text-primary" />
-                      <p className="text-[9px] font-black uppercase tracking-widest text-primary">Counter</p>
+                      <ShieldCheck className="h-3 w-3 text-cat-correct" />
+                      <p className="text-[9px] font-black uppercase tracking-widest text-cat-correct">Counter</p>
                     </div>
                     <p className="text-xs text-foreground leading-relaxed font-medium">{fog.weakness}</p>
                   </div>
@@ -485,7 +494,13 @@ export default function DashboardPage() {
           {[
             { label: 'Day Streak', val: currentStreak, icon: true },
             { label: 'Games Played', val: progression?.totalGamesPlayed || 0 },
-            { label: 'Saved Virtually', val: formatValue(progression?.walletBalance || 0), smallVal: true },
+            // FIX (2026-09-30): was reading walletBalance, which is a net
+            // cash-flow number that's floored at 0 — most quests are spending
+            // scenarios where even the optimal choice is a negative delta, so
+            // this showed 0 for most users after most quests regardless of
+            // how well they played. totalSaved only accumulates genuine
+            // "saved/gained money" choices, so it actually reflects the label.
+            { label: 'Saved Virtually', val: formatValue(progression?.totalSaved || 0), smallVal: true },
             {
               // FIX (2026-09): hardcoded "/ 8" — lessons.ts now has 12
               // lessons (was 8 when this was written), so a user who'd done

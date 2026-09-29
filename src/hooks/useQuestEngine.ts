@@ -137,11 +137,16 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
               optimalRate,
               healthDelta: nextState.totalHealthDelta,
               // FIX (2026-09): totalWalletDelta was computed here the whole
-              // time but never actually sent to the server — the "Saved
-              // Virtually" stat on the dashboard (progression.walletBalance)
-              // had no write path anywhere in the codebase, so it always
-              // showed ₹0 for every user no matter how many quests they
-              // completed.
+              // time but never actually sent to the server — it had no write
+              // path anywhere in the codebase.
+              // FIX (2026-09-30): once it WAS wired up, "Saved Virtually" on
+              // the dashboard still showed ~0, because it was reading
+              // progression.walletBalance — a net-cash-flow figure that's
+              // floored at 0, and most quests are spending scenarios where
+              // even the optimal choice is a negative delta. The dashboard
+              // now reads progression.totalSaved instead, which the server
+              // increments only from the positive side of this same delta
+              // (see app/api/quests/complete/route.ts).
               walletDelta: nextState.totalWalletDelta,
             }),
           });

@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useGameTutorial, GameTutorialModal, HowToPlayButton } from '@/components/games/GameTutorial';
+import { ConceptBreakdown } from '@/components/ConceptBreakdown';
 
 const SPARKLINE_LEN = 20; // points of history to show
 
@@ -131,6 +132,23 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
 
   const [cash, setCash] = useState(startingCash);
   const [portfolio, setPortfolio] = useState<Record<string, number>>({});
+  // FIX (2026-09-30): "what should correct feedback look like" pass. This sim
+  // deliberately has no per-trade "correct answer" — prices move on
+  // randomized volatility + news, so no one (including us) can say in
+  // advance whether a buy was right. What IS a fact, not a prediction, is
+  // what a SALE actually returned relative to what you paid. avgCost tracks
+  // a running weighted-average cost basis per symbol so a sell can show a
+  // real, honest gain/loss — feedback on what happened, not a verdict on
+  // what you should have known beforehand.
+  const [avgCost, setAvgCost] = useState<Record<string, number>>({});
+  const [realizedPL, setRealizedPL] = useState(0);
+  // `tone` distinguishes a buy (neutral — no correct/wrong judgment, just a
+  // confirmation something happened) from a sell (a real gain/loss fact).
+  const [tradePop, setTradePop] = useState<{ text: string; tone: 'correct' | 'wrong' | 'neutral'; key: number } | null>(null);
+  // FIX (2026-09-30): this game never showed which lesson it ties back to,
+  // same gap as MoneyMaze — 'investing-basics' is already tagged with
+  // 'stockMarketSim' in its relatedActivityIds, just never wired in.
+  const [showBreakdown, setShowBreakdown] = useState(true);
   const [prices, setPrices] = useState<Record<string, number>>(
     () => Object.fromEntries(companies.map(c => [c.symbol, c.startPrice]))
   );
@@ -234,19 +252,61 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
 
   const handleTrade = (qty: number) => {
     if (!tradeModal) return;
-    const price = prices[tradeModal.stock.symbol];
+    const symbol = tradeModal.stock.symbol;
+    const price = prices[symbol];
     if (tradeModal.type === 'buy' && cash >= qty * price) {
       setCash(prev => prev - qty * price);
-      setPortfolio(prev => ({ ...prev, [tradeModal.stock.symbol]: (prev[tradeModal.stock.symbol] || 0) + qty }));
-    } else if (tradeModal.type === 'sell' && (portfolio[tradeModal.stock.symbol] || 0) >= qty) {
+      const prevQty = portfolio[symbol] || 0;
+      const prevCost = avgCost[symbol] || 0;
+      // Weighted-average cost basis: buying more at a different price shifts
+      // the average, same as any real brokerage statement would show it.
+      const newQty = prevQty + qty;
+      const newAvgCost = newQty > 0 ? (prevCost * prevQty + price * qty) / newQty : price;
+      setAvgCost(prev => ({ ...prev, [symbol]: newAvgCost }));
+      setPortfolio(prev => ({ ...prev, [symbol]: newQty }));
+      // FIX (2026-09-30): buying gave zero visual feedback — only selling did
+      // (the gain/loss pop). That asymmetry read as "did my tap even work?"
+      // Neutral tone on purpose: buying isn't right or wrong at the moment
+      // it happens, just confirmed.
+      setTradePop({ text: `Bought ${qty} ${tradeModal.stock.symbol}`, tone: 'neutral', key: Date.now() });
+    } else if (tradeModal.type === 'sell' && (portfolio[symbol] || 0) >= qty) {
       setCash(prev => prev + qty * price);
-      setPortfolio(prev => ({ ...prev, [tradeModal.stock.symbol]: (prev[tradeModal.stock.symbol] || 0) - qty }));
+      setPortfolio(prev => ({ ...prev, [symbol]: (prev[symbol] || 0) - qty }));
+      // Realized gain/loss on exactly the shares being sold, vs. what was
+      // actually paid for them — a fact, shown as it happens, not a guess.
+      const gain = (price - (avgCost[symbol] || price)) * qty;
+      setRealizedPL(prev => prev + gain);
+      setTradePop({ text: `${gain >= 0 ? '+' : '−'}$${Math.abs(gain).toFixed(2)}`, tone: gain >= 0 ? 'correct' : 'wrong', key: Date.now() });
     }
     setTradeModal(null);
   };
 
+  // Auto-dismiss the trade pop — it's a momentary flourish, not a persistent
+  // banner, and nothing else in this screen clears it (unlike the quiz,
+  // there's no "next question" transition to hook the reset onto).
+  useEffect(() => {
+    if (!tradePop) return;
+    const t = setTimeout(() => setTradePop(null), 1400);
+    return () => clearTimeout(t);
+  }, [tradePop]);
+
   const portfolioValue = Object.entries(portfolio).reduce((acc, [s, q]) => acc + q * prices[s], 0);
   const totalWealth = cash + portfolioValue;
+
+  // ─── Concept Brief ──────────────────────────────────────────────────────────
+
+  if (showBreakdown) {
+    return (
+      <ConceptBreakdown
+        breakdownId="investing-basics"
+        ageGroup={ageGroup}
+        activityType="game"
+        activityTitle="Stock Simulator"
+        fogEnemyId="market_madness"
+        onContinue={() => setShowBreakdown(false)}
+      />
+    );
+  }
 
   // ─── Personality quiz flow ─────────────────────────────────────────────────
 
@@ -362,19 +422,45 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
           </div>
           <CardContent className="p-10 space-y-6">
             <div className="text-center">
-              <div className={cn("text-6xl font-black mb-1", totalWealth >= startingCash ? 'text-primary' : 'text-rose-600')}>
+              <div className={cn("text-6xl font-black mb-1", totalWealth >= startingCash ? 'text-cat-correct' : 'text-cat-wrong')}>
                 ${totalWealth.toFixed(2)}
               </div>
-              <div className={cn("text-sm font-bold", totalWealth >= startingCash ? 'text-primary' : 'text-rose-600')}>
+              <div className={cn("text-sm font-bold", totalWealth >= startingCash ? 'text-cat-correct' : 'text-cat-wrong')}>
                 {totalWealth >= startingCash ? '+' : ''}{((totalWealth - startingCash) / startingCash * 100).toFixed(1)}% return
               </div>
             </div>
+
+            {/* FIX (2026-09-30): "what should correct feel like" pass. There's no
+                real market index simulated here, so the only honest baseline to
+                compare against is the one already implicit in this game: cash
+                that was never traded doesn't grow or shrink on its own. Making
+                that comparison explicit — instead of leaving the % return to
+                imply a vague sense of "good" or "bad" — is a more honest
+                teaching moment than a fabricated benchmark would be. */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-xl bg-muted p-4 text-center">
+                <div className="text-[10px] font-black uppercase text-muted-foreground tracking-widest mb-1">If you'd never traded</div>
+                <div className="text-xl font-black text-foreground">${startingCash.toFixed(2)}</div>
+              </div>
+              <div className={cn("rounded-xl p-4 text-center", realizedPL >= 0 ? "bg-cat-correct/10" : "bg-cat-wrong/10")}>
+                <div className="text-[10px] font-black uppercase text-muted-foreground tracking-widest mb-1">Realized from trades</div>
+                <div className={cn("text-xl font-black", realizedPL >= 0 ? "text-cat-correct" : "text-cat-wrong")}>
+                  {realizedPL >= 0 ? '+' : '−'}${Math.abs(realizedPL).toFixed(2)}
+                </div>
+              </div>
+            </div>
+            {Object.values(portfolio).some(q => q > 0) && (
+              <p className="text-[11px] text-muted-foreground text-center -mt-2">
+                "Realized" only counts shares you actually sold — any stock you're still holding is a paper gain or loss until you sell it too.
+              </p>
+            )}
+
             <p className="text-xs text-muted-foreground text-center bg-muted rounded-xl p-3">
               {totalWealth > startingCash * 1.1
-                ? '🎯 Excellent! You beat the market. Diversifying and reading news headlines made the difference.'
+                ? 'Excellent! You beat doing nothing by a wide margin. Diversifying and reading news headlines made the difference.'
                 : totalWealth >= startingCash
-                ? '👍 Positive return! Keep studying the patterns — timing your buys matters.'
-                : '📚 Lost money this round — that\'s part of learning. Watch for news headlines and diversify next time.'}
+                ? 'Positive return! Keep studying the patterns — timing your buys matters.'
+                : 'Lost money this round — that\'s part of learning. Watch for news headlines and diversify next time.'}
             </p>
             <Button onClick={onExit} className="w-full h-14 font-bold text-lg min-h-[44px]">Return to Hub</Button>
           </CardContent>
@@ -388,7 +474,17 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
 
   return (
     <div className="max-w-5xl mx-auto space-y-4 md:space-y-6">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+      <div className="relative grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        {/* Realized gain/loss pop on sell — a fact about what just happened,
+            not a judgment on the trade decision itself. See handleTrade. */}
+        {tradePop && (
+          <div key={tradePop.key} className={cn(
+            "xp-pop-anim absolute left-1/2 -translate-x-1/2 -top-2 pointer-events-none font-black text-base md:text-xl z-10 whitespace-nowrap",
+            tradePop.tone === 'correct' ? "text-cat-correct" : tradePop.tone === 'wrong' ? "text-cat-wrong" : "text-muted-foreground"
+          )}>
+            {tradePop.text}
+          </div>
+        )}
         <Card className="p-3 md:p-4 flex flex-col items-center border-none shadow-sm">
           <div className="text-[10px] md:text-xs font-black uppercase text-muted-foreground">Cash</div>
           <div className="text-lg md:text-xl font-black text-primary">${cash.toFixed(2)}</div>
@@ -401,24 +497,50 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
           <div className="text-[10px] md:text-xs font-black uppercase text-muted-foreground">Portfolio</div>
           <div className="text-lg md:text-xl font-black text-primary">${portfolioValue.toFixed(2)}</div>
         </Card>
-        <Card className={cn("p-3 md:p-4 flex flex-col items-center border-none shadow-sm", totalWealth >= startingCash ? 'bg-[#E8F5EE]' : 'bg-rose-50')}>
-          <div className="text-[10px] md:text-xs font-black uppercase text-slate-400">Total</div>
-          <div className={cn("text-lg md:text-xl font-black", totalWealth >= startingCash ? 'text-primary' : 'text-rose-700')}>${totalWealth.toFixed(2)}</div>
+        {/* FIX (2026-09-30): fixed light-hex bg (#E8F5EE/rose-50) + fixed slate-400
+            text didn't adapt to dark mode — now cat-correct/cat-wrong tokens. */}
+        <Card className={cn("p-3 md:p-4 flex flex-col items-center border-none shadow-sm", totalWealth >= startingCash ? 'bg-cat-correct/10' : 'bg-cat-wrong/10')}>
+          <div className="text-[10px] md:text-xs font-black uppercase text-muted-foreground">Total</div>
+          <div className={cn("text-lg md:text-xl font-black", totalWealth >= startingCash ? 'text-cat-correct' : 'text-cat-wrong')}>${totalWealth.toFixed(2)}</div>
         </Card>
       </div>
 
+      {/* FIX (2026-09-30): user feedback — the flow wasn't clear ("what am I
+          even supposed to do, when, where"). This game has no fixed turns —
+          prices move on their own and you can trade whenever you want, which
+          is unusual compared to every other game in the app. Spelling that
+          out in one line, always visible during play, instead of only in the
+          optional How To Play modal. */}
+      <p className="text-[11px] md:text-xs text-muted-foreground text-center font-medium">
+        Prices update on their own — trade any stock whenever you want. Day {currentRound} ends automatically when the timer runs out.
+      </p>
+
       {/* Timer bar */}
-      <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
+      <div className="h-2 w-full bg-border rounded-full overflow-hidden">
         <div
-          className={cn("h-full transition-all duration-1000", timeLeft > 12 ? "bg-primary" : timeLeft > 6 ? "bg-amber-400" : "bg-rose-500")}
+          className={cn("h-full transition-all duration-1000", timeLeft > 12 ? "bg-primary" : timeLeft > 6 ? "bg-cat-want" : "bg-cat-wrong")}
           style={{ width: `${(timeLeft / ROUND_TIME) * 100}%` }}
         />
       </div>
 
       {currentHeadline && (
-        <div className="bg-[#C8E8D8] p-4 rounded-2xl flex items-center gap-3 md:gap-4 animate-in slide-in-from-top-2">
-          <Newspaper className="h-5 w-5 md:h-6 md:w-6 text-[#2E7D5A] shrink-0" />
-          <div className="text-xs md:text-sm font-bold text-[#1A1F2E] leading-tight">{currentHeadline.headline}</div>
+        // FIX (2026-09-30): the headline text names a company informally
+        // ("SolarRise wins a contract") but never explicitly ties it to the
+        // stock card it just moved — a player has to guess the connection.
+        // Also fixed light-hex bg/text that didn't adapt to dark mode.
+        <div className="bg-cat-correct/10 p-4 rounded-2xl flex items-center gap-3 md:gap-4 animate-in slide-in-from-top-2">
+          <Newspaper className="h-5 w-5 md:h-6 md:w-6 text-cat-correct shrink-0" />
+          <div className="min-w-0">
+            <div className="text-xs md:text-sm font-bold text-foreground leading-tight">{currentHeadline.headline}</div>
+            {(() => {
+              const affected = companies.find(c => c.symbol === currentHeadline.ticker);
+              return affected ? (
+                <div className="text-[10px] font-black uppercase tracking-widest text-cat-correct mt-1">
+                  Affects: {affected.name} ({affected.symbol})
+                </div>
+              ) : null;
+            })()}
+          </div>
         </div>
       )}
 

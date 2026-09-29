@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useCurrency } from '@/hooks/useCurrency';
 import { usdToInr } from '@/lib/formatCurrency';
+import { getFogEnemy } from '@/config/narrative';
+import { Flame } from 'lucide-react';
 
 // FIX (2026-09): conceptBreakdowns.ts content is authored inconsistently —
 // the 12 core lesson-tied entries (budgeting-basics, emergency-fund, etc.)
@@ -34,6 +36,12 @@ interface ConceptBreakdownProps {
   onContinue: () => void;
   activityTitle: string;
   activityType: 'quest' | 'quiz' | 'game' | 'challenge';
+  /** FIX (2026-09-30): part of wiring the Gray Fog narrative into things
+   *  players actually see, not just status cards — when set, shows which
+   *  real threat this game trains you to fight (see GAME_FOG_MAP in
+   *  narrative.ts). Optional so callers that don't have a fog mapping yet
+   *  aren't forced to invent one. */
+  fogEnemyId?: string;
 }
 
 export function ConceptBreakdown({
@@ -41,7 +49,8 @@ export function ConceptBreakdown({
   ageGroup,
   onContinue,
   activityTitle,
-  activityType
+  activityType,
+  fogEnemyId
 }: ConceptBreakdownProps) {
   const breakdown = conceptBreakdowns.find(b => b.id === breakdownId);
   const { formatINR } = useCurrency();
@@ -83,11 +92,19 @@ export function ConceptBreakdown({
           from { opacity: 0; transform: translateY(12px); }
           to { opacity: 1; transform: translateY(0); }
         }
+        /* FIX (2026-09-30): this whole overlay used to be hardcoded to a fixed
+           light-blue hex (#EEF3FF) with slate-colored shapes, so it never
+           reacted to dark mode at all — it was flagged during the app-wide
+           dark mode pass as a gap because inline <style jsx> doesn't pick up
+           Tailwind's .dark class the way utility classes do. Swapped every
+           hardcoded color here for the same CSS variables the rest of the
+           theme uses, so this screen (the "Daily Challenge" brief, among
+           others) now actually goes dark with the rest of the app. */
         .concept-breakdown-overlay {
           min-height: 100dvh;
           display: flex;
           flex-direction: column;
-          background: #EEF3FF;
+          background: hsl(var(--background));
           padding: 24px 20px calc(24px + env(safe-area-inset-bottom, 0px)) 20px;
           animation: slideUp 0.3s ease-out forwards;
           overflow-y: auto;
@@ -98,7 +115,7 @@ export function ConceptBreakdown({
           left: -10px;
           width: 32px;
           height: 32px;
-          background: #e2e8f0;
+          background: hsl(var(--muted));
           border-radius: 50%;
           opacity: 0.5;
           z-index: 0;
@@ -107,7 +124,7 @@ export function ConceptBreakdown({
           display: inline-block;
           width: 14px;
           height: 10px;
-          background: #94a3b8;
+          background: hsl(var(--muted-foreground));
           border-radius: 50%;
           position: relative;
           margin-right: 8px;
@@ -119,7 +136,7 @@ export function ConceptBreakdown({
           left: 2px;
           width: 4px;
           height: 4px;
-          background: #94a3b8;
+          background: hsl(var(--muted-foreground));
           border-radius: 50%;
         }
       `}</style>
@@ -134,8 +151,17 @@ export function ConceptBreakdown({
         )}>
           {activityType === 'challenge' ? 'Daily Challenge' : activityType}
         </div>
-        <h1 className="text-[18px] font-bold text-slate-900 leading-tight">{activityTitle}</h1>
-        <p className="text-[13px] text-slate-400 font-medium mt-1">Quick concept brief</p>
+        <h1 className="text-[18px] font-bold text-foreground leading-tight">{activityTitle}</h1>
+        <p className="text-[13px] text-muted-foreground font-medium mt-1">Quick concept brief</p>
+        {fogEnemyId && (() => {
+          const fog = getFogEnemy(fogEnemyId);
+          return (
+            <div className="flex items-center gap-1.5 mt-2 text-[11px] font-bold text-cat-wrong">
+              <Flame className="h-3 w-3" />
+              Training to fight: {fog.name}
+            </div>
+          );
+        })()}
       </header>
 
       <div className="space-y-8 flex-1">
@@ -147,24 +173,24 @@ export function ConceptBreakdown({
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-[13px] font-black uppercase text-slate-400 tracking-widest">What to know</h2>
+          <h2 className="text-[13px] font-black uppercase text-muted-foreground tracking-widest">What to know</h2>
           <ul className="space-y-4 list-none p-0">
             {keyPoints.map((point, i) => (
               <li key={i} className="flex items-start gap-3">
                 <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
-                <span className="text-[14px] font-medium text-slate-600 leading-relaxed">{localiseCurrency(point)}</span>
+                <span className="text-[14px] font-medium text-foreground leading-relaxed">{localiseCurrency(point)}</span>
               </li>
             ))}
           </ul>
         </section>
 
-        <section className="bg-[#E8F5EE]/40 p-5 rounded-xl border-l-[3px] border-[#2E7D5A]">
-          <span className="text-[11px] font-black uppercase text-[#2E7D5A] tracking-widest block mb-1">Real world</span>
-          <p className="text-[14px] font-bold text-slate-700 leading-relaxed">
+        <section className="bg-primary/10 p-5 rounded-xl border-l-[3px] border-primary">
+          <span className="text-[11px] font-black uppercase text-primary tracking-widest block mb-1">Real world</span>
+          <p className="text-[14px] font-bold text-foreground leading-relaxed">
             {localiseCurrency(breakdown.realWorldStat)}
           </p>
           {isSenior && breakdown.ageAdapted.senior.extraStat && (
-            <p className="text-[12px] font-medium text-slate-500 mt-3 italic border-t border-[#4EA07A]/10 pt-2">
+            <p className="text-[12px] font-medium text-muted-foreground mt-3 italic border-t border-primary/10 pt-2">
               Note: {localiseCurrency(breakdown.ageAdapted.senior.extraStat)}
             </p>
           )}
@@ -173,26 +199,26 @@ export function ConceptBreakdown({
         {(ageGroup === 'teen' || ageGroup === 'senior') && (
           <section className="flex items-start gap-2 pt-2">
             <div className="thought-bubble-shape mt-1.5 shrink-0" />
-            <p className="text-[13px] font-medium italic text-slate-500 leading-relaxed">
+            <p className="text-[13px] font-medium italic text-muted-foreground leading-relaxed">
               {localiseCurrency(breakdown.quickQuestion)}
             </p>
           </section>
         )}
 
-        <div className="text-[11px] font-bold text-slate-300 uppercase tracking-widest pt-4">
+        <div className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest pt-4">
           ~{breakdown.estimatedReadSeconds} second read
         </div>
       </div>
 
       <footer className="mt-10 pb-2 space-y-3 shrink-0">
-        <Button 
-          onClick={onContinue} 
-          className="w-full h-[52px] text-lg font-black bg-primary hover:bg-primary-700 shadow-xl shadow-blue-100 rounded-2xl"
+        <Button
+          onClick={onContinue}
+          className="w-full h-[52px] text-lg font-black bg-primary hover:bg-primary-700 shadow-xl shadow-primary/20 rounded-2xl"
           suppressHydrationWarning
         >
           I'm ready — let's go
         </Button>
-        <p className="text-center text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+        <p className="text-center text-[11px] font-bold text-muted-foreground uppercase tracking-widest">
           {activityType === 'quest' ? `Starting: ${activityTitle}` :
            activityType === 'quiz' ? `Starting: ${activityTitle} quiz` :
            activityType === 'game' ? `Playing: ${activityTitle}` :

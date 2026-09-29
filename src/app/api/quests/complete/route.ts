@@ -176,6 +176,19 @@ export async function POST(request: NextRequest) {
       const currentWallet: number = statsData.walletBalance ?? 0;
       const newWalletBalance = Math.max(0, currentWallet + walletDelta);
 
+      // FIX (2026-09-30): walletBalance is a realistic net-cash-flow number —
+      // most quests are spending scenarios (rent, bills, birthday money)
+      // where even the mathematically optimal choice has a NEGATIVE
+      // walletDelta, and the balance above is floored at 0. That meant the
+      // dashboard's "Saved Virtually" stat (which read walletBalance) showed
+      // 0 for most users after most quests, even played perfectly — not
+      // because nothing was written (that was fixed already), but because
+      // the number being shown wasn't actually a savings tally. totalSaved
+      // only accumulates the positive side of walletDelta — an explicit
+      // "you chose to save or gained money" moment — so it only goes up,
+      // which is what a label like "Saved Virtually" should mean.
+      const savedThisQuest = Math.max(0, walletDelta);
+
       // ── Write quest progress ──────────────────────────────────────────────
       tx.set(questProgressRef, {
         completed: true,
@@ -197,6 +210,7 @@ export async function POST(request: NextRequest) {
           lastActivityDate: FieldValue.serverTimestamp(),
           financialHealth: newHealth,
           walletBalance: newWalletBalance,
+          totalSaved: FieldValue.increment(savedThisQuest),
         },
         { merge: true }
       );

@@ -99,12 +99,17 @@ export function XPWallet() {
     return { current, next, progress, RankIcon, xpToNext };
   }, [data.totalXP]);
 
+  // FIX (2026-09-30): was keyed off walletBalance, a net-cash-flow figure
+  // that's floored at 0 and stays there for most players (see progressionService.ts
+  // for the full explanation) — meaning this milestone messaging almost never
+  // advanced past "Starting your journey" even for players making consistently
+  // smart choices. totalSaved only accumulates genuine saving moments.
   const walletMilestone = useMemo(() => {
-    if (data.walletBalance >= 1000) return "That's a major milestone for your piggy bank!";
-    if (data.walletBalance >= 500) return "You've got a solid safety net forming!";
-    if (data.walletBalance >= 100) return "You're building real momentum!";
+    if (data.totalSaved >= 1000) return "That's a major milestone for your piggy bank!";
+    if (data.totalSaved >= 500) return "You've got a solid safety net forming!";
+    if (data.totalSaved >= 100) return "You're building real momentum!";
     return "Starting your journey to mastery!";
-  }, [data.walletBalance]);
+  }, [data.totalSaved]);
 
   if (isLoading) return null;
 
@@ -148,7 +153,7 @@ export function XPWallet() {
               </div>
               <span className="font-black text-foreground tracking-tight text-lg">XP Game Wallet</span>
             </div>
-            <div className="text-2xl font-black text-accent">{formatValue(data.walletBalance)} saved</div>
+            <div className="text-2xl font-black text-accent">{formatValue(data.totalSaved)} saved</div>
           </div>
           <div className="p-4 rounded-xl bg-muted border-2 border-dashed border-border flex items-start gap-3">
             <ArrowUpRight className="h-5 w-5 text-accent mt-0.5 shrink-0" />

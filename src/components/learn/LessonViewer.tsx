@@ -186,12 +186,22 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
           amounts (and India-only units like "lakh"/"crore") directly into
           prose, so it doesn't actually convert to the user's selected
           currency. A proper fix requires re-templating all lesson content —
-          flagged as a bigger follow-up. For now, tell non-INR users the
-          numbers are illustrative rather than silently showing wrong-currency
-          amounts as if they were correct. */}
+          flagged as a bigger follow-up. STRENGTHENED (2026-09-30): the
+          original version of this banner only warned that the NUMBERS
+          weren't converted — but the deeper issue is that much of this
+          curriculum teaches India-specific rules (tax brackets, DICGC
+          deposit insurance, FOIR lending limits, EPF/PPF), not just
+          India-priced examples. Converting the rupee figure to a user's
+          local currency wouldn't fix that anyway, so the banner now says
+          so explicitly instead of implying "just a number problem." Also
+          switched off the hardcoded amber-50/amber-200/amber-800 classes
+          (invisible/washed out in dark mode, same bug class as every other
+          hardcoded-light-color fix this project has needed) to the
+          cat-want token used everywhere else for this kind of caution
+          banner. */}
       {activeCurrency.code !== 'INR' && (
-        <div className="px-4 py-2 bg-amber-50 border-b border-amber-200 text-amber-800 text-xs font-bold text-center">
-          Amounts in this lesson are illustrative examples in ₹ (INR) and haven't been converted to {activeCurrency.code} yet.
+        <div className="px-4 py-2.5 bg-cat-want/10 border-b border-cat-want/30 text-cat-want text-xs font-bold text-center leading-relaxed">
+          This lesson uses ₹ (INR) examples and describes India-specific rules — tax brackets, deposit insurance limits, lending guidelines, and similar — which may not match {activeCurrency.code} or the rules where you live. Treat it as an illustration of the concept, not local guidance for your country.
         </div>
       )}
 

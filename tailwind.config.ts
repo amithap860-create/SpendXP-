@@ -65,6 +65,25 @@ export default {
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))',
         },
+        // Category / feedback colors for games (added 2026-09-30) — see the
+        // long comment above these tokens in globals.css for why they exist.
+        // Use bg-cat-want / text-cat-streak / border-cat-wrong etc. instead
+        // of a raw Tailwind color whenever a game needs to color-code NEED
+        // vs WANT vs SAVE, correct vs wrong, or a streak indicator.
+        cat: {
+          need: 'hsl(var(--cat-need))',
+          'need-foreground': 'hsl(var(--cat-need-foreground))',
+          want: 'hsl(var(--cat-want))',
+          'want-foreground': 'hsl(var(--cat-want-foreground))',
+          save: 'hsl(var(--cat-save))',
+          'save-foreground': 'hsl(var(--cat-save-foreground))',
+          streak: 'hsl(var(--cat-streak))',
+          'streak-foreground': 'hsl(var(--cat-streak-foreground))',
+          correct: 'hsl(var(--cat-correct))',
+          'correct-foreground': 'hsl(var(--cat-correct-foreground))',
+          wrong: 'hsl(var(--cat-wrong))',
+          'wrong-foreground': 'hsl(var(--cat-wrong-foreground))',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',

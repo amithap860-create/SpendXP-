@@ -173,6 +173,21 @@ export function fireConfettiPersonalBest(): void {
   });
 }
 
+/** Small, quick burst for an in-game correct answer — NOT the same weight as
+ *  fireConfettiPersonalBest. Firing the big celebration on every correct
+ *  quiz answer would cheapen it for the moments (high scores, badges) that
+ *  are actually supposed to feel special. This is a light flourish: few
+ *  particles, short life, on-brand sage/gold colors only. */
+export function fireConfettiCorrectAnswer(originX = 0.5, originY = 0.35): void {
+  fireConfetti({
+    particleCount: 16,
+    colors: ['#2E7D5A', '#4EA07A', '#f59e0b'],
+    origin: { x: originX, y: originY },
+    duration: 700,
+    scalar: 0.6,
+  });
+}
+
 export function fireConfettiBadgeUnlock(): void {
   fireConfetti({
     particleCount: 60,

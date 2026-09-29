@@ -28,9 +28,11 @@ import {
   BookOpen,
   Calculator,
   X,
+  Flame,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useGameTutorial, GameTutorialModal, HowToPlayButton } from '@/components/games/GameTutorial';
+import { fireConfettiCorrectAnswer } from '@/lib/confetti';
 
 const FINIQ_TUTORIAL_STEPS = [
   'You\'ll get 10 real-life money scenarios, one at a time.',
@@ -222,6 +224,11 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
   const [showBreakdown, setShowBreakdown] = useState(true);
   const [pauseTab, setPauseTab] = useState<'glossary' | 'calculator'>('glossary');
   const [showQuestionInfo, setShowQuestionInfo] = useState(false);
+  // FIX (2026-09-30): floating "+XP" pop shown briefly after a correct answer.
+  // Keyed by Date.now() so re-triggering on the very next question restarts
+  // the CSS animation instead of it being a no-op (React won't replay an
+  // animation on an element whose key hasn't changed).
+  const [xpPop, setXpPop] = useState<{ amount: number; key: number } | null>(null);
   const [categoryStats, setCategoryStats] = useState<Record<Category, { correct: number; total: number }>>({
     BUDGETING: { correct: 0, total: 0 },
     INVESTING: { correct: 0, total: 0 },
@@ -252,6 +259,7 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
     xpEarned,
     currentRound,
     timeLeft,
+    streak,
     bestStreak,
     comboActive,
     countdown,
@@ -303,14 +311,24 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
         total: prev[currentQuestion.category].total + 1
       }
     }));
-    if (isCorrect) correctAnswer(currentQuestion.xpReward);
-    else wrongAnswer();
+    if (isCorrect) {
+      correctAnswer(currentQuestion.xpReward);
+      // FIX (2026-09-30): small game-feel pass — a light confetti burst and a
+      // floating "+XP" pop on every correct answer, distinct from the big
+      // fireConfettiPersonalBest() reserved for actual high scores.
+      fireConfettiCorrectAnswer();
+      setXpPop({ amount: currentQuestion.xpReward, key: Date.now() });
+    } else {
+      wrongAnswer();
+      setXpPop(null);
+    }
     setShowExplanation(true);
   };
 
   const handleNext = () => {
     setSelectedOption(null);
     setShowExplanation(false);
+    setXpPop(null);
     if (currentRound < 10) nextRound();
     // NOTE (2026-09): this explicitly passed 0, throwing away the 100xp
     // completion bonus declared in xpPerWin above. Per-question XP (via
@@ -332,7 +350,19 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
     SPENDING: 'spending-habits'
   };
 
+  // FIX (2026-09-30): which fog enemy this question category actually fights
+  // (see narrative.ts) — kept alongside breakdownIdMap since it's the same
+  // per-category lookup pattern.
+  const fogEnemyIdMap: Record<string, string> = {
+    BUDGETING: 'impulse_storm',
+    INVESTING: 'market_madness',
+    CREDIT: 'debt_web',
+    TAXES: 'the_procrastinator',
+    SPENDING: 'impulse_storm',
+  };
+
   const currentBreakdownId = currentQuestion ? breakdownIdMap[currentQuestion.category] : 'budgeting-basics';
+  const currentFogEnemyId = currentQuestion ? fogEnemyIdMap[currentQuestion.category] : 'impulse_storm';
 
   if (showBreakdown) {
     return (
@@ -341,6 +371,7 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
         ageGroup={ageGroup}
         activityType={isDailyChallenge ? 'challenge' : 'quiz'}
         activityTitle={isDailyChallenge ? "Daily Blitz" : "FinIQ Scenario"}
+        fogEnemyId={currentFogEnemyId}
         onContinue={() => {
           setShowBreakdown(false);
           if (gameState === 'IDLE') startGame();
@@ -479,20 +510,38 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
 
       <div className="space-y-4 md:space-y-6">
         {/* HUD row */}
-        <div className="flex items-center justify-between px-2">
+        <div className="relative flex items-center justify-between px-2">
           <div className="flex items-center gap-3 md:gap-4">
             <Badge className="bg-primary px-3 md:px-4 py-1 text-xs md:text-sm font-black rounded-lg">Q {currentRound}/10</Badge>
             <div className="flex items-center gap-2 text-primary font-black text-xs md:text-base"><TrendingUp className="h-3 w-3 md:h-4 md:w-4" />{score}</div>
+            {/* FIX (2026-09-30): live streak indicator — useGameEngine already
+                tracked `streak` and `bestStreak`, but nothing showed the running
+                streak during play, only bestStreak at the results screen. Shows
+                from 2 in a row onward so it feels like momentum building, not
+                just a static counter from question 1. */}
+            {streak >= 2 && (
+              <div className="flex items-center gap-1 text-cat-streak font-black text-xs md:text-base">
+                <Flame className="h-3.5 w-3.5 md:h-4 md:w-4 flame-flicker" />
+                {streak}
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-2">
             {comboActive && <Badge className="bg-accent animate-bounce font-black text-[10px] md:text-xs">+50 XP COMBO!</Badge>}
             <span className="text-[10px] text-muted-foreground font-mono">{questionTimerSeconds}s</span>
             <button onClick={() => { pauseGame(); setPauseTab('glossary'); }}
-              className="h-8 w-8 bg-slate-200 hover:bg-slate-300 rounded-full flex items-center justify-center transition-colors"
+              className="h-8 w-8 bg-muted hover:bg-border rounded-full flex items-center justify-center transition-colors"
               suppressHydrationWarning>
               <Pause className="h-3.5 w-3.5 text-foreground" />
             </button>
           </div>
+
+          {/* Floating +XP pop on a correct answer */}
+          {xpPop && (
+            <div key={xpPop.key} className="xp-pop-anim absolute left-1/2 -translate-x-1/2 -top-2 pointer-events-none text-cat-correct font-black text-lg md:text-xl">
+              +{xpPop.amount} XP
+            </div>
+          )}
         </div>
 
         {/* Timer bar */}
@@ -552,34 +601,40 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
                     selectedOption === null
                       ? "hover:border-primary hover:bg-primary/5 border-border"
                       : i === currentQuestion.shuffledCorrectIndex
-                        ? "bg-[#E8F5EE] border-primary text-[#1A1F2E]"
+                        // FIX (2026-09-30): was a fixed light-hex bg + fixed dark text,
+                        // same class of bug as ConceptBreakdown.tsx — didn't adapt to
+                        // dark mode. Now uses cat-correct token throughout.
+                        ? "bg-cat-correct/10 border-cat-correct text-foreground"
                         : selectedOption === i
-                          ? "bg-rose-50 border-rose-500 text-rose-900"
+                          ? "bg-cat-wrong/10 border-cat-wrong text-foreground"
                           : "opacity-40 grayscale"
                   )}
                 >
                   <span className="font-bold text-[15px] md:text-base">{opt}</span>
-                  {selectedOption !== null && i === currentQuestion.shuffledCorrectIndex && <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />}
-                  {selectedOption !== null && selectedOption === i && i !== currentQuestion.shuffledCorrectIndex && <XCircle className="h-5 w-5 text-rose-600 shrink-0" />}
+                  {selectedOption !== null && i === currentQuestion.shuffledCorrectIndex && <CheckCircle2 className="h-5 w-5 text-cat-correct shrink-0" />}
+                  {selectedOption !== null && selectedOption === i && i !== currentQuestion.shuffledCorrectIndex && <XCircle className="h-5 w-5 text-cat-wrong shrink-0" />}
                 </button>
               ))}
             </div>
           </div>
 
           {showExplanation && (
-            <div className={cn("p-6 md:p-8 animate-in slide-in-from-bottom-4 duration-500", gotItRight ? "bg-[#E8F5EE]" : "bg-rose-50")}>
+            // FIX (2026-09-30): was bg-[#E8F5EE] / bg-rose-50 (fixed hex, doesn't
+            // adapt to dark mode) — now cat-correct/cat-wrong tokens, and the
+            // Learning Moment text switched off hardcoded slate to theme tokens.
+            <div className={cn("p-6 md:p-8 animate-in slide-in-from-bottom-4 duration-500", gotItRight ? "bg-cat-correct/10" : "bg-cat-wrong/10")}>
               {isInvestingQ && gotItRight && (
                 <div className="flex items-center gap-2 mb-4 bg-primary text-white text-xs font-black px-3 py-2 rounded-lg w-fit">
                   <TrendingUp className="h-4 w-4" /> SMART MOVE: BUY KNOWLEDGE!
                 </div>
               )}
               <div className="flex items-start gap-3 md:gap-4 mb-4">
-                <div className="h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center shrink-0 bg-white shadow-sm">
+                <div className="h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center shrink-0 bg-card shadow-sm">
                   <Info className="h-4 w-4 md:h-5 md:w-5 text-primary" />
                 </div>
                 <div>
-                  <h4 className="font-black text-slate-900 mb-1 text-sm md:text-base">Learning Moment</h4>
-                  <p className="text-xs md:text-sm text-slate-700 leading-relaxed font-medium">{currentQuestion.explanation}</p>
+                  <h4 className="font-black text-foreground mb-1 text-sm md:text-base">Learning Moment</h4>
+                  <p className="text-xs md:text-sm text-muted-foreground leading-relaxed font-medium">{currentQuestion.explanation}</p>
                 </div>
               </div>
 
@@ -588,7 +643,7 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
                 <div className="mb-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Calculator className="h-4 w-4 text-primary" />
-                    <span className="text-xs font-black text-slate-600 uppercase tracking-widest">Check the maths yourself</span>
+                    <span className="text-xs font-black text-muted-foreground uppercase tracking-widest">Check the maths yourself</span>
                   </div>
                   <InlineCalculator question={currentQuestion.question} />
                 </div>

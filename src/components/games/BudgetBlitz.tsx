@@ -309,9 +309,9 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
               <p className="text-muted-foreground">Cards fall from the top. Sort each item into the right bucket before it hits the bottom. Miss a card = lose a life. 3 lives per game. Speed increases every 30 seconds. Your accuracy score at the end shows how well you know what actually counts as a Need vs. a Want.</p>
               <div className="grid grid-cols-3 gap-2 text-xs text-center">
                 {[
-                  { icon: ShoppingBag, label: 'NEED', desc: 'Must-haves: food, rent, medicine', color: 'bg-[#E8F5EE] border-[#A8D5BC] text-primary' },
-                  { icon: Wallet, label: 'WANT', desc: 'Nice-to-haves: games, snacks, movies', color: 'bg-[#E8F5EE] border-[#A8D5BC] text-[#2E7D5A]' },
-                  { icon: PiggyBank, label: 'SAVE', desc: 'Money set aside for future goals', color: 'bg-blue-50 border-blue-200 text-blue-700' },
+                  { icon: ShoppingBag, label: 'NEED', desc: 'Must-haves: food, rent, medicine', color: 'bg-cat-need/10 border-cat-need/30 text-cat-need' },
+                  { icon: Wallet, label: 'WANT', desc: 'Nice-to-haves: games, snacks, movies', color: 'bg-cat-want/10 border-cat-want/30 text-cat-want' },
+                  { icon: PiggyBank, label: 'SAVE', desc: 'Money set aside for future goals', color: 'bg-cat-save/10 border-cat-save/30 text-cat-save' },
                 ].map(({ icon: Icon, label, desc, color }) => (
                   <div key={label} className={cn('border rounded-lg p-2', color)}>
                     <Icon className="h-4 w-4 mx-auto mb-1" />
@@ -369,9 +369,9 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
     const verdict = getVerdict();
 
     const buckets = [
-      { label: 'NEED', Icon: ShoppingBag, count: stats.NEED, color: 'bg-primary/10 text-primary border-primary/20', barColor: 'bg-primary', priority: 1, tip: 'Pay these first — always.' },
-      { label: 'SAVE', Icon: PiggyBank, count: stats.SAVE, color: 'bg-blue-50 text-blue-700 border-blue-200', barColor: 'bg-blue-500', priority: 2, tip: 'Set aside before spending on wants.' },
-      { label: 'WANT', Icon: Wallet, count: stats.WANT, color: 'bg-amber-50 text-amber-700 border-amber-200', barColor: 'bg-amber-400', priority: 3, tip: 'Whatever is left — then enjoy.' },
+      { label: 'NEED', Icon: ShoppingBag, count: stats.NEED, color: 'bg-cat-need/10 text-cat-need border-cat-need/20', barColor: 'bg-cat-need', priority: 1, tip: 'Pay these first — always.' },
+      { label: 'SAVE', Icon: PiggyBank, count: stats.SAVE, color: 'bg-cat-save/10 text-cat-save border-cat-save/20', barColor: 'bg-cat-save', priority: 2, tip: 'Set aside before spending on wants.' },
+      { label: 'WANT', Icon: Wallet, count: stats.WANT, color: 'bg-cat-want/10 text-cat-want border-cat-want/20', barColor: 'bg-cat-want', priority: 3, tip: 'Whatever is left — then enjoy.' },
     ];
 
     return (
@@ -462,9 +462,9 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
             <div className="text-muted-foreground text-sm mt-1">accuracy ({trialCorrect} of {TRIAL_MAX} correct)</div>
           </div>
           <div className="grid grid-cols-3 gap-2 text-center text-xs">
-            <div className="bg-[#E8F5EE] rounded-lg p-2"><div className="font-black text-primary">{trialStats.NEED}</div><div className="text-primary">Need</div></div>
-            <div className="bg-[#E8F5EE] rounded-lg p-2"><div className="font-black text-[#2E7D5A]">{trialStats.WANT}</div><div className="text-[#2E7D5A]">Want</div></div>
-            <div className="bg-blue-50 rounded-lg p-2"><div className="font-black text-blue-700">{trialStats.SAVE}</div><div className="text-blue-600">Save</div></div>
+            <div className="bg-cat-need/10 rounded-lg p-2"><div className="font-black text-cat-need">{trialStats.NEED}</div><div className="text-cat-need">Need</div></div>
+            <div className="bg-cat-want/10 rounded-lg p-2"><div className="font-black text-cat-want">{trialStats.WANT}</div><div className="text-cat-want">Want</div></div>
+            <div className="bg-cat-save/10 rounded-lg p-2"><div className="font-black text-cat-save">{trialStats.SAVE}</div><div className="text-cat-save">Save</div></div>
           </div>
           {accuracy < 70 && (
             <p className="text-xs text-slate-500 bg-[#E8F5EE] border border-[#A8D5BC] rounded-lg p-3">
@@ -590,15 +590,20 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
 
         {/* Bucket buttons */}
         <div className="p-3 md:p-4 grid grid-cols-3 gap-3 z-10 bg-card/80 backdrop-blur-sm border-t">
-          <Button className="h-16 md:h-20 min-h-[44px] flex-col gap-1 bg-primary hover:bg-primary rounded-2xl shadow-lg w-full"
+          {/* FIX (2026-09-30): all three buttons now pull from the shared cat-*
+              tokens (globals.css) instead of raw/mismatched colors — this is
+              what fixed the NEED/WANT collision, and it's also now the one
+              place this game's 3-way color scheme is decided, matching the
+              rules card and results breakdown below. */}
+          <Button className="h-16 md:h-20 min-h-[44px] flex-col gap-1 bg-cat-need text-cat-need-foreground hover:bg-cat-need/90 rounded-2xl shadow-lg w-full"
             onClick={() => cards.length > 0 && handleSort([...cards].sort((a, b) => b.y - a.y)[0].id, 'NEED')}>
             <ChevronLeft className="h-3 w-3 text-white/50" /><ShoppingBag className="h-5 w-5" /><span className="text-[10px] font-black uppercase">NEED</span>
           </Button>
-          <Button className="h-16 md:h-20 min-h-[44px] flex-col gap-1 bg-primary hover:bg-[#3A9068] rounded-2xl shadow-lg w-full"
+          <Button className="h-16 md:h-20 min-h-[44px] flex-col gap-1 bg-cat-want text-cat-want-foreground hover:bg-cat-want/90 rounded-2xl shadow-lg w-full"
             onClick={() => cards.length > 0 && handleSort([...cards].sort((a, b) => b.y - a.y)[0].id, 'WANT')}>
             <Wallet className="h-5 w-5" /><span className="text-[10px] font-black uppercase">WANT</span>
           </Button>
-          <Button className="h-16 md:h-20 min-h-[44px] flex-col gap-1 bg-blue-500 hover:bg-blue-600 rounded-2xl shadow-lg w-full"
+          <Button className="h-16 md:h-20 min-h-[44px] flex-col gap-1 bg-cat-save text-cat-save-foreground hover:bg-cat-save/90 rounded-2xl shadow-lg w-full"
             onClick={() => cards.length > 0 && handleSort([...cards].sort((a, b) => b.y - a.y)[0].id, 'SAVE')}>
             <ChevronRight className="h-3 w-3 text-white/50" /><PiggyBank className="h-5 w-5" /><span className="text-[10px] font-black uppercase">SAVE</span>
           </Button>

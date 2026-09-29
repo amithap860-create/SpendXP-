@@ -53,7 +53,7 @@ type Action =
   | { type: 'WRONG_ANSWER'; livesEnabled: boolean }
   | { type: 'NEXT_ROUND'; totalRounds: number; timePerRound?: number; xpPerWin: number }
   | { type: 'SET_SCORE'; score: number }
-  | { type: 'END_GAME' }
+  | { type: 'END_GAME'; bonusXp?: number }
   | { type: 'RESET_COMBO' }
   | { type: 'RESET_GAME'; config: GameConfig };
 
@@ -129,7 +129,16 @@ function gameReducer(state: GameState, action: Action): GameState {
         return { ...state, status: 'RESULTS', xpEarned: state.xpEarned + action.xpPerWin };
       }
       return { ...state, currentRound: state.currentRound + 1, timeLeft: action.timePerRound ?? 0, streak: 0 };
-    case 'END_GAME': return { ...state, status: 'RESULTS' };
+    // FIX (2026-09-29): this used to just flip status to 'RESULTS' without
+    // ever folding in the finalXpBonus that endGame() below adds for the
+    // Firestore write. That bonus (xpPerWin — 100-200 XP depending on the
+    // game) was correctly saved to the server but never reflected in the
+    // xpEarned value components display, so Credit Score Builder always
+    // showed "0 XP" (it has xpPerCorrectAnswer: 0, so ALL its XP is this
+    // bonus), and FinIQ Quiz / Budget Blitz undercounted by 100-200 XP on
+    // every single results screen. Adding bonusXp here makes the displayed
+    // total match what actually lands in the player's wallet.
+    case 'END_GAME': return { ...state, status: 'RESULTS', xpEarned: state.xpEarned + (action.bonusXp || 0) };
     case 'RESET_COMBO': return { ...state, comboActive: false };
     case 'RESET_GAME': return initialState(action.config);
     default: return state;
@@ -247,7 +256,7 @@ export function useGameEngine(config: GameConfig) {
     const xpVal = validateXP(safeXP);
     if (!scoreVal.valid || !xpVal.valid) return { isHighScore: false };
 
-    dispatch({ type: 'END_GAME' });
+    dispatch({ type: 'END_GAME', bonusXp: finalXpBonus });
 
     // Celebration
     fireConfettiPersonalBest();

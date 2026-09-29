@@ -48,6 +48,7 @@ export function useProgression() {
           badges: [],
           level: 'Saver',
           walletBalance: 0,
+          totalSaved: 0,
           financialHealth: 50,
           healthHistory: [],
         }, { merge: true });

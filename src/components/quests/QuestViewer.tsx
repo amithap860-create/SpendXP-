@@ -23,10 +23,12 @@ import {
   ArrowUpRight,
   Lightbulb,
   History,
-  TrendingUp
+  TrendingUp,
+  Shield
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { fireConfettiQuestComplete } from '@/lib/confetti';
+import { getQuestFog } from '@/config/narrative';
 
 interface QuestViewerProps {
   quest: Quest;
@@ -146,6 +148,25 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
               </div>
             </div>
 
+            {/* NEW (2026-09-30): unlike lessons.ts, quest narrative/choice
+                text DOES get its ₹ amounts converted to the user's active
+                currency (see localiseText above) — but converting the
+                number doesn't convert the underlying rule. Several quests
+                (EMI affordability/FOIR, capital gains tax, deposit
+                insurance limits) teach India-specific regulations that
+                don't apply the same way, or at all, in other countries.
+                Flag this explicitly rather than let a correctly-formatted
+                local-currency number imply the whole scenario is
+                accurate for the player's actual country. */}
+            {activeCurrency.code !== 'INR' && (
+              <div className="p-3 bg-cat-want/10 rounded-xl border border-cat-want/30 flex items-start gap-3">
+                <Info className="h-4 w-4 text-cat-want shrink-0 mt-0.5" />
+                <p className="text-xs font-medium text-cat-want leading-relaxed">
+                  Amounts here are shown in {activeCurrency.code}, but this scenario is built around India-specific rules (tax rates, lending limits, deposit insurance, and similar) that may not match where you live. Treat the numbers as real, the underlying regulations as an illustration.
+                </p>
+              </div>
+            )}
+
             <Button onClick={startQuest} className="w-full h-12 md:h-14 text-base md:text-lg font-black rounded-2xl shadow-lg shadow-primary/20 gap-2 group" suppressHydrationWarning>
               Accept Mission <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
@@ -220,6 +241,28 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
           </div>
 
           <CardContent className="p-5 md:p-7 space-y-7">
+            {/* FIX (2026-09-30): closing a case file used to just say "Mission
+                Success" and hand you XP — no connection back to the actual
+                threat the briefing screen said you were facing. This debrief
+                closes that loop: the specific enemy this quest was mapped to
+                (see narrative.ts) is named as weakened, tied to a real
+                completion, not just "+XP" with no story attached. Skipped on
+                a replay since the enemy was already weakened the first time. */}
+            {!isReplay && (() => {
+              const { district, fogEnemy } = getQuestFog(quest.id);
+              return (
+                <div className="bg-cat-correct/10 border border-cat-correct/20 rounded-2xl p-4 flex items-start gap-3">
+                  <Shield className="h-5 w-5 text-cat-correct shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-cat-correct mb-0.5">Case Closed</p>
+                    <p className="text-sm font-bold text-foreground">
+                      You weakened the {fogEnemy.name}. {district.name} is a little safer.
+                    </p>
+                  </div>
+                </div>
+              );
+            })()}
+
             <div className="grid md:grid-cols-3 gap-4">
               <ResultCard label="Starting Cash" val={formatINR(quest.startingBalance)} />
               <ResultCard label="Ending Cash" val={formatINR(currentBalance)} color={getBalanceColor()} icon={ArrowUpRight} />
