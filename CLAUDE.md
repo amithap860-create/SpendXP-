@@ -37,13 +37,8 @@ section over any older one below it if they conflict):
 - 6 games: Budget Blitz, FinIQ Quiz, Money Maze,
   Stock Market Simulator, Credit Score Builder,
   Compound Clicker
-- ~27 quests with branching financial scenarios,
-  tied to the "Gray Fog" narrative system
-  (src/config/narrative.ts QUEST_FOG_MAP)
-- 8+ lesson modules with interactive cards (new lessons
-  added Sept 2026 from SEBI/Investopedia-sourced content:
-  needs-vs-wants, SMART goals, compounding, take-home pay,
-  net worth — see CHANGELOG.md for exact list)
+- Quests with branching financial scenarios, tied to the "Gray Fog" narrative system (src/config/narrative.ts QUEST_FOG_MAP). Current list: src/data/quests.ts — do not hardcode a count here, it goes stale on the next addition.
+- Lesson modules with interactive cards, in a hard-locked linear curriculum. Current list and order: src/data/lessons.ts — do not hardcode a count here.
 - 4 financial calculator tools
 - XP progression system with 5 levels and 19 badges
 - Financial health score system (0-100)
@@ -237,8 +232,8 @@ src/firebase/         Firebase barrel exports
 /onboarding           4 step setup after signup
 /dashboard            Main user dashboard
 /games                All 6 games hub
-/quests               All ~27 quests hub
-/learn                8 lesson modules
+/quests               Quests hub (list: src/data/quests.ts)
+/learn                Lesson modules (list: src/data/lessons.ts)
 /tools                4 financial calculators
 /resources            10 framework resource hub
 /profile              User settings and profile
@@ -308,7 +303,7 @@ Compound Clicker
 
 ---
 
-## THE QUESTS (~27, growing — do not hardcode a count or list here)
+## THE QUESTS (do not hardcode a count or list here)
 
 File: src/data/quests.ts (source of truth — read it directly for
   the current full list, do not trust a hardcoded list in this
@@ -693,7 +688,7 @@ Before submitting to Play Store:
 Code:
   pnpm build passes with zero errors
   pnpm exec tsc --noEmit passes with zero errors
-  All 7 known bugs are fixed
+  No open items in the KNOWN BUGS section (near top)
   App loads and works on Android emulator
 
 Firebase:
@@ -706,8 +701,9 @@ Firebase:
 Android Studio:
   App signed with release keystore
   AAB (Android App Bundle) generated not APK
-  Version code: 1
-  Version name: 1.0.0
+  versionCode/versionName: see ANDROID APP DETAILS in the
+  MOBILE ARCHITECTURE section (android/app/build.gradle is
+  the real source)
 
 Play Console:
   Developer account created ($25 fee paid)
@@ -870,10 +866,7 @@ moving on. Don't wait to be asked. Don't just log it in
 CHANGELOG.md — that's for user-facing release notes, this file
 is for cross-session technical memory and the two serve
 different purposes.
-When you fix a bug listed here, mark it fixed. When you add
-quests/lessons, update the count and note where the full list
-lives (CHANGELOG.md). When a "known issue / deferred" item
-gets resolved, remove the deferral warning.
+When you fix a bug listed here, mark it fixed instead of leaving it listed as open. When you add quests/lessons, do NOT write a count or list into this file — point to src/data/quests.ts / src/data/lessons.ts instead, since a hardcoded count goes stale the moment the next one is added. When a "known issue / deferred" item gets resolved or ruled out, remove the deferral warning so a future session doesn't re-investigate something already closed.
 If you're not sure whether something is worth recording here,
 err on recording it — a stale fact here costs more than an
 unnecessary line.
