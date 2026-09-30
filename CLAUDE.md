@@ -237,7 +237,7 @@ src/firebase/         Firebase barrel exports
 /onboarding           4 step setup after signup
 /dashboard            Main user dashboard
 /games                All 6 games hub
-/quests               All 7 quests hub
+/quests               All ~27 quests hub
 /learn                8 lesson modules
 /tools                4 financial calculators
 /resources            10 framework resource hub
@@ -308,25 +308,25 @@ Compound Clicker
 
 ---
 
-## THE 7 QUESTS
+## THE QUESTS (~27, growing — do not hardcode a count or list here)
 
-File: src/data/quests.ts
+File: src/data/quests.ts (source of truth — read it directly for
+  the current full list, do not trust a hardcoded list in this
+  file, it will go stale the next time a quest is added)
 Hook: src/hooks/useQuestEngine.ts
 Component: src/components/quests/QuestViewer.tsx
+Narrative/fog-enemy mapping: src/config/narrative.ts QUEST_FOG_MAP
 
-Quests are multi-step financial story scenarios.
-Each step has 3-4 choices. Choices affect XP and
-Financial Health score. An optimal choice is marked
-on each step.
-
-Quest IDs and themes:
-  first-paycheck         What to do with first salary
-  first-apartment        Renting decisions and costs
-  phone-emi              True cost of instalments
-  emergency-expense      Why emergency funds matter
-  vacation-planning      Saving vs borrowing for goals
-  first-credit-card      APR, rewards, credit risk
-  calculations-quest     Pure maths practice age adapted
+Quests are multi-step (mostly single-step as of Sept 2026 batches)
+financial story scenarios. Each step has 3-4 choices. Choices
+affect XP and Financial Health score. An optimal choice is marked
+on each step. Unlocking is per-quest via
+unlockRequirement.completedQuestId — NOT a strict sequential walk
+by chapterNumber — so new quests can be appended safely with new
+chapterNumbers without disrupting existing unlocks. New lessons in
+lessons.ts are different: that array IS a hard-locked linear
+curriculum and must be inserted at the correct position, not
+appended.
 
 Financial Health Score:
   Separate from XP. Starts at 50. Range 0 to 100.
