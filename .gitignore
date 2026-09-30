@@ -72,3 +72,6 @@ keystore.properties
 android/keystore.properties
 
 .vercel
+
+# Local build outputs — never track AAB binaries or deobfuscation maps
+release-builds/
