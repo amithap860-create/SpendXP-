@@ -45,16 +45,36 @@ export function useNativeInit({
 }: UseNativeInitOptions) {
   // ── Service worker teardown (must run first — see native.ts) ───────────
   useEffect(() => {
-    disableServiceWorkerIfNative();
+    // TEMP INSTRUMENTATION (2026-09-30): logs real on-device timings so we
+    // stop guessing at the app-open lag. Read via chrome://inspect while
+    // the phone is USB-connected — do NOT leave this in past the next
+    // diagnosis round, remove once the lag is confirmed fixed or the real
+    // cause is found.
+    if (isNative()) console.time('[perf] sw-teardown');
+    disableServiceWorkerIfNative().then(() => {
+      if (isNative()) console.timeEnd('[perf] sw-teardown');
+    });
   }, []);
 
   // ── Status bar + splash ────────────────────────────────────────────────
+  // FIX (2026-09-30): this used to wait a flat, unconditional 400ms after
+  // mount before hiding the splash screen — every single launch, regardless
+  // of device speed or network. That was pure padding: this effect already
+  // only fires after React has committed and painted RootLayoutContent, so
+  // "give React a beat to hydrate" was already true by the time we got here.
+  // Down to a single animation frame (~16ms) so the splash comes down as
+  // soon as the real content is actually on screen instead of on a fixed
+  // clock. If a real flash-of-unstyled-content reappears, that's a separate,
+  // measurable problem — do not put the 400ms back as a blind fix.
   useEffect(() => {
     if (!isNative()) return;
     initStatusBar();
-    // Give React a beat to hydrate before hiding splash
-    const t = setTimeout(() => hideSplash(), 400);
-    return () => clearTimeout(t);
+    console.time('[perf] splash-to-hide');
+    const raf = requestAnimationFrame(() => {
+      hideSplash();
+      console.timeEnd('[perf] splash-to-hide');
+    });
+    return () => cancelAnimationFrame(raf);
   }, []);
 
   // ── FCM push notifications (server-to-device) ──────────────────────────

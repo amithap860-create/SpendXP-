@@ -32,104 +32,112 @@ with Firebase. It has working features but several
 bugs that need fixing. The existing code should be
 used as the foundation — do not start from scratch.
 
-WHAT IS BUILT AND WORKING:
+WHAT IS BUILT AND WORKING (updated 2026-09-30 — trust this
+section over any older one below it if they conflict):
 - 6 games: Budget Blitz, FinIQ Quiz, Money Maze,
   Stock Market Simulator, Credit Score Builder,
   Compound Clicker
-- 7 quests with branching financial scenarios
-- 8 lesson modules with interactive cards
+- ~27 quests with branching financial scenarios,
+  tied to the "Gray Fog" narrative system
+  (src/config/narrative.ts QUEST_FOG_MAP)
+- 8+ lesson modules with interactive cards (new lessons
+  added Sept 2026 from SEBI/Investopedia-sourced content:
+  needs-vs-wants, SMART goals, compounding, take-home pay,
+  net worth — see CHANGELOG.md for exact list)
 - 4 financial calculator tools
 - XP progression system with 5 levels and 19 badges
 - Financial health score system (0-100)
 - Parent dashboard with child monitoring
 - Age adaptation system (Junior/Teen/Senior)
 - Firestore security rules
-- Currency system (INR default, 8 currencies)
+- Currency system (INR default, 8 currencies) with
+  disclaimers that non-INR regulatory content (tax rates,
+  EMI/FOIR rules etc.) does not localize, only amounts do
 - Glossary with 20 financial terms and formulas
 - Resource hub based on 10 financial frameworks
+- Daily reminder with user-configurable time (Profile page,
+  src/lib/progressionService.ts updateReminderTime)
 
-KNOWN BUGS TO FIX (in priority order):
-1. Rules of Hooks violation in dashboard page
-   File: src/app/dashboard/page.tsx line 80
-   Error: useState inside a conditional block
+KNOWN BUGS — the original 7 listed below are FIXED. Do not
+re-investigate them; they're kept only as bug-pattern examples.
+Current known issue: a residual ~1 second app-open lag remains
+after the main login-lag fix (see AuthContext.tsx note below).
+Root cause suspected: disableServiceWorkerIfNative() in
+src/lib/native.ts strips all JS caching on every native app
+open. NOT YET FIXED — deliberately deferred, fixing it risks
+reintroducing an old service-worker hang bug. Do not attempt
+without discussing the tradeoff with the developer first.
 
-2. Account creation not working on landing page
-   File: src/lib/store.ts and src/app/page.tsx
-   Error: isInitialLoading stuck as true forever
-
-3. isInitialLoading never resolves
-   File: src/lib/store.ts
-   Fix: add 3 second timeout fallback
-
-4. Unclosed Card JSX tag
-   File: src/app/parent/page.tsx
-   Fix: find and close the unclosed Card component
-
-5. OpenTelemetry missing module on Vercel
-   File: next.config.ts
-   Fix: add to serverExternalPackages and webpack
-   externals
-
-6. EmailSection crashes when user is null
-   File: src/app/profile/page.tsx
-   Fix: add null guard at top of component
-
-7. CurrencySection crashes when profile is null
-   File: src/app/profile/page.tsx
-   Fix: add null guard with optional chaining
+ORIGINAL 7 BUGS (historical, already fixed):
+1. Rules of Hooks violation in dashboard page (fixed)
+2. Account creation isInitialLoading stuck true (fixed)
+3. isInitialLoading never resolves (fixed)
+4. Unclosed Card JSX tag in parent page (fixed)
+5. OpenTelemetry missing module on Vercel (fixed)
+6. EmailSection crashes when user is null (fixed)
+7. CurrencySection crashes when profile is null (fixed)
 
 ---
 
-## MOBILE FIRST — ANDROID PLAY STORE LAUNCH
+## MOBILE ARCHITECTURE — READ THIS BEFORE TOUCHING BUILDS
 
-The immediate goal is to get SpendXP onto the
-Google Play Store as an Android app.
+CRITICAL — this is NOT a static-export/offline app. The
+Android app is a thin Capacitor WebView shell that loads a
+LIVE remote URL at runtime:
 
-The existing Next.js web app must be converted to
-a mobile app using Capacitor. This is the recommended
-approach because:
-- It wraps the existing web code into a native app
-- No need to rebuild everything in React Native
-- Works on both Android and iOS from the same code
-- The web version continues to work too
+  capacitor.config.ts → server.url: 'https://spendxp.vercel.app'
+  webDir: 'public' (a placeholder — irrelevant at runtime
+  because server.url overrides it and loads the live site)
 
-STEPS TO BUILD FOR ANDROID:
+WHAT THIS MEANS — THE SINGLE MOST IMPORTANT RULE IN THIS FILE:
+  - Any change to web/content/logic code (lessons.ts, quests.ts,
+    components, hooks, pages, styles) ships the INSTANT it is
+    committed, pushed to `main`, and Vercel finishes deploying.
+    NO new AAB is needed and uploading one changes nothing for
+    this kind of change.
+  - A NEW AAB IS ONLY NEEDED when the native/Android layer itself
+    changes: new or upgraded Capacitor plugins, changed Android
+    permissions, edits to capacitor.config.ts (server url, splash,
+    status bar colors), app icon changes, or a versionCode/
+    versionName bump for a Play Console requirement.
+  - Before ever telling the developer "you need a new build,"
+    check whether the change is content/web-only. Most fixes are.
+  - Before saying "you don't need a new build," verify the native
+    plugin in question is already compiled into the last shipped
+    AAB (check android/capacitor.settings.gradle and
+    android/app/capacitor.build.gradle) — don't assume.
 
-Step 1 — Install Capacitor:
-  pnpm add @capacitor/core @capacitor/cli
-  pnpm add @capacitor/android
-  npx cap init SpendXP com.spendxp.app --web-dir=out
+DEPLOYMENT PIPELINE:
+  Local repo: D:\SpendXP Main\SpendXP (git remote 'origin' =
+    https://github.com/amithap860-create/SpendXP-.git, branch main)
+  Vercel project 'spend-xp' auto-deploys from `main` via GitHub
+    integration.
+  The developer must run `git push origin main` themselves from
+    their own authenticated terminal — do not assume a push
+    succeeded just because a commit was made locally.
 
-Step 2 — Configure Next.js for static export:
-  In next.config.ts add:
-    output: 'export'
-    trailingSlash: true
-    images: { unoptimized: true }
-
-Step 3 — Build the web app:
-  pnpm build
-
-Step 4 — Add Android platform:
-  npx cap add android
-
-Step 5 — Sync files to Android:
-  npx cap sync android
-
-Step 6 — Open in Android Studio:
-  npx cap open android
-
-Step 7 — In Android Studio:
-  Build → Generate Signed Bundle/APK
-  Choose Android App Bundle (AAB) for Play Store
-  Follow the signing key setup steps
+STEPS TO BUILD A NEW ANDROID RELEASE (native changes only):
+  1. Bump versionCode in android/app/build.gradle if required
+     by Play Console (check it hasn't been used before)
+  2. Run build-release-aab.bat from the project root (handles
+     JAVA_HOME auto-detection and copies output to
+     release-builds\ as spendxp-v{VCODE}.aab +
+     spendxp-v{VCODE}-mapping.txt)
+  3. Upload BOTH the .aab and the matching mapping.txt to
+     Play Console (mapping.txt is the deobfuscation file —
+     minifyEnabled is true, so ProGuard/R8 renames symbols)
+  4. Test on a real device before releasing to all testers
 
 ANDROID APP DETAILS TO USE:
   App name: SpendXP
   Package name: com.spendxp.app
-  Version: 1.0.0
+  Current versionCode: 8 (do not reuse 1-7, already submitted)
+  versionName: 1.1
   Min SDK: 24 (Android 7.0)
   Target SDK: 34 (Android 14)
-  Theme color: #0F6E56 (teal)
+  Theme: dark, background #1A1F2E (NOT teal #0F6E56 — that
+  was an early placeholder and is stale everywhere it still
+  appears in this file)
 
 PLAY STORE REQUIREMENTS:
   The developer needs a Google Play Developer account
@@ -160,7 +168,17 @@ Mobile:        Capacitor (wraps web app for mobile)
 ## FIREBASE PROJECT
 
 Project ID:    studio-7609169345-afafa
-Firestore:     Native mode, persistent local cache
+Firestore:     Native mode, MEMORY-ONLY local cache
+               (src/lib/firebase.ts deliberately uses
+               memoryLocalCache(), NOT persistentLocalCache().
+               persistentLocalCache() was tried and caused an
+               INTERNAL ASSERTION FAILED (ca9/b815) crash when
+               an onSnapshot listener was denied by security
+               rules. Do not switch this back without fixing
+               that underlying crash first. Consequence: zero
+               local Firestore persistence across app sessions
+               — every doc read needs a live network round trip,
+               which is a contributor to app-open lag.)
 Auth methods:  Email/Password, Google Sign-In
 Rules file:    firestore.rules
 Admin SDK:     src/lib/firebaseAdmin.ts (server only)
@@ -631,21 +649,27 @@ package.json. Using it will crash the build.
 
 ## MOBILE APP CONFIGURATION
 
-For Android Play Store release:
+For Android Play Store release. See the MOBILE ARCHITECTURE
+section near the top of this file first — it explains that
+server.url makes this a remote-loading shell, which changes
+what "release" actually means for most changes.
 
-capacitor.config.ts settings:
+capacitor.config.ts settings (actual, current):
   appId: 'com.spendxp.app'
   appName: 'SpendXP'
-  webDir: 'out'
+  webDir: 'public'   (placeholder, overridden by server.url)
+  server.url: 'https://spendxp.vercel.app'
   bundledWebRuntime: false
 
 Android specific settings in
 android/app/src/main/res/values/strings.xml:
   app_name: SpendXP
 
-Splash screen color: #0F6E56 (teal)
-Status bar color: #0F6E56 (teal)
-Theme: Light mode default
+Theme: dark mode, background #1A1F2E
+Native splash duration: launchShowDuration 1800ms
+  (capacitor.config.ts), plus a 400ms setTimeout in
+  useNativeInit.ts before hideSplash() — both contribute
+  to perceived app-open time, do not remove without reason
 
 Min Android version: 7.0 (API 24)
 Target Android version: 14 (API 34)
@@ -829,15 +853,55 @@ Anthropic Console: console.anthropic.com
 
 ---
 
+## KEEPING THIS FILE CURRENT — MANDATORY, DO NOT SKIP
+
+This file went stale before (it described a static-export app
+with webDir:'out' and a teal theme for months after the app
+became a remote-loading Capacitor shell with a dark theme —
+that mismatch caused real confusion and wasted time). The
+developer has explicitly asked that this not happen again.
+
+Rule: after finishing any piece of work that changes a fact
+this file states — architecture, versionCode, theme, known
+bugs, quest/lesson counts, deployment rules, anything under
+"WHAT IS BUILT AND WORKING" or "MOBILE ARCHITECTURE" — update
+the relevant section of THIS file in the same session, before
+moving on. Don't wait to be asked. Don't just log it in
+CHANGELOG.md — that's for user-facing release notes, this file
+is for cross-session technical memory and the two serve
+different purposes.
+When you fix a bug listed here, mark it fixed. When you add
+quests/lessons, update the count and note where the full list
+lives (CHANGELOG.md). When a "known issue / deferred" item
+gets resolved, remove the deferral warning.
+If you're not sure whether something is worth recording here,
+err on recording it — a stale fact here costs more than an
+unnecessary line.
+
+---
+
 ## FINAL NOTES FOR CLAUDE CODE
 
-- The developer is a beginner. Explain every step.
+- The developer is a non-technical solo founder. Explain every
+  step in plain language, no jargon without explanation.
+- The developer wants concise, direct answers and strict,
+  critical feedback — do not over-praise, flag gaps and risks
+  plainly.
 - Always fix bugs before adding new features.
-- Always run pnpm build after changes to verify.
-- Mobile (Android) is the first priority.
-- Web deployment is the second priority.
+- Always run pnpm build / tsc --noEmit after changes to verify.
+- Mobile (Android, Play Store, target launch August 2026) is
+  the first priority. Web deployment is second. iOS is third.
 - Never break existing working features.
 - When in doubt ask the developer what they want.
-- Keep all amounts in INR unless user changes currency.
+- Keep all amounts in INR unless user changes currency; verify
+  non-INR content also carries the correct regulatory disclaimer
+  (see LessonViewer.tsx / QuestViewer.tsx disclaimer banners).
 - All dates in IST timezone.
 - All hooks at the top of every component always.
+- The developer has NO GitHub push credentials in a Cowork
+  sandbox environment — if working from Cowork rather than
+  directly on the developer's machine, commits succeed locally
+  but `git push origin main` must be run by the developer
+  themselves. Not relevant if you're running directly on their
+  machine (Claude Code normally is) — verify which situation
+  you're in before assuming a push needs to be manual.

@@ -143,6 +143,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // when auth state changes (e.g. user logs out or switches accounts).
     let firestoreUnsub: (() => void) | null = null;
 
+    // TEMP INSTRUMENTATION (2026-09-30): pairs with the console.time calls
+    // in useNativeInit.ts — read together via chrome://inspect on a USB-
+    // connected device to get real numbers for the app-open lag instead of
+    // guessing from code. Remove once the lag is diagnosed/confirmed fixed.
+    if (typeof window !== 'undefined') console.time('[perf] auth-resolve');
+
     // FIX (2026-09-30): `loading` used to stay true until the Firestore
     // user-doc listener delivered its FIRST snapshot — not just until Auth
     // itself resolved. Firestore here runs on memoryLocalCache (see
@@ -179,6 +185,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Auth has resolved — let the app render now. Profile-dependent
           // fields below arrive shortly after and update reactively.
           setLoading(false);
+          if (typeof window !== 'undefined') console.timeEnd('[perf] auth-resolve');
 
           // Real-time listener on the user's Firestore doc.
           // This fires immediately with the current value, then again on every change
@@ -230,6 +237,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setCountryCode('IN');
           setIsParent(false);
           setLoading(false);
+          if (typeof window !== 'undefined') console.timeEnd('[perf] auth-resolve');
         }
       },
       (authError) => {
