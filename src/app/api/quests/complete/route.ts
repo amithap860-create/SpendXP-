@@ -8,7 +8,7 @@
  *  • Quest progress record (idempotent — re-submitting same questId is a no-op)
  *
  * Request body:
- *   { questId: string, xpEarned: number, optimalRate: number, healthDelta: number, walletDelta: number }
+ *   { questId: string, xpEarned: number, optimalRate: number, healthDelta: number, walletDelta: number, savedAmount: number }
  *
  * Response:
  *   200 { success: true, xpAwarded, streak, questsToday, dailyLimitReached }
@@ -79,6 +79,18 @@ export async function POST(request: NextRequest) {
     // Clamped generously (quests.ts's largest single-choice value is 50,000)
     // to allow legitimate high-value quests while bounding tampering.
     const walletDelta: number = Math.min(200000, Math.max(-200000, Number(body.walletDelta) || 0));
+    // BUGFIX (2026-10-02): "Saved Virtually" (totalSaved below) was stuck at
+    // 0 for every tester even on fresh quest completions. This endpoint used
+    // to derive it as Math.max(0, walletDelta) — the positive-clamped sum of
+    // the WHOLE quest. Almost every quest's net total is negative (rent,
+    // EMIs, a laptop purchase) even on the best possible path, so that total
+    // got clamped to 0 almost every time regardless of how well someone
+    // played. The client now tracks and sends the sum of only the positive
+    // per-choice deltas as they happen (see useQuestEngine.ts), so a quest
+    // with one "+500 you saved" moment and one "-2000 you paid rent" moment
+    // correctly contributes +500 instead of 0. Clamped the same way
+    // walletDelta is, for the same tamper-resistance reason.
+    const savedAmount: number = Math.min(200000, Math.max(0, Number(body.savedAmount) || 0));
 
     if (!questId) {
       return NextResponse.json({ error: 'Missing questId' }, { status: 400 });
@@ -176,18 +188,10 @@ export async function POST(request: NextRequest) {
       const currentWallet: number = statsData.walletBalance ?? 0;
       const newWalletBalance = Math.max(0, currentWallet + walletDelta);
 
-      // FIX (2026-09-30): walletBalance is a realistic net-cash-flow number —
-      // most quests are spending scenarios (rent, bills, birthday money)
-      // where even the mathematically optimal choice has a NEGATIVE
-      // walletDelta, and the balance above is floored at 0. That meant the
-      // dashboard's "Saved Virtually" stat (which read walletBalance) showed
-      // 0 for most users after most quests, even played perfectly — not
-      // because nothing was written (that was fixed already), but because
-      // the number being shown wasn't actually a savings tally. totalSaved
-      // only accumulates the positive side of walletDelta — an explicit
-      // "you chose to save or gained money" moment — so it only goes up,
-      // which is what a label like "Saved Virtually" should mean.
-      const savedThisQuest = Math.max(0, walletDelta);
+      // See the BUGFIX (2026-10-02) comment near the top of this file —
+      // `savedAmount` is now the client-computed sum of positive per-choice
+      // moments, not a re-clamp of the quest's net total. Using it directly.
+      const savedThisQuest = savedAmount;
 
       // ── Write quest progress ──────────────────────────────────────────────
       tx.set(questProgressRef, {

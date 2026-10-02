@@ -22,6 +22,19 @@ export type QuestState = {
   totalXPEarned: number;
   totalHealthDelta: number;
   totalWalletDelta: number;
+  /** BUGFIX (2026-10-02): "Saved Virtually" was still showing 0 for every
+   *  tester after the 2026-09-30 fix, even on fresh quest completions. Root
+   *  cause: the server was computing Math.max(0, totalWalletDelta) — the
+   *  POSITIVE-CLAMPED SUM OF THE WHOLE QUEST — not the sum of individual
+   *  positive moments. Almost every quest's net total is negative (you're
+   *  paying rent, buying a laptop, covering EMIs) even on the optimal path,
+   *  so that total got clamped to 0 for nearly every quest, nearly every
+   *  time — "Saved Virtually" wasn't broken by a missing write, it could
+   *  essentially never increase by design. This tracks the sum of only the
+   *  POSITIVE per-choice deltas as choices happen, so a quest with one
+   *  +500 "you saved" moment and one -2000 "you paid rent" moment correctly
+   *  contributes +500, not 0. */
+  totalPositiveWalletDelta: number;
   optimalChoiceCount: number;
   /** Populated after completion — from the server response */
   serverResult?: {
@@ -52,6 +65,7 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
     totalXPEarned: 0,
     totalHealthDelta: 0,
     totalWalletDelta: 0,
+    totalPositiveWalletDelta: 0,
     optimalChoiceCount: 0,
   });
 
@@ -79,6 +93,7 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
       totalXPEarned: 0,
       totalHealthDelta: 0,
       totalWalletDelta: 0,
+      totalPositiveWalletDelta: 0,
       optimalChoiceCount: 0,
     });
   }, [filteredSteps]);
@@ -107,6 +122,9 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
         totalXPEarned: state.totalXPEarned + choice.xpDelta,
         totalHealthDelta: state.totalHealthDelta + choice.healthDelta,
         totalWalletDelta: state.totalWalletDelta + choice.walletDelta,
+        // See the BUGFIX comment on the type above — only the positive part
+        // of EACH choice counts, not the positive part of the running total.
+        totalPositiveWalletDelta: state.totalPositiveWalletDelta + Math.max(0, choice.walletDelta),
         optimalChoiceCount: state.optimalChoiceCount + (choice.isOptimal ? 1 : 0),
         currentStepId: isEnd ? state.currentStepId : choice.nextStepId,
         status: isEnd ? 'COMPLETE' : 'IN_PROGRESS',
@@ -144,10 +162,13 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
               // progression.walletBalance — a net-cash-flow figure that's
               // floored at 0, and most quests are spending scenarios where
               // even the optimal choice is a negative delta. The dashboard
-              // now reads progression.totalSaved instead, which the server
-              // increments only from the positive side of this same delta
-              // (see app/api/quests/complete/route.ts).
+              // now reads progression.totalSaved instead.
               walletDelta: nextState.totalWalletDelta,
+              // BUGFIX (2026-10-02): totalSaved was STILL stuck at 0 for
+              // everyone — see the comment on QuestState.totalPositiveWalletDelta
+              // above for why. Sending the pre-computed per-choice positive
+              // sum instead of letting the server clamp the quest's net total.
+              savedAmount: nextState.totalPositiveWalletDelta,
             }),
           });
 
