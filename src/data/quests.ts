@@ -1218,88 +1218,88 @@ export const quests: Quest[] = [
       {
         id: 'ra-1',
         title: 'Choosing Where to Live',
-        narrative: "Your office is downtown. You have ₹90,000 in savings. Renting close to work is expensive — but commuting far drains your time and energy.",
+        narrative: "Your office is downtown. You take home ₹55,000/month and have ₹90,000 in savings. Renting close to work is expensive — but commuting far drains your time and energy. Each option below lists monthly rent and the deposit required (deposits in this city run 2-3x monthly rent). Work out what each actually costs you before picking.",
         ageGroups: ['senior'],
         choices: [
           {
             id: 'ra-c1',
-            text: 'Shared room near office: ₹18,000',
-            consequence: 'High rent, but ₹0 commute and utilities included. Deposit: ₹18,000.',
+            text: 'Shared room near office: ₹18,000/mo, ₹18,000 deposit',
+            consequence: 'Zero commute, utilities included. Your bank balance drops to ₹72,000 after the deposit, and ₹18,000 leaves every month from here.',
             xpDelta: 40,
             healthDelta: 5,
             walletDelta: -18000,
             nextStepId: 'ra-2',
             isOptimal: false,
-            explanation: "Good for time management, but eats 33% of salary. Tight but manageable for a first job.",
-            realLifeTip: "Commute time is money. Living close can save you 100+ hours of travel a month."
+            explanation: "₹18,000 rent against a ₹55,000 salary is 33% of income on housing alone — above the 25% line most financial planners use before things get tight. The commute savings are real, but this is the 'house poor' option even though it doesn't look dramatic at first glance.",
+            realLifeTip: "Run the math as rent ÷ salary, not rent vs. 'does this feel affordable.' 33% doesn't feel extreme until you add food, transport, EMIs, and anything unexpected on top."
           },
           {
             id: 'ra-c2',
-            text: 'Shared flat across town: ₹12,500',
-            consequence: 'Low rent (23% of salary). Deposit: ₹37,500. 45-min commute each way.',
+            text: 'Shared flat across town: ₹12,500/mo, ₹37,500 deposit',
+            consequence: 'Your bank balance drops to ₹52,500 after the deposit. ₹12,500 leaves every month. 45-min commute each way, 5 days a week.',
             xpDelta: 60,
             healthDelta: 10,
             walletDelta: -37500,
             nextStepId: 'ra-2',
             isOptimal: true,
-            explanation: "Housing under 25% of salary is the gold standard for early wealth building.",
-            realLifeTip: "Use the 3:1 income-to-rent ratio rule — your income should be at least 3× your monthly rent."
+            explanation: "₹12,500 against ₹55,000 is ~23% of income — under the 25% line. It costs more upfront (the deposit is double the near-office option) and costs you real time in commuting, but it's the one that doesn't quietly eat your ability to save every single month.",
+            realLifeTip: "Use the 3:1 income-to-rent ratio rule — your income should be at least 3x your monthly rent. A bigger deposit now is a one-time hit; a bad rent-to-income ratio is a hit every month for as long as you live there."
           },
           {
             id: 'ra-c3',
-            text: 'Own studio in far suburb: ₹22,000',
-            consequence: 'Your own space, but 40% of salary. Deposit: ₹66,000. Long commute adds up.',
+            text: 'Own studio in far suburb: ₹22,000/mo, ₹66,000 deposit',
+            consequence: 'Your bank balance drops to ₹24,000 after the deposit — your emergency buffer is now almost gone. ₹22,000 leaves every month. Long commute.',
             xpDelta: 20,
             healthDelta: -8,
             walletDelta: -66000,
             nextStepId: 'ra-2',
             isOptimal: false,
-            explanation: "Spending 40%+ on rent is the 'house poor' trap. Your savings will stagnate.",
-            realLifeTip: "Always plan for 2–3 months' rent in deposit upfront when moving to a new city."
+            explanation: "₹22,000 against ₹55,000 is 40% of income on rent alone, and the deposit alone burns through most of your ₹90,000 cushion. Having your own space feels like an upgrade, but you'd be one unexpected expense away from real trouble with almost no savings left.",
+            realLifeTip: "Always plan for 2-3 months' rent in deposit upfront when moving to a new city — and check what's left over AFTER that deposit before deciding the rent itself is affordable."
           }
         ]
       },
       {
         id: 'ra-2',
         title: 'The Agent Problem',
-        narrative: "The letting agent wants 1 month's rent as a finder's fee. This is on top of your deposit.",
+        narrative: "The letting agent wants 1 month's rent as a finder's fee. This is on top of your deposit. Your office lease on your current place ends in 10 days — you need somewhere to sleep by then.",
         ageGroups: ['senior'],
         choices: [
           {
             id: 'ra-c4',
-            text: 'Negotiate the fee to 50%',
-            consequence: 'Success! You save ₹6,250–₹11,000. Most people never ask.',
+            text: 'Negotiate the fee down before agreeing to anything',
+            consequence: "You push back politely and ask for 50%. The agent agrees — you save thousands, and you still move in well within your 10-day window.",
             xpDelta: 55,
             healthDelta: 8,
             walletDelta: -6250,
             nextStepId: 'ra-3',
             isOptimal: true,
-            explanation: "Agent fees are negotiable. A short conversation saved you over a week's salary.",
-            realLifeTip: "Agents are more willing to negotiate if you can sign and pay quickly."
+            explanation: "Agent fees are almost always negotiable, and negotiating costs you nothing but a short, slightly awkward conversation. This is the only option here that improves your position without creating a new risk somewhere else.",
+            realLifeTip: "Agents are more willing to negotiate when you can sign and pay quickly — use your readiness to move as leverage, not just your budget."
           },
           {
             id: 'ra-c5',
-            text: 'Find a no-fee listing directly (₹0)',
-            consequence: 'Saves ₹12,500–₹22,000 but takes 2 extra weeks to find a place.',
-            xpDelta: 60,
-            healthDelta: 10,
-            walletDelta: 0,
+            text: 'Skip the agent entirely — hold out for a no-fee listing you find yourself',
+            consequence: "You spend your evenings scrolling listings instead of negotiating. Finding one directly from a landlord takes 2-3 weeks on average — longer than your 10-day window. Day 9 arrives with nothing finalized, and you end up paying for a week in a guesthouse while you keep searching, on top of whatever you eventually sign.",
+            xpDelta: 25,
+            healthDelta: -5,
+            walletDelta: -4000,
             nextStepId: 'ra-3',
-            isOptimal: true,
-            explanation: "Avoiding middleman fees preserves your capital — time spent is worth it.",
-            realLifeTip: "Direct landlord listings are rarer but always worth checking first."
+            isOptimal: false,
+            explanation: "Avoiding middleman fees is a good instinct in general, but it ignores your actual timeline. Direct listings are real and worth checking, but betting your only housing plan on finding one inside 10 days is the kind of 'save money in theory' move that often costs money in practice once a deadline forces your hand anyway.",
+            realLifeTip: "A cheaper option that doesn't fit your actual timeline isn't actually cheaper — price in the cost of running out of time, not just the sticker price."
           },
           {
             id: 'ra-c6',
-            text: 'Pay full fee to secure it fast',
-            consequence: 'Flat secured quickly! But your savings are now dangerously low with no buffer.',
+            text: 'Pay the full fee to secure it fast',
+            consequence: 'Flat secured quickly — well within your window. But your savings are now dangerously low with no buffer, and you never even tried to negotiate.',
             xpDelta: 15,
             healthDelta: -4,
             walletDelta: -12500,
             nextStepId: 'ra-3',
             isOptimal: false,
-            explanation: "Accepting high upfront costs without negotiating drains your emergency fund.",
-            realLifeTip: "Always keep a 'Move-in Fund' separate from your security deposit."
+            explanation: "Accepting high upfront costs without even attempting to negotiate drains your emergency fund for no reason — a short conversation could have gotten you most of the same speed at half the cost.",
+            realLifeTip: "Always keep a 'Move-in Fund' separate from your security deposit — and always ask before you pay the asking price on anything negotiable."
           }
         ]
       },
@@ -1411,57 +1411,89 @@ export const quests: Quest[] = [
   {
     id: 'emergency-expense',
     title: 'The Pink Slip Surprise',
-    description: 'A sudden layoff hits. You have 30 days of pay left. How long can you survive?',
+    description: 'A sudden layoff hits. You have savings and a severance check — but no idea how long the job search will take. How you handle the first month decides whether this is a setback or a crisis.',
     category: 'emergency',
-    difficulty: 'intermediate',
+    difficulty: 'advanced',
     ageGroups: ['senior'],
     chapterNumber: 14,
     chapter: 'Safety Net First',
-    estimatedMinutes: 7,
-    xpReward: 300,
+    estimatedMinutes: 9,
+    xpReward: 350,
     startingBalance: 120000,
     steps: [
       {
         id: 'efq-1',
         title: 'The Layoff Notice',
-        narrative: "Your startup closed. You get 1 month severance (₹40,000). You have ₹1,20,000 in total savings.",
+        narrative: "Your startup closed. You get 1 month severance (₹40,000), landing on top of your ₹1,20,000 in savings — ₹1,60,000 total. Your current monthly expenses are ₹30,000. You have no idea if the job search takes 2 months or 8.",
         ageGroups: ['senior'],
         choices: [
           {
             id: 'efq-c1',
-            text: 'Cut all luxury immediately',
-            consequence: 'Expenses drop to ₹20,000. Your savings now last 8 months instead of 5.',
+            text: 'Cut expenses to ₹20,000/month immediately, before doing anything else',
+            consequence: "At ₹20,000/month, your ₹1,60,000 stretches to 8 months of runway. You haven't earned a rupee yet, but you've bought yourself the most valuable thing in a job search: time to be selective instead of desperate.",
             xpDelta: 60,
             healthDelta: 10,
-            walletDelta: 40000,
-            nextStepId: 'end',
+            walletDelta: 20000,
+            nextStepId: 'efq-2',
             isOptimal: true,
-            explanation: "Surviving a layoff is about extending your 'runway' as much as possible.",
-            realLifeTip: "The first thing to cut is subscriptions and dining out. These are pure variable costs."
+            explanation: "Runway (savings ÷ monthly burn) is the single number that matters most in a layoff. Cutting costs first — before you know how long the search takes — maximizes the one variable fully in your control on day one.",
+            realLifeTip: "The first things to cut are subscriptions and dining out — pure variable costs with zero commitment attached. Do this in week one, not after the savings have already started draining."
           },
           {
             id: 'efq-c2',
-            text: 'Maintain lifestyle for morale',
-            consequence: 'You stay happy, but you only have 5 months to find a job or move back home.',
+            text: 'Keep your lifestyle at ₹30,000/month — you need stability to job hunt well, not more stress',
+            consequence: "You reason that a stressed, broke version of you interviews worse. At ₹30,000/month, your ₹1,60,000 lasts about 5.3 months. Three months in, with no offer yet, you're calculating your runway for the first time — later than you should have.",
             xpDelta: 20,
             healthDelta: -5,
-            walletDelta: 40000,
-            nextStepId: 'end',
+            walletDelta: 10000,
+            nextStepId: 'efq-2',
             isOptimal: false,
-            explanation: "Denial is expensive. High fixed costs are your enemy during unemployment.",
-            realLifeTip: "Morale comes from security. Security comes from having a 6-month buffer."
+            explanation: "The instinct isn't crazy — stress does hurt interview performance. But the math still runs against you: 3 extra months of runway from cutting costs is worth far more than marginally nicer dinners, and real security (knowing you have 8 months, not 5) reduces stress more than an unchanged lifestyle does.",
+            realLifeTip: "Security is what actually reduces job-search stress — not an unchanged budget. A visible, calculated runway number is more calming than denial."
           },
           {
             id: 'efq-c3',
-            text: 'Start freelancing immediately',
-            consequence: 'Brings in ₹10,000/mo. Extends your survival by 2 months.',
-            xpDelta: 50,
-            healthDelta: 7,
-            walletDelta: 40000,
+            text: 'Keep spending at ₹30,000/month, but start freelancing for extra income instead of cutting costs',
+            consequence: "Freelance work brings in ₹10,000/month, so your effective burn is ₹20,000/month — the same runway as just cutting costs would have given you, except now you're spending 15-20 hours/week on freelance work on top of job hunting, which is leaving you less time to actually interview well.",
+            xpDelta: 40,
+            healthDelta: 2,
+            walletDelta: 20000,
+            nextStepId: 'efq-2',
+            isOptimal: false,
+            explanation: "Extra income is genuinely valuable, and relying on one income source is a real risk — but it's not a substitute for cutting the costs you can cut for free. The strongest move does both; doing only the harder one (finding freelance work) while skipping the easy one (dropping subscriptions and dining out) is working harder for the same runway you could have gotten for free.",
+            realLifeTip: "Cut what costs nothing to cut before you go looking for extra income — income takes real time and effort, cost-cutting usually takes an afternoon."
+          }
+        ]
+      },
+      {
+        id: 'efq-2',
+        title: 'The Instant-Loan Offer',
+        narrative: "It's week 3. A lending app you'd signed up for ages ago sends a push notification: '₹50,000 approved instantly, 2.5%/month, no paperwork.' No job offer yet, but nothing urgent is due either — this would just be a cushion.",
+        ageGroups: ['senior'],
+        choices: [
+          {
+            id: 'efq-c4',
+            text: 'Ignore it. Nothing is actually due — this would be debt for comfort, not necessity.',
+            consequence: "You close the notification. Your runway stays exactly what it was before — built from savings and cost-cutting, not borrowed money you'd owe interest on regardless of whether you land a job next week or next quarter.",
+            xpDelta: 70,
+            healthDelta: 12,
+            walletDelta: 0,
             nextStepId: 'end',
             isOptimal: true,
-            explanation: "Income diversification prevents total depletion during job gaps.",
-            realLifeTip: "Never rely on a single source of income."
+            explanation: "2.5%/month compounds to roughly 34% a year — expensive money for a problem you don't have yet. Borrowing 'just in case' during unemployment, when your income to repay it is uncertain, turns a temporary cash crunch into a real debt obligation.",
+            realLifeTip: "The best time to evaluate a loan offer is never 'because it's available' — it's when a specific, unavoidable expense is actually due and no cheaper option exists."
+          },
+          {
+            id: 'efq-c5',
+            text: 'Take the ₹50,000 now — more cash cushion can\'t hurt, and the rate seems manageable',
+            consequence: "You take the loan. Two months later you land a job, but now your first 2-3 salaries are routed straight to paying off ₹50,000 plus accumulated interest — money that extends a layoff's financial damage well past the layoff itself.",
+            xpDelta: 10,
+            healthDelta: -15,
+            walletDelta: 50000,
+            nextStepId: 'end',
+            isOptimal: false,
+            explanation: "'More cash can't hurt' ignores that this cash isn't free — it's a loan you'll repay with interest once you're earning again, which means your layoff ends up costing you money even after you're employed again.",
+            realLifeTip: "A loan taken 'just in case' during a low-income period is one of the most common ways a temporary setback turns into months of ongoing debt repayment."
           }
         ]
       }
@@ -1574,44 +1606,44 @@ export const quests: Quest[] = [
       {
         id: 'fcc-1',
         title: 'The Big Purchase',
-        narrative: "A new laptop is ₹45,000. Your card gives 10x points. You have ₹20,000 in your bank account.",
+        narrative: "A new laptop is ₹45,000 — your current one just died and you need one for your new job starting in 2 weeks. Your card gives 10x points on this purchase. You have ₹20,000 in your bank account.",
         ageGroups: ['senior'],
         choices: [
           {
             id: 'fcc-c1',
-            text: 'Buy ₹20,000 laptop in cash',
-            consequence: 'Basic but functional. 0 debt. Your ₹20,000 is still yours.',
-            xpDelta: 50,
-            healthDelta: 10,
+            text: 'Buy a ₹20,000 laptop in cash — basic spec, but it covers what the job needs',
+            consequence: "You check the job's actual requirements first: browser, spreadsheets, video calls. A ₹20,000 laptop handles all of it. Zero debt, and your money is still yours. It's not the laptop you wanted — it's the laptop the job needs.",
+            xpDelta: 70,
+            healthDelta: 12,
             walletDelta: -20000,
             nextStepId: 'end',
             isOptimal: true,
-            explanation: "Buying what you can afford beats chasing points with money you don't have.",
-            realLifeTip: "Credit card points are worth ~1-2% in reality, not 10% cash value."
+            explanation: "The real question was never 'can I afford ₹45,000 in points-adjusted value' — it was 'what does this job actually require.' Matching the purchase to the actual need, not the nicest available option, is what made this the only choice with zero downside.",
+            realLifeTip: "Before any big purchase, write down the minimum spec that solves your actual problem. Then price-check against that — not against what's most appealing in the store."
           },
           {
             id: 'fcc-c2',
-            text: 'Buy ₹45,000 laptop on card',
-            consequence: 'You owe ₹25,000 more than you have. Points worth: ₹450.',
+            text: 'Buy the ₹45,000 laptop on the card — you need it in 2 weeks anyway, might as well get the better one',
+            consequence: "You owe ₹25,000 more than you have, due in full before your first salary even lands. Interest starts accruing immediately on the unpaid portion if you can't clear it — around ₹875 in month one alone — while the ₹450 in points barely covers a coffee.",
             xpDelta: 20,
             healthDelta: -12,
             walletDelta: -45000,
             nextStepId: 'end',
             isOptimal: false,
-            explanation: "You earned ₹450 in points but will pay ₹875 in interest in month one.",
-            realLifeTip: "Never spend on credit unless you have the cash today."
+            explanation: "'I need it anyway' justifies the laptop, not the price tag. You needed a laptop in 2 weeks — you didn't need THIS laptop. The urgency was real; borrowing ₹25,000 to upgrade spec you don't need yet wasn't.",
+            realLifeTip: "Urgency justifies buying something now. It never justifies buying the most expensive version of something now — those are two separate decisions and it's easy to let one disguise the other."
           },
           {
             id: 'fcc-c3',
-            text: 'Wait 3 months, buy in cash',
-            consequence: 'The best financial choice. No debt, and you might get a better deal later.',
-            xpDelta: 60,
-            healthDelta: 12,
+            text: 'Wait 3 months and buy in cash once you have more saved',
+            consequence: "You show up to your new job on a borrowed laptop from a friend for the first few weeks — workable, but awkward, and you miss the 10x points window entirely. By month 3 you've saved enough, but you've also spent 3 months without a laptop that's reliably yours.",
+            xpDelta: 35,
+            healthDelta: 2,
             walletDelta: 0,
             nextStepId: 'end',
-            isOptimal: true,
-            explanation: "Avoiding high-interest consumer debt is the fastest way to wealth.",
-            realLifeTip: "Sales happen every 3 months. Patience saves more than points."
+            isOptimal: false,
+            explanation: "Patience is usually the right instinct with debt — but this wasn't a discretionary purchase with a flexible timeline. The job starts in 2 weeks regardless of your savings plan, and 'wait it out' doesn't work when the need is real and immediate, not optional.",
+            realLifeTip: "The 'wait and save' strategy only works for wants with a flexible timeline. For a genuine, time-boxed need, the right question isn't whether to wait — it's what's the cheapest option that actually works today."
           }
         ]
       }
@@ -2359,6 +2391,18 @@ export const quests: Quest[] = [
             isOptimal: true,
             explanation: "Starting with less than someone else just means your early numbers are smaller — not your potential. If your savings rate is higher than theirs, you will eventually overtake them regardless of the head start. Consistency competes with timing every time, and consistency wins long-term.",
             realLifeTip: "Your starting point is just that — a starting point. What matters infinitely more is what you do consistently from here. Pick a savings percentage (even 20%), start it today, and don't touch it."
+          },
+          {
+            id: 'rot-c1b',
+            text: '"I\'ll start properly once I have a real amount to begin with — maybe ₹5,000. ₹500 feels too small to bother tracking."',
+            consequence: "This feels more responsible than giving up entirely — you're planning to start, just not yet. Three months pass while you wait to 'have enough to start with.' You still have ₹500, because the plan was always to start once you had the ₹5,000, and that ₹5,000 was never going to arrive from waiting — only from saving the ₹500 you already had.",
+            xpDelta: 25,
+            healthDelta: -5,
+            walletDelta: 0,
+            nextStepId: 'rot-2b',
+            isOptimal: false,
+            explanation: "This looks different from giving up, but it's the same trap wearing a more reasonable-sounding outfit. 'I'll start once I have enough to start with' is circular — the only way to get from ₹500 to ₹5,000 is to start saving the ₹500, not to wait for it to grow on its own.",
+            realLifeTip: "If your plan to start saving depends on already having savings, it's not actually a plan — notice when 'I'll start once X' quietly requires the thing you're trying to build."
           }
         ]
       },
