@@ -2,6 +2,17 @@
 
 Running log of real fixes and changes, kept so you have something concrete to paste into the Play Console readiness questionnaire or release notes. I'll keep adding to this as we go — tell me any time you want the latest entries read out or copied somewhere.
 
+## 2026-10-05
+
+- Second pass at the ~1 second app-open lag that survived the 09-30 login fix. Web-only changes (ship via Vercel, no new AAB):
+  - Dashboard: the daily-rank query was awaited serially AFTER the main parallel data load and BEFORE the loading skeleton cleared — a second full uncached network round trip (Firestore is on memoryLocalCache) blocking the whole screen behind a widget that only feeds a subtitle. Now runs in the background and fills in when ready.
+  - Root layout: the bug-report button and AI chat widget were statically imported, so their code was part of the JS every launch had to fetch/parse/hydrate before the splash could hide. Now lazy-loaded (client-only) after first render.
+  - Splash fade-out shortened 300ms -> 120ms.
+  - Not verified on a device: no before/after numbers yet. The `[perf]` console timings from 10-02 are still in place to measure it.
+- Not changed (native, would need a new AAB): `launchShowDuration: 1800` in capacitor.config.ts. Believed to be only a ceiling (JS hides the splash earlier once hydrated), so lowering it should only matter on slow loads. Don't rebuild for it until the timings show the splash is actually the bottleneck.
+- Fixed build-release-aab.bat naming output `spendxp-vnot.aab`: its findstr used a space inside the pattern, which findstr treats as OR, so a comment line overwrote the version number with the word "not". Now anchored to the real `versionCode N` line and aborts the copy if it can't read one.
+- Untracked release-builds/ from git (an AAB and a 64k-line mapping file had been committed by mistake) and gitignored it.
+
 ## 2026-10-02
 
 - Found and fixed the real reason "Saved Virtually" was stuck at 0 for every tester, even after the 2026-09-30 fix and even on brand-new quest completions — my earlier theory (that it just needed a backfill for old accounts) was wrong; this was a logic bug in the fix itself. The server was computing the stat as `Math.max(0, totalWalletDelta)` — the positive-clamped sum of the WHOLE quest's net cash flow. Almost every quest's net total is negative even on the best possible path (you're still paying rent, an EMI, a laptop — just less badly than the worse options), so that total got clamped to 0 on nearly every quest completion, for everyone, regardless of how well they played. Fixed by having the client track and send the sum of only the POSITIVE individual choice moments as they happen (`useQuestEngine.ts`'s new `totalPositiveWalletDelta`), instead of letting the server derive a flawed version from the already-negative quest total. A quest with one "+500 you saved" choice and one "-2000 you paid rent" choice now correctly contributes +500 instead of 0.

@@ -175,17 +175,31 @@ export default function DashboardPage() {
         // fetched above via getProgression(), no extra request needed.
         setCurrentStreak(progData.currentStreak || 0);
 
-        const rankSnap = await getDocs(query(
-          collection(db, 'dailyChallenges', istDateKey, 'scores'),
-          orderBy('score', 'desc')
-        ));
-        const userRankIndex = rankSnap.docs.findIndex(d => d.id === uid);
-        if (userRankIndex !== -1) {
-          setDailyRank({
-            score: rankSnap.docs[userRankIndex]?.data()?.score ?? 0,
-            rank: userRankIndex + 1
-          });
-        }
+        // PERF FIX (2026-10-05): the daily-rank query used to be awaited
+        // right here, BEFORE setLoading(false) — a second full, uncached
+        // network round trip (Firestore runs on memoryLocalCache) stacked on
+        // top of the Promise.all above, blocking the whole dashboard behind a
+        // widget that only feeds a subtitle line. That serial round trip was
+        // a large part of the ~1s "app opens slow" lag. It now runs in the
+        // background and fills in when it arrives; the dashboard renders as
+        // soon as the parallel batch above returns.
+        void (async () => {
+          try {
+            const rankSnap = await getDocs(query(
+              collection(db, 'dailyChallenges', istDateKey, 'scores'),
+              orderBy('score', 'desc')
+            ));
+            const userRankIndex = rankSnap.docs.findIndex(d => d.id === uid);
+            if (userRankIndex !== -1) {
+              setDailyRank({
+                score: rankSnap.docs[userRankIndex]?.data()?.score ?? 0,
+                rank: userRankIndex + 1
+              });
+            }
+          } catch (rankErr) {
+            console.warn('[SpendXP] Daily rank load failed (non-fatal):', rankErr);
+          }
+        })();
       } catch (err) {
         console.error('[SpendXP] Dashboard Load Error:', err);
       } finally {

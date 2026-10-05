@@ -119,7 +119,9 @@ export async function hideSplash(): Promise<void> {
   if (!isNative()) return;
   try {
     const { SplashScreen } = await import('@capacitor/splash-screen');
-    await SplashScreen.hide({ fadeOutDuration: 300 });
+    // 300 -> 120ms (2026-10-05): the splash sits over live content during the
+    // fade, so a long fade is a direct add-on to perceived open time.
+    await SplashScreen.hide({ fadeOutDuration: 120 });
   } catch { /* ignore */ }
 }
 

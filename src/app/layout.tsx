@@ -13,12 +13,25 @@ import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { useEffect, useState } from 'react';
 import { OfflineBanner } from '@/components/OfflineBanner';
-import { BugReportButton } from '@/components/BugReportButton';
+import dynamic from 'next/dynamic';
 import { useNativeInit } from '@/hooks/useNativeInit';
 import { useAuthContext } from '@/context/AuthContext';
 import { useProgression } from '@/hooks/useProgression';
-import { FinEducatorChat } from '@/components/chat/FinEducatorChat';
 import { ThemeProvider } from '@/context/ThemeContext';
+
+// PERF (2026-10-05): the floating bug-report button and the AI chat widget
+// are not needed for first paint, but were statically imported into the root
+// layout — so their code (and everything they pull in) was part of the JS
+// every launch had to download, parse and hydrate before the splash screen
+// could come down. Loaded lazily after first render instead, client-only.
+const BugReportButton = dynamic(
+  () => import('@/components/BugReportButton').then((m) => m.BugReportButton),
+  { ssr: false }
+);
+const FinEducatorChat = dynamic(
+  () => import('@/components/chat/FinEducatorChat').then((m) => m.FinEducatorChat),
+  { ssr: false }
+);
 
 const inter = Inter({ 
   subsets: ['latin'], 

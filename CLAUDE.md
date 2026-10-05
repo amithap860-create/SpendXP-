@@ -53,6 +53,13 @@ section over any older one below it if they conflict):
 - Daily reminder with user-configurable time (Profile page,
   src/lib/progressionService.ts updateReminderTime)
 
+LAG STATUS (2026-10-05): dashboard serial rank query made
+non-blocking, bug-report/chat widgets lazy-loaded, splash fade
+cut to 120ms. Temporary `[perf]` console.time logs remain in
+useNativeInit.ts and AuthContext.tsx — remove once the lag is
+confirmed gone. Unverified on device. Native `launchShowDuration:
+1800` untouched (needs AAB; likely only a ceiling).
+
 KNOWN BUGS — the original 7 listed below are FIXED. Do not
 re-investigate them; they're kept only as bug-pattern examples.
 Current known issue: a residual ~1 second app-open lag remains
