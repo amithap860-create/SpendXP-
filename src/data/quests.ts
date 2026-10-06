@@ -1358,8 +1358,8 @@ export const quests: Quest[] = [
     ageGroups: ['teen', 'senior'],
     chapterNumber: 12,
     chapter: 'Debt Awareness',
-    estimatedMinutes: 5,
-    xpReward: 200,
+    estimatedMinutes: 8,
+    xpReward: 300,
     startingBalance: 15000,
     steps: [
       {
@@ -1375,7 +1375,7 @@ export const quests: Quest[] = [
             xpDelta: 60,
             healthDelta: 12,
             walletDelta: 0,
-            nextStepId: 'end',
+            nextStepId: 'p-2',
             isOptimal: true,
             explanation: "Sinking funds prevent your future income from being locked in debt.",
             realLifeTip: "'No Cost' EMI often has hidden processing fees and GST on the interest component."
@@ -1387,7 +1387,7 @@ export const quests: Quest[] = [
             xpDelta: 20,
             healthDelta: -10,
             walletDelta: 0,
-            nextStepId: 'end',
+            nextStepId: 'p-2',
             isOptimal: false,
             explanation: "Debt for depreciating assets (phones) is the fastest way to stay poor.",
             realLifeTip: "If you can't buy it twice in cash, you can't afford it."
@@ -1399,10 +1399,154 @@ export const quests: Quest[] = [
             xpDelta: 50,
             healthDelta: 8,
             walletDelta: -30000,
-            nextStepId: 'end',
+            nextStepId: 'p-2',
             isOptimal: false,
             explanation: "Second-hand purchases are high-value for tech, but the ₹30k hit to savings is large.",
             realLifeTip: "Check battery health before buying used iPhones."
+          }
+        ]
+      },
+      {
+        "id": "p-2",
+        "title": "The Trade-In Pressure",
+        "narrative": "However you decided to pay, you're now at the shop (or checkout page). The salesperson says: \"Today only — ₹8,000 off if you trade in your old phone!\" You've also seen a similar old model sell online for about ₹12,000. What do you do?",
+        "ageGroups": ['teen', 'senior'],
+        "choices": [
+          {
+            "text": "Compare: selling it myself nets about ₹12,000 versus ₹8,000 off here — sell it online and don't let 'today only' decide",
+            "consequence": "You list the phone online and sell it for ₹11,500 after a small fee. It takes two days, but you're ₹3,500 better off than the in-store trade-in.",
+            "xpDelta": 55,
+            "healthDelta": 12,
+            "walletDelta": 3500,
+            "isOptimal": true,
+            "explanation": "Trade-in offers often pay less than the open market, and 'today only' is a pressure tactic. Doing a 5-minute comparison turned an apparent bargain into a ₹3,500 gain.",
+            "realLifeTip": "A deal that expires today is designed to stop you comparing. If it's real, it will still be a good deal tomorrow; if not, you've lost nothing.",
+            "id": "p-2-c1",
+            "nextStepId": "p-3"
+          },
+          {
+            "text": "Take the ₹8,000 trade-in discount — it's easy and it's available right now",
+            "consequence": "You save the effort and get ₹8,000 off. It feels good, but you later learn you could have sold the old phone for around ₹4,000 more.",
+            "xpDelta": 15,
+            "healthDelta": -3,
+            "walletDelta": 8000,
+            "isOptimal": false,
+            "explanation": "Convenience has a price. The trade-in wasn't terrible, but it left a few thousand rupees on the table that a short comparison would have captured.",
+            "realLifeTip": "Convenience is worth paying for sometimes — just know what you're paying.",
+            "id": "p-2-c2",
+            "nextStepId": "p-3"
+          },
+          {
+            "text": "Buy a second, newer phone for a 'family discount' since the deal is today only",
+            "consequence": "You leave with two phones and a much bigger bill, bought mostly because a discount made it feel like a bargain. The second phone isn't something you needed.",
+            "xpDelta": 0,
+            "healthDelta": -20,
+            "walletDelta": -30000,
+            "isOptimal": false,
+            "explanation": "A discount on something you don't need is still spending. Spending more to 'save' on a bundle is how bills grow.",
+            "realLifeTip": "You never save money by buying more. A discount only helps on things you were already going to buy.",
+            "id": "p-2-c3",
+            "nextStepId": "p-3"
+          },
+          {
+            "text": "Walk away without buying — it's too much pressure",
+            "consequence": "You leave and start your search from scratch. You avoid an impulse decision, but the same offer returns the following week, and you've wasted a trip.",
+            "xpDelta": 25,
+            "healthDelta": 3,
+            "walletDelta": 0,
+            "isOptimal": false,
+            "explanation": "Walking away from pressure is a good instinct, but here a quick comparison would have made the decision easy rather than starting over.",
+            "realLifeTip": "Don't just run from pressure — use a few minutes to check the numbers and decide calmly.",
+            "id": "p-2-c4",
+            "nextStepId": "p-3"
+          }
+        ]
+      },
+      {
+        "id": "p-3",
+        "title": "The ₹6,000 Protection Plan",
+        "narrative": "At the counter, the salesperson adds: \"Don't forget the 2-year protection plan — only ₹6,000. Screen damage costs ₹12,000 to fix, so this saves you money!\" You haven't been given a chance to read the terms. What do you do?",
+        "ageGroups": ['teen', 'senior'],
+        "choices": [
+          {
+            "text": "Skip the plan. Buy a good case and screen guard, and start a ₹500/month 'phone repair' fund instead",
+            "consequence": "You skip the ₹6,000. A case and guard cost ₹800. Your repair fund grows slowly, and if nothing breaks, you keep all of it. Two years later you've spent far less than the plan would have cost.",
+            "xpDelta": 55,
+            "healthDelta": 12,
+            "walletDelta": 5200,
+            "isOptimal": true,
+            "explanation": "Protection plans are priced so that, on average, the seller makes a profit. Many exclude the most common damage or have heavy deductibles. A small repair fund plus a case covers most risks cheaply.",
+            "realLifeTip": "Insurance makes sense for losses you couldn't afford to cover yourself. Small gadget repairs are usually better 'self-insured'.",
+            "id": "p-3-c1",
+            "nextStepId": "p-4"
+          },
+          {
+            "text": "Buy the plan — it's cheaper than the repair and gives peace of mind",
+            "consequence": "You pay ₹6,000. Two years pass without a claim and you've spent ₹6,000 for protection you never used. When you read the terms later, you notice it excludes water damage.",
+            "xpDelta": 10,
+            "healthDelta": -8,
+            "walletDelta": -6000,
+            "isOptimal": false,
+            "explanation": "The plan only breaks even if you break the phone, and then only if the plan actually covers it. Peace of mind has a price, and here it's a high one.",
+            "realLifeTip": "Read what a plan excludes before deciding what it covers.",
+            "id": "p-3-c2",
+            "nextStepId": "p-4"
+          },
+          {
+            "text": "Buy the plan and pay for it on EMI as well",
+            "consequence": "The plan adds another fixed monthly payment on top of your phone EMI. Your monthly commitments grow for something you may never use.",
+            "xpDelta": 0,
+            "healthDelta": -15,
+            "walletDelta": -6000,
+            "isOptimal": false,
+            "explanation": "Financing an optional add-on turns an unnecessary purchase into a long-term obligation, which is the opposite of what protection is meant to do.",
+            "realLifeTip": "Never finance add-ons. Optional extras should be paid in cash or skipped.",
+            "id": "p-3-c3",
+            "nextStepId": "p-4"
+          }
+        ]
+      },
+      {
+        "id": "p-4",
+        "title": "The Yearly Upgrade Treadmill",
+        "narrative": "A year later, your friend upgrades their phone for the third year in a row using trade-in offers. \"It only costs me ₹2,000 a month!\" they say. Your ₹60,000 phone still works perfectly. What's your plan?",
+        "ageGroups": ['teen', 'senior'],
+        "choices": [
+          {
+            "text": "Keep my phone 3-4 years. ₹60,000 over 4 years is ₹15,000 a year (₹1,250 a month) — far cheaper than upgrading yearly",
+            "consequence": "You keep your phone, replace the battery for ₹2,000 in year 3, and use it for four years. You've spent a fraction of what your friend has, and your savings are higher.",
+            "xpDelta": 55,
+            "healthDelta": 12,
+            "walletDelta": 0,
+            "isOptimal": true,
+            "explanation": "₹60,000 ÷ 48 months = ₹1,250 a month. Your friend's ₹2,000 a month is 60% more, and it repeats every year. Cost per month of ownership falls sharply the longer you keep a device.",
+            "realLifeTip": "Cost per month of ownership is a powerful way to judge purchases. Stretching a device's life is one of the easiest ways to save.",
+            "id": "p-4-c1",
+            "nextStepId": "end"
+          },
+          {
+            "text": "Upgrade every year too — newer is better and the monthly payment is small",
+            "consequence": "You get the latest model each year, but the ₹2,000 a month never ends. After four years you've spent more than ₹96,000 for something that was fine all along.",
+            "xpDelta": 10,
+            "healthDelta": -12,
+            "walletDelta": -24000,
+            "isOptimal": false,
+            "explanation": "A small monthly payment hides a permanent expense. Yearly upgrading means you are always paying for a phone, so the 'small' amount adds up to far more than a single purchase.",
+            "realLifeTip": "A low monthly payment is not a low cost — multiply it by how many months you'll be paying it.",
+            "id": "p-4-c2",
+            "nextStepId": "end"
+          },
+          {
+            "text": "Never replace it, even when it stops working properly",
+            "consequence": "You squeeze another year out of it, but it becomes slow, the battery barely lasts, and you miss important apps and updates. A rushed replacement costs more than a planned one.",
+            "xpDelta": 20,
+            "healthDelta": -3,
+            "walletDelta": 0,
+            "isOptimal": false,
+            "explanation": "Keeping a phone a long time is smart, but running it until it breaks leaves you buying in a hurry. A planned replacement fund avoids panic purchases.",
+            "realLifeTip": "Plan for the replacement: set aside a little each month so the next phone doesn't cost you a rushed, expensive decision.",
+            "id": "p-4-c3",
+            "nextStepId": "end"
           }
         ]
       }
@@ -1599,8 +1743,8 @@ export const quests: Quest[] = [
     ageGroups: ['senior'],
     chapterNumber: 15,
     chapter: 'Credit',
-    estimatedMinutes: 7,
-    xpReward: 300,
+    estimatedMinutes: 8,
+    xpReward: 400,
     startingBalance: 20000,
     steps: [
       {
@@ -1616,7 +1760,7 @@ export const quests: Quest[] = [
             xpDelta: 70,
             healthDelta: 12,
             walletDelta: -20000,
-            nextStepId: 'end',
+            nextStepId: 'fcc-2',
             isOptimal: true,
             explanation: "The real question was never 'can I afford ₹45,000 in points-adjusted value' — it was 'what does this job actually require.' Matching the purchase to the actual need, not the nicest available option, is what made this the only choice with zero downside.",
             realLifeTip: "Before any big purchase, write down the minimum spec that solves your actual problem. Then price-check against that — not against what's most appealing in the store."
@@ -1628,7 +1772,7 @@ export const quests: Quest[] = [
             xpDelta: 20,
             healthDelta: -12,
             walletDelta: -45000,
-            nextStepId: 'end',
+            nextStepId: 'fcc-2',
             isOptimal: false,
             explanation: "'I need it anyway' justifies the laptop, not the price tag. You needed a laptop in 2 weeks — you didn't need THIS laptop. The urgency was real; borrowing ₹25,000 to upgrade spec you don't need yet wasn't.",
             realLifeTip: "Urgency justifies buying something now. It never justifies buying the most expensive version of something now — those are two separate decisions and it's easy to let one disguise the other."
@@ -1640,10 +1784,142 @@ export const quests: Quest[] = [
             xpDelta: 35,
             healthDelta: 2,
             walletDelta: 0,
-            nextStepId: 'end',
+            nextStepId: 'fcc-2',
             isOptimal: false,
             explanation: "Patience is usually the right instinct with debt — but this wasn't a discretionary purchase with a flexible timeline. The job starts in 2 weeks regardless of your savings plan, and 'wait it out' doesn't work when the need is real and immediate, not optional.",
             realLifeTip: "The 'wait and save' strategy only works for wants with a flexible timeline. For a genuine, time-boxed need, the right question isn't whether to wait — it's what's the cheapest option that actually works today."
+          }
+        ]
+      },
+      {
+        "id": "fcc-2",
+        "title": "Your First Statement",
+        "narrative": "A month later, your first credit card statement arrives. Total due: ₹12,000. Minimum due: ₹600. The due date is in 10 days. You have enough in your bank to pay the full ₹12,000, though it would leave you with only a small balance. The card charges about 3.5% a month on any unpaid amount. What do you do?",
+        "ageGroups": ['senior'],
+        "choices": [
+          {
+            "text": "Pay the full ₹12,000 before the due date",
+            "consequence": "You pay in full and owe ₹0 interest. The card has worked as a convenience — you earned reward points, kept your cash a bit longer, and built a clean payment record.",
+            "xpDelta": 60,
+            "healthDelta": 15,
+            "walletDelta": -12000,
+            "isOptimal": true,
+            "explanation": "Paying in full by the due date means no interest — you borrowed for free for a few weeks. This is how a credit card is meant to be used.",
+            "realLifeTip": "Set up autopay for the FULL statement balance, not the minimum. It's the simplest way to never pay credit card interest.",
+            "id": "fcc-2-c1",
+            "nextStepId": "fcc-3"
+          },
+          {
+            "text": "Pay only the ₹600 minimum so I keep more cash",
+            "consequence": "The remaining ₹11,400 is charged about 3.5% for the month — roughly ₹399 in interest — and the interest keeps building next month too. You also lose the interest-free period on new purchases.",
+            "xpDelta": 10,
+            "healthDelta": -12,
+            "walletDelta": -600,
+            "isOptimal": false,
+            "explanation": "The minimum keeps your account 'in good standing', but nearly all of the balance keeps growing at ~42% a year. ₹11,400 × 3.5% ≈ ₹399 in one month alone.",
+            "realLifeTip": "The minimum due is the least the bank will accept, not what you should pay. It exists to keep you in debt.",
+            "id": "fcc-2-c2",
+            "nextStepId": "fcc-3"
+          },
+          {
+            "text": "Pay ₹6,000 now and the rest next month",
+            "consequence": "You paid half, so the remaining ₹6,000 is charged about 3.5% — around ₹210 — and you also lose the interest-free period on new spending. It's better than the minimum, but still an avoidable cost.",
+            "xpDelta": 30,
+            "healthDelta": -3,
+            "walletDelta": -6000,
+            "isOptimal": false,
+            "explanation": "Any unpaid balance after the due date attracts interest. Paying half avoided most of the damage, but you still paid interest for no real reason, since you could afford the full amount.",
+            "realLifeTip": "If you can pay in full, always do. Partial payments are for emergencies, not routine.",
+            "id": "fcc-2-c3",
+            "nextStepId": "fcc-3"
+          }
+        ]
+      },
+      {
+        "id": "fcc-3",
+        "title": "The Limit-Increase Offer",
+        "narrative": "Your bank emails you: \"Congratulations! We've raised your limit from ₹50,000 to ₹1,50,000.\" You're excited, and a friend says, \"Use it on that big trip you've been wanting.\" You currently spend around ₹15,000 a month on the card. What do you do?",
+        "ageGroups": ['senior'],
+        "choices": [
+          {
+            "text": "Accept the higher limit but keep spending about the same, and set spend alerts so I don't drift upward",
+            "consequence": "Your spending stays near ₹15,000 — now 10% of your limit instead of 30%. Lower utilisation helps your credit score, and you have headroom for emergencies without ever having to use it.",
+            "xpDelta": 60,
+            "healthDelta": 15,
+            "walletDelta": 0,
+            "isOptimal": true,
+            "explanation": "₹15,000 on a ₹50,000 limit is 30% utilisation; on ₹1,50,000 it's 10%. Lower utilisation usually helps credit scores. A higher limit is a tool, not a spending target.",
+            "realLifeTip": "A higher limit is only good if your spending doesn't rise with it. Treat the old limit as your real limit.",
+            "id": "fcc-3-c1",
+            "nextStepId": "fcc-4"
+          },
+          {
+            "text": "Use the extra limit for the big trip — it's there, so why not",
+            "consequence": "You book a ₹90,000 trip on the card. When the statement arrives you can't pay in full, and the interest starts running at about 3.5% a month on a balance you never planned.",
+            "xpDelta": 0,
+            "healthDelta": -25,
+            "walletDelta": -90000,
+            "isOptimal": false,
+            "explanation": "A higher limit isn't extra money — it's extra borrowing capacity. Using it for something you can't pay off quickly turns a trip into a long-term debt.",
+            "realLifeTip": "Your limit is the bank's decision about how much you can borrow. Your budget is your decision about how much you should.",
+            "id": "fcc-3-c2",
+            "nextStepId": "fcc-4"
+          },
+          {
+            "text": "Decline the increase and close the card because it's too tempting",
+            "consequence": "Closing the card removes your credit history and available credit, which can lower your score and shorten your average account age. You've avoided temptation but reduced the benefits of building credit.",
+            "xpDelta": 20,
+            "healthDelta": -3,
+            "walletDelta": 0,
+            "isOptimal": false,
+            "explanation": "Wanting to avoid overspending is sensible, but closing your oldest card can hurt your score by raising utilisation and shrinking your credit history. Controls like alerts and autopay solve the temptation without losing the benefits.",
+            "realLifeTip": "If you worry about overspending, add guardrails — alerts, a lower self-set limit, autopay — rather than closing the account.",
+            "id": "fcc-3-c3",
+            "nextStepId": "fcc-4"
+          }
+        ]
+      },
+      {
+        "id": "fcc-4",
+        "title": "The EMI Conversion Pitch",
+        "narrative": "A big ₹30,000 laptop bill lands on your card. You can't pay it all this month, but you can comfortably put aside about ₹5,500 each month. The bank offers to 'convert it to 6 easy EMIs at 15% a year with a 2% processing fee'. If you don't, the unpaid balance rolls on at about 3.5% a month. What do you do?",
+        "ageGroups": ['senior'],
+        "choices": [
+          {
+            "text": "Convert it to the 6-month EMI — it costs about ₹1,926 (₹1,326 interest + ₹600 fee), far less than letting it roll at 3.5% a month",
+            "consequence": "You pay about ₹5,221 a month for 6 months and total extra cost is roughly ₹1,926. Had you let the balance roll on while paying ₹5,500 a month, the interest would have been about ₹3,882 over 7 months.",
+            "xpDelta": 60,
+            "healthDelta": 12,
+            "walletDelta": -5221,
+            "isOptimal": true,
+            "explanation": "When you can't pay in full, comparing the actual total cost shows the conversion costs roughly half of leaving it to revolve. Fixed EMIs also give you a clear end date.",
+            "realLifeTip": "If you can't clear a card bill, ask for the total cost of an EMI conversion and compare it with the card's revolving interest.",
+            "id": "fcc-4-c1",
+            "nextStepId": "end"
+          },
+          {
+            "text": "Pay just the minimum each month and hope to clear it when I can",
+            "consequence": "The balance keeps growing at ~3.5% a month while your minimum barely reduces it. Months later you still owe most of the original amount, plus a lot of interest.",
+            "xpDelta": 5,
+            "healthDelta": -20,
+            "walletDelta": -1500,
+            "isOptimal": false,
+            "explanation": "Paying only the minimum means most of each payment goes to interest. You could be paying for a laptop for years.",
+            "realLifeTip": "The minimum due is a trap. If you can't pay in full, choose a plan with a fixed end date and a known total cost.",
+            "id": "fcc-4-c2",
+            "nextStepId": "end"
+          },
+          {
+            "text": "Ignore the bill until the cash feels easier to find",
+            "consequence": "A missed due date brings a late fee, full interest on the balance, and a note on your credit history. A manageable ₹30,000 bill becomes a bigger one and a lower credit score.",
+            "xpDelta": 0,
+            "healthDelta": -25,
+            "walletDelta": -2500,
+            "isOptimal": false,
+            "explanation": "Missing the due date makes every cost worse: late fees, full interest and a hit to your credit record. Ignoring a bill rarely makes it cheaper.",
+            "realLifeTip": "If you can't pay in full, always pay at least the minimum on time and contact the bank — never skip a due date.",
+            "id": "fcc-4-c3",
+            "nextStepId": "end"
           }
         ]
       }
@@ -2849,8 +3125,8 @@ export const quests: Quest[] = [
     ageGroups: ['junior', 'teen'],
     chapterNumber: 22,
     chapter: 'Needs, Wants & Desires',
-    estimatedMinutes: 3,
-    xpReward: 110,
+    estimatedMinutes: 8,
+    xpReward: 210,
     startingBalance: 1000,
     steps: [
       {
@@ -2866,7 +3142,7 @@ export const quests: Quest[] = [
             xpDelta: 110,
             healthDelta: 20,
             walletDelta: -600,
-            nextStepId: 'end',
+            nextStepId: 'fs-2',
             isOptimal: true,
             explanation: "This is the correct priority order: Needs first, then Wants, then Desires — with Desires funded by saving, not by skipping something more important or borrowing. Nothing here required going without a real need or going into debt for something aspirational.",
             realLifeTip: "When a Desire doesn't fit your budget this month, the answer is almost never 'skip a Need' or 'borrow for it' — it's 'save toward it and buy it next month.' The collectible isn't going anywhere; your shoes and your friendships matter now."
@@ -2878,7 +3154,7 @@ export const quests: Quest[] = [
             xpDelta: 45,
             healthDelta: 0,
             walletDelta: -1000,
-            nextStepId: 'end',
+            nextStepId: 'fs-2',
             isOptimal: false,
             explanation: "The Need was covered, which matters — but a Desire (the collectible) got funded ahead of building any buffer at all, and you spent every rupee you had. Wants don't have to lose every time, and a Desire funded by zeroing out your entire balance leaves you with nothing if anything unexpected comes up.",
             realLifeTip: "Covering your Need is non-negotiable — good instinct. But funding a Desire with 100% of your money, leaving ₹0 spare, is exactly the kind of spending that turns a fun purchase into a stressful week."
@@ -2890,7 +3166,7 @@ export const quests: Quest[] = [
             xpDelta: 10,
             healthDelta: -15,
             walletDelta: -1000,
-            nextStepId: 'end',
+            nextStepId: 'fs-2',
             isOptimal: false,
             explanation: "Borrowing to fund a Desire — even from a friend, even a small amount — is exactly the trap SMART spenders avoid. If the only way to afford something is to borrow for it, it means you can't actually afford it yet.",
             realLifeTip: "'I can afford it if I borrow a little' almost always means 'I can't afford it yet.' Desires are the single most common thing people go into debt for, precisely because they don't feel urgent enough to say no to but also aren't essential enough to already be budgeted."
@@ -2902,10 +3178,142 @@ export const quests: Quest[] = [
             xpDelta: -10,
             healthDelta: -20,
             walletDelta: -800,
-            nextStepId: 'end',
+            nextStepId: 'fs-2',
             isOptimal: false,
             explanation: "This flips the priority order entirely — a Want and a Desire got funded while a real Need went unmet. Needs always come first, no matter how tempting the Want or Desire in front of you is.",
             realLifeTip: "If a Need is sitting unresolved while you're spending on Wants or Desires, that's the clearest sign your priority order needs fixing before your spending does."
+          }
+        ]
+      },
+      {
+        "id": "fs-2",
+        "title": "The 10-Minute Flash Sale",
+        "narrative": "A few days later, the collectible pops up on your phone again: \"FLASH SALE — 40% off, ends in 10 minutes! Only 3 left.\" The price drops from ₹600 to ₹360. Your heart speeds up. You hadn't planned to buy it today. What do you do?",
+        "ageGroups": ['junior', 'teen'],
+        "choices": [
+          {
+            "text": "Close the app, wait 24 hours, and decide with a clear head — if it's still a real want tomorrow, I'll plan for it",
+            "consequence": "The timer expires and you feel a twinge of FOMO. By the next morning it has faded, and you realise you'd have bought it purely because of the countdown. A week later you spot the same item at a similar price anyway.",
+            "xpDelta": 55,
+            "healthDelta": 12,
+            "walletDelta": 0,
+            "isOptimal": true,
+            "explanation": "Countdown timers and 'only 3 left' are designed to make you decide before you can think. A discount on something you weren't planning to buy isn't a saving — it's still spending ₹360 you hadn't planned to spend.",
+            "realLifeTip": "The 24-hour rule beats almost every flash sale. If you still want it tomorrow and it fits your budget, it was a real want. If not, the urge was the sale, not the item.",
+            "id": "fs-2-c1",
+            "nextStepId": "fs-3"
+          },
+          {
+            "text": "Buy it now — 40% off is too good to miss, and I'm technically 'saving' ₹240",
+            "consequence": "You tap buy before the timer ends and feel great for ten minutes. Then you remember you now have ₹360 less for the rest of the month, and the item isn't any more useful than it was yesterday.",
+            "xpDelta": 10,
+            "healthDelta": -12,
+            "walletDelta": -360,
+            "isOptimal": false,
+            "explanation": "You didn't save ₹240 — you spent ₹360 you had no plan to spend. A 'saving' only exists if you were going to buy the item anyway at full price.",
+            "realLifeTip": "Ask 'would I have bought this at full price this month?' If the answer is no, the discount isn't a saving; it's a reason to spend.",
+            "id": "fs-2-c2",
+            "nextStepId": "fs-3"
+          },
+          {
+            "text": "Message your friends to ask if anyone wants to split it and rush to decide before the timer ends",
+            "consequence": "Two friends reply 'maybe' and one says 'whatever'. You spend the 10 minutes anxiously chatting about it and end up buying it without a clear plan for who actually gets it or how the ₹360 is shared.",
+            "xpDelta": 20,
+            "healthDelta": -5,
+            "walletDelta": -360,
+            "isOptimal": false,
+            "explanation": "Splitting a cost can be smart when it's planned, but doing it under a countdown means you commit before agreeing anything. The pressure, not the plan, drove the decision.",
+            "realLifeTip": "Sharing a cost only works if the split is agreed BEFORE you pay. Pressure from a timer is the worst time to negotiate.",
+            "id": "fs-2-c3",
+            "nextStepId": "fs-3"
+          }
+        ]
+      },
+      {
+        "id": "fs-3",
+        "title": "The Birthday Invitation",
+        "narrative": "Your close friend's birthday party is Saturday, and everyone is chipping in for a gift. You've got ₹400 left in your festival money for the rest of the month. Some friends are talking about spending ₹500 each to 'get something really impressive.' How do you handle it?",
+        "ageGroups": ['junior', 'teen'],
+        "choices": [
+          {
+            "text": "Set a gift budget of ₹150 and spend it on something thoughtful, even if others spend more",
+            "consequence": "You make a card and add a small, personal gift. Your friend loves it — they mention it was the one that felt the most 'them'. You still have ₹250 left for the rest of the month.",
+            "xpDelta": 55,
+            "healthDelta": 12,
+            "walletDelta": -150,
+            "isOptimal": true,
+            "explanation": "Gifts are a Want-category spend you can control. Setting a budget before you shop keeps you generous without letting group pressure set your spending for you.",
+            "realLifeTip": "The value of a gift comes from thought, not price. Decide your number first, then find the best gift inside it — not the other way around.",
+            "id": "fs-3-c1",
+            "nextStepId": "fs-4"
+          },
+          {
+            "text": "Match the group at ₹500 so you don't look cheap — you'll sort out the rest of the month later",
+            "consequence": "You can't actually afford ₹500, so you borrow ₹100 from a sibling. The gift looks impressive, but for the next two weeks you're quietly watching every rupee.",
+            "xpDelta": 10,
+            "healthDelta": -15,
+            "walletDelta": -500,
+            "isOptimal": false,
+            "explanation": "Overspending on a Want to match what others do is how small social pressures turn into small debts. You paid for how the gift looked, not for what it was worth to your friend.",
+            "realLifeTip": "If you'd have to borrow to keep up, you can't afford it yet — and most friends would rather you skip the pressure than start the month in debt.",
+            "id": "fs-3-c2",
+            "nextStepId": "fs-4"
+          },
+          {
+            "text": "Skip the party gift entirely and just show up — you can't afford it",
+            "consequence": "You feel awkward arriving empty-handed while everyone else hands over presents. Your friend says it's fine, but the evening is uncomfortable, and you leave feeling you'd have been fine spending ₹100-150.",
+            "xpDelta": 25,
+            "healthDelta": -3,
+            "walletDelta": 0,
+            "isOptimal": false,
+            "explanation": "Avoiding the spend completely felt safe, but you actually had ₹400 available. A small, planned amount would have kept you within budget AND let you take part in something that mattered to you.",
+            "realLifeTip": "A budget isn't a reason to opt out of what matters — it's a way to afford it. Plan a small amount for things you genuinely care about.",
+            "id": "fs-3-c3",
+            "nextStepId": "fs-4"
+          }
+        ]
+      },
+      {
+        "id": "fs-4",
+        "title": "The Surprise ₹300",
+        "narrative": "At the end of the month, a relative sends you ₹300 as a thank-you for helping them move. You hadn't expected it. You still really want the collectible, and you also have a handful of small treats you'd enjoy. What's your plan for the ₹300?",
+        "ageGroups": ['junior', 'teen'],
+        "choices": [
+          {
+            "text": "Put ₹200 into a labelled 'collectible fund' and keep ₹100 for a guilt-free treat now",
+            "consequence": "The ₹200 starts a visible fund toward the collectible, and the ₹100 treat means you enjoy this windfall too. Within two months the fund covers the purchase and you buy it without touching your regular money.",
+            "xpDelta": 60,
+            "healthDelta": 15,
+            "walletDelta": 200,
+            "isOptimal": true,
+            "explanation": "Splitting a windfall between a goal and a treat respects both your future self and your present self. A labelled fund also makes a Desire visible and achievable instead of a vague wish.",
+            "realLifeTip": "Give windfalls a job before they hit your wallet. A named fund (even in your head) is far harder to spend by accident than 'leftover' money.",
+            "id": "fs-4-c1",
+            "nextStepId": "end"
+          },
+          {
+            "text": "Spend the whole ₹300 on snacks and games with friends this weekend",
+            "consequence": "You have a great weekend, but by Monday the money is gone and the collectible is exactly as far away as it was before.",
+            "xpDelta": 15,
+            "healthDelta": -3,
+            "walletDelta": 0,
+            "isOptimal": false,
+            "explanation": "Treating yourself isn't wrong, but a windfall spent entirely on the spot never moves you toward the thing you actually wanted most. A Desire funded by 'someday' tends to stay a wish.",
+            "realLifeTip": "Windfalls are the easiest money to save because you never counted on them. Even 50% toward a goal changes how fast you reach it.",
+            "id": "fs-4-c2",
+            "nextStepId": "end"
+          },
+          {
+            "text": "Lend all ₹300 to a friend who says they'll 'pay you back soon' with no date",
+            "consequence": "A month later your friend still hasn't repaid it. Asking feels awkward, the friendship feels slightly strained, and you realise you've effectively funded someone else's spending with money you could have used.",
+            "xpDelta": 5,
+            "healthDelta": -10,
+            "walletDelta": -300,
+            "isOptimal": false,
+            "explanation": "Lending without a clear amount, date and agreement often means the money isn't coming back on time — and it can cost you the friendship's comfort too.",
+            "realLifeTip": "If you lend, treat it as a gift you can afford to lose. If you couldn't comfortably lose it, don't lend it — or agree a repayment date upfront.",
+            "id": "fs-4-c3",
+            "nextStepId": "end"
           }
         ]
       }
@@ -2921,8 +3329,8 @@ export const quests: Quest[] = [
     ageGroups: ['teen', 'senior'],
     chapterNumber: 23,
     chapter: 'Setting Goals',
-    estimatedMinutes: 3,
-    xpReward: 160,
+    estimatedMinutes: 8,
+    xpReward: 260,
     startingBalance: 0,
     steps: [
       {
@@ -2938,7 +3346,7 @@ export const quests: Quest[] = [
             xpDelta: 160,
             healthDelta: 20,
             walletDelta: 800,
-            nextStepId: 'end',
+            nextStepId: 'sgs-2',
             isOptimal: true,
             explanation: "This goal is Specific (₹4,800 ticket), Measurable (₹800/month), Achievable, Realistic, and Time-bound (6 months, before it sells out). Because you can check your progress every single month, you know by month 3 whether you're on track or need to adjust — instead of finding out in month 6 that you're short.",
             realLifeTip: "The SMART template works for any goal: 'I will save/pay ₹___ every [period] for ___ to [outcome] by [date].' If you can fill in every blank with a real number, you have a plan. If you can't, you have a wish."
@@ -2950,7 +3358,7 @@ export const quests: Quest[] = [
             xpDelta: 30,
             healthDelta: -10,
             walletDelta: 100,
-            nextStepId: 'end',
+            nextStepId: 'sgs-2',
             isOptimal: false,
             explanation: "\"Try to cut back and see how it goes\" has no specific amount and no way to measure progress — you can't know if you're on track because you never defined what 'on track' means. Vague goals fail quietly, and you usually don't notice until it's too late to fix.",
             realLifeTip: "If your goal doesn't have a number and a date attached, you can't actually check your progress against it — which means you won't know you're behind until the deadline has already passed."
@@ -2962,7 +3370,7 @@ export const quests: Quest[] = [
             xpDelta: 10,
             healthDelta: -10,
             walletDelta: 0,
-            nextStepId: 'end',
+            nextStepId: 'sgs-2',
             isOptimal: false,
             explanation: "This isn't a financial goal at all — it's outsourcing the decision to someone else's uncertain timeline. A real goal is something you can act on yourself, starting today, without waiting for anyone else's yes.",
             realLifeTip: "Asking for help is fine — but it isn't a substitute for having your own plan. If the ask doesn't come through, you should still be on track without it."
@@ -2974,10 +3382,142 @@ export const quests: Quest[] = [
             xpDelta: -20,
             healthDelta: -25,
             walletDelta: -4800,
-            nextStepId: 'end',
+            nextStepId: 'sgs-2',
             isOptimal: false,
             explanation: "This is a Desire funded by debt instead of a plan — exactly the trap that turns an exciting purchase into a stressful repayment. Six months was enough time to save the full amount at ₹800/month; borrowing traded that manageable plan for a repayment deadline plus fees.",
             realLifeTip: "If you have months of lead time before you need the money, that's exactly when a SMART savings goal works best — \"pay later\" plans exist for when you have no other option, not when you already had 6 months of runway."
+          }
+        ]
+      },
+      {
+        "id": "sgs-2",
+        "title": "Month 2: The Unplanned Repair",
+        "narrative": "You saved ₹800 in month 1, right on plan. Then in month 2, your phone screen cracks and the repair costs ₹1,500 — you can only put ₹400 toward the concert fund this month. You now have ₹1,200 saved (₹800 + ₹400) and 4 months left to reach ₹4,800. What do you do?",
+        "ageGroups": ['teen', 'senior'],
+        "choices": [
+          {
+            "text": "Recalculate: I still need ₹3,600 over 4 months, so I'll save ₹900 a month from here — and look for ₹100 of extra spending to trim",
+            "consequence": "You update your goal: ₹900/month for months 3-6. It's a small step up from ₹800, and you find the extra ₹100 by cutting one takeaway a month. You're back on track with a clear new number.",
+            "xpDelta": 60,
+            "healthDelta": 15,
+            "walletDelta": 400,
+            "isOptimal": true,
+            "explanation": "A SMART goal isn't set once and forgotten — it's reviewed and adjusted. (₹4,800 − ₹1,200) ÷ 4 months = ₹900. Because the goal was Measurable, you can see exactly how much to adjust.",
+            "realLifeTip": "When life interrupts your plan, don't abandon it — re-run the maths: (remaining target) ÷ (remaining months). A goal you can recalculate is a goal you can recover.",
+            "id": "sgs-2-c1",
+            "nextStepId": "sgs-3"
+          },
+          {
+            "text": "Keep saving ₹800 a month as originally planned and hope it works out",
+            "consequence": "You never recalculate. After month 6 you've saved ₹1,200 + (4 × ₹800) = ₹4,400 — ₹400 short of the ticket, and the ticket price has already gone up.",
+            "xpDelta": 15,
+            "healthDelta": -8,
+            "walletDelta": 400,
+            "isOptimal": false,
+            "explanation": "Ignoring the shortfall meant the plan quietly stopped working. ₹1,200 + ₹3,200 = ₹4,400, which is ₹400 short — you only find that out at the end if you never re-check.",
+            "realLifeTip": "Check your progress against the plan at least once a month. A goal that's off by ₹400 is easy to fix in month 2 and painful to fix in month 6.",
+            "id": "sgs-2-c2",
+            "nextStepId": "sgs-3"
+          },
+          {
+            "text": "Give up on the concert — the repair ruined the plan, so there's no point continuing",
+            "consequence": "You stop saving, spend the rest on small things, and in month 6 the concert comes and goes without you. The ₹1,200 you'd already saved quietly disappears.",
+            "xpDelta": 5,
+            "healthDelta": -15,
+            "walletDelta": 0,
+            "isOptimal": false,
+            "explanation": "One setback doesn't break a goal — it just changes the numbers. Dropping the plan entirely turned a ₹100-a-month adjustment into a lost goal.",
+            "realLifeTip": "A setback is a reason to re-plan, not to quit. The goals that get reached are the ones that got adjusted, not the ones that never had trouble.",
+            "id": "sgs-2-c3",
+            "nextStepId": "sgs-3"
+          }
+        ]
+      },
+      {
+        "id": "sgs-3",
+        "title": "The Price-Rise Warning",
+        "narrative": "It's month 5. The organisers announce that ticket prices will jump from ₹4,800 to ₹5,400 in three weeks. You've saved ₹3,300 so far. You need ₹4,800 to buy at today's price, so you're ₹1,500 short and have three weeks. What do you do?",
+        "ageGroups": ['teen', 'senior'],
+        "choices": [
+          {
+            "text": "Find ₹1,500 of extra money within 3 weeks — sell things you don't use or take a few extra tutoring hours — and buy at ₹4,800",
+            "consequence": "You sell an old game console for ₹900 and earn ₹600 from extra tutoring. You hit ₹4,800 two days before the deadline and buy at the lower price, saving ₹600 compared with waiting.",
+            "xpDelta": 60,
+            "healthDelta": 15,
+            "walletDelta": 1500,
+            "isOptimal": true,
+            "explanation": "₹4,800 − ₹3,300 = ₹1,500 short. Because your goal was Specific and Time-bound, you knew the exact gap and the deadline, and could take targeted action instead of panicking.",
+            "realLifeTip": "When a deadline moves, a clear number is your best tool. 'I need ₹1,500 in 3 weeks' is a solvable problem; 'I'm worried about the price' isn't.",
+            "id": "sgs-3-c1",
+            "nextStepId": "sgs-4"
+          },
+          {
+            "text": "Let the price rise and buy later at ₹5,400 once you've saved up",
+            "consequence": "You wait, keep saving, and eventually buy at ₹5,400. It works, but you've paid ₹600 more for exactly the same ticket purely because you didn't act inside the window.",
+            "xpDelta": 20,
+            "healthDelta": -5,
+            "walletDelta": 0,
+            "isOptimal": false,
+            "explanation": "Waiting wasn't a disaster, but ₹600 extra is a real cost — a 12.5% premium on something you could have avoided with a short push.",
+            "realLifeTip": "Deadlines with a known price change are worth a short, focused effort. A one-off push of three weeks can beat months of paying more.",
+            "id": "sgs-3-c2",
+            "nextStepId": "sgs-4"
+          },
+          {
+            "text": "Use an instant-loan app to borrow the missing ₹1,500 and pay it back next month",
+            "consequence": "The app approves you in minutes, but it adds a fee and interest. You repay about ₹1,750 next month — more than you saved on the ticket price, and a worse habit than the one you set out to build.",
+            "xpDelta": 5,
+            "healthDelta": -15,
+            "walletDelta": -250,
+            "isOptimal": false,
+            "explanation": "Short-term loan apps charge heavily for convenience. Borrowing ₹1,500 and repaying about ₹1,750 turns a ₹600 saving into a net cost.",
+            "realLifeTip": "Borrowing to beat a price rise only works if the loan costs less than the rise. With instant-loan apps, it almost never does.",
+            "id": "sgs-3-c3",
+            "nextStepId": "sgs-4"
+          }
+        ]
+      },
+      {
+        "id": "sgs-4",
+        "title": "The Next Goal",
+        "narrative": "You got the ticket! The saving habit felt good, and you want to keep it going. Your next want is a laptop for college. You can realistically save about ₹800 a month, and you'd like the laptop in a year. How do you set your next goal?",
+        "ageGroups": ['teen', 'senior'],
+        "choices": [
+          {
+            "text": "\"I'll save ₹800 every month for 12 months — ₹9,600 — as a deposit toward a laptop, by this time next year.\"",
+            "consequence": "You write it down, automate the ₹800, and check progress each month. A year later you have ₹9,600 set aside, ready for a laptop deposit and a sensible EMI if you need one.",
+            "xpDelta": 60,
+            "healthDelta": 15,
+            "walletDelta": 800,
+            "isOptimal": true,
+            "explanation": "This is a SMART goal: Specific (laptop deposit), Measurable (₹800/month, ₹9,600), Achievable and Realistic (matches what you actually save), Time-bound (12 months). ₹800 × 12 = ₹9,600.",
+            "realLifeTip": "A realistic goal built on your proven savings rate is far more likely to be reached than a big one built on hope.",
+            "id": "sgs-4-c1",
+            "nextStepId": "end"
+          },
+          {
+            "text": "\"I'll try to save as much as I can for a laptop sometime soon.\"",
+            "consequence": "Without a number or date, saving slips. Some months you save, some you don't. A year later you honestly can't say how much you've saved or whether you're close.",
+            "xpDelta": 15,
+            "healthDelta": -8,
+            "walletDelta": 0,
+            "isOptimal": false,
+            "explanation": "'As much as I can' and 'sometime soon' fail the Specific, Measurable and Time-bound tests. Vague goals quietly lose to everyday spending.",
+            "realLifeTip": "If you can't say how much and by when, you can't tell whether you're on track.",
+            "id": "sgs-4-c2",
+            "nextStepId": "end"
+          },
+          {
+            "text": "\"I'll save ₹50,000 in the next 3 months so I can buy the best laptop immediately.\"",
+            "consequence": "That's ₹16,667 a month — far above what you can save. By month 2 you're far behind, feel discouraged, and quietly drop the goal.",
+            "xpDelta": 5,
+            "healthDelta": -10,
+            "walletDelta": 0,
+            "isOptimal": false,
+            "explanation": "₹50,000 ÷ 3 months ≈ ₹16,667 a month, more than twenty times your real savings rate. The goal failed the Achievable and Realistic tests before it began.",
+            "realLifeTip": "Ambitious is good; impossible is demotivating. Set targets that stretch your savings rate, not ones that ignore it.",
+            "id": "sgs-4-c3",
+            "nextStepId": "end"
           }
         ]
       }
@@ -2993,8 +3533,8 @@ export const quests: Quest[] = [
     ageGroups: ['teen', 'senior'],
     chapterNumber: 24,
     chapter: 'Time & Compounding',
-    estimatedMinutes: 3,
-    xpReward: 220,
+    estimatedMinutes: 8,
+    xpReward: 320,
     startingBalance: 50000,
     steps: [
       {
@@ -3010,7 +3550,7 @@ export const quests: Quest[] = [
             xpDelta: 220,
             healthDelta: 20,
             walletDelta: 0,
-            nextStepId: 'end',
+            nextStepId: 'tes-2',
             isOptimal: true,
             explanation: "You can't change when you got the money, but you can control when you start letting it compound. Investing all of it today, at a steady rate, gives it the maximum number of years to double — the single biggest lever you have left.",
             realLifeTip: "You'll never recover money-that-wasn't-invested-yet. The only lever you control is today — every year you delay is a year permanently removed from your compounding timeline."
@@ -3022,7 +3562,7 @@ export const quests: Quest[] = [
             xpDelta: 60,
             healthDelta: -5,
             walletDelta: -30000,
-            nextStepId: 'end',
+            nextStepId: 'tes-2',
             isOptimal: false,
             explanation: "Investing something is better than investing nothing — but compounding works on whatever principal you actually put in. Shrinking the principal by 60% doesn't just cost you ₹30,000 today, it costs you 60% of everything that ₹30,000 would have become over the next 8+ years.",
             realLifeTip: "A rupee spent today isn't just a rupee — it's that rupee plus everything it would have doubled into. Before a big Desire purchase, ask what that same money would be worth in 8 years if left alone."
@@ -3034,7 +3574,7 @@ export const quests: Quest[] = [
             xpDelta: -10,
             healthDelta: -15,
             walletDelta: 0,
-            nextStepId: 'end',
+            nextStepId: 'tes-2',
             isOptimal: false,
             explanation: "There's no such thing as a perfect moment to start — only a cost to waiting. A 'good enough' steady investment started today beats a 'perfect' one started a year from now, because compounding rewards time far more than it rewards precision.",
             realLifeTip: "Research matters, but it has a deadline. If a year of 'more research' has cost you a full year of compounding on money you already have, the research itself became the expensive choice."
@@ -3046,10 +3586,142 @@ export const quests: Quest[] = [
             xpDelta: 20,
             healthDelta: 0,
             walletDelta: 0,
-            nextStepId: 'end',
+            nextStepId: 'tes-2',
             isOptimal: false,
             explanation: "Safety isn't free — the rate you accept directly sets how long doubling takes. 72 ÷ 3.5 ≈ 20 years versus 72 ÷ 9 ≈ 8 years: the same ₹50,000, the same 8-year wait, but a very different outcome purely because of the rate chosen.",
             realLifeTip: "A savings account isn't wrong — it's the right place for money you need soon (like an emergency fund). But money you won't need for 8+ years pays a real, calculable cost for staying that safe."
+          }
+        ]
+      },
+      {
+        "id": "tes-2",
+        "title": "The 15% Dip",
+        "narrative": "Six months after you invested, markets drop and your ₹50,000 now shows as ₹42,500 — down 15%. News headlines are loud. Your eight-year plan hasn't changed, but your stomach is telling you something different. What do you do?",
+        "ageGroups": ['teen', 'senior'],
+        "choices": [
+          {
+            "text": "Hold. Nothing about my 8-year plan has changed, and a paper loss isn't a real loss until I sell",
+            "consequence": "You leave it alone. Over the following year, markets recover and your investment climbs back above ₹50,000. You didn't have to do anything except resist the urge to act.",
+            "xpDelta": 55,
+            "healthDelta": 15,
+            "walletDelta": 0,
+            "isOptimal": true,
+            "explanation": "A temporary drop only becomes a permanent loss if you sell. With an 8-year horizon, short-term swings are noise unless your reason for investing has actually changed.",
+            "realLifeTip": "Before selling in a drop, ask: 'Has my goal or timeline changed?' If not, the drop is just volatility, not new information.",
+            "id": "tes-2-c1",
+            "nextStepId": "tes-3"
+          },
+          {
+            "text": "Sell everything now to stop the losses and put the money back in savings",
+            "consequence": "You lock in a ₹7,500 loss. The market recovers a few months later, but you're not in it — and getting back in feels scarier than before.",
+            "xpDelta": 5,
+            "healthDelta": -15,
+            "walletDelta": -7500,
+            "isOptimal": false,
+            "explanation": "Selling after a fall turns a temporary paper loss into a permanent one, and you miss the recovery. Many investors lose far more from panic-selling than from the drop itself.",
+            "realLifeTip": "The market's worst days often come right before its best. Missing a few recovery days can cost far more than the dip itself.",
+            "id": "tes-2-c2",
+            "nextStepId": "tes-3"
+          },
+          {
+            "text": "Check the value every day and keep switching to whatever fund looks best this week",
+            "consequence": "Constant switching racks up fees and taxes, and you're always a step behind — selling after funds drop and buying after they've already risen. After a year, you're behind where simply holding would have left you.",
+            "xpDelta": 20,
+            "healthDelta": -8,
+            "walletDelta": -1500,
+            "isOptimal": false,
+            "explanation": "Chasing last week's winners means buying high and selling low, and each switch can trigger costs and tax. A steady plan usually beats constant tinkering.",
+            "realLifeTip": "Checking prices daily mostly increases anxiety, not returns. Set a schedule — quarterly is plenty — and stick to it.",
+            "id": "tes-2-c3",
+            "nextStepId": "tes-3"
+          }
+        ]
+      },
+      {
+        "id": "tes-3",
+        "title": "Adding ₹2,000 a Month",
+        "narrative": "You've started tutoring on weekends and now have ₹2,000 a month spare. Your ₹50,000 is already growing at about 9% a year. You can add to your investment each month, keep the extra in a savings account at ~3.5%, or spend it. Time horizon: 8 years.",
+        "ageGroups": ['teen', 'senior'],
+        "choices": [
+          {
+            "text": "Invest ₹2,000 a month alongside the original ₹50,000 — a regular monthly SIP",
+            "consequence": "At about 9% a year, ₹2,000 a month over 8 years grows to roughly ₹2.8 lakh from ₹1.92 lakh invested. Combined with your original ₹50,000 doubling to about ₹1 lakh, you finish with nearly ₹3.8 lakh — from small, consistent steps.",
+            "xpDelta": 60,
+            "healthDelta": 15,
+            "walletDelta": -2000,
+            "isOptimal": true,
+            "explanation": "₹2,000 × 96 months = ₹1,92,000 invested. At ~9% annual returns, that grows to roughly ₹2.8 lakh. Regular contributions add fresh principal that compounds too, not just the starting lump sum.",
+            "realLifeTip": "Starting early matters, but so does adding steadily. A modest monthly habit often builds more than one big lump sum you never top up.",
+            "id": "tes-3-c1",
+            "nextStepId": "tes-4"
+          },
+          {
+            "text": "Keep the extra ₹2,000 a month in a savings account at ~3.5%",
+            "consequence": "It's completely safe, but after 8 years it grows to only about ₹2.2 lakh, roughly ₹60,000 less than investing the same money — the price of never taking any market risk.",
+            "xpDelta": 25,
+            "healthDelta": 3,
+            "walletDelta": -2000,
+            "isOptimal": false,
+            "explanation": "Safe money has its place — emergency funds, short-term goals — but for an 8-year horizon, a rate far below your investment return means a real gap in what you end up with.",
+            "realLifeTip": "Match the account to the timeline: savings accounts for money you need soon, investments for money you won't touch for years.",
+            "id": "tes-3-c2",
+            "nextStepId": "tes-4"
+          },
+          {
+            "text": "Spend the ₹2,000 each month — it's tutoring money, you earned it",
+            "consequence": "You enjoy the money month to month, but in 8 years you have ₹0 extra to show for ₹1.92 lakh of tutoring income, and your friend who invested theirs is far ahead.",
+            "xpDelta": 5,
+            "healthDelta": -8,
+            "walletDelta": 0,
+            "isOptimal": false,
+            "explanation": "Spending it all is your right, but income that's never directed anywhere disappears. Even ₹500 a month invested would have grown into something meaningful.",
+            "realLifeTip": "Pay yourself first: decide how much goes to the future BEFORE you decide what's left to spend.",
+            "id": "tes-3-c3",
+            "nextStepId": "tes-4"
+          }
+        ]
+      },
+      {
+        "id": "tes-4",
+        "title": "The Hot Tip",
+        "narrative": "Your friend is excited: \"Move your whole ₹50,000 into this new coin — it's going to triple in a year, I swear.\" Your steady 9% plan suddenly feels boring. What do you do?",
+        "ageGroups": ['teen', 'senior'],
+        "choices": [
+          {
+            "text": "Stick with my plan. If I'm curious, I'll try with a tiny amount — say 5% — that I can afford to lose entirely",
+            "consequence": "You keep your core plan intact and put ₹2,500 into the coin as an experiment. The coin falls 70% — you lose ₹1,750, but your real plan is untouched and you've learned something cheaply.",
+            "xpDelta": 55,
+            "healthDelta": 15,
+            "walletDelta": -1750,
+            "isOptimal": true,
+            "explanation": "A small, capped experiment satisfies curiosity without risking your plan. 'Triple in a year' claims come with the possibility of losing almost everything, which is why position size matters most.",
+            "realLifeTip": "If you must gamble, cap it at an amount that would not change your life if it vanished — and never use money your goals depend on.",
+            "id": "tes-4-c1",
+            "nextStepId": "end"
+          },
+          {
+            "text": "Move the whole ₹50,000 in — tripling it would be amazing",
+            "consequence": "The coin crashes and you're left with about ₹15,000. Your 8-year plan, the compounding, and the buffer you'd built are mostly gone.",
+            "xpDelta": 0,
+            "healthDelta": -25,
+            "walletDelta": -35000,
+            "isOptimal": false,
+            "explanation": "Putting everything into one high-risk bet breaks the first rule of investing: don't risk money you can't afford to lose. The upside sounded huge, but the downside wasn't just a dip — it could be nearly total.",
+            "realLifeTip": "Promises of 'triple in a year' are a warning sign, not a feature. Anyone who guarantees extreme returns is either lucky, lying, or both.",
+            "id": "tes-4-c2",
+            "nextStepId": "end"
+          },
+          {
+            "text": "Take a loan to put in even more, so the tripling is bigger",
+            "consequence": "The coin falls, and now you owe the loan plus interest on money that has already vanished. A bad bet turned into a debt that outlasts the investment.",
+            "xpDelta": 0,
+            "healthDelta": -30,
+            "walletDelta": -20000,
+            "isOptimal": false,
+            "explanation": "Borrowing to invest magnifies losses as much as gains, and the loan has to be repaid whether the bet works or not.",
+            "realLifeTip": "Never borrow to speculate. A loss on your own money hurts; a loss on borrowed money follows you.",
+            "id": "tes-4-c3",
+            "nextStepId": "end"
           }
         ]
       }
@@ -3074,8 +3746,8 @@ export const quests: Quest[] = [
     ageGroups: ['teen', 'senior'],
     chapterNumber: 25,
     chapter: 'Net Worth',
-    estimatedMinutes: 3,
-    xpReward: 150,
+    estimatedMinutes: 8,
+    xpReward: 250,
     startingBalance: 60000,
     steps: [
       {
@@ -3091,7 +3763,7 @@ export const quests: Quest[] = [
             xpDelta: 150,
             healthDelta: 20,
             walletDelta: 0,
-            nextStepId: 'end',
+            nextStepId: 'nwc-2',
             isOptimal: true,
             explanation: "Net worth (assets minus liabilities) is the number that actually measures financial position — not salary, not what someone just bought, not how confident they sound. Kabir's higher income and newer bike say nothing about whether he's ahead; the math does.",
             realLifeTip: "Whenever someone's spending makes you feel behind, the actual question isn't 'who earns more' or 'who bought what' — it's 'who has more assets minus liabilities.' Those are very often different answers."
@@ -3103,7 +3775,7 @@ export const quests: Quest[] = [
             xpDelta: 20,
             healthDelta: -10,
             walletDelta: 0,
-            nextStepId: 'end',
+            nextStepId: 'nwc-2',
             isOptimal: false,
             explanation: "Higher income and newer purchases feel like winning, but they say nothing about actual financial position without knowing the debt behind them. Assuming someone is 'ahead' based on visible spending is exactly how net worth gets confused with income.",
             realLifeTip: "What someone owns is visible. What they owe almost never is. Never judge financial position — yours or anyone else's — off visible spending alone."
@@ -3115,7 +3787,7 @@ export const quests: Quest[] = [
             xpDelta: -20,
             healthDelta: -25,
             walletDelta: -50000,
-            nextStepId: 'end',
+            nextStepId: 'nwc-2',
             isOptimal: false,
             explanation: "Reacting to someone else's visible spending by taking on debt yourself is lifestyle inflation triggered by a false signal — you were already financially ahead, and this choice made that no longer true.",
             realLifeTip: "'Keeping up' with someone's visible spending, when you don't know their actual liabilities, can turn a real financial lead into a real financial loss — purely for the appearance of parity."
@@ -3127,10 +3799,142 @@ export const quests: Quest[] = [
             xpDelta: 40,
             healthDelta: 0,
             walletDelta: 0,
-            nextStepId: 'end',
+            nextStepId: 'nwc-2',
             isOptimal: false,
             explanation: "The instinct not to panic was right, but skipping the actual calculation means you never build the habit that matters — checking your real net worth periodically, whether or not someone's comment prompts it.",
             realLifeTip: "Being right by instinct once is fine. Being able to check the actual number, every time, is the habit worth building — it works even when your instinct might be wrong."
+          }
+        ]
+      },
+      {
+        "id": "nwc-2",
+        "title": "Building Your Balance Sheet",
+        "narrative": "You decide to work out your actual net worth. You have ₹60,000 in savings. You own a phone you paid ₹40,000 for — similar models resell for about ₹18,000 now — and a bicycle that would sell for around ₹6,000. You also owe a friend ₹5,000. How do you calculate it?",
+        "ageGroups": ['teen', 'senior'],
+        "choices": [
+          {
+            "text": "Value things at what you could sell them for today, and subtract everything I owe: ₹60,000 + ₹18,000 + ₹6,000 − ₹5,000 = ₹79,000",
+            "consequence": "You land on ₹79,000 — a realistic number you could actually rely on. It's lower than what you paid for things, but it's honest, and now you have a baseline to track.",
+            "xpDelta": 55,
+            "healthDelta": 15,
+            "walletDelta": 0,
+            "isOptimal": true,
+            "explanation": "Net worth is assets at what they're worth NOW, minus liabilities. Using resale value avoids fooling yourself, and counting even small debts keeps the number honest.",
+            "realLifeTip": "Value your assets at what you'd actually get for them, not what you paid. Things you buy new usually lose value the day you buy them.",
+            "id": "nwc-2-c1",
+            "nextStepId": "nwc-3"
+          },
+          {
+            "text": "Use what I originally paid for the phone (₹40,000) since that's what it's 'worth' to me",
+            "consequence": "Your calculation shows ₹101,000, which feels great — but it overstates your position by ₹22,000. If you needed cash fast, you'd never actually get that much.",
+            "xpDelta": 15,
+            "healthDelta": -5,
+            "walletDelta": 0,
+            "isOptimal": false,
+            "explanation": "Using purchase price overstates your net worth. A ₹40,000 phone that sells for ₹18,000 is a ₹18,000 asset, not ₹40,000.",
+            "realLifeTip": "A number that feels good but can't be turned into cash isn't net worth — it's wishful thinking.",
+            "id": "nwc-2-c2",
+            "nextStepId": "nwc-3"
+          },
+          {
+            "text": "Leave out the ₹5,000 I owe my friend — it's small and informal",
+            "consequence": "Your calculation says ₹84,000, which is ₹5,000 too high. Small, informal debts are still real, and leaving them out makes your position look better than it is.",
+            "xpDelta": 20,
+            "healthDelta": -3,
+            "walletDelta": 0,
+            "isOptimal": false,
+            "explanation": "Net worth is assets MINUS ALL liabilities, however small or informal. Hiding a debt doesn't remove it; it only hides it from your own calculation.",
+            "realLifeTip": "Count every debt, even small or informal ones. The point is an honest number, not a flattering one.",
+            "id": "nwc-2-c3",
+            "nextStepId": "nwc-3"
+          }
+        ]
+      },
+      {
+        "id": "nwc-3",
+        "title": "The ₹20,000 Windfall",
+        "narrative": "Your grandparents gift you ₹20,000. Your net worth just went up by ₹20,000. You can put it in a diversified index fund for the long term, spend it on a new gaming console that would resell for around ₹8,000 next month, or lend it to a friend with no repayment plan.",
+        "ageGroups": ['teen', 'senior'],
+        "choices": [
+          {
+            "text": "Invest it in a diversified index fund for the long term",
+            "consequence": "Your net worth stays at the higher figure and has the chance to grow. Over time the money compounds, quietly lifting your net worth year after year.",
+            "xpDelta": 60,
+            "healthDelta": 15,
+            "walletDelta": 20000,
+            "isOptimal": true,
+            "explanation": "Investing keeps the ₹20,000 as an asset that can grow. Net worth rises with assets that hold or gain value, not with things that lose value as soon as you buy them.",
+            "realLifeTip": "To grow net worth, favour assets that keep or increase their value over things that depreciate the moment you buy them.",
+            "id": "nwc-3-c1",
+            "nextStepId": "nwc-4"
+          },
+          {
+            "text": "Buy the ₹20,000 console — a big treat for myself",
+            "consequence": "You enjoy it, but next month it's worth only ₹8,000. Your net worth immediately fell by ₹12,000 compared with simply keeping the cash.",
+            "xpDelta": 10,
+            "healthDelta": -10,
+            "walletDelta": -12000,
+            "isOptimal": false,
+            "explanation": "Buying something that loses most of its value instantly converts net worth into depreciating stuff. It isn't wrong to enjoy a purchase, but it's worth knowing its true cost to your net worth.",
+            "realLifeTip": "Before a large purchase, ask: 'What will this be worth in a year?' The gap is the real cost of owning it.",
+            "id": "nwc-3-c2",
+            "nextStepId": "nwc-4"
+          },
+          {
+            "text": "Lend ₹20,000 to a friend with no repayment date",
+            "consequence": "Your friend promises to pay you back 'when they can'. Months pass with no repayment, and your ₹20,000 asset has effectively become an uncertain claim you can't count on.",
+            "xpDelta": 5,
+            "healthDelta": -15,
+            "walletDelta": -20000,
+            "isOptimal": false,
+            "explanation": "A loan with no terms is a gift you may never see again. Net worth counts money you can reliably collect — not money someone has vaguely promised.",
+            "realLifeTip": "Lend only what you can afford to lose, and agree amount and date before handing it over.",
+            "id": "nwc-3-c3",
+            "nextStepId": "nwc-4"
+          }
+        ]
+      },
+      {
+        "id": "nwc-4",
+        "title": "A Year Later",
+        "narrative": "A year on, you run the numbers again. Your net worth has grown steadily. Kabir's looks different: he's been paying off his bike loan and his net worth is improving, but he's still behind you. He suggests you compare numbers every month 'to see who's winning.' What's your move?",
+        "ageGroups": ['teen', 'senior'],
+        "choices": [
+          {
+            "text": "Track my own net worth every quarter and focus on the direction — up is good — rather than racing anyone",
+            "consequence": "You note your number each quarter. Some quarters it dips, some it climbs, but the trend over a year is clearly upward, and you never feel pressure from someone else's numbers.",
+            "xpDelta": 55,
+            "healthDelta": 15,
+            "walletDelta": 0,
+            "isOptimal": true,
+            "explanation": "Net worth is personal. Tracking yours at a steady interval shows the trend, which matters far more than any single month or anyone else's number.",
+            "realLifeTip": "Compare yourself to your past self, not to others. Your starting point, income and goals are different from anyone else's.",
+            "id": "nwc-4-c1",
+            "nextStepId": "end"
+          },
+          {
+            "text": "Compare with Kabir every month and adjust my spending to stay ahead of him",
+            "consequence": "You start measuring yourself against someone else's progress. When his numbers jump after a bonus, you feel behind, and you start cutting things you value just to win a race nobody asked you to run.",
+            "xpDelta": 15,
+            "healthDelta": -8,
+            "walletDelta": 0,
+            "isOptimal": false,
+            "explanation": "Comparing creates pressure that has nothing to do with your goals. Differences in income, family situation and timing make most comparisons meaningless.",
+            "realLifeTip": "Someone else's numbers say nothing about your plan. Use your own goals as the measuring stick.",
+            "id": "nwc-4-c2",
+            "nextStepId": "end"
+          },
+          {
+            "text": "Stop checking — I know it only goes up, so there's no need",
+            "consequence": "A few months later a large expense knocks your net worth down, and you don't notice until it's become a bigger problem. Without regular checks, you're flying blind.",
+            "xpDelta": 15,
+            "healthDelta": -5,
+            "walletDelta": 0,
+            "isOptimal": false,
+            "explanation": "Net worth doesn't only go up — expenses, market falls and new debts can lower it. Regular checks catch problems while they're small.",
+            "realLifeTip": "A quarterly net-worth check takes 10 minutes and can save you months of drifting.",
+            "id": "nwc-4-c3",
+            "nextStepId": "end"
           }
         ]
       }
@@ -3146,8 +3950,8 @@ export const quests: Quest[] = [
     ageGroups: ['teen', 'senior'],
     chapterNumber: 26,
     chapter: 'Capital Gains Tax',
-    estimatedMinutes: 3,
-    xpReward: 180,
+    estimatedMinutes: 8,
+    xpReward: 280,
     startingBalance: 200000,
     steps: [
       {
@@ -3163,7 +3967,7 @@ export const quests: Quest[] = [
             xpDelta: 180,
             healthDelta: 20,
             walletDelta: 190625,
-            nextStepId: 'end',
+            nextStepId: 'snw-2',
             isOptimal: true,
             explanation: "With no urgent need for the cash and genuine confidence in the position, the tax math alone favors waiting: a guaranteed ₹30,625 difference for a 2-month wait is a real, calculable return that has nothing to do with predicting the stock's price.",
             realLifeTip: "When you have no real reason to sell now, check the calendar before you check the ticker. A 2-month wait for a lower, well-defined tax rate is often the single highest 'return' decision available — with none of the market's uncertainty."
@@ -3175,7 +3979,7 @@ export const quests: Quest[] = [
             xpDelta: 60,
             healthDelta: 0,
             walletDelta: 160000,
-            nextStepId: 'end',
+            nextStepId: 'snw-2',
             isOptimal: false,
             explanation: "Locking in a gain is a reasonable instinct when there's real uncertainty or an actual need for the cash — but here, neither was true. Selling early with no real reason to converted a knowable, guaranteed tax saving into an unnecessary cost.",
             realLifeTip: "'Locking in gains' is a real strategy when you have a reason to. Without one, it's just giving up a scheduled tax discount for no benefit."
@@ -3187,7 +3991,7 @@ export const quests: Quest[] = [
             xpDelta: 40,
             healthDelta: -10,
             walletDelta: 160000,
-            nextStepId: 'end',
+            nextStepId: 'snw-2',
             isOptimal: false,
             explanation: "Fear of a price drop is a legitimate reason to sell when you actually believe the risk is real — but reacting to a vague 'what if' rather than an actual concern about the company meant giving up a guaranteed, calculable tax benefit for a risk that never materialized.",
             realLifeTip: "Separate 'I have a real, specific concern about this company' from 'I feel nervous in general.' Only the first is a good reason to override a known tax benefit; the second usually isn't."
@@ -3199,10 +4003,142 @@ export const quests: Quest[] = [
             xpDelta: 10,
             healthDelta: -15,
             walletDelta: 160000,
-            nextStepId: 'end',
+            nextStepId: 'snw-2',
             isOptimal: false,
             explanation: "This wasn't a bad outcome because of bad luck — it's a guaranteed, knowable ₹30,625 difference that simply never got factored into the decision at all.",
             realLifeTip: "Capital gains tax timing is one of the few investing decisions that's completely knowable in advance — no market prediction required. Not checking it before selling is leaving a certain amount of money on the table."
+          }
+        ]
+      },
+      {
+        "id": "snw-2",
+        "title": "Month 11: The Stock Drops 8%",
+        "narrative": "You've decided to hold and the 12-month mark is now only a month away. Then bad news hits the market and your shares fall 8%. You originally invested ₹10,00,000, so your holding is now worth about ₹11,04,000 — your gain has shrunk from ₹2,00,000 to ₹1,04,000. Nothing about the company's business has actually changed. What do you do?",
+        "ageGroups": ['teen', 'senior'],
+        "choices": [
+          {
+            "text": "Hold until the 12-month mark if my reasons for owning the company haven't changed — the gain is now under the ₹1,25,000 exemption, so the tax could even be zero",
+            "consequence": "You wait. A month later you cross 12 months and your gain is ₹1,04,000 — fully inside the ₹1,25,000 long-term exemption. You pay ₹0 in tax instead of the ₹20,800 you'd have paid by selling earlier.",
+            "xpDelta": 55,
+            "healthDelta": 15,
+            "walletDelta": 104000,
+            "isOptimal": true,
+            "explanation": "Sold now, ₹1,04,000 of short-term gain is taxed at 20% = ₹20,800. Sold after 12 months, the same gain falls inside the ₹1,25,000 exemption and is taxed at ₹0. Holding made sense because the business hadn't changed — not just because of the tax.",
+            "realLifeTip": "A price drop alone isn't a reason to sell. Ask whether the reason you bought has changed. If it hasn't, check the calendar and the tax rules before the panic button.",
+            "id": "snw-2-c1",
+            "nextStepId": "snw-3"
+          },
+          {
+            "text": "Sell immediately before it falls more",
+            "consequence": "You sell at once and pay 20% short-term tax on ₹1,04,000 = ₹20,800. Over the next month the price edges back up. You locked in a lower gain AND a higher tax bill.",
+            "xpDelta": 5,
+            "healthDelta": -12,
+            "walletDelta": 83200,
+            "isOptimal": false,
+            "explanation": "Selling in a dip because it might fall further is predicting the market, which almost nobody does reliably. It also meant paying ₹20,800 in tax that waiting a month could have removed.",
+            "realLifeTip": "Selling out of fear usually costs twice: you realise the loss of the dip AND often pay more tax than necessary.",
+            "id": "snw-2-c2",
+            "nextStepId": "snw-3"
+          },
+          {
+            "text": "Borrow money to buy more shares at the lower price to 'average down' and recover faster",
+            "consequence": "The market falls a little further before recovering. Now you owe interest on the borrowed money while your extra shares are still below what you paid. A single dip has turned into a debt problem.",
+            "xpDelta": 0,
+            "healthDelta": -20,
+            "walletDelta": -50000,
+            "isOptimal": false,
+            "explanation": "Buying more when you believe in a company can be sensible with your own spare money — but borrowing to do it adds interest and the risk of being forced to sell at the worst time.",
+            "realLifeTip": "Never invest borrowed money. A loan has to be repaid whether the shares recover or not.",
+            "id": "snw-2-c3",
+            "nextStepId": "snw-3"
+          }
+        ]
+      },
+      {
+        "id": "snw-3",
+        "title": "The Yearly Tax-Free Allowance",
+        "narrative": "It's late March, near the end of the financial year. Separately, you hold another investment you've owned for 3 years with ₹1,25,000 of unrealised gain. Under current rules the first ₹1,25,000 of long-term equity gains each financial year is tax-free — and unused allowance doesn't carry over. How do you handle it?",
+        "ageGroups": ['teen', 'senior'],
+        "choices": [
+          {
+            "text": "Sell enough to book about ₹1,25,000 of gain this year, tax-free, and buy the holding back — raising my purchase price on paper for the future",
+            "consequence": "You realise the gain with ₹0 tax and rebuy the investment. Your cost price is now higher, so future gains on it start from a higher base. It cost you a little in transaction charges — far less than the tax you'd have paid later.",
+            "xpDelta": 60,
+            "healthDelta": 15,
+            "walletDelta": 0,
+            "isOptimal": true,
+            "explanation": "Because the ₹1,25,000 exemption resets each year and can't be carried forward, using it deliberately can reduce future tax. (Rules and rates can change, and brokerage applies — always check current rules before acting.)",
+            "realLifeTip": "Tax rules with annual allowances reward people who plan around the calendar. An unused tax-free allowance is simply lost.",
+            "id": "snw-3-c1",
+            "nextStepId": "snw-4"
+          },
+          {
+            "text": "Ignore the exemption and let all the gains sit untouched",
+            "consequence": "The year ends and your tax-free allowance disappears unused. Years later, when you sell, the whole gain sits above the exemption and more of it gets taxed.",
+            "xpDelta": 20,
+            "healthDelta": -3,
+            "walletDelta": 0,
+            "isOptimal": false,
+            "explanation": "Nothing went wrong, but a free allowance was wasted. Over many years, unused exemptions add up to a noticeable amount of avoidable tax.",
+            "realLifeTip": "Put a yearly reminder in your calendar for the tax-planning window. It takes minutes.",
+            "id": "snw-3-c2",
+            "nextStepId": "snw-4"
+          },
+          {
+            "text": "Sell a big holding with ₹3,00,000 of gain all at once to 'lock it in'",
+            "consequence": "The first ₹1,25,000 is tax-free, but the remaining ₹1,75,000 is taxed at 12.5% = ₹21,875. Spread across two or three years, most of that tax would have been avoided.",
+            "xpDelta": 10,
+            "healthDelta": -8,
+            "walletDelta": -21875,
+            "isOptimal": false,
+            "explanation": "Booking a large gain in a single year uses one exemption and pays tax on the rest. Splitting gains across years can use the allowance more than once.",
+            "realLifeTip": "When there's no urgency, spreading a big gain over several tax years usually costs less tax than realising it all at once.",
+            "id": "snw-3-c3",
+            "nextStepId": "snw-4"
+          }
+        ]
+      },
+      {
+        "id": "snw-4",
+        "title": "The Friend Who 'Trades Weekly'",
+        "narrative": "A friend says: \"I make about 2% a week trading in and out — ₹2,000 a week on ₹1,00,000. You should do it too.\" Short-term gains are taxed at 20%, and each trade has brokerage and charges. What do you take from this?",
+        "ageGroups": ['teen', 'senior'],
+        "choices": [
+          {
+            "text": "Keep my long-term core as it is. If I'm curious, trade with only a small, capped amount and track the after-tax result honestly",
+            "consequence": "You allot ₹5,000 to experiment. After tax and charges your results are mixed — some weeks up, some down — but your main investments keep compounding untouched. You learn a lot while risking little.",
+            "xpDelta": 55,
+            "healthDelta": 15,
+            "walletDelta": 0,
+            "isOptimal": true,
+            "explanation": "A claimed ₹2,000 a week is ₹1,04,000 a year; after 20% short-term tax you keep about ₹1,600 of each ₹2,000, and one bad week can erase many good ones. Most claims of steady weekly profit leave out the losses and the costs.",
+            "realLifeTip": "When someone brags about returns, ask for the full year including losses, taxes and charges. Without those, the number is only half a story.",
+            "id": "snw-4-c1",
+            "nextStepId": "end"
+          },
+          {
+            "text": "Move all my investments into weekly trading to chase that 2%",
+            "consequence": "A few good weeks feel amazing. Then a bad week drops 10%, and taxes, brokerage and stress add up. A year later you're behind where holding steadily would have left you.",
+            "xpDelta": 0,
+            "healthDelta": -20,
+            "walletDelta": -15000,
+            "isOptimal": false,
+            "explanation": "Frequent trading means short-term tax at 20% and repeated charges, and it requires being right again and again. Most people who trade often underperform people who simply hold.",
+            "realLifeTip": "Every trade has a cost. The more you trade, the more the market's small edge has to beat your costs and taxes — and usually it doesn't.",
+            "id": "snw-4-c2",
+            "nextStepId": "end"
+          },
+          {
+            "text": "Copy my friend's exact picks without understanding them",
+            "consequence": "You buy what your friend buys. When they exit without telling you, you're left holding with no idea why you bought or when to sell.",
+            "xpDelta": 5,
+            "healthDelta": -12,
+            "walletDelta": -4000,
+            "isOptimal": false,
+            "explanation": "Copying without understanding leaves you with no plan for when to sell. By the time a tip reaches you, the timing and price are usually already different from your friend's.",
+            "realLifeTip": "Never invest in something you can't explain in two sentences.",
+            "id": "snw-4-c3",
+            "nextStepId": "end"
           }
         ]
       }
@@ -3218,8 +4154,8 @@ export const quests: Quest[] = [
     ageGroups: ['teen', 'senior'],
     chapterNumber: 27,
     chapter: 'EMI Affordability',
-    estimatedMinutes: 3,
-    xpReward: 190,
+    estimatedMinutes: 8,
+    xpReward: 290,
     startingBalance: 40000,
     steps: [
       {
@@ -3235,7 +4171,7 @@ export const quests: Quest[] = [
             xpDelta: 190,
             healthDelta: 20,
             walletDelta: 0,
-            nextStepId: 'end',
+            nextStepId: 'eac-2',
             isOptimal: true,
             explanation: "45% FOIR sits right at or above what most lenders themselves consider the safe ceiling — meaning there's zero room left for a job disruption, medical cost, or any other emergency. Doing the actual math before saying yes is exactly what your friend's reassurance skipped.",
             realLifeTip: "'It's totally manageable' from someone who isn't looking at your actual numbers is not a substitute for doing the FOIR math yourself. A 5-minute calculation beats a confident guess every time."
@@ -3247,7 +4183,7 @@ export const quests: Quest[] = [
             xpDelta: -20,
             healthDelta: -25,
             walletDelta: -10000,
-            nextStepId: 'end',
+            nextStepId: 'eac-2',
             isOptimal: false,
             explanation: "Taking on debt based on someone else's reassurance, without checking your own FOIR, is exactly how a manageable-sounding EMI turns into a real problem the moment anything unexpected happens.",
             realLifeTip: "Nobody else's opinion of what you can 'easily' afford accounts for your actual numbers. Always run your own FOIR before adding any EMI on top of existing ones."
@@ -3259,7 +4195,7 @@ export const quests: Quest[] = [
             xpDelta: 90,
             healthDelta: 5,
             walletDelta: -5000,
-            nextStepId: 'end',
+            nextStepId: 'eac-2',
             isOptimal: false,
             explanation: "Downsizing the EMI is a real improvement over the original offer and shows you understood the FOIR problem — but it still adds a fixed monthly obligation on top of an existing one without ever asking whether saving up instead was the better option entirely.",
             realLifeTip: "Reducing an EMI's size is better than ignoring the math, but the first question is always whether you need the EMI at all — not just how to make it smaller."
@@ -3271,10 +4207,142 @@ export const quests: Quest[] = [
             xpDelta: 60,
             healthDelta: 10,
             walletDelta: 0,
-            nextStepId: 'end',
+            nextStepId: 'eac-2',
             isOptimal: false,
             explanation: "Avoiding this EMI worked out, but avoiding EMIs on principle rather than by checking the actual FOIR math means you'll also turn down loans that would have been genuinely fine — the goal is knowing the number, not avoiding debt entirely.",
             realLifeTip: "The goal isn't 'never borrow' — it's 'know your FOIR before you decide.' Blanket avoidance and blanket comfort with debt are both worse than actually checking."
+          }
+        ]
+      },
+      {
+        "id": "eac-2",
+        "title": "The 'No-Cost EMI' Phone",
+        "narrative": "A few months later, your phone dies. A shop offers a ₹24,000 phone on 'No-Cost EMI': 6 monthly payments of ₹4,000, 'zero interest'. But if you pay cash, they'll take ₹2,000 off — ₹22,000. You have the cash, but it would use up a good part of your savings. What do you do?",
+        "ageGroups": ['teen', 'senior'],
+        "choices": [
+          {
+            "text": "Pay the ₹22,000 cash price — the 'no-cost' EMI quietly costs ₹2,000 more",
+            "consequence": "You skip the EMI and pay once. No new monthly obligation, no hidden cost, and your FOIR stays where it was. You rebuild your savings over the next few months.",
+            "xpDelta": 60,
+            "healthDelta": 15,
+            "walletDelta": -22000,
+            "isOptimal": true,
+            "explanation": "The EMI total (6 × ₹4,000 = ₹24,000) is ₹2,000 more than the ₹22,000 cash price. Paying ₹4,000 a month for something worth ₹22,000 today works out to roughly 2.5% a month — about 30% a year. 'No-cost' hides the cost in the lost discount.",
+            "realLifeTip": "Always ask: 'What's the price if I pay cash today?' The difference is the real cost of the EMI.",
+            "id": "eac-2-c1",
+            "nextStepId": "eac-3"
+          },
+          {
+            "text": "Take the 'No-Cost EMI' — zero interest means it's free",
+            "consequence": "You pay ₹4,000 a month for 6 months. It feels easy, but your FOIR is up and you've paid ₹2,000 more than the cash price — an effective borrowing cost near 30% a year.",
+            "xpDelta": 10,
+            "healthDelta": -10,
+            "walletDelta": -4000,
+            "isOptimal": false,
+            "explanation": "Interest hasn't disappeared — it's moved into the price. The cash discount you give up is the cost of borrowing, and it works out far above most personal-loan rates.",
+            "realLifeTip": "'Zero interest' almost never means zero cost. Compare the cash price with the total of all EMIs.",
+            "id": "eac-2-c2",
+            "nextStepId": "eac-3"
+          },
+          {
+            "text": "Put it on a credit card and pay only the minimum each month",
+            "consequence": "The card's interest of about 3.5% a month starts on the unpaid balance. Months later you've paid far more than ₹24,000 and still owe money — your FOIR and credit score both suffer.",
+            "xpDelta": 0,
+            "healthDelta": -20,
+            "walletDelta": -24000,
+            "isOptimal": false,
+            "explanation": "Paying only the minimum on a credit card keeps almost all of the balance accruing at high interest, making this the most expensive option of all.",
+            "realLifeTip": "Credit cards are for purchases you can pay off in full by the due date. Minimum payments are how small purchases become long debts.",
+            "id": "eac-2-c3",
+            "nextStepId": "eac-3"
+          }
+        ]
+      },
+      {
+        "id": "eac-3",
+        "title": "The Layoff Rumour",
+        "narrative": "Word spreads at your company that layoffs may be coming. You take home ₹40,000, your bike EMI is ₹8,000, and your essentials come to about ₹20,000 a month, so you need around ₹28,000 a month to survive. You have no firm information — just a rumour. What do you do?",
+        "ageGroups": ['teen', 'senior'],
+        "choices": [
+          {
+            "text": "Start building a buffer of about 3 months of EMI + essentials (about ₹84,000) with automatic monthly transfers, and take on no new EMIs for now",
+            "consequence": "You set up an automatic ₹5,000 monthly transfer and pause any new borrowing. Months later the rumour fizzles out — but you've built a cushion that would have covered a job gap.",
+            "xpDelta": 60,
+            "healthDelta": 15,
+            "walletDelta": 5000,
+            "isOptimal": true,
+            "explanation": "₹28,000 × 3 months = ₹84,000. A buffer sized to your actual monthly commitments (including EMIs) turns a scary rumour into a manageable risk. Avoiding new EMIs keeps your fixed obligations from growing before you know your income is safe.",
+            "realLifeTip": "Uncertainty is the worst time to add fixed payments. Build the buffer first; take on new EMIs only when your income feels secure.",
+            "id": "eac-3-c1",
+            "nextStepId": "eac-4"
+          },
+          {
+            "text": "Take a new EMI for a gadget now — lenders approve you more easily while you're still employed",
+            "consequence": "You get approved, but the rumours turn out to be true. You lose your job with a larger EMI than before and not enough savings, and you start missing payments.",
+            "xpDelta": 0,
+            "healthDelta": -25,
+            "walletDelta": -10000,
+            "isOptimal": false,
+            "explanation": "Taking on debt because you can qualify right now ignores the real risk — your income may disappear. EMIs have to be paid regardless of your job situation.",
+            "realLifeTip": "Qualifying for a loan doesn't mean you can afford it through a tough patch. Plan for your worst-case income, not your best.",
+            "id": "eac-3-c2",
+            "nextStepId": "eac-4"
+          },
+          {
+            "text": "Use all my savings to prepay the bike loan so I have no EMI to worry about",
+            "consequence": "The EMI is gone, but so is your cash. When a layoff does come, you have a loan-free bike but no money for rent or food, and a gap with nothing to cover it.",
+            "xpDelta": 20,
+            "healthDelta": -8,
+            "walletDelta": 0,
+            "isOptimal": false,
+            "explanation": "Clearing debt feels responsible, but emptying your savings leaves you with no liquidity. Cash can pay any bill; a prepaid loan can't be turned back into cash.",
+            "realLifeTip": "Don't drain your emergency cushion to prepay a loan unless you still have a buffer left afterwards.",
+            "id": "eac-3-c3",
+            "nextStepId": "eac-4"
+          }
+        ]
+      },
+      {
+        "id": "eac-4",
+        "title": "The Refinance Offer",
+        "narrative": "A lender calls with an offer for your bike loan. You owe about ₹1,60,000 with 24 months left at 14% (EMI ≈ ₹7,682). They'll move you to 11% (EMI ≈ ₹7,457), but charge a ₹6,000 processing fee. Over the 24 months, the lower rate would save about ₹5,395 in interest. They say: 'Lower rate — it's obviously better!' What do you do?",
+        "ageGroups": ['teen', 'senior'],
+        "choices": [
+          {
+            "text": "Compare the total cost: ₹5,395 saved − ₹6,000 fee = about −₹605. It isn't worth it — decline",
+            "consequence": "You decline and keep your loan as it is. A few weeks later you see a different lender advertising the same 11% with no processing fee and consider that one instead.",
+            "xpDelta": 60,
+            "healthDelta": 15,
+            "walletDelta": 0,
+            "isOptimal": true,
+            "explanation": "A lower rate only helps if the interest you save is greater than the fees. Here the ₹6,000 fee is more than the ₹5,395 saved, so you'd end up slightly worse off despite the lower rate.",
+            "realLifeTip": "Always net the fee against the savings before saying yes to a refinance. 'Lower rate' alone isn't enough.",
+            "id": "eac-4-c1",
+            "nextStepId": "end"
+          },
+          {
+            "text": "Accept immediately — a lower interest rate is always better",
+            "consequence": "You pay the ₹6,000 fee and save ₹5,395 over two years. You come out about ₹605 behind and spent time on paperwork for nothing.",
+            "xpDelta": 10,
+            "healthDelta": -8,
+            "walletDelta": -605,
+            "isOptimal": false,
+            "explanation": "A lower rate is only half the picture. Fees can wipe out the benefit entirely, especially when the loan is short.",
+            "realLifeTip": "Ask for the total cost of switching, including every fee, before comparing rates.",
+            "id": "eac-4-c2",
+            "nextStepId": "end"
+          },
+          {
+            "text": "Refinance AND stretch the loan to 36 months so the monthly EMI is smaller",
+            "consequence": "Your EMI drops to about ₹5,238, which feels great each month. But over 36 months you pay about ₹28,575 in interest — far more than the ₹24,369 you'd pay on the current loan — plus the ₹6,000 fee.",
+            "xpDelta": 5,
+            "healthDelta": -10,
+            "walletDelta": -10000,
+            "isOptimal": false,
+            "explanation": "A longer tenure lowers the monthly payment but increases the total interest. A smaller EMI can look like a win while the loan costs you more overall.",
+            "realLifeTip": "A smaller EMI isn't always cheaper. Check total interest, not just the monthly figure.",
+            "id": "eac-4-c3",
+            "nextStepId": "end"
           }
         ]
       }

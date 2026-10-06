@@ -2,6 +2,16 @@
 
 Running log of real fixes and changes, kept so you have something concrete to paste into the Play Console readiness questionnaire or release notes. I'll keep adding to this as we go — tell me any time you want the latest entries read out or copied somewhere.
 
+## 2026-10-07 (later)
+
+- Floating calculator (QuickCalculator): always-visible button + non-modal panel in FinIQ Quiz, Budget Blitz, Money Maze, Credit Score Builder and Quests, so players can work out the maths BEFORE answering. The timer keeps running while it is open.
+- FinIQ Quiz:
+  - +45 questions (15 per age group); pools are now junior 34 / teen 54 / senior 69.
+  - Questions you've already seen are remembered on-device (per age group, last 200) and avoided until the pool is exhausted. Daily challenge unaffected.
+  - Fixed: "Try Again" replayed the identical 10 questions and kept the old category stats.
+  - Fixed: the round timer was seeded from question 1 only while the HUD showed the current question's time. Questions containing numbers now get +8s.
+- Quests: all 8 formerly single-step quests (wants-vs-desires, smart-goal-setting, the-early-start, net-worth-checkin, sell-now-or-wait, emi-affordability-check, phone-emi, first-credit-card) now run 4 steps each, with xpReward +100 and estimatedMinutes 8. Already-completed quests stay completed (completion is idempotent), so existing players won't see the new steps on those.
+
 ## 2026-10-07
 
 - Fixed the "Finance Scholar" badge popup (and confetti) replaying for a badge testers already owned, every time they opened a screen with the XP wallet. Not a re-award: the award code correctly refuses duplicates and never paid XP twice. The bug was in the celebration: the wallet compared your badges against an empty "previously seen" list on every load, so the first badge in your list always looked brand new. The first loaded snapshot is now treated as already-owned; only badges that appear afterwards trigger the popup. Trade-off: a badge earned moments before the wallet screen mounts (e.g. a quest finishing straight onto a results screen) may not pop up there, since it's already in the first snapshot — it still appears in Profile.

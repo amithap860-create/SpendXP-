@@ -270,6 +270,7 @@ FinIQ Quiz
   Teaches: All 5 financial topics
   File: src/components/games/FinIQQuiz.tsx
   Firestore: users/{uid}/gameScores/finIQQuiz
+  Notes: pool sizes junior 34 / teen 54 / senior 69. Seen-question memory in localStorage `spendxp_finiq_seen_<ageGroup>` (cap 200). Timer is per-question (+8s if it contains a digit). Floating src/components/QuickCalculator.tsx is also mounted in BudgetBlitz, MoneyMaze, CreditScoreBuilder and quests/QuestViewer.
   Special: Daily challenge with shared leaderboard
 
 Money Maze
