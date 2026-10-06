@@ -9,6 +9,10 @@ export interface StockCompany {
   startPrice: number;
   volatility: 'low' | 'medium' | 'high';
   description: string;
+  /** Only offered to the Senior (17-20) age group — extra companies for
+   *  older players who asked for more to choose from. Juniors and teens
+   *  never see these, nor headlines about them. */
+  seniorOnly?: boolean;
 }
 
 export interface NewsHeadline {
@@ -65,7 +69,35 @@ export const STOCK_COMPANIES: StockCompany[] = [
     sector: 'Consumer Staples', 
     startPrice: 32.00, 
     volatility: 'low', 
-    description: 'Supplying affordable food to millions of homes every day.' 
+    description: 'Supplying affordable food to millions of homes every day.'
+  },
+  // ── Senior (17-20) only ──────────────────────────────────────────────────
+  {
+    symbol: 'AGB',
+    name: 'Apex Global Bank',
+    sector: 'Banking',
+    startPrice: 120.00,
+    volatility: 'low',
+    description: 'A large bank earning steadily from loans and fees — sensitive to interest-rate news.',
+    seniorOnly: true,
+  },
+  {
+    symbol: 'VDM',
+    name: 'VoltDrive Motors',
+    sector: 'Electric Vehicles',
+    startPrice: 68.00,
+    volatility: 'high',
+    description: 'A fast-growing EV maker: big upside if it scales, big losses if production stumbles.',
+    seniorOnly: true,
+  },
+  {
+    symbol: 'SWM',
+    name: 'StreamWave Media',
+    sector: 'Entertainment',
+    startPrice: 28.00,
+    volatility: 'medium',
+    description: 'A streaming platform whose price follows subscriber growth and content hits.',
+    seniorOnly: true,
   },
 ];
 
@@ -90,4 +122,11 @@ export const NEWS_HEADLINES: NewsHeadline[] = [
   { id: '18', ticker: 'FCC', headline: 'Food shortage fears drive up FCC prices', multiplier: 1.07 },
   { id: '19', ticker: 'SRE', headline: 'Global climate pact boosts energy stocks', multiplier: 1.09 },
   { id: '20', ticker: 'CVT', headline: 'Social media celebrity tweets about CVT', multiplier: 1.20 },
+  // Senior-only companies (see seniorOnly above)
+  { id: '21', ticker: 'AGB', headline: 'Central bank raises interest rates, widening bank lending margins', multiplier: 1.09 },
+  { id: '22', ticker: 'AGB', headline: 'Apex Global Bank hit by surge in loan defaults', multiplier: 0.86 },
+  { id: '23', ticker: 'VDM', headline: 'VoltDrive beats delivery targets, orders double', multiplier: 1.22 },
+  { id: '24', ticker: 'VDM', headline: 'VoltDrive recalls 40,000 cars over battery fault', multiplier: 0.76 },
+  { id: '25', ticker: 'SWM', headline: 'StreamWave original series becomes a global hit', multiplier: 1.16 },
+  { id: '26', ticker: 'SWM', headline: 'StreamWave loses subscribers after price hike', multiplier: 0.88 },
 ];

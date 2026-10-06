@@ -2,6 +2,14 @@
 
 Running log of real fixes and changes, kept so you have something concrete to paste into the Play Console readiness questionnaire or release notes. I'll keep adding to this as we go — tell me any time you want the latest entries read out or copied somewhere.
 
+## 2026-10-07
+
+- Stock Market Sim, from tester feedback:
+  - Ages 17-20 now trade 9 companies instead of 6: added Apex Global Bank (low risk), VoltDrive Motors (high risk), StreamWave Media (medium risk), each with 2 news headlines (one good, one bad). Teens still get the original 6 and juniors still get 3 — the new ones are flagged `seniorOnly` in stockMarketData.ts.
+  - Every holding now shows the average price you bought at, plus your current gain/loss on it in rupee-free sim dollars and percent, on the stock card, in the mobile portfolio sheet, and in the sell dialog. The average was already being tracked internally (for the sell gain/loss pop) — it just was never displayed. Applies to all age groups.
+  - Fixed a related bug: news headlines were picked from the full list regardless of which stocks you were actually trading, so juniors could see a headline about a stock they don't have (it moved nothing). Headlines are now drawn only from stocks in your game — which also stops teens/juniors being shown the new senior-only companies' news.
+- Not touched: the sim still shows hardcoded "$" instead of the currency system (pre-existing; it's a sim-dollar game), flagging it as a known inconsistency with the app's "never hardcode currency" rule.
+
 ## 2026-10-05
 
 - Second pass at the ~1 second app-open lag that survived the 09-30 login fix. Web-only changes (ship via Vercel, no new AAB):

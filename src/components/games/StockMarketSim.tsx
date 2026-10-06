@@ -111,7 +111,15 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
   const { ageGroup } = useAgeAdapt();
   const tutorial = useGameTutorial('stockMarketSim');
   const startingCash = useMemo(() => ageGroup === 'junior' ? 100 : ageGroup === 'senior' ? 5000 : 1000, [ageGroup]);
-  const companies = useMemo(() => ageGroup === 'junior' ? STOCK_COMPANIES.slice(0, 3) : STOCK_COMPANIES, [ageGroup]);
+  // Junior (8-12): first 3 core companies. Teen (13-16): the 6 core companies.
+  // Senior (17-20): the 6 core companies PLUS 3 senior-only ones (2026-10-07,
+  // requested by older testers who wanted more to choose from).
+  const companies = useMemo(() => {
+    const core = STOCK_COMPANIES.filter(c => !c.seniorOnly);
+    if (ageGroup === 'junior') return core.slice(0, 3);
+    if (ageGroup === 'senior') return STOCK_COMPANIES;
+    return core;
+  }, [ageGroup]);
   // UPDATED (2026-09-30): user feedback — days were flying by in ~10-35s,
   // too fast to actually read the headline and make a considered trade.
   // Bumped to a flat 90s (1.5 min) per day for every age group, per explicit
@@ -221,7 +229,13 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
   useEffect(() => {
     if (gameState === 'PLAYING' && timeLeft === 0) {
       if (currentRound < 5) {
-        const headline = NEWS_HEADLINES[Math.floor(Math.random() * NEWS_HEADLINES.length)];
+        // Only pick headlines about stocks actually in this player's game —
+        // previously juniors (3 stocks) could be shown news about stocks
+        // they can't trade, which silently moved nothing.
+        const inPlay = new Set(companies.map(c => c.symbol));
+        const eligible = NEWS_HEADLINES.filter(h => inPlay.has(h.ticker));
+        const pool = eligible.length ? eligible : NEWS_HEADLINES;
+        const headline = pool[Math.floor(Math.random() * pool.length)];
         setCurrentHeadline(headline);
         // Apply the news impact ONCE, right now, instead of letting the
         // ticking interval reapply it every few seconds for the whole day.
@@ -248,7 +262,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
         endGame(gameConfig.xpPerWin);
       }
     }
-  }, [timeLeft, gameState, currentRound, nextRound, endGame, gameConfig.xpPerWin]);
+  }, [timeLeft, gameState, currentRound, nextRound, endGame, gameConfig.xpPerWin, companies]);
 
   const handleTrade = (qty: number) => {
     if (!tradeModal) return;
@@ -562,6 +576,25 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
                     {isRecommended && <Star className="h-3 w-3 text-primary shrink-0" />}
                   </div>
                   <div className="text-[10px] font-bold text-muted-foreground uppercase">{c.symbol} · {c.volatility} risk{ownedQty > 0 ? ` · ${ownedQty} owned` : ''}</div>
+                  {/* Requested by testers (2026-10-07): "it gets hard to keep
+                      track" of what you paid. Shows the weighted-average buy
+                      price (already tracked in avgCost for sell P/L) plus
+                      unrealised gain/loss vs. today's price. */}
+                  {ownedQty > 0 && avgCost[c.symbol] !== undefined && (() => {
+                    const bought = avgCost[c.symbol];
+                    const plPerShare = currentPrice - bought;
+                    const plTotal = plPerShare * ownedQty;
+                    const plPct = bought > 0 ? (plPerShare / bought) * 100 : 0;
+                    const up = plTotal >= 0;
+                    return (
+                      <div className="text-[11px] font-bold mt-0.5 text-muted-foreground">
+                        Bought at ${bought.toFixed(2)} avg ·{' '}
+                        <span className={up ? 'text-cat-correct' : 'text-cat-wrong'}>
+                          {up ? '+' : '−'}${Math.abs(plTotal).toFixed(2)} ({up ? '+' : '−'}{Math.abs(plPct).toFixed(1)}%)
+                        </span>
+                      </div>
+                    );
+                  })()}
                 </div>
                 {/* Sparkline */}
                 <div className="mx-3 hidden sm:block">
@@ -599,7 +632,12 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
             <div className="py-6 space-y-4">
               {Object.entries(portfolio).map(([s, q]) => q > 0 && (
                 <div key={s} className="flex justify-between items-center p-4 bg-muted rounded-xl border">
-                  <div><div className="font-black text-foreground">{s}</div><div className="text-[10px] uppercase font-bold text-muted-foreground">{q} Shares</div></div>
+                  <div>
+                    <div className="font-black text-foreground">{s}</div>
+                    <div className="text-[10px] uppercase font-bold text-muted-foreground">
+                      {q} Shares{avgCost[s] !== undefined ? ` · bought at $${avgCost[s].toFixed(2)} avg` : ''}
+                    </div>
+                  </div>
                   <div className="font-black text-primary">${(q * prices[s]).toFixed(2)}</div>
                 </div>
               ))}
@@ -617,6 +655,9 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
             </DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">Current price: <span className="font-black text-primary">${tradeModal ? prices[tradeModal.stock.symbol] : 0}</span></p>
+          {tradeModal?.type === 'sell' && avgCost[tradeModal.stock.symbol] !== undefined && (
+            <p className="text-sm text-muted-foreground">You bought at: <span className="font-black text-foreground">${avgCost[tradeModal.stock.symbol].toFixed(2)}</span> avg</p>
+          )}
           <div className="grid grid-cols-2 gap-3 py-4">
             {[1, 5, 10, 20].map(v => (
               <Button key={v} variant="outline" className="h-14 font-black min-h-[44px]" onClick={() => handleTrade(v)}>
