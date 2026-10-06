@@ -4,6 +4,8 @@ Running log of real fixes and changes, kept so you have something concrete to pa
 
 ## 2026-10-07
 
+- Fixed the "Finance Scholar" badge popup (and confetti) replaying for a badge testers already owned, every time they opened a screen with the XP wallet. Not a re-award: the award code correctly refuses duplicates and never paid XP twice. The bug was in the celebration: the wallet compared your badges against an empty "previously seen" list on every load, so the first badge in your list always looked brand new. The first loaded snapshot is now treated as already-owned; only badges that appear afterwards trigger the popup. Trade-off: a badge earned moments before the wallet screen mounts (e.g. a quest finishing straight onto a results screen) may not pop up there, since it's already in the first snapshot — it still appears in Profile.
+
 - Stock Market Sim, from tester feedback:
   - Ages 17-20 now trade 9 companies instead of 6: added Apex Global Bank (low risk), VoltDrive Motors (high risk), StreamWave Media (medium risk), each with 2 news headlines (one good, one bad). Teens still get the original 6 and juniors still get 3 — the new ones are flagged `seniorOnly` in stockMarketData.ts.
   - Every holding now shows the average price you bought at, plus your current gain/loss on it in rupee-free sim dollars and percent, on the stock card, in the mobile portfolio sheet, and in the sell dialog. The average was already being tracked internally (for the sell gain/loss pop) — it just was never displayed. Applies to all age groups.

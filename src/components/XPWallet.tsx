@@ -75,19 +75,35 @@ export function XPWallet() {
   const { data, isLoading } = useProgression();
   const { formatValue, activeCurrency } = useCurrency();
   const [unlockedBadge, setUnlockedBadge] = useState<(typeof BADGE_MAP)[0] | null>(null);
-  const [prevBadges, setPrevBadges] = useState<string[]>([]);
+  // BUGFIX (2026-10-07): testers kept getting the "badge unlocked" popup +
+  // confetti for a badge they already owned (Finance Scholar), on every
+  // visit. Cause: the previous-badges list started as [] on every mount, so
+  // the moment the saved badges finished loading, the FIRST badge in the
+  // user's array looked "newly added" compared to that empty list and got
+  // celebrated again. The award logic itself (badgeService.awardBadge) was
+  // never re-awarding or re-paying XP — it dedupes correctly — this was only
+  // the celebration replaying. Now the first fully-loaded snapshot is
+  // treated as "already owned" and only badges that appear AFTER that
+  // count as newly unlocked.
+  const seenBadges = React.useRef<string[] | null>(null);
 
   useEffect(() => {
-    if (data.badges.length > prevBadges.length) {
-      const newlyAdded = data.badges.find(b => !prevBadges.includes(b));
+    if (isLoading) return;
+    if (seenBadges.current === null) {
+      seenBadges.current = data.badges;
+      return;
+    }
+    const known = seenBadges.current;
+    const newlyAdded = data.badges.find(b => !known.includes(b));
+    if (newlyAdded) {
       const badgeInfo = BADGE_MAP.find(b => b.id === newlyAdded);
       if (badgeInfo) {
         setUnlockedBadge(badgeInfo);
         fireConfettiBadgeUnlock();
       }
     }
-    setPrevBadges(data.badges);
-  }, [data.badges, prevBadges]);
+    seenBadges.current = data.badges;
+  }, [data.badges, isLoading]);
 
   const levelInfo = useMemo(() => {
     const totalXP = data.totalXP;
