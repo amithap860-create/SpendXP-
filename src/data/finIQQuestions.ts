@@ -1,5 +1,5 @@
 /**
- * @fileOverview 65 scenario-based financial literacy questions for SpendXP.
+ * @fileOverview 110 scenario-based financial literacy questions for SpendXP.
  * Categorized by age group and financial topic.
  *
  * Country variants: most of these questions are universal finance concepts
@@ -999,5 +999,501 @@ export const finIQQuestions: Question[] = [
     explanation: "Lynch's 4 questions eliminate 95% of stocks — but what remains is your research shortlist, not your buy list. The real work — annual reports, risk assessment, position sizing — starts here. The framework opens the door; it doesn't walk you through it.",
     xpReward: 50,
     difficulty: 'hard'
+  },
+  // --- 2026-10-07 expansion: 45 currency-neutral questions (plain numbers / coins) so they need no per-country variants ---
+  {
+    id: 'nq-j-01',
+    category: 'SPENDING',
+    ageGroups: ['junior'],
+    question: "A shop sells 3 pencils for 12 coins. How much does 1 pencil cost?",
+    options: ["4 coins", "3 coins", "6 coins", "9 coins"],
+    correctIndex: 0,
+    explanation: "Divide the total price by the number of pencils: 12 ÷ 3 = 4 coins each. Working out the price of ONE item is how you compare deals.",
+    xpReward: 20,
+    difficulty: 'easy'
+  },
+  {
+    id: 'nq-j-02',
+    category: 'BUDGETING',
+    ageGroups: ['junior'],
+    question: "You get 50 coins pocket money every week. How much will you have received after 4 weeks?",
+    options: ["200 coins", "150 coins", "54 coins", "250 coins"],
+    correctIndex: 0,
+    explanation: "50 coins × 4 weeks = 200 coins. Knowing your total income over a month helps you plan what to spend and what to save.",
+    xpReward: 20,
+    difficulty: 'easy'
+  },
+  {
+    id: 'nq-j-03',
+    category: 'SPENDING',
+    ageGroups: ['junior'],
+    question: "Which of these is a NEED, not a want?",
+    options: ["Warm clothes in winter", "The newest video game", "Extra-fancy sneakers", "A bag of candy"],
+    correctIndex: 0,
+    explanation: "Needs are things you must have to stay healthy and safe, like food, shelter and warm clothes. Wants are nice to have, but you can live without them.",
+    xpReward: 20,
+    difficulty: 'easy'
+  },
+  {
+    id: 'nq-j-04',
+    category: 'BUDGETING',
+    ageGroups: ['junior'],
+    question: "You save 15 coins every week. How many weeks until you have 90 coins?",
+    options: ["6 weeks", "5 weeks", "7 weeks", "9 weeks"],
+    correctIndex: 0,
+    explanation: "90 ÷ 15 = 6 weeks. Dividing your goal by what you save each week tells you how long it will take.",
+    xpReward: 20,
+    difficulty: 'easy'
+  },
+  {
+    id: 'nq-j-05',
+    category: 'SPENDING',
+    ageGroups: ['junior'],
+    question: "Your friends all say, \"Everyone has this toy — buy it now!\" What is the smartest first step?",
+    options: ["Wait a day and ask yourself if you really want it", "Buy it right away so you don't miss out", "Borrow coins from a sibling", "Buy two so you have a spare"],
+    correctIndex: 0,
+    explanation: "Waiting a day takes away the pressure. If you still want it tomorrow, it's a real want; if not, you just saved your coins from a peer-pressure purchase.",
+    xpReward: 20,
+    difficulty: 'easy'
+  },
+  {
+    id: 'nq-j-06',
+    category: 'INVESTING',
+    ageGroups: ['junior'],
+    question: "A bank pays you a little extra money for keeping your savings with them. What is this extra money called?",
+    options: ["Interest", "Tax", "A fine", "A discount"],
+    correctIndex: 0,
+    explanation: "Interest is the reward the bank pays you for letting it hold your money. The longer you save, the more interest you can earn.",
+    xpReward: 20,
+    difficulty: 'easy'
+  },
+  {
+    id: 'nq-j-07',
+    category: 'CREDIT',
+    ageGroups: ['junior'],
+    question: "You borrow 20 coins from a friend for lunch. What is the fair thing to do?",
+    options: ["Pay it back on the day you promised", "Wait until they forget", "Pay back only 10 coins", "Borrow more to pay them"],
+    correctIndex: 0,
+    explanation: "Paying back on time builds trust. Banks work the same way: people who repay what they borrow, when they said they would, get trusted with more later.",
+    xpReward: 20,
+    difficulty: 'easy'
+  },
+  {
+    id: 'nq-j-08',
+    category: 'BUDGETING',
+    ageGroups: ['junior'],
+    question: "You have 80 coins. You spend 25 on a book and 30 on snacks. How many coins are left?",
+    options: ["25 coins", "55 coins", "35 coins", "15 coins"],
+    correctIndex: 0,
+    explanation: "First add what you spent: 25 + 30 = 55. Then subtract from what you had: 80 − 55 = 25 coins left.",
+    xpReward: 20,
+    difficulty: 'easy'
+  },
+  {
+    id: 'nq-j-09',
+    category: 'TAXES',
+    ageGroups: ['junior'],
+    question: "Some shops add a small extra charge to the price that goes to the government to pay for roads and schools. What is this called?",
+    options: ["Tax", "A tip", "A gift", "A loan"],
+    correctIndex: 0,
+    explanation: "Taxes are payments to the government that fund public things like roads, schools and hospitals. Sales tax is added on top of the shelf price.",
+    xpReward: 20,
+    difficulty: 'easy'
+  },
+  {
+    id: 'nq-j-10',
+    category: 'SPENDING',
+    ageGroups: ['junior'],
+    question: "Which habit best helps you spot a good deal?",
+    options: ["Compare the price at 2 or 3 different shops", "Always buy from the first shop you see", "Pick the item with the shiniest box", "Buy whatever an advert tells you to"],
+    correctIndex: 0,
+    explanation: "Comparing prices is the simplest money-saving skill there is. The same item can cost very different amounts in different places.",
+    xpReward: 20,
+    difficulty: 'easy'
+  },
+  {
+    id: 'nq-j-11',
+    category: 'INVESTING',
+    ageGroups: ['junior', 'teen'],
+    question: "Why is it risky to put ALL your savings into just one thing?",
+    options: ["If that one thing fails, you could lose everything", "It is against the rules", "It makes your money grow more slowly", "Banks do not allow it"],
+    correctIndex: 0,
+    explanation: "Spreading money across different places is called diversification. If one goes badly, the others can protect you — it's the 'don't put all your eggs in one basket' rule.",
+    xpReward: 20,
+    difficulty: 'easy'
+  },
+  {
+    id: 'nq-j-12',
+    category: 'BUDGETING',
+    ageGroups: ['junior', 'teen'],
+    question: "What does the 'save first' habit mean?",
+    options: ["Set some money aside as soon as you receive it, then spend the rest", "Spend everything first and save what is left over", "Only save at the end of the year", "Save only when you feel rich"],
+    correctIndex: 0,
+    explanation: "If you wait to see what is left over, there usually is nothing. Saving first turns saving into a habit instead of a leftover.",
+    xpReward: 20,
+    difficulty: 'easy'
+  },
+  {
+    id: 'nq-j-13',
+    category: 'CREDIT',
+    ageGroups: ['junior', 'teen'],
+    question: "What is a credit card?",
+    options: ["A way to borrow money that you must pay back, sometimes with extra charges", "Free money from the bank", "A gift card for one shop", "A savings account with a card"],
+    correctIndex: 0,
+    explanation: "A credit card lets you spend the bank's money now and repay later. If you don't repay in full and on time, interest is added — so it's a loan, not free money.",
+    xpReward: 25,
+    difficulty: 'easy'
+  },
+  {
+    id: 'nq-j-14',
+    category: 'BUDGETING',
+    ageGroups: ['junior', 'teen'],
+    question: "Why is it smart to keep a small emergency fund?",
+    options: ["To cover surprise costs, like a broken phone, without borrowing", "To spend on treats every weekend", "Because banks make you", "To impress friends"],
+    correctIndex: 0,
+    explanation: "Surprises happen to everyone. A small cushion means a sudden cost doesn't force you into debt or to ask others for help.",
+    xpReward: 25,
+    difficulty: 'easy'
+  },
+  {
+    id: 'nq-j-15',
+    category: 'SPENDING',
+    ageGroups: ['junior', 'teen'],
+    question: "A toy costs 200 coins and the sign says '25% off'. How much do you pay?",
+    options: ["150 coins", "175 coins", "125 coins", "50 coins"],
+    correctIndex: 0,
+    explanation: "25% of 200 is 50, so the discount is 50 coins. 200 − 50 = 150 coins. Don't mix up the discount (50) with the price you pay (150).",
+    xpReward: 30,
+    difficulty: 'medium'
+  },
+  {
+    id: 'nq-t-01',
+    category: 'BUDGETING',
+    ageGroups: ['teen', 'senior'],
+    question: "You earn 20,000 a month and decide to save 15% of it. How much do you save each month?",
+    options: ["3,000", "1,500", "2,000", "4,500"],
+    correctIndex: 0,
+    explanation: "15% of 20,000 = 20,000 × 0.15 = 3,000 per month, or 36,000 over a year.",
+    xpReward: 30,
+    difficulty: 'medium'
+  },
+  {
+    id: 'nq-t-02',
+    category: 'INVESTING',
+    ageGroups: ['teen', 'senior'],
+    question: "Using the Rule of 72, about how long does money take to double at 9% a year?",
+    options: ["About 8 years", "About 6 years", "About 12 years", "About 9 years"],
+    correctIndex: 0,
+    explanation: "Rule of 72: divide 72 by the yearly return. 72 ÷ 9 = 8 years. It is a quick estimate, not an exact figure.",
+    xpReward: 30,
+    difficulty: 'medium'
+  },
+  {
+    id: 'nq-t-03',
+    category: 'CREDIT',
+    ageGroups: ['teen', 'senior'],
+    question: "Your credit card bill is 10,000 and you pay only the 500 minimum. The card charges 3% a month on the unpaid 9,500. About how much interest is added this month?",
+    options: ["285", "300", "500", "95"],
+    correctIndex: 0,
+    explanation: "The interest is charged on what you did NOT pay: 9,500 × 3% = 285. At 3% a month that is about 36% a year — paying only the minimum is very expensive.",
+    xpReward: 35,
+    difficulty: 'medium'
+  },
+  {
+    id: 'nq-t-03b',
+    category: 'SPENDING',
+    ageGroups: ['teen', 'senior'],
+    question: "A streaming plan costs 299 a month, or 2,999 for a full year. How much do you save by paying yearly?",
+    options: ["589", "599", "299", "12"],
+    correctIndex: 0,
+    explanation: "Monthly for a year: 299 × 12 = 3,588. Yearly plan: 2,999. Difference: 3,588 − 2,999 = 589. (Only worth it if you'll actually use it all year.)",
+    xpReward: 30,
+    difficulty: 'medium'
+  },
+  {
+    id: 'nq-t-05',
+    category: 'INVESTING',
+    ageGroups: ['teen', 'senior'],
+    question: "How does an index fund mainly reduce risk?",
+    options: ["By spreading your money across many companies", "By guaranteeing a fixed profit", "By only buying the cheapest shares", "By avoiding the stock market entirely"],
+    correctIndex: 0,
+    explanation: "An index fund holds many companies at once, so one company doing badly barely dents the whole. It lowers risk but does not remove it or guarantee profit.",
+    xpReward: 30,
+    difficulty: 'medium'
+  },
+  {
+    id: 'nq-t-06',
+    category: 'BUDGETING',
+    ageGroups: ['teen', 'senior'],
+    question: "With the 50/30/20 rule on a 40,000 monthly income, how much goes to 'wants' (30%)?",
+    options: ["12,000", "8,000", "20,000", "15,000"],
+    correctIndex: 0,
+    explanation: "30% of 40,000 = 12,000. The rest: 20,000 for needs (50%) and 8,000 for savings (20%).",
+    xpReward: 30,
+    difficulty: 'medium'
+  },
+  {
+    id: 'nq-t-07',
+    category: 'CREDIT',
+    ageGroups: ['teen', 'senior'],
+    question: "Which habit usually helps your credit score the most over time?",
+    options: ["Paying every bill and EMI on time", "Opening many new cards quickly", "Always maxing out your limit", "Closing your oldest account"],
+    correctIndex: 0,
+    explanation: "Payment history is the biggest part of most credit scores. Late payments cause the most damage; consistent on-time payments build the strongest record.",
+    xpReward: 30,
+    difficulty: 'medium'
+  },
+  {
+    id: 'nq-t-08',
+    category: 'TAXES',
+    ageGroups: ['teen', 'senior'],
+    question: "Your monthly salary is 50,000 and 2,000 is deducted as tax at source (TDS) before it reaches you. What do you actually receive?",
+    options: ["48,000", "52,000", "50,000", "46,000"],
+    correctIndex: 0,
+    explanation: "50,000 − 2,000 = 48,000. The money you take home is lower than your gross salary, so budget from take-home pay, not the offer letter figure.",
+    xpReward: 25,
+    difficulty: 'easy'
+  },
+  {
+    id: 'nq-t-09',
+    category: 'INVESTING',
+    ageGroups: ['teen', 'senior'],
+    question: "You invest 5,000 every month through a SIP for one year. How much have YOU put in (ignoring any returns)?",
+    options: ["60,000", "5,000", "12,000", "6,000"],
+    correctIndex: 0,
+    explanation: "5,000 × 12 months = 60,000 invested. Whatever the fund earns is on top of that, but your own contribution is fixed by you.",
+    xpReward: 25,
+    difficulty: 'easy'
+  },
+  {
+    id: 'nq-t-10',
+    category: 'SPENDING',
+    ageGroups: ['teen', 'senior'],
+    question: "A 'buy now, pay later' app splits a 12,000 purchase into 4 payments of 3,000. What is the biggest danger?",
+    options: ["It feels like free money, so you overspend and dues pile up", "The product costs more in the shop", "You can only use it once", "It lowers the product's quality"],
+    correctIndex: 0,
+    explanation: "Splitting a price makes it feel smaller, so people buy things they could not afford at once. Several small dues at the same time, plus late fees, add up fast.",
+    xpReward: 30,
+    difficulty: 'medium'
+  },
+  {
+    id: 'nq-t-11',
+    category: 'BUDGETING',
+    ageGroups: ['teen'],
+    question: "Your monthly allowance is 2,500. By day 20 you've spent 1,800, about 90 a day. If you keep spending at this pace, how will the 30-day month end?",
+    options: ["You'll be 200 short", "Exactly on budget", "200 left over", "700 short"],
+    correctIndex: 0,
+    explanation: "90 a day × 30 days = 2,700, which is 200 more than 2,500. Checking your daily average mid-month lets you slow down before you run out.",
+    xpReward: 35,
+    difficulty: 'medium'
+  },
+  {
+    id: 'nq-t-12',
+    category: 'INVESTING',
+    ageGroups: ['teen'],
+    question: "Over the long run, which of these usually carries the HIGHEST risk and the highest potential return?",
+    options: ["Stocks", "A savings account", "A fixed deposit", "Cash kept at home"],
+    correctIndex: 0,
+    explanation: "Stocks can swing a lot in the short term, but historically reward patient investors more than safer options. Higher potential return comes with higher risk.",
+    xpReward: 25,
+    difficulty: 'easy'
+  },
+  {
+    id: 'nq-t-13',
+    category: 'CREDIT',
+    ageGroups: ['teen'],
+    question: "A friend asks you to co-sign their loan. What happens if they stop paying?",
+    options: ["You are legally responsible for the repayment", "Nothing, it is their loan", "The bank cancels the loan", "Only their family has to pay"],
+    correctIndex: 0,
+    explanation: "A co-signer promises to repay if the borrower can't. Missed payments hurt your credit too — only co-sign if you can afford to pay the whole loan yourself.",
+    xpReward: 30,
+    difficulty: 'medium'
+  },
+  {
+    id: 'nq-t-14',
+    category: 'SPENDING',
+    ageGroups: ['teen'],
+    question: "What is 'lifestyle inflation'?",
+    options: ["Spending more every time your income goes up", "Prices rising across the country", "Buying cheaper goods over time", "Saving more as you earn more"],
+    correctIndex: 0,
+    explanation: "If every raise is absorbed by a nicer phone or more eating out, your savings never grow. Saving at least part of each raise breaks the cycle.",
+    xpReward: 25,
+    difficulty: 'easy'
+  },
+  {
+    id: 'nq-t-15',
+    category: 'TAXES',
+    ageGroups: ['teen'],
+    question: "Your income is below the level where you'd owe any income tax. Is filing a tax return still useful?",
+    options: ["Yes — it creates an official income record for loans, visas and refunds", "No — it's illegal to file", "No — it cancels your savings", "Only if you are over 60"],
+    correctIndex: 0,
+    explanation: "A filed return is proof of income that lenders and visa offices often ask for, and it is how you claim a refund if tax was deducted by mistake.",
+    xpReward: 30,
+    difficulty: 'medium'
+  },
+  {
+    id: 'nq-s-01',
+    category: 'INVESTING',
+    ageGroups: ['senior'],
+    question: "You invest 100,000 at 10% a year, compounded annually. What is it worth after 2 years?",
+    options: ["121,000", "120,000", "110,000", "122,000"],
+    correctIndex: 0,
+    explanation: "Year 1: 100,000 × 1.10 = 110,000. Year 2: 110,000 × 1.10 = 121,000. The extra 1,000 over simple interest (120,000) is interest earning interest.",
+    xpReward: 40,
+    difficulty: 'hard'
+  },
+  {
+    id: 'nq-s-02',
+    category: 'CREDIT',
+    ageGroups: ['senior'],
+    question: "A shop offers a 'flat 10% interest' loan on 100,000 for 2 years, repaid monthly. Why is the true annual rate (APR) well above 10%?",
+    options: ["Interest is charged on the full original amount even as you repay it", "Banks add secret taxes", "Because 2 years is a long time", "The rate is actually lower than 10%"],
+    correctIndex: 0,
+    explanation: "With a flat rate, interest is calculated on the whole 100,000 for the entire term, even though your balance shrinks each month. A reducing-balance loan at the same stated rate would cost much less.",
+    xpReward: 45,
+    difficulty: 'hard'
+  },
+  {
+    id: 'nq-s-03',
+    category: 'INVESTING',
+    ageGroups: ['senior'],
+    question: "A fixed deposit pays 7% while inflation is 6%. Roughly what is your real return?",
+    options: ["About 1%", "About 7%", "About 13%", "About −1%"],
+    correctIndex: 0,
+    explanation: "Real return ≈ (1.07 ÷ 1.06) − 1 ≈ 0.94%, about 1%. Most of your headline 7% is eaten by rising prices.",
+    xpReward: 40,
+    difficulty: 'hard'
+  },
+  {
+    id: 'nq-s-04',
+    category: 'TAXES',
+    ageGroups: ['senior'],
+    question: "Your 'marginal tax rate' is 20%. What does that mean?",
+    options: ["The tax rate on your NEXT unit of income, not on all of it", "You pay 20% on every unit you earn", "You pay 20% only on investments", "Your effective tax rate is also 20%"],
+    correctIndex: 0,
+    explanation: "In a slab system, only income inside the higher slab is taxed at the higher rate. Your overall (effective) tax rate is lower than your marginal rate.",
+    xpReward: 40,
+    difficulty: 'hard'
+  },
+  {
+    id: 'nq-s-05',
+    category: 'INVESTING',
+    ageGroups: ['senior'],
+    question: "Fund A charges a 1.5% yearly fee, Fund B charges 0.2%. On 500,000 invested, about how much more does Fund A cost each year?",
+    options: ["6,500", "1,300", "7,500", "65,000"],
+    correctIndex: 0,
+    explanation: "The difference is 1.5% − 0.2% = 1.3%. 1.3% of 500,000 = 6,500 a year, and the gap compounds over decades.",
+    xpReward: 40,
+    difficulty: 'hard'
+  },
+  {
+    id: 'nq-s-06',
+    category: 'CREDIT',
+    ageGroups: ['senior'],
+    question: "Your credit limit is 200,000 and you owe 90,000. To get your utilisation down to 30%, how much must you pay off?",
+    options: ["30,000", "60,000", "90,000", "15,000"],
+    correctIndex: 0,
+    explanation: "30% of 200,000 = 60,000 is the most you should be using. You owe 90,000, so pay off 90,000 − 60,000 = 30,000.",
+    xpReward: 45,
+    difficulty: 'hard'
+  },
+  {
+    id: 'nq-s-07',
+    category: 'BUDGETING',
+    ageGroups: ['senior'],
+    question: "Your expenses are 28,000 a month and you want a 6-month emergency fund. You already have 70,000. How much more do you need?",
+    options: ["98,000", "168,000", "70,000", "42,000"],
+    correctIndex: 0,
+    explanation: "Target: 28,000 × 6 = 168,000. You have 70,000, so you still need 168,000 − 70,000 = 98,000.",
+    xpReward: 35,
+    difficulty: 'medium'
+  },
+  {
+    id: 'nq-s-08',
+    category: 'INVESTING',
+    ageGroups: ['senior'],
+    question: "A stock trades at a P/E of 40 while similar companies average 18, with similar growth. What does that most likely suggest?",
+    options: ["It may be expensive compared with its peers", "It's guaranteed to outperform", "It has no debt", "It pays no tax"],
+    correctIndex: 0,
+    explanation: "A much higher P/E than comparable companies means you pay more for each unit of profit. That can be justified by better growth, but with similar growth it signals the stock may be overpriced.",
+    xpReward: 45,
+    difficulty: 'hard'
+  },
+  {
+    id: 'nq-s-09',
+    category: 'SPENDING',
+    ageGroups: ['senior'],
+    question: "You buy a 60,000 phone. If that money had instead been invested at 12% a year for 5 years (compounded), roughly what would it have become?",
+    options: ["About 105,700", "About 96,000", "About 120,000", "About 66,000"],
+    correctIndex: 0,
+    explanation: "60,000 × 1.12⁵ ≈ 60,000 × 1.7623 ≈ 105,740. That gap is the 'opportunity cost' — what a purchase really costs once you count what the money could have earned.",
+    xpReward: 45,
+    difficulty: 'hard'
+  },
+  {
+    id: 'nq-s-10',
+    category: 'CREDIT',
+    ageGroups: ['senior'],
+    question: "In the 'debt avalanche' method, which debt do you pay extra on first?",
+    options: ["The one with the highest interest rate", "The one with the smallest balance", "The oldest one", "The one from your favourite lender"],
+    correctIndex: 0,
+    explanation: "Avalanche targets the highest interest rate first, which minimises the total interest paid. (Snowball targets the smallest balance first for motivation.)",
+    xpReward: 35,
+    difficulty: 'medium'
+  },
+  {
+    id: 'nq-s-11',
+    category: 'TAXES',
+    ageGroups: ['teen', 'senior'],
+    question: "In a simple tax system the first 300,000 of income is taxed at 0% and the next 300,000 at 5%. How much tax is due on an income of 600,000?",
+    options: ["15,000", "30,000", "0", "9,000"],
+    correctIndex: 0,
+    explanation: "The first 300,000 is tax-free. The next 300,000 × 5% = 15,000. Only the portion inside each slab is taxed at that slab's rate.",
+    xpReward: 35,
+    difficulty: 'medium'
+  },
+  {
+    id: 'nq-s-12',
+    category: 'INVESTING',
+    ageGroups: ['teen', 'senior'],
+    question: "What is the main benefit of investing a fixed amount every month (a SIP) during ups and downs?",
+    options: ["You buy more units when prices are low and fewer when high", "You never lose money", "You always beat the market", "You avoid all fees"],
+    correctIndex: 0,
+    explanation: "A fixed amount buys more units when prices fall and fewer when they rise, which averages out your cost. It smooths risk; it does not remove it.",
+    xpReward: 30,
+    difficulty: 'medium'
+  },
+  {
+    id: 'nq-s-13',
+    category: 'BUDGETING',
+    ageGroups: ['teen', 'senior'],
+    question: "Your 40,000 salary arrives and 8,000 is moved automatically to savings on payday. What share of income are you saving?",
+    options: ["20%", "8%", "25%", "12%"],
+    correctIndex: 0,
+    explanation: "8,000 ÷ 40,000 = 0.20 = 20%. Automating it on payday means you never have to rely on willpower.",
+    xpReward: 30,
+    difficulty: 'medium'
+  },
+  {
+    id: 'nq-s-14',
+    category: 'CREDIT',
+    ageGroups: ['teen', 'senior'],
+    question: "Which of these is usually the CHEAPEST way to borrow?",
+    options: ["A loan secured against an asset you own, like gold or a home", "An unpaid credit card balance", "An instant-loan app", "A credit card cash advance"],
+    correctIndex: 0,
+    explanation: "Secured loans carry lower interest because the lender can claim the asset if you don't repay. Unsecured, instant borrowing usually costs far more.",
+    xpReward: 35,
+    difficulty: 'medium'
+  },
+  {
+    id: 'nq-s-15',
+    category: 'SPENDING',
+    ageGroups: ['teen', 'senior'],
+    question: "A product is priced at 1,000 and 18% tax is added at checkout. What is the final price?",
+    options: ["1,180", "1,018", "1,800", "1,080"],
+    correctIndex: 0,
+    explanation: "18% of 1,000 = 180, so the final price is 1,000 + 180 = 1,180. Always check whether a price shown includes tax.",
+    xpReward: 25,
+    difficulty: 'easy'
   },
 ];

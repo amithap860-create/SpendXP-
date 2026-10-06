@@ -33,6 +33,68 @@ import {
 import { cn } from '@/lib/utils';
 import { useGameTutorial, GameTutorialModal, HowToPlayButton } from '@/components/games/GameTutorial';
 import { fireConfettiCorrectAnswer } from '@/lib/confetti';
+import { QuickCalculator } from '@/components/QuickCalculator';
+
+// ─── No-repeat question memory (2026-10-07) ───────────────────────────────
+// Testers: "I don't want the same questions repeating all the time." Each
+// round used to be 10 random picks from a small pool with no memory, so
+// repeats were guaranteed (and "Try Again" re-served the exact same 10).
+// We now remember which question ids this device has been SHOWN, per age
+// group, and draw unseen ones first; once fewer than 10 unseen remain, the
+// oldest-seen fill the gap. The daily challenge is deliberately excluded —
+// it must be identical for everyone that day.
+const SEEN_KEY_PREFIX = 'spendxp_finiq_seen_';
+
+function readSeen(ageGroup: string): string[] {
+  try {
+    const raw = localStorage.getItem(SEEN_KEY_PREFIX + ageGroup);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+function markSeen(ageGroup: string, id: string) {
+  try {
+    const seen = readSeen(ageGroup).filter(x => x !== id);
+    seen.push(id); // most recent last
+    localStorage.setItem(SEEN_KEY_PREFIX + ageGroup, JSON.stringify(seen.slice(-200)));
+  } catch { /* storage unavailable — fall back to plain random */ }
+}
+
+function shuffled<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/** Unseen questions first (shuffled); if fewer than `count`, top up with the
+ *  least-recently-seen ones. Also spreads categories so a round isn't all
+ *  one topic when the unseen pool happens to be lopsided. */
+function pickFreshQuestions(pool: Question[], count: number, seenOrder: string[]): Question[] {
+  const seenSet = new Set(seenOrder);
+  const unseen = shuffled(pool.filter(q => !seenSet.has(q.id)));
+  let picks: Question[];
+  if (unseen.length >= count) {
+    picks = unseen.slice(0, count);
+  } else {
+    const rank = new Map(seenOrder.map((id, i) => [id, i]));
+    const stale = pool
+      .filter(q => seenSet.has(q.id))
+      .sort((a, b) => (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0)); // oldest first
+    picks = [...unseen, ...stale.slice(0, count - unseen.length)];
+  }
+  return shuffled(picks);
+}
+
+/** Rough "does this question need working out?" — any digit in the stem. */
+function questionNeedsMaths(question: string): boolean {
+  return /\d/.test(question);
+}
 
 const FINIQ_TUTORIAL_STEPS = [
   'You\'ll get 10 real-life money scenarios, one at a time.',
@@ -207,11 +269,16 @@ function InlineCalculator({ question }: { question: string }) {
 }
 
 /** Adaptive timer: juniors get more time, hard questions need more thought */
-function getTimerForQuestion(ageGroup: string, difficulty: string): number {
+function getTimerForQuestion(ageGroup: string, difficulty: string, question?: string): number {
   const base = ageGroup === 'junior' ? 22 : ageGroup === 'senior' ? 12 : 15;
-  if (difficulty === 'easy') return base + 5;
-  if (difficulty === 'hard') return Math.max(base - 3, 8);
-  return base;
+  let t = base;
+  if (difficulty === 'easy') t = base + 5;
+  else if (difficulty === 'hard') t = Math.max(base - 3, 8);
+  // Questions with numbers to work out get extra seconds, since players now
+  // have a calculator one tap away and using it takes time (the clock does
+  // NOT pause while it's open).
+  if (question && questionNeedsMaths(question)) t += 8;
+  return t;
 }
 
 export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) {
@@ -237,12 +304,18 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
     SPENDING: { correct: 0, total: 0 },
   });
 
-  // Adaptive timer — recalculated per question in the PLAYING render
+  // BUGFIX (2026-10-07): the engine's per-round timer used to be seeded from
+  // roundQuestions[0] only — every question in a round ran on question 1's
+  // time, while the HUD showed the CURRENT question's (different) number, so
+  // the label and the real clock disagreed. qIdx tracks which question is
+  // live so the engine's timePerRound follows the current question (and so
+  // math-heavy questions can actually get their extra seconds).
+  const [qIdx, setQIdx] = useState(0);
   const currentTimerSeconds = useMemo(() => {
-    const q = roundQuestions[0]; // fallback seed
+    const q = roundQuestions[qIdx];
     if (!q) return 15;
-    return getTimerForQuestion(ageGroup, q.difficulty);
-  }, [ageGroup, roundQuestions]);
+    return getTimerForQuestion(ageGroup, q.difficulty, q.question);
+  }, [ageGroup, roundQuestions, qIdx]);
 
   const gameConfig = useMemo(() => ({
     gameName: 'finIQ' as const,
@@ -280,24 +353,52 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
     return [...all].sort(() => seededRandom() - 0.5).slice(0, 10);
   }, []);
 
-  const getRandomQuestions = useCallback((all: Question[]) => [...all].sort(() => Math.random() - 0.5).slice(0, 10), []);
+  const buildRound = useCallback(() => {
+    const filtered = finIQQuestions.filter(q => q.ageGroups.includes(ageGroup));
+    const raw = isDailyChallenge
+      ? getDailySeededQuestions(filtered)
+      : pickFreshQuestions(filtered, 10, readSeen(ageGroup));
+    // Resolve each question to the user's country variant, then shuffle
+    // options independently for variety on every load.
+    setRoundQuestions(raw.map(q => shuffleOptions(q, countryCode)));
+    setQIdx(0);
+  }, [ageGroup, isDailyChallenge, countryCode, getDailySeededQuestions]);
 
   useEffect(() => {
-    if (gameState === 'IDLE') {
-      const filtered = finIQQuestions.filter(q => q.ageGroups.includes(ageGroup));
-      const raw = isDailyChallenge ? getDailySeededQuestions(filtered) : getRandomQuestions(filtered);
-      // Resolve each question to the user's country variant, then shuffle
-      // options independently for variety on every load.
-      setRoundQuestions(raw.map(q => shuffleOptions(q, countryCode)));
-    }
-  }, [gameState, ageGroup, isDailyChallenge, countryCode, getDailySeededQuestions, getRandomQuestions]);
+    if (gameState === 'IDLE') buildRound();
+  }, [gameState, buildRound]);
 
   const currentQuestion = roundQuestions[currentRound - 1];
 
-  // Per-question adaptive timer — changes as questions change
-  const questionTimerSeconds = currentQuestion
-    ? getTimerForQuestion(ageGroup, currentQuestion.difficulty)
-    : 15;
+  // Remember every question the player is actually shown, so the next round
+  // draws different ones (see pickFreshQuestions). Daily challenge excluded.
+  useEffect(() => {
+    if (gameState === 'PLAYING' && currentQuestion && !isDailyChallenge) {
+      markSeen(ageGroup, currentQuestion.id);
+    }
+  }, [gameState, currentQuestion?.id, ageGroup, isDailyChallenge]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // BUGFIX (2026-10-07): "Try Again" on the results screen called startGame()
+  // directly, which never passes back through IDLE — so it replayed the exact
+  // same 10 questions, in the same order, and kept the previous attempt's
+  // category stats on top. Rebuild the round and clear stats first.
+  const handleTryAgain = () => {
+    setSelectedOption(null);
+    setShowExplanation(false);
+    setXpPop(null);
+    setCategoryStats({
+      BUDGETING: { correct: 0, total: 0 },
+      INVESTING: { correct: 0, total: 0 },
+      CREDIT: { correct: 0, total: 0 },
+      TAXES: { correct: 0, total: 0 },
+      SPENDING: { correct: 0, total: 0 },
+    });
+    buildRound();
+    startGame();
+  };
+
+  // Per-question adaptive timer — now identical to what the engine runs
+  const questionTimerSeconds = currentTimerSeconds;
 
   const handleSelect = (idx: number) => {
     if (selectedOption !== null || (gameState !== 'PLAYING' && gameState !== 'PAUSED')) return;
@@ -329,7 +430,7 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
     setSelectedOption(null);
     setShowExplanation(false);
     setXpPop(null);
-    if (currentRound < 10) nextRound();
+    if (currentRound < 10) { setQIdx(i => i + 1); nextRound(); }
     // NOTE (2026-09): this explicitly passed 0, throwing away the 100xp
     // completion bonus declared in xpPerWin above. Per-question XP (via
     // correctAnswer() calls) still worked, so this game wasn't fully blank
@@ -393,7 +494,7 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
         <CardContent className="p-6 md:p-10 space-y-8">
           <div className="grid grid-cols-2 gap-4">
             <div className="p-4 rounded-xl bg-muted border border-border flex items-center gap-3"><Calendar className="h-5 w-5 text-primary" /><div className="text-xs md:text-sm font-bold">10 Scenarios</div></div>
-            <div className="p-4 rounded-xl bg-muted border border-border flex items-center gap-3"><Timer className="h-5 w-5 text-accent" /><div className="text-xs md:text-sm font-bold">15s Limit</div></div>
+            <div className="p-4 rounded-xl bg-muted border border-border flex items-center gap-3"><Timer className="h-5 w-5 text-accent" /><div className="text-xs md:text-sm font-bold">Timed + calculator</div></div>
           </div>
           <Button onClick={startGame} className="w-full h-14 md:h-16 text-lg md:text-xl font-black rounded-2xl shadow-xl shadow-primary/20 min-h-[44px]" suppressHydrationWarning>START QUIZ</Button>
         </CardContent>
@@ -444,7 +545,7 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
                 </div>
               </div>
               <div className="flex gap-3 md:gap-4">
-                <Button variant="outline" onClick={startGame} className="flex-1 gap-2 h-12 md:h-14 font-bold text-xs md:text-sm min-h-[44px]" suppressHydrationWarning><RotateCcw className="h-4 w-4" /> Try Again</Button>
+                <Button variant="outline" onClick={handleTryAgain} className="flex-1 gap-2 h-12 md:h-14 font-bold text-xs md:text-sm min-h-[44px]" suppressHydrationWarning><RotateCcw className="h-4 w-4" /> Try Again</Button>
                 <Button onClick={onExit} className="flex-1 h-12 md:h-14 font-bold text-xs md:text-lg min-h-[44px]" suppressHydrationWarning>Exit</Button>
               </div>
             </CardContent>
@@ -465,6 +566,10 @@ export function FinIQQuiz({ isDailyChallenge = false, onExit }: FinIQQuizProps) 
 
   return (
     <div className="relative max-w-3xl mx-auto">
+      {/* One-tap calculator (2026-10-07): previously only reachable inside the
+          Pause panel, which almost nobody found. Hidden while paused/after
+          answering since those states have their own calculator. */}
+      {gameState === 'PLAYING' && selectedOption === null && <QuickCalculator />}
 
       {/* ── Pause overlay ── */}
       {gameState === 'PAUSED' && (

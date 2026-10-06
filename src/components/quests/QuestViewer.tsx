@@ -10,7 +10,8 @@ import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { ConceptBreakdown } from '@/components/ConceptBreakdown';
-import { 
+import { QuickCalculator } from '@/components/QuickCalculator';
+import {
   ArrowRight, 
   ChevronRight, 
   CheckCircle2, 
@@ -372,6 +373,9 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
 
   return (
     <div className="flex-1 flex flex-col p-4 md:p-6 gap-6 md:gap-8 bg-background min-h-screen-safe overflow-y-auto">
+      {/* One-tap calculator (2026-10-07) — quest steps are full of rent %,
+          EMIs and tax figures. Quests aren't timed, so nothing to pause. */}
+      <QuickCalculator />
       <div className="sticky top-4 z-50 animate-in slide-in-from-top-4 duration-500 space-y-1.5">
         <div className="max-w-3xl mx-auto bg-card/90 backdrop-blur-md rounded-3xl border-2 border-border shadow-xl p-4 flex items-center justify-around">
           <div className="flex flex-col items-center">

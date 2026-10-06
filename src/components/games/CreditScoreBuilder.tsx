@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { XPWallet } from '@/components/XPWallet';
+import { QuickCalculator } from '@/components/QuickCalculator';
 import { ShieldCheck, Trophy, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ConceptBreakdown } from '@/components/ConceptBreakdown';
@@ -168,6 +169,7 @@ export function CreditScoreBuilder({ onExit }: { onExit: () => void }) {
 
   return (
     <div className="max-w-5xl mx-auto grid lg:grid-cols-12 gap-6 md:gap-8">
+      <QuickCalculator />
       <div className="lg:col-span-4">
         <Card className="p-6 md:p-8 text-center flex flex-col items-center justify-center">
           <div className={cn("text-5xl md:text-6xl font-black", band.color)}>{currentScore}</div>

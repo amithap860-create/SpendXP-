@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { XPWallet } from '@/components/XPWallet';
+import { QuickCalculator } from '@/components/QuickCalculator';
 import {
   Puzzle, TrendingUp, ShieldAlert, Landmark, Building2, Wallet,
   ArrowDownUp, Trophy, RefreshCcw, Sparkles, Info, CheckCircle2, X, BookOpen, Target,
@@ -707,6 +708,9 @@ export function MoneyMaze({ onExit }: { onExit: () => void }) {
 
   return (
     <div className="max-w-5xl mx-auto space-y-4">
+      {/* One-tap calculator (2026-10-07): Debt Domino and Portfolio Builder
+          both involve working out balances, rates and percentages. */}
+      <QuickCalculator />
       {/* Goals + Glossary toolbar */}
       <div className="flex items-center justify-between">
         <div className="flex gap-2">

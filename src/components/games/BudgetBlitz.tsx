@@ -31,6 +31,7 @@ import { useUser } from '@/lib/store';
 import { doc, setDoc } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { XPWallet } from '@/components/XPWallet';
+import { QuickCalculator } from '@/components/QuickCalculator';
 
 const TRIAL_MAX = 10;
 
@@ -488,6 +489,8 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
   // ── PLAYING ──────────────────────────────────────────────────────────────────
   return (
     <div className="relative w-full" ref={containerRef}>
+      {/* One-tap calculator (2026-10-07) — the game keeps running while open. */}
+      {gameState === 'PLAYING' && <QuickCalculator />}
       {/* Pause overlay */}
       {gameState === 'PAUSED' && (
         <div className="absolute inset-0 z-50 bg-slate-900/95 rounded-3xl flex flex-col overflow-hidden">
