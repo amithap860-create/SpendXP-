@@ -115,7 +115,14 @@ const LEVEL_THRESHOLDS = [
   { name: 'Investor', min: 500, max: 1500, color: 'bg-blue-500' },
   { name: 'Banker', min: 1500, max: 3500, color: 'bg-primary' },
   { name: 'Finance Pro', min: 3500, max: 7500, color: 'bg-primary' },
-  { name: 'Money Master', min: 7500, max: 15000, color: 'bg-secondary' },
+  // FIX (2026-10-07): 'bg-secondary' is a pale tint in light mode, so the white
+  // pill text + progress bar were near-invisible. Use solid colours that read in
+  // both themes. Levels extended past 15,000 XP so the top level is never a dead
+  // end (previously a 8,340 XP user saw "8,340 / 7,500 XP").
+  { name: 'Money Master', min: 7500, max: 15000, color: 'bg-amber-600' },
+  { name: 'Wealth Architect', min: 15000, max: 30000, color: 'bg-purple-600' },
+  { name: 'Finance Legend', min: 30000, max: 60000, color: 'bg-rose-600' },
+  { name: 'Tycoon', min: 60000, max: Infinity, color: 'bg-yellow-600' },
 ];
 
 const BADGE_META: Record<string, { label: string; icon: React.ElementType; color: string }> = {
@@ -720,8 +727,9 @@ export default function ProfilePage() {
   const levelInfo = getLevelInfo(progression.totalXP);
   const nextLevel = LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.indexOf(levelInfo) + 1];
   const xpIntoLevel = progression.totalXP - levelInfo.min;
-  const xpForLevel = (nextLevel?.min ?? levelInfo.max) - levelInfo.min;
-  const progressPct = Math.min(100, (xpIntoLevel / xpForLevel) * 100);
+  const isTopLevel = !nextLevel;
+  const xpForLevel = nextLevel ? nextLevel.min - levelInfo.min : 0;
+  const progressPct = isTopLevel ? 100 : Math.min(100, Math.max(0, (xpIntoLevel / xpForLevel) * 100));
   const ageLabel = profile.ageGroup === 'junior' ? 'Junior (8–12)' : profile.ageGroup === 'teen' ? 'Teen (13–16)' : 'Senior (17–20)';
   const avatarCfg = getAvatar(profile.avatarId ?? 'voss');
   const countryCfg = getCountryConfig(profile.countryCode ?? 'IN');
@@ -851,7 +859,7 @@ export default function ProfilePage() {
             <div className="h-2.5 bg-muted rounded-full overflow-hidden">
               <div className={cn('h-full rounded-full transition-all duration-700', levelInfo.color)} style={{ width: `${progressPct}%` }} />
             </div>
-            <div className="text-xs text-muted-foreground font-medium text-right">{xpIntoLevel.toLocaleString('en-IN')} / {xpForLevel.toLocaleString('en-IN')} XP</div>
+            <div className="text-xs text-muted-foreground font-medium text-right">{isTopLevel ? `${progression.totalXP.toLocaleString('en-IN')} XP · Max level` : `${xpIntoLevel.toLocaleString('en-IN')} / ${xpForLevel.toLocaleString('en-IN')} XP`}</div>
           </CardContent>
         </Card>
 
