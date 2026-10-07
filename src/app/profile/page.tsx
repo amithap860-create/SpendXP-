@@ -110,21 +110,6 @@ interface LinkedChild {
   ageGroup: string;
 }
 
-const LEVEL_THRESHOLDS = [
-  { name: 'Saver', min: 0, max: 500, color: 'bg-slate-500' },
-  { name: 'Investor', min: 500, max: 1500, color: 'bg-blue-500' },
-  { name: 'Banker', min: 1500, max: 3500, color: 'bg-primary' },
-  { name: 'Finance Pro', min: 3500, max: 7500, color: 'bg-primary' },
-  // FIX (2026-10-07): 'bg-secondary' is a pale tint in light mode, so the white
-  // pill text + progress bar were near-invisible. Use solid colours that read in
-  // both themes. Levels extended past 15,000 XP so the top level is never a dead
-  // end (previously a 8,340 XP user saw "8,340 / 7,500 XP").
-  { name: 'Money Master', min: 7500, max: 15000, color: 'bg-amber-600' },
-  { name: 'Wealth Architect', min: 15000, max: 30000, color: 'bg-purple-600' },
-  { name: 'Finance Legend', min: 30000, max: 60000, color: 'bg-rose-600' },
-  { name: 'Tycoon', min: 60000, max: Infinity, color: 'bg-yellow-600' },
-];
-
 const BADGE_META: Record<string, { label: string; icon: React.ElementType; color: string }> = {
   first_win:              { label: 'First Win',          icon: Trophy,      color: 'bg-[#E8F5EE] text-[#2E7D5A] border-[#A8D5BC]' },
   five_game_streak:       { label: '5-Game Streak',      icon: Flame,       color: 'bg-rose-50 text-rose-700 border-rose-200' },
@@ -146,13 +131,6 @@ const BADGE_META: Record<string, { label: string; icon: React.ElementType; color
   scholar:                { label: 'Scholar',             icon: BookOpen,    color: 'bg-blue-50 text-blue-700 border-blue-200' },
   emergency_fund_builder: { label: 'Emergency Builder',   icon: ShieldCheck, color: 'bg-[#E8F5EE] text-primary border-[#A8D5BC]' },
 };
-
-function getLevelInfo(xp: number) {
-  for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
-    if (xp >= LEVEL_THRESHOLDS[i].min) return LEVEL_THRESHOLDS[i];
-  }
-  return LEVEL_THRESHOLDS[0];
-}
 
 function ProfileSkeleton() {
   return (
@@ -724,12 +702,6 @@ export default function ProfilePage() {
   if (loading) return <ProfileSkeleton />;
   if (!profile || !progression) return <ProfileSkeleton />;
 
-  const levelInfo = getLevelInfo(progression.totalXP);
-  const nextLevel = LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.indexOf(levelInfo) + 1];
-  const xpIntoLevel = progression.totalXP - levelInfo.min;
-  const isTopLevel = !nextLevel;
-  const xpForLevel = nextLevel ? nextLevel.min - levelInfo.min : 0;
-  const progressPct = isTopLevel ? 100 : Math.min(100, Math.max(0, (xpIntoLevel / xpForLevel) * 100));
   const ageLabel = profile.ageGroup === 'junior' ? 'Junior (8–12)' : profile.ageGroup === 'teen' ? 'Teen (13–16)' : 'Senior (17–20)';
   const avatarCfg = getAvatar(profile.avatarId ?? 'voss');
   const countryCfg = getCountryConfig(profile.countryCode ?? 'IN');
@@ -844,25 +816,6 @@ export default function ProfilePage() {
           </Card>
         </div>
 
-        {/* ── Level progress ── */}
-        <Card className="border-none shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-black flex items-center gap-2">
-              <Star className="h-4 w-4 text-[#2E7D5A]" /> Level Progress
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 pt-0">
-            <div className="flex justify-between items-center">
-              <div className={cn('px-3 py-1 rounded-full text-white text-xs font-black', levelInfo.color)}>{levelInfo.name}</div>
-              {nextLevel && <div className="text-xs font-bold text-muted-foreground">{nextLevel.name} in {(nextLevel.min - progression.totalXP).toLocaleString('en-IN')} XP</div>}
-            </div>
-            <div className="h-2.5 bg-muted rounded-full overflow-hidden">
-              <div className={cn('h-full rounded-full transition-all duration-700', levelInfo.color)} style={{ width: `${progressPct}%` }} />
-            </div>
-            <div className="text-xs text-muted-foreground font-medium text-right">{isTopLevel ? `${progression.totalXP.toLocaleString('en-IN')} XP · Max level` : `${xpIntoLevel.toLocaleString('en-IN')} / ${xpForLevel.toLocaleString('en-IN')} XP`}</div>
-          </CardContent>
-        </Card>
-
         {/* ── Order Storyline card ── */}
         {(() => {
           const totalXP = progression.totalXP ?? 0;
@@ -894,6 +847,7 @@ export default function ProfilePage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2 mb-1">
                       <span className="text-base font-black text-foreground">{rank.name}</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-primary border border-primary/40 rounded px-1.5 py-0.5">{rank.title}</span>
                       <span className="text-[11px] font-bold text-muted-foreground">{rank.district}</span>
                     </div>
                     <div className="h-1.5 bg-muted rounded-full overflow-hidden mb-1">

@@ -2,6 +2,10 @@
 
 Running log of real fixes and changes, kept so you have something concrete to paste into the Play Console readiness questionnaire or release notes. I'll keep adding to this as we go — tell me any time you want the latest entries read out or copied somewhere.
 
+## 2026-10-07 (progression)
+
+- Profile: fixed Level Progress showing "8,340 / 7,500 XP" and an unreadable Money Master pill in light mode. The separate profile-only "level" ladder (Saver..Money Master) is now removed: there is ONE ladder, the Order ranks (Apprentice..Legend). Each rank carries a broader `title` (Saver, Investor, Banker, Tycoon) shown beside the rank name on the profile's Order card. Thresholds unchanged, so no player's rank changes.
+
 ## 2026-10-07 (later)
 
 - Floating calculator (QuickCalculator): always-visible button + non-modal panel in FinIQ Quiz, Budget Blitz, Money Maze, Credit Score Builder and Quests, so players can work out the maths BEFORE answering. The timer keeps running while it is open.

@@ -12,9 +12,15 @@
 
 // ─── RANKS ──────────────────────────────────────────────────────────────────
 
+/** Broad player title shown alongside the rank (replaces the old profile-only
+ *  "level" ladder: Saver -> Tycoon). One ladder, two labels: rank is the
+ *  specific step, title is the tier. Unified 2026-10-07. */
+export type PlayerTitle = 'Saver' | 'Investor' | 'Banker' | 'Tycoon';
+
 export type OrderRank = {
   id: string;
   name: string;
+  title: PlayerTitle;
   emoji: string;
   minXP: number;
   maxXP: number;
@@ -34,6 +40,7 @@ export type OrderRank = {
 export const RANKS: OrderRank[] = [
   {
     id: 'apprentice',
+    title: 'Saver',
     name: 'Apprentice',
     emoji: '🔍',
     minXP: 0,
@@ -47,6 +54,7 @@ export const RANKS: OrderRank[] = [
   },
   {
     id: 'scout',
+    title: 'Saver',
     name: 'Scout',
     emoji: '🗺️',
     minXP: 500,
@@ -60,6 +68,7 @@ export const RANKS: OrderRank[] = [
   },
   {
     id: 'agent',
+    title: 'Investor',
     name: 'Agent',
     emoji: '🕵️',
     minXP: 1500,
@@ -73,6 +82,7 @@ export const RANKS: OrderRank[] = [
   },
   {
     id: 'inspector',
+    title: 'Investor',
     name: 'Inspector',
     emoji: '🌍',
     minXP: 3500,
@@ -86,6 +96,7 @@ export const RANKS: OrderRank[] = [
   },
   {
     id: 'detective',
+    title: 'Banker',
     name: 'Detective',
     emoji: '🏛️',
     minXP: 7500,
@@ -99,6 +110,7 @@ export const RANKS: OrderRank[] = [
   },
   {
     id: 'chief',
+    title: 'Banker',
     name: 'Chief',
     emoji: '📋',
     minXP: 15000,
@@ -112,6 +124,7 @@ export const RANKS: OrderRank[] = [
   },
   {
     id: 'grandmaster',
+    title: 'Tycoon',
     name: 'Grandmaster',
     emoji: '⚔️',
     minXP: 30000,
@@ -125,6 +138,7 @@ export const RANKS: OrderRank[] = [
   },
   {
     id: 'legend',
+    title: 'Tycoon',
     name: 'Legend',
     emoji: '📜',
     minXP: 60000,
