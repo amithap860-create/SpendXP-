@@ -2,6 +2,10 @@
 
 Running log of real fixes and changes, kept so you have something concrete to paste into the Play Console readiness questionnaire or release notes. I'll keep adding to this as we go — tell me any time you want the latest entries read out or copied somewhere.
 
+## 2026-10-08
+
+- Fixed the web app hanging on the loading screen in browsers that had visited an older build. Cause: an earlier version registered a service worker at /sw.js; that file no longer exists on the server, so browsers could never update the worker and it kept serving stale cached pages (reproduced: normal Chrome stuck, Incognito fine; DevTools showed sw.js received 22/08/2026 still running). Added public/sw.js as a kill switch: it replaces the stale worker, clears all caches, unregisters itself and reloads the tab once. The installed Android app was never affected (it strips service workers on startup).
+
 ## 2026-10-07 (progression)
 
 - Profile: fixed Level Progress showing "8,340 / 7,500 XP" and an unreadable Money Master pill in light mode. The separate profile-only "level" ladder (Saver..Money Master) is now removed: there is ONE ladder, the Order ranks (Apprentice..Legend). Each rank carries a broader `title` (Saver, Investor, Banker, Tycoon) shown beside the rank name on the profile's Order card. Thresholds unchanged, so no player's rank changes.

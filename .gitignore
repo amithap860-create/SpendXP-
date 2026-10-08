@@ -54,7 +54,8 @@ s.ageGroups.includes*
 avatar.fallbackInitial
 
 # PWA generated files
-public/sw.js
+# public/sw.js is a hand-written KILL SWITCH (tracked on purpose). PWA is disabled,
+# so next-pwa no longer generates it. See the file header.
 public/sw.js.map
 public/workbox-*.js
 public/workbox-*.js.map
