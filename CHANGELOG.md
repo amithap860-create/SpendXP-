@@ -2,6 +2,10 @@
 
 Running log of real fixes and changes, kept so you have something concrete to paste into the Play Console readiness questionnaire or release notes. I'll keep adding to this as we go — tell me any time you want the latest entries read out or copied somewhere.
 
+## 2026-10-10
+
+- Android release build bumped to versionCode 9 / versionName 1.1.1 so the closed-testing track shows a fresh build, with a matched AAB + mapping.txt pair (build-release-aab.bat saves both as release-builds/spendxp-v9.*). No native code changed since versionCode 8; this build bundles the same shell, with `webContentsDebuggingEnabled` still false and minify on. Web changes since v8 (calculator, FinIQ no-repeat, quest expansion, unified ranks, service-worker kill switch) ship through Vercel and are not part of the binary.
+
 ## 2026-10-08
 
 - Fixed the web app hanging on the loading screen in browsers that had visited an older build. Cause: an earlier version registered a service worker at /sw.js; that file no longer exists on the server, so browsers could never update the worker and it kept serving stale cached pages (reproduced: normal Chrome stuck, Incognito fine; DevTools showed sw.js received 22/08/2026 still running). Added public/sw.js as a kill switch: it replaces the stale worker, clears all caches, unregisters itself and reloads the tab once. The installed Android app was never affected (it strips service workers on startup).
