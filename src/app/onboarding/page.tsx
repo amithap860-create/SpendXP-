@@ -3,7 +3,7 @@
 import { useState, Suspense } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { db } from '@/firebase';
-import { doc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -94,6 +94,26 @@ function OnboardingContent() {
       const ageGroup = birthYear ? getAgeGroup(birthYear) : 'junior';
       const userRef = doc(db, 'users', uid);
 
+      // UNDER-13 GATE (2026-10-12): the email signup path asks a parent for
+      // approval BEFORE creating an account, but "Continue with Google" (web)
+      // creates the account first and lands here with no age check, and this
+      // screen lets anyone pick any birth year from 8 to 20. So the decision
+      // is made here, on the FINAL birth year: if under 13 and no parental
+      // consent is recorded, flag the account `consentRequired` and send the
+      // child to /consent. ConsentGuard (layout) keeps them there until a
+      // parent approves. Accounts that already have consentGiven (e.g. made
+      // through the email+parent flow) pass straight through.
+      const age = birthYear ? currentYear - birthYear : null;
+      let needsConsent = false;
+      if (age !== null && age < 13) {
+        try {
+          const existing = await getDoc(userRef);
+          needsConsent = !existing.data()?.consentGiven;
+        } catch {
+          needsConsent = true; // can't verify -> fail closed for a child
+        }
+      }
+
       const success = await safeSetDoc(userRef, {
         displayName: nickname,
         nickname,
@@ -105,6 +125,9 @@ function OnboardingContent() {
         currencyCode: selectedCountry.currency.code,
         balance: selectedCountry.startingBalance,
         onboardingComplete: true,
+        // Only ever set to true here; the parent-approval API clears the need
+        // by setting consentGiven. Never write `false` (would unlock a child).
+        ...(needsConsent ? { consentRequired: true } : {}),
         updatedAt: serverTimestamp(),
       }, { merge: true });
 
@@ -120,7 +143,7 @@ function OnboardingContent() {
         } catch {
           // Non-fatal — XP will sync on next activity
         }
-        router.push('/games');
+        router.push(needsConsent ? '/consent' : '/games');
       } else {
         setError('Could not save your profile. Please try again.');
       }

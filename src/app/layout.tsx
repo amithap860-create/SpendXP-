@@ -16,6 +16,7 @@ import { OfflineBanner } from '@/components/OfflineBanner';
 import dynamic from 'next/dynamic';
 import { useNativeInit } from '@/hooks/useNativeInit';
 import { useAuthContext } from '@/context/AuthContext';
+import { ConsentGuard } from '@/components/ConsentGuard';
 import { useProgression } from '@/hooks/useProgression';
 import { ThemeProvider } from '@/context/ThemeContext';
 
@@ -157,6 +158,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
       )}
+      <ConsentGuard />
       <BugReportButton />
       <FinEducatorChat />
       <Toaster />

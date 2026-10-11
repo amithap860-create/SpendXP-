@@ -2,6 +2,12 @@
 
 Running log of real fixes and changes, kept so you have something concrete to paste into the Play Console readiness questionnaire or release notes. I'll keep adding to this as we go — tell me any time you want the latest entries read out or copied somewhere.
 
+## 2026-10-12 (branch feature/under13-consent-gate, NOT yet on main)
+
+- Closed an under-13 consent gap. Email signup already asked a parent for approval before creating an account, but web "Continue with Google" created the account first and went to onboarding with no age check, and onboarding let anyone pick any birth year 8-20. Now onboarding decides on the FINAL birth year: under 13 with no `consentGiven` -> account flagged `consentRequired`, child sent to /consent; a new ConsentGuard (mounted in the root layout) keeps flagged children there until the server-side approval API sets `consentGiven`. Existing accounts are untouched (no flag). Guard fails open on read errors; onboarding fails closed for children. /consent gained a "My parent approved - continue" check button.
+- firestore.rules: `consentGiven` and `coppaConsented` are now protected fields (client can no longer self-approve). Rules must be deployed separately (firebase deploy --only firestore:rules); code works without it but a child could still self-approve until deployed.
+- Known follow-up: /api/consent-email trusts the uid in the request body (no auth check), so anyone could trigger a consent email for any uid. Low impact, should be fixed with an ID-token check.
+
 ## 2026-10-10
 
 - Android release build bumped to versionCode 9 / versionName 1.1.1 so the closed-testing track shows a fresh build, with a matched AAB + mapping.txt pair (build-release-aab.bat saves both as release-builds/spendxp-v9.*). No native code changed since versionCode 8; this build bundles the same shell, with `webContentsDebuggingEnabled` still false and minify on. Web changes since v8 (calculator, FinIQ no-repeat, quest expansion, unified ranks, service-worker kill switch) ship through Vercel and are not part of the binary.
