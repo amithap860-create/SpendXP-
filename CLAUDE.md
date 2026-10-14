@@ -857,6 +857,19 @@ Anthropic Console: console.anthropic.com
 
 ---
 
+## PLAY RELEASE NOTES RULE (added 2026-10-14)
+
+Google's production-access review looks at whether tester feedback led to app
+UPDATES on the closed-testing track (web-only Vercel fixes are invisible to
+them). So EVERY time a new AAB / versionCode is built:
+1. Bump versionCode + versionName in android/app/build.gradle.
+2. Write Play release notes (max 500 characters, user-facing, tie each line to
+   a real tester report or fix; never pad with empty changes).
+3. Add them to CHANGELOG.md under a "Play release notes - versionName" heading,
+   and give them to AP in the reply, wrapped in <en-US>...</en-US> tags.
+4. Keep a dated feedback log entry (who reported what, what changed) so the
+   next production-access application can quote it.
+
 ## KEEPING THIS FILE CURRENT — MANDATORY, DO NOT SKIP
 
 This file went stale before (it described a static-export app
