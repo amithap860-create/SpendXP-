@@ -2,6 +2,12 @@
 
 Running log of real fixes and changes, kept so you have something concrete to paste into the Play Console readiness questionnaire or release notes. I'll keep adding to this as we go — tell me any time you want the latest entries read out or copied somewhere.
 
+## Tester feedback log (bugReports) - status as of 2026-10-15
+
+Marked `resolved` in Firestore on 2026-10-15 (11 of 17): Peter Lynch lesson/quiz crash or not loading x4 (10, 12, 21, 21 Sep; lesson confirmed working), Stock Sim stuck at Day 2 x2 (11, 26 Sep; fixed 26 Sep), Budget Blitz rent shown as "$12" (21 Sep; fixed 28 Sep), Budget Blitz score mismatch (21 Sep; fixed 28 Sep), Money Maze can't drag (21 Sep; replaced with Up/Down buttons), Profile Level Progress colour (7 Oct; card removed), junk "testing" report.
+
+Left `new` on purpose (6 of 17): quests not showing complete (12 Sep), same cases repeating (11 Sep), quest list jumps to top (12 Sep), Budget Blitz too fast at start (14 Oct) - fixed on branch feature/lesson-player, mark resolved once merged to main and live; signed out every time the app opens (5 Sep) - no code cause found, awaiting retest on v10; Stock Sim slow to load (11 Sep) - low priority, not changed.
+
 ## NEXT AAB (planned 1.1.3, not built yet) - release notes to use
 
 Everything below shipped to testers via Vercel (web content) on merge of feature/lesson-player. The AAB itself only needs a version bump (versionCode 11 / 1.1.3) plus any native/shell changes; its Play release notes should still name these changes so reviewers see feedback being acted on.
