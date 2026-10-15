@@ -26,6 +26,7 @@ What's new:
 - Fixed quests not showing as complete; you now get a retry if saving fails
 - Case Files list keeps your place after a quest
 - Budget Blitz starts slower so you can read the cards
+- Fixed the in-game calculator getting stuck open; it now has its own close button
 </en-US>
 
 ## 2026-10-15 - Lesson player redesign + "What Makes a Stock Move?" (branch feature/lesson-player)
@@ -42,6 +43,10 @@ What's new:
 - Fixed a factually wrong compound-interest statistic (was off 3-10x), removed an unsourced savings-rate statistic and an invented quote, corrected two crypto/market facts.
 - Added an educational-use disclaimer and "content last reviewed" date on Learn, Quests hub and quest completion screens (config/content.ts).
 - Full findings and remaining items: CONTENT-AUDIT.md.
+
+## 2026-10-15 - Calculator stuck open (web only)
+
+- Tester report: the quick calculator could not be closed when opened during a game. The open panel covered the floating button that was meant to close it. The floating button now hides while open and the panel has its own close (X) button. File: QuickCalculator.tsx.
 
 ## 2026-10-15 - Tester bug-report fixes (web only, ships via Vercel)
 

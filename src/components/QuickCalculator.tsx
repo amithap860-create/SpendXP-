@@ -130,21 +130,29 @@ export function QuickCalculator({ className }: { className?: string }) {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(o => !o)}
-        aria-label={open ? 'Close calculator' : 'Open calculator'}
-        aria-expanded={open}
-        className={cn(
-          'fixed right-4 bottom-[calc(156px+env(safe-area-inset-bottom,0px))] md:bottom-[84px] z-40',
-          'h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center',
-          'hover:opacity-90 transition-opacity',
-          className
-        )}
-        suppressHydrationWarning
-      >
-        {open ? <X className="h-5 w-5" /> : <Calculator className="h-5 w-5" />}
-      </button>
+      {/* FIX (2026-10-15): tester report — "the calculator stays up with no way
+          to close it". The open panel (z-60) is tall enough on a phone to sit
+          directly ON TOP of this floating button (z-40, 156px from the
+          bottom), so the button that was supposed to close it was hidden
+          underneath. The floating button now only shows while the calculator
+          is closed, and the open panel has its own close button in its header. */}
+      {!open && (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="Open calculator"
+          aria-expanded={false}
+          className={cn(
+            'fixed right-4 bottom-[calc(156px+env(safe-area-inset-bottom,0px))] md:bottom-[84px] z-40',
+            'h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center',
+            'hover:opacity-90 transition-opacity',
+            className
+          )}
+          suppressHydrationWarning
+        >
+          <Calculator className="h-5 w-5" />
+        </button>
+      )}
 
       {open && (
         <div
@@ -152,6 +160,18 @@ export function QuickCalculator({ className }: { className?: string }) {
           role="dialog"
           aria-label="Calculator"
         >
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-black uppercase tracking-widest text-white/50">Calculator</span>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label="Close calculator"
+              className="h-9 w-9 -mr-1 -mt-1 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+              suppressHydrationWarning
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
           <div className="text-right font-mono bg-slate-800 rounded-lg px-3 py-2 mb-2 min-h-[56px] flex flex-col justify-end overflow-hidden">
             <div className={cn('text-white text-2xl font-bold truncate', result === 'Error' && 'text-rose-400')}>
               {expr === '' ? '0' : expr}
