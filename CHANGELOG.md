@@ -2,6 +2,24 @@
 
 Running log of real fixes and changes, kept so you have something concrete to paste into the Play Console readiness questionnaire or release notes. I'll keep adding to this as we go — tell me any time you want the latest entries read out or copied somewhere.
 
+## NEXT AAB (planned 1.1.3, not built yet) - release notes to use
+
+Everything below shipped to testers via Vercel (web content) on merge of feature/lesson-player. The AAB itself only needs a version bump (versionCode 11 / 1.1.3) plus any native/shell changes; its Play release notes should still name these changes so reviewers see feedback being acted on.
+
+Tie each item to tester feedback in the dated feedback log (bug reports 11-12 Sep quests, 14 Oct Budget Blitz speed, tester ask for more fun lessons / stock-movers topic).
+
+Still to do before building 1.1.3: server-side fix for editable birth year on Profile; auth check on /api/consent-email; update Play Data safety form.
+
+<en-US>
+What's new:
+- Lessons now play as short animated scenes with interactive charts
+- New lesson: What Makes a Stock Move? (buybacks, inflation, interest rates)
+- 9 more lessons and 100+ new quiz questions on credit, loans, scams, tax and retirement
+- Fixed quests not showing as complete; you now get a retry if saving fails
+- Case Files list keeps your place after a quest
+- Budget Blitz starts slower so you can read the cards
+</en-US>
+
 ## 2026-10-15 - Lesson player redesign + "What Makes a Stock Move?" (branch feature/lesson-player)
 
 - Lessons are no longer a card pager. Each card is now an animated SCENE that unfolds beat by beat (coach bubbles -> animated visual -> "in real life" bubble), then swipe-through fun facts, a quiz with pop/shake feedback and a reward screen with an XP count-up. Reduced-motion users get no animation. Data model unchanged, so all existing lessons work as-is.
