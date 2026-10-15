@@ -50,7 +50,8 @@ export const newLessons: Record<string, Lesson> = {
         visual: 'comparison',
         visualData: {
           left: { label: 'Savings a/c @3% (5 yrs)', value: 15927, color: '#f59e0b' },
-          right: { label: 'FD @7% (5 yrs)', value: 40255, color: '#10b981' }
+          right: { label: 'FD @7% (5 yrs)', value: 40255, color: '#10b981' },
+          prefix: '₹'
         },
         xpReward: 20
       },
@@ -125,10 +126,12 @@ export const newLessons: Record<string, Lesson> = {
         visual: 'bar',
         visualData: {
           items: [
-            { label: '3-yr interest (₹k)', value: 64, color: '#10b981' },
-            { label: '5-yr interest (₹k)', value: 108, color: '#f59e0b' },
-            { label: '7-yr interest (₹k)', value: 155, color: '#ef4444' }
-          ]
+            { label: 'Interest paid over 3 years', value: 64, color: '#10b981' },
+            { label: 'Interest paid over 5 years', value: 108, color: '#f59e0b' },
+            { label: 'Interest paid over 7 years', value: 155, color: '#ef4444' }
+          ],
+          prefix: '₹',
+          unit: 'k'
         },
         xpReward: 25
       },
@@ -148,7 +151,8 @@ export const newLessons: Record<string, Lesson> = {
         visual: 'comparison',
         visualData: {
           left: { label: '12% flat – total repaid', value: 124000, color: '#ef4444' },
-          right: { label: '12% reducing – total repaid', value: 112976, color: '#10b981' }
+          right: { label: '12% reducing – total repaid', value: 112976, color: '#10b981' },
+          prefix: '₹'
         },
         xpReward: 25
       },
@@ -211,7 +215,8 @@ export const newLessons: Record<string, Lesson> = {
         visual: 'comparison',
         visualData: {
           left: { label: 'Pay in full', value: 10000, color: '#10b981' },
-          right: { label: 'Carry for 12 months', value: 15111, color: '#ef4444' }
+          right: { label: 'Carry for 12 months', value: 15111, color: '#ef4444' },
+          prefix: '₹'
         },
         xpReward: 25
       },
@@ -442,7 +447,8 @@ export const newLessons: Record<string, Lesson> = {
         visual: 'comparison',
         visualData: {
           left: { label: 'Marginal rate (top slab)', value: 10, color: '#f59e0b' },
-          right: { label: 'Effective rate overall', value: 4.4, color: '#10b981' }
+          right: { label: 'Effective rate overall', value: 4.4, color: '#10b981' },
+          unit: '%'
         },
         xpReward: 25
       },
@@ -524,7 +530,8 @@ export const newLessons: Record<string, Lesson> = {
             { label: 'Base price', value: 1000, color: '#2e72db' },
             { label: 'GST @18%', value: 180, color: '#ef4444' },
             { label: 'You pay', value: 1180, color: '#10b981' }
-          ]
+          ],
+          prefix: '₹'
         },
         xpReward: 20
       },
@@ -598,8 +605,10 @@ export const newLessons: Record<string, Lesson> = {
         },
         visual: 'comparison',
         visualData: {
-          left: { label: 'Start at 35 (25 yrs)', value: 4755, color: '#f59e0b' },
-          right: { label: 'Start at 25 (35 yrs)', value: 11469, color: '#10b981' }
+          left: { label: 'Start at 35 (25 yrs)', value: 47.6, color: '#f59e0b' },
+          right: { label: 'Start at 25 (35 yrs)', value: 114.7, color: '#10b981' },
+          prefix: '₹',
+          unit: ' lakh'
         },
         xpReward: 25
       },
@@ -651,6 +660,193 @@ export const newLessons: Record<string, Lesson> = {
       { emoji: '⏰', fact: 'Because of compounding, starting a retirement contribution at 25 instead of 35 can more than double the final amount, even with the same monthly deposit.' },
       { emoji: '🏛️', fact: 'EPF, PPF and NPS each have different lock-ins, limits and tax rules, and those rules are revised from time to time — check the official source before you invest.' },
       { emoji: '🎯', fact: 'Retirement estimates rely on assumed returns and inflation. They are planning tools, not promises.' }
+    ]
+  },
+  // ───────────────────────── INVESTING: WHAT MOVES A STOCK ─────────────────────────
+  // Added 2026-10-15 at a tester's request ("why does a buyback make a stock fall?
+  // why does inflation affect the market? what moves a market?"). Placed right after
+  // 'l-investing' so stock/share vocabulary is already taught.
+  // Maths: 1,000 cr profit / 100 cr shares = EPS 10. Buy back 5% (5 cr shares at 150
+  // = 750 cr) → 95 cr shares → EPS 10.53; at an unchanged P/E of 15 that is ~157.9.
+  // Discounting: 100 / 1.05 = 95.24, 100 / 1.08 = 92.59.
+  'l-stock-movers': {
+    id: 'l-stock-movers',
+    topic: 'investing',
+    relatedGame: 'stockMarketSim',
+    title: 'What Makes a Stock Move?',
+    estimatedMinutes: 6,
+    ageGroups: ['teen', 'senior'],
+    cards: [
+      {
+        id: 'sm1',
+        title: 'A Price Is a Tug-of-War',
+        body: {
+          junior: "A stock's price is just what people agree to pay right now. If lots of people want to buy it, the price goes up. If lots want to sell, it goes down.",
+          teen: "A stock price is simply the last price a buyer and a seller agreed on. Every trade needs both. When more people want to buy than sell, buyers have to offer more to get shares, so the price rises. When more want to sell, sellers have to accept less, so it falls. News matters only because it changes how many people want to buy or sell.",
+          senior: "A quoted price is the last price at which a buyer and a seller were matched. Price discovery is the tug-of-war between demand and supply at each moment: excess buying pushes the price up until enough sellers are tempted, excess selling pushes it down until enough buyers step in. Every driver in this lesson — profits, rates, inflation, news — works through one channel: it shifts the balance of buyers and sellers."
+        },
+        example: {
+          junior: "Like trading cards at school: a rare card everyone wants costs more stickers than a card nobody cares about.",
+          teen: "A company announces a new factory. More investors think it will earn more in future, so more want to buy. Sellers now ask for a higher price before letting go of their shares — and the price climbs.",
+          senior: "On results day a stock sees 5 lakh shares of buy orders against 2 lakh of sell orders at the current price. The unmatched buyers bid higher, and the price steps up until selling interest rises to meet them."
+        },
+        visual: 'tug',
+        visualData: {
+          leftLabel: 'Sellers',
+          rightLabel: 'Buyers',
+          events: [
+            { label: 'Company reports record profit', shift: 22 },
+            { label: 'New factory announced', shift: 14 },
+            { label: 'Big investor sells a large stake', shift: -16 },
+            { label: 'A key product is banned', shift: -28 },
+            { label: 'Central bank hikes interest rates', shift: -12 },
+            { label: 'Strong sales numbers released', shift: 18 }
+          ]
+        },
+        xpReward: 25
+      },
+      {
+        id: 'sm2',
+        title: "It's Not the News — It's the Surprise",
+        body: {
+          junior: "Sometimes a company has great news and its stock still falls! That happens when people hoped for even MORE than they got.",
+          teen: "Markets move on the gap between what people EXPECTED and what actually happened. If investors already expect a big profit, the price already includes it — this is called being 'priced in'. A good result that is smaller than hoped can make a stock fall, and a bad result that is better than feared can make it rise.",
+          senior: "Prices reflect expectations, so only new information moves them. Analysts publish consensus estimates and traders form unofficial 'whisper' numbers; the reaction depends on the surprise versus those, plus any change in guidance for the future. A beat that is smaller than the whisper number, or a strong quarter paired with cautious guidance, can trigger a sell-off even though the headline looks good."
+        },
+        example: {
+          junior: "Imagine you hoped for 100 marks and got 90. You feel sad even though 90 is great. Stocks react to hopes, too.",
+          teen: "Analysts expect ₹100 crore profit; a company reports ₹110 crore — a beat. But traders had quietly hoped for ₹125 crore, so many sell and the stock drops anyway.",
+          senior: "Consensus EPS ₹10, reported ₹10.50 (+5% beat), but management cuts next-year growth guidance from 18% to 12%. The market reprices the future, not the past quarter, and the stock falls despite the beat."
+        },
+        visual: 'chain',
+        visualData: {
+          steps: [
+            { title: 'Analysts expect a profit of ₹100 crore' },
+            { title: 'The company reports ₹110 crore — a beat!' },
+            { title: 'But traders had quietly hoped for ₹125 crore', note: 'That hope was already built into the price.' },
+            { title: 'Disappointed buyers sell, and the price falls', note: 'The news was good. It was just less good than the price assumed.' }
+          ]
+        },
+        xpReward: 25
+      },
+      {
+        id: 'sm3',
+        title: 'What Is a Buyback?',
+        body: {
+          junior: "A buyback is when a company uses its own money to buy back some of its own shares from people. The company then has fewer shares in the world.",
+          teen: "A buyback (share repurchase) is when a company uses its spare cash to buy its own shares from investors, then cancels them. With fewer shares left, each remaining share owns a bigger slice of the company, and profit per share (EPS) goes up even if total profit stays the same. Companies do it to return cash to shareholders and sometimes to signal they think the stock is cheap.",
+          senior: "A buyback is a capital-return method: the company repurchases its shares through the open market or a tender offer (often at a premium to market) and extinguishes them. Share count falls, so earnings per share rise mechanically: EPS = profit ÷ shares outstanding. It is an alternative to dividends, and its tax treatment for shareholders differs by country and has changed over time — check the current rules. The cash used is no longer available for growth or to cut debt."
+        },
+        example: {
+          junior: "A pizza cut into 10 slices: you own 1 slice. If 5 slices disappear, the same pizza is cut into fewer slices, so your slice is worth more.",
+          teen: "A company earns ₹1,000 crore with 100 crore shares: EPS = ₹10. It spends ₹750 crore to buy back 5 crore shares at ₹150. Now there are 95 crore shares: EPS = ₹10.53. Same profit, higher profit per share.",
+          senior: "₹1,000 cr profit, 100 cr shares → EPS ₹10. Repurchase 5% (5 cr shares × ₹150 = ₹750 cr) → 95 cr shares → EPS ≈ ₹10.53 (+5.3%). At an unchanged P/E of 15, that implies a price of about ₹158 versus ₹150 — before accounting for the lost interest income on the ₹750 cr and the loss of financial flexibility."
+        },
+        visual: 'comparison',
+        visualData: {
+          left: { label: 'Profit per share BEFORE buyback', value: 10, color: '#94a3b8' },
+          right: { label: 'AFTER buying back 5% of shares', value: 10.5, color: '#10b981' },
+          prefix: '₹'
+        },
+        xpReward: 25
+      },
+      {
+        id: 'sm4',
+        title: 'Why a Buyback Can Lift — or Drop — a Price',
+        body: {
+          junior: "Buybacks usually help a stock because there are fewer shares and the company seems confident. But they can also hurt if the company is using its money in a risky way.",
+          teen: "Buybacks often lift a price: higher EPS, extra demand from the company itself, and a signal that management thinks the shares are cheap. But the price can fall too — if the company borrows heavily to fund it, if investors read it as 'we have no better ideas to grow', if it was already expected (priced in), or when a tender offer ends and the extra demand disappears. A buyback is information, not a guarantee.",
+          senior: "Announcement effects are on average positive, but not mechanical. Bearish readings: debt-funded repurchases raise financial risk; it may signal that management sees few high-return growth projects; buybacks can merely offset dilution from employee stock options (so the share count doesn't really fall); and a tender-offer premium vanishes once the window closes. Judge a buyback by its funding source, the company's growth prospects, whether it was anticipated, and whether it actually reduces the share count."
+        },
+        example: {
+          junior: "A shop that uses its savings to buy more of its own stickers may look confident — or may be out of better ideas. You'd need to look at the whole story.",
+          teen: "Company A uses spare cash for a buyback: investors cheer. Company B borrows heavily to do the same: investors worry about its debt, and the price falls. Same word, opposite reactions.",
+          senior: "A firm announces a ₹2,000 cr buyback funded by new borrowing while its sales growth is slowing. EPS rises, but net debt/EBITDA also rises and the market reads it as financial engineering — the stock falls despite the headline."
+        },
+        visual: 'tug',
+        visualData: {
+          leftLabel: 'Pushes price down',
+          rightLabel: 'Pushes price up',
+          events: [
+            { label: 'Fewer shares, so profit per share rises', shift: 20 },
+            { label: 'Signals management thinks the stock is cheap', shift: 15 },
+            { label: 'Funded by taking on heavy debt', shift: -22 },
+            { label: 'Read as "no better growth ideas"', shift: -16 },
+            { label: 'Already expected, so it is priced in', shift: -8 },
+            { label: 'Tender offer ends and the extra demand stops', shift: -12 }
+          ]
+        },
+        xpReward: 30
+      },
+      {
+        id: 'sm5',
+        title: 'Inflation, Interest Rates & Stocks',
+        body: {
+          junior: "When prices of everything keep rising, the people who run the country's money try to slow it down by making borrowing more expensive. That usually makes company stocks less exciting.",
+          teen: "When inflation runs high, central banks often raise interest rates to cool the economy. Higher rates make loans costlier for companies and shoppers, so profits are expected to slow. They also make safe options like FDs and bonds pay more, so stocks look less attractive. Finally, investors value a company by its FUTURE profits — and higher interest rates make those future profits worth less today.",
+          senior: "Inflation hits stocks through several channels: input costs squeeze margins unless a company has pricing power; consumers cut discretionary spending; and central banks raise policy rates. Higher rates lift borrowing costs, raise the yield on risk-free alternatives, and increase the discount rate applied to future cash flows — which reduces present values, with long-duration 'growth' stocks (profits far in the future) typically hit hardest. The effect isn't uniform: companies with pricing power and banks with widening margins can hold up better."
+        },
+        example: {
+          junior: "Saving ₹100 for next year is worth less to you today if you could earn more interest elsewhere. Investors think the same way about a company's future profits.",
+          teen: "₹100 promised in one year is worth about ₹95.2 today if safe interest is 5%, but only about ₹92.6 if it is 8%. The same future profit becomes worth less today, so share prices tend to fall when rates rise.",
+          senior: "Discounting a ₹100 cash flow due in a year: ÷1.05 = ₹95.24, ÷1.08 = ₹92.59 (−2.8%). For a cash flow due in 10 years the gap is far larger (÷1.05¹⁰ = ₹61.4 versus ÷1.08¹⁰ = ₹46.3, −24.6%), which is why growth stocks swing the most on rate news."
+        },
+        visual: 'chain',
+        visualData: {
+          steps: [
+            { title: 'Prices rise faster across the economy (inflation)' },
+            { title: 'The central bank raises interest rates to cool things down' },
+            { title: 'Loans cost more; FDs and bonds now pay more', note: 'Safe options become more tempting than stocks.' },
+            { title: 'Companies pay more to borrow, and shoppers spend less', note: 'Profits are expected to grow more slowly.' },
+            { title: 'Future profits are worth less today, so stocks tend to fall', note: 'Growth stocks usually feel it most.' }
+          ]
+        },
+        xpReward: 30
+      },
+      {
+        id: 'sm6',
+        title: 'What Moves the Whole Market?',
+        body: {
+          junior: "Sometimes all stocks go up or down together. That can happen because of big news — like how the economy is doing, what's happening in other countries, or whether people feel confident or scared.",
+          teen: "Whole markets move on big-picture forces: economic data (growth, jobs, inflation), central bank decisions, oil and currency moves, global markets (a sell-off abroad often spills over), money flowing in or out from big institutions and foreign investors, major elections or policy changes, and plain sentiment — fear and greed. Often several act at once, and markets react to what is EXPECTED to happen, not only what has happened.",
+          senior: "Index-level drivers: macro data and policy (growth, inflation, rate path), liquidity and institutional flows (e.g., foreign portfolio investors' buying or selling), global risk appetite and correlated sell-offs, commodity and currency shocks (oil, the rupee), earnings season trends, regulation and elections, and sentiment — measured by gauges like India VIX. Short-term moves are noisy and hard to predict; that is why diversification and a long horizon matter more than guessing the next headline."
+        },
+        example: {
+          junior: "If everyone in school gets scared about a rumour, many kids might sell their stickers at once — and prices drop for all of them.",
+          teen: "Global markets fall sharply overnight and oil spikes. Investors fear slower growth, so the Indian market opens lower even though no Indian company has had bad news.",
+          senior: "FPIs sell heavily for several sessions as US yields rise and the rupee weakens; the index falls even though domestic earnings are on track. Months later, flows reverse and the index recovers — the trigger was liquidity and global risk appetite, not company fundamentals."
+        },
+        visual: 'tug',
+        visualData: {
+          leftLabel: 'Market falls',
+          rightLabel: 'Market rises',
+          events: [
+            { label: 'Strong economic growth data', shift: 18 },
+            { label: 'Oil prices spike sharply', shift: -18 },
+            { label: 'Foreign investors buy heavily', shift: 24 },
+            { label: 'Global markets sell off overnight', shift: -26 },
+            { label: 'Central bank cuts interest rates', shift: 20 },
+            { label: 'Election result creates uncertainty', shift: -14 }
+          ]
+        },
+        xpReward: 30
+      }
+    ],
+    quizCard: {
+      question: 'A company reports its highest-ever profit, yet its stock falls. What is the most likely reason?',
+      options: [
+        'Investors had expected even more, so the good news was already priced in',
+        'A stock must always fall after good news',
+        'The company has too many shareholders',
+        'Profits do not matter to stock prices'
+      ],
+      correctIndex: 0,
+      explanation: 'Prices already contain what investors expect. A result that is good but smaller than hoped, or that comes with weaker guidance, can disappoint — so the stock falls even on good news.'
+    },
+    briefs: [
+      { emoji: '🤝', fact: 'Every stock trade has two sides — a buyer and a seller who agree on a price. If no one agrees, no trade happens, and the price does not move.' },
+      { emoji: '📊', fact: 'India VIX, often called the "fear index", measures how much volatility traders expect over the near term — it tends to jump when markets are nervous.' },
+      { emoji: '🎯', fact: 'Professional fund managers study the economy and companies full-time and still cannot reliably predict short-term moves — one reason diversification and a long horizon matter.' }
     ]
   }
 };

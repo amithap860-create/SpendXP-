@@ -2,6 +2,13 @@
 
 Running log of real fixes and changes, kept so you have something concrete to paste into the Play Console readiness questionnaire or release notes. I'll keep adding to this as we go — tell me any time you want the latest entries read out or copied somewhere.
 
+## 2026-10-15 - Lesson player redesign + "What Makes a Stock Move?" (branch feature/lesson-player)
+
+- Lessons are no longer a card pager. Each card is now an animated SCENE that unfolds beat by beat (coach bubbles -> animated visual -> "in real life" bubble), then swipe-through fun facts, a quiz with pop/shake feedback and a reward screen with an XP count-up. Reduced-motion users get no animation. Data model unchanged, so all existing lessons work as-is.
+- Visuals now animate and two are interactive: "comparison" asks you to guess which side is bigger before revealing; new "tug" (buyers vs sellers) lets you tap news events and watch the price pressure move; new "chain" shows cause -> effect. Fixed a bug where bars/comparisons with large values (e.g. 40,000 vs 9,375) rendered at thousands of percent height and showed "%".
+- New lesson (26 total) after "The Power of Investing": What Makes a Stock Move? - supply and demand, expectations vs surprise (priced in), what a buyback is and why it can lift or drop a price, inflation and interest rates, and what moves a whole market. 14 matching quiz questions (218 total).
+- Fixed: replaying a finished lesson paid full XP every time (now first completion only); backing out of the last unfinished lesson awarded the Scholar badge without finishing.
+
 ## 2026-10-15 - Content expansion and audit (web only)
 
 - 8 new lessons (17 -> 25): Savings Accounts vs FDs, Loans & EMIs, Credit Cards, Spotting Scams, How Marketing Tricks Your Brain, Slabs/TDS/Filing, GST, Retirement (EPF/PPF/NPS). Inserted into the learn path where their vocabulary is already taught (existing completed lessons stay unlocked).

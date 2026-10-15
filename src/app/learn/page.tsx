@@ -52,9 +52,13 @@ export default function LearnHub() {
   const completedCount = lessons.filter(l => isLessonComplete(l.id)).length;
   const overallProgress = (completedCount / lessons.length) * 100;
 
-  const handleLessonFinish = async (lessonId: string) => {
+  const handleLessonFinish = async (lessonId: string, completed = true) => {
     const wasAlreadyComplete = !!tasks.find(t => t.id === `lesson-${lessonId}`)?.completed;
     setActiveLesson(null);
+    // FIX (2026-10-15): backing out of a lesson used to run the same path as
+    // finishing it, so opening the LAST unfinished lesson and tapping back
+    // awarded the Scholar badge without completing anything.
+    if (!completed) return;
     // Only award Scholar when this was the final *new* lesson completed
     if (user && !wasAlreadyComplete && completedCount + 1 === lessons.length) {
       await awardBadge(user.uid, 'scholar');
@@ -197,7 +201,7 @@ export default function LearnHub() {
           {activeLesson && typeof document !== 'undefined' && createPortal(
             <LessonViewer
               lesson={activeLesson}
-              onClose={() => handleLessonFinish(activeLesson.id)}
+              onClose={(done) => handleLessonFinish(activeLesson.id, done !== false)}
             />,
             document.body
           )}

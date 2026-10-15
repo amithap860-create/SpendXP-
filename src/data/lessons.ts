@@ -14,7 +14,7 @@ export type LessonCard = {
     teen: string;
     senior: string;
   };
-  visual: 'bar' | 'pie' | 'line' | 'comparison' | 'none';
+  visual: 'bar' | 'pie' | 'line' | 'comparison' | 'chain' | 'tug' | 'none';
   visualData?: any;
   xpReward: number;
 };
@@ -512,6 +512,7 @@ const baseLessons: Lesson[] = [
         visualData: {
           left: { label: 'Simple interest (20yr)', value: 300000, color: '#94a3b8' },
           right: { label: 'Compound interest (20yr)', value: 672000, color: '#10b981' },
+          prefix: '₹',
         },
         xpReward: 25,
       },
@@ -535,6 +536,7 @@ const baseLessons: Lesson[] = [
             { label: 'Triple (Rule of 114)', value: 12.7, color: '#f59e0b' },
             { label: 'Quadruple (Rule of 144)', value: 16, color: '#10b981' },
           ],
+          unit: ' yrs',
         },
         xpReward: 25,
       },
@@ -1289,6 +1291,7 @@ const baseLessons: Lesson[] = [
         visualData: {
           left: { label: 'STCG (<12mo): 20% tax', value: 40000, color: '#ef4444' },
           right: { label: 'LTCG (12mo+): 12.5%, ₹1.25L exempt', value: 9375, color: '#10b981' },
+          prefix: '₹',
         },
         xpReward: 25,
       },
@@ -1552,6 +1555,7 @@ const LESSON_INSERTIONS: Array<{ after: string; ids: string[] }> = [
   { after: 'l-credit', ids: ['l-loans', 'l-credit-cards'] },
   { after: 'l-insurance', ids: ['l-scams'] },
   { after: 'l-taxes', ids: ['l-income-tax', 'l-gst'] },
+  { after: 'l-investing', ids: ['l-stock-movers'] },
   { after: 'l-etfs', ids: ['l-retirement'] },
 ];
 

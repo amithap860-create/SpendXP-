@@ -1,5 +1,5 @@
 /**
- * @fileOverview 204 scenario-based financial literacy questions for SpendXP.
+ * @fileOverview 218 scenario-based financial literacy questions for SpendXP.
  * Categorized by age group and financial topic.
  *
  * Country variants: most of these questions are universal finance concepts
@@ -2531,5 +2531,161 @@ export const finIQQuestions: Question[] = [
     explanation: "Interest is the price of using someone else's money. The longer you borrow, the more it usually adds up.",
     xpReward: 25,
     difficulty: 'easy'
+  },
+
+  // --- 2026-10-15: questions for the new 'What Makes a Stock Move?' lesson ---
+  {
+    id: 'cq-95',
+    category: 'INVESTING',
+    ageGroups: ['teen', 'senior'],
+    question: "What is a share buyback?",
+    options: ["A company uses its own cash to purchase its shares from investors and cancels them", "Investors buying shares from each other", "A company issuing new shares to raise money", "A government purchase of shares"],
+    correctIndex: 0,
+    explanation: "A buyback reduces the number of shares outstanding. Each remaining share then owns a bigger slice of the company.",
+    xpReward: 25,
+    difficulty: 'easy'
+  },
+  {
+    id: 'cq-96',
+    category: 'INVESTING',
+    ageGroups: ['teen', 'senior'],
+    question: "A company earns 500 with 50 shares outstanding, then buys back and cancels 5 shares with the same profit. What is the new profit per share (EPS), approximately?",
+    options: ["11.1", "10", "10.5", "12.5"],
+    correctIndex: 0,
+    explanation: "After the buyback there are 45 shares: 500 ÷ 45 ≈ 11.11, up from 10. Same profit, fewer shares, higher EPS.",
+    xpReward: 35,
+    difficulty: 'medium'
+  },
+  {
+    id: 'cq-97',
+    category: 'INVESTING',
+    ageGroups: ['senior'],
+    question: "A company earns 600 with 60 shares and cancels 12 shares through a buyback (profit unchanged). What is the new EPS?",
+    options: ["12.5", "10", "11", "15"],
+    correctIndex: 0,
+    explanation: "Shares fall from 60 to 48: 600 ÷ 48 = 12.5, up from 10 (a 25% rise).",
+    xpReward: 50,
+    difficulty: 'hard'
+  },
+  {
+    id: 'cq-98',
+    category: 'INVESTING',
+    ageGroups: ['teen', 'senior'],
+    question: "Which is a reason a buyback announcement could push a stock price DOWN?",
+    options: ["It is funded by heavy borrowing, or seen as a sign the company has no better growth ideas", "Fewer shares automatically cut the price", "Buybacks are illegal in most countries", "Buybacks always lower profit per share"],
+    correctIndex: 0,
+    explanation: "Buybacks are information, not a guarantee. Debt-funded repurchases raise risk, and investors may read one as a lack of growth opportunities.",
+    xpReward: 35,
+    difficulty: 'medium'
+  },
+  {
+    id: 'cq-99',
+    category: 'INVESTING',
+    ageGroups: ['senior'],
+    question: "Which is a typical reason a buyback ANNOUNCEMENT lifts a stock?",
+    options: ["Higher profit per share and a signal that management thinks the shares are cheap", "It guarantees higher profits", "It removes all risk", "It forces investors to hold the shares"],
+    correctIndex: 0,
+    explanation: "Fewer shares raise EPS, and the company becoming a buyer adds demand and signals confidence — though none of this is guaranteed.",
+    xpReward: 35,
+    difficulty: 'medium'
+  },
+  {
+    id: 'cq-100',
+    category: 'INVESTING',
+    ageGroups: ['teen', 'senior'],
+    question: "A company reports record profit but its share price falls. What is the most likely reason?",
+    options: ["Investors expected even more, so the good news was already priced in", "Profit does not affect share prices", "Share prices always fall after results", "The company has too many shareholders"],
+    correctIndex: 0,
+    explanation: "Prices contain expectations. A result that is good but smaller than hoped, or paired with weaker guidance, can disappoint.",
+    xpReward: 35,
+    difficulty: 'medium'
+  },
+  {
+    id: 'cq-101',
+    category: 'INVESTING',
+    ageGroups: ['teen', 'senior'],
+    question: "Why do rising interest rates tend to push stock prices down?",
+    options: ["Future profits are worth less today and safe options like FDs and bonds become more attractive", "Companies stop making profits", "Stocks are banned from paying dividends", "Investors must sell stocks by law"],
+    correctIndex: 0,
+    explanation: "Higher rates raise borrowing costs, make safe returns more competitive, and shrink the present value of future earnings.",
+    xpReward: 35,
+    difficulty: 'medium'
+  },
+  {
+    id: 'cq-102',
+    category: 'INVESTING',
+    ageGroups: ['senior'],
+    question: "At 5% interest, about what is a promised 100 in one year worth today (present value)?",
+    options: ["95.2", "105", "100", "90"],
+    correctIndex: 0,
+    explanation: "100 ÷ 1.05 ≈ 95.24. At 8% it would be 100 ÷ 1.08 ≈ 92.59 — higher rates make future money worth less today.",
+    xpReward: 50,
+    difficulty: 'hard'
+  },
+  {
+    id: 'cq-103',
+    category: 'INVESTING',
+    ageGroups: ['senior'],
+    question: "Which stocks usually react MOST to rising interest rates?",
+    options: ["Growth stocks, whose profits are expected far in the future", "Companies that already paid out all profits", "Cash held under a mattress", "Stocks with the lowest prices"],
+    correctIndex: 0,
+    explanation: "The further away the expected profits, the more a higher discount rate cuts their present value, so long-duration growth stocks are hit hardest.",
+    xpReward: 50,
+    difficulty: 'hard'
+  },
+  {
+    id: 'cq-104',
+    category: 'INVESTING',
+    ageGroups: ['teen', 'senior'],
+    question: "What actually sets a stock's price at any moment?",
+    options: ["The last price a buyer and a seller agreed on", "The company's accountant", "A government committee", "The price printed on the share certificate"],
+    correctIndex: 0,
+    explanation: "Every trade needs a buyer and a seller. When more people want to buy than sell, the price rises; when more want to sell, it falls.",
+    xpReward: 25,
+    difficulty: 'easy'
+  },
+  {
+    id: 'cq-105',
+    category: 'INVESTING',
+    ageGroups: ['teen', 'senior'],
+    question: "Which of these can move an ENTIRE stock market, not just one company?",
+    options: ["A sharp sell-off in global markets or a big change in interest rates", "A new flavour at one company's cafeteria", "One company's change of logo", "A single shareholder's birthday"],
+    correctIndex: 0,
+    explanation: "Market-wide moves come from big-picture forces: economic data, central bank decisions, global risk appetite, oil, currency and large investor flows.",
+    xpReward: 25,
+    difficulty: 'easy'
+  },
+  {
+    id: 'cq-106',
+    category: 'INVESTING',
+    ageGroups: ['senior'],
+    question: "Foreign investors sell heavily for several days and the index falls, though most companies' profits are unchanged. What does this show?",
+    options: ["Markets can be driven by money flows and sentiment, not just company results", "Company profits are irrelevant forever", "The index calculation is wrong", "Domestic investors must also sell"],
+    correctIndex: 0,
+    explanation: "Liquidity and risk appetite can move prices in the short run, even when fundamentals are steady. Over long periods, earnings matter far more.",
+    xpReward: 50,
+    difficulty: 'hard'
+  },
+  {
+    id: 'cq-107',
+    category: 'INVESTING',
+    ageGroups: ['teen', 'senior'],
+    question: "Why is it hard to profit by trading on news headlines?",
+    options: ["By the time you read it, the price has often already reacted, and expectations were priced in", "News is always false", "Headlines are illegal to use", "Prices only move on weekends"],
+    correctIndex: 0,
+    explanation: "Professional traders react in seconds and prices already include what the market expects, so acting on public news rarely gives an edge.",
+    xpReward: 35,
+    difficulty: 'medium'
+  },
+  {
+    id: 'cq-108',
+    category: 'INVESTING',
+    ageGroups: ['senior'],
+    question: "Which statement about inflation and stocks is most accurate?",
+    options: ["Effects vary: companies with strong pricing power often cope better than those that cannot pass on costs", "Inflation always raises every stock", "Inflation never affects company profits", "Stocks are completely unaffected by central bank actions"],
+    correctIndex: 0,
+    explanation: "Inflation raises costs and prompts rate hikes, but firms that can raise prices (or banks with widening margins) can hold up better.",
+    xpReward: 50,
+    difficulty: 'hard'
   },
 ];

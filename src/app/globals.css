@@ -310,3 +310,32 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* ── Lesson player motion (2026-10-15) ───────────────────────────────────
+   Used by components/learn/LessonViewer.tsx + LessonVisuals.tsx. All of it
+   is switched off for users who ask for reduced motion. */
+@keyframes lesson-rise {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes lesson-pop {
+  0%   { opacity: 0; transform: scale(0.55); }
+  60%  { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes lesson-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-7px); }
+  40%, 80% { transform: translateX(7px); }
+}
+@keyframes lesson-glow {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.35); }
+  50%      { box-shadow: 0 0 0 10px hsl(var(--primary) / 0); }
+}
+.lesson-rise  { animation: lesson-rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.lesson-pop   { animation: lesson-pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+.lesson-shake { animation: lesson-shake 0.4s ease-in-out both; }
+.lesson-glow  { animation: lesson-glow 1.8s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .lesson-rise, .lesson-pop, .lesson-shake, .lesson-glow { animation: none; }
+}
