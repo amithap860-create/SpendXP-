@@ -6,7 +6,9 @@ Running log of real fixes and changes, kept so you have something concrete to pa
 
 Marked `resolved` in Firestore on 2026-10-15 (11 of 17): Peter Lynch lesson/quiz crash or not loading x4 (10, 12, 21, 21 Sep; lesson confirmed working), Stock Sim stuck at Day 2 x2 (11, 26 Sep; fixed 26 Sep), Budget Blitz rent shown as "$12" (21 Sep; fixed 28 Sep), Budget Blitz score mismatch (21 Sep; fixed 28 Sep), Money Maze can't drag (21 Sep; replaced with Up/Down buttons), Profile Level Progress colour (7 Oct; card removed), junk "testing" report.
 
-Left `new` on purpose (6 of 17): quests not showing complete (12 Sep), same cases repeating (11 Sep), quest list jumps to top (12 Sep), Budget Blitz too fast at start (14 Oct) - fixed on branch feature/lesson-player, mark resolved once merged to main and live; signed out every time the app opens (5 Sep) - no code cause found, awaiting retest on v10; Stock Sim slow to load (11 Sep) - low priority, not changed.
+UPDATE 2026-10-15 (after merge to main, Vercel Ready on 95e44ee): the 4 quest/Budget Blitz reports below are now `resolved` too (15 of 17). Still `new`: sign-in forgotten (5 Sep) and Stock Sim slow load (11 Sep).
+
+Originally left `new` on purpose (6 of 17): quests not showing complete (12 Sep), same cases repeating (11 Sep), quest list jumps to top (12 Sep), Budget Blitz too fast at start (14 Oct) - fixed on branch feature/lesson-player, mark resolved once merged to main and live; signed out every time the app opens (5 Sep) - no code cause found, awaiting retest on v10; Stock Sim slow to load (11 Sep) - low priority, not changed.
 
 ## NEXT AAB (planned 1.1.3, not built yet) - release notes to use
 
