@@ -78,7 +78,7 @@ export default function LandingPage() {
       <section className="max-w-6xl mx-auto px-6 pt-16 pb-20 text-center">
         <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border mb-6">
           <Star className="h-4 w-4 text-primary fill-primary" />
-          <span className="text-sm font-semibold text-primary">Built for ages 8 to 20 · India-first</span>
+          <span className="text-sm font-semibold text-primary">Built for ages 9 to 20 · India-first</span>
         </div>
         <h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 leading-tight mb-6">
           Master your money<br />
@@ -152,7 +152,7 @@ export default function LandingPage() {
           {
             icon: <Star className="h-7 w-7 text-primary" />,
             title: 'Age-Adapted Content',
-            desc: 'Juniors (8–12) learn with pocket money. Teens (13–16) tackle allowances. Seniors (17–20) handle salaries.'
+            desc: 'Juniors (9–12) learn with pocket money. Teens (13–16) tackle allowances. Seniors (17–20) handle salaries.'
           }
         ].map((f, i) => (
           <div key={i} className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border shadow-sm">

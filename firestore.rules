@@ -33,7 +33,7 @@ service cloud.firestore {
     // their own activity data (gameScores, lessonProgress, healthHistory,
     // etc. — see the /users/{uid} read rule below) to any account they chose.
     function hasProtectedFields(data) {
-      return data.keys().hasAny(['isPremium', 'isAdmin', 'stripeCustomerId', 'stripeSubscriptionId', 'parentUid']);
+      return data.keys().hasAny(['isPremium', 'isAdmin', 'stripeCustomerId', 'stripeSubscriptionId', 'parentUid', 'consentGiven', 'coppaConsented']);
     }
 
     // User documents
@@ -65,7 +65,7 @@ service cloud.firestore {
                     || isStudioPreview();
 
       // Update: owner can update their doc, but cannot add/change protected fields
-      allow update: if (isOwner(uid) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isPremium', 'isAdmin', 'stripeCustomerId', 'stripeSubscriptionId', 'parentUid']))
+      allow update: if (isOwner(uid) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isPremium', 'isAdmin', 'stripeCustomerId', 'stripeSubscriptionId', 'parentUid', 'consentGiven', 'coppaConsented']))
                     || isStudioPreview();
 
       // Delete: disallow client-side account deletion (use Admin SDK / Cloud Function)

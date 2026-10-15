@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { db } from '@/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, doc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,10 +20,33 @@ import { ShieldCheck, Mail, CheckCircle2, AlertCircle } from 'lucide-react';
  */
 export default function ConsentPage() {
   const { user } = useAuthContext();
+  const router = useRouter();
+  const [checking, setChecking] = useState(false);
+  const [notYet, setNotYet] = useState(false);
   const [parentEmail, setParentEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Child taps this after the parent says they approved. Reads the account;
+  // only the server-side approval API can set consentGiven.
+  const handleCheckApproval = async () => {
+    if (!user) return;
+    setChecking(true);
+    setNotYet(false);
+    try {
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      if (snap.data()?.consentGiven) {
+        router.replace('/dashboard');
+        return;
+      }
+      setNotYet(true);
+    } catch {
+      setNotYet(true);
+    } finally {
+      setChecking(false);
+    }
+  };
 
   const handleSendRequest = async () => {
     if (!user || !parentEmail.trim()) return;
@@ -177,6 +201,12 @@ export default function ConsentPage() {
                   We've emailed <strong>{parentEmail}</strong>. Ask them to check their inbox and click the approval link.
                 </p>
               </div>
+              <Button onClick={handleCheckApproval} disabled={checking} className="font-bold" suppressHydrationWarning>
+                {checking ? 'Checking…' : 'My parent approved — continue'}
+              </Button>
+              {notYet && (
+                <p className="text-xs text-muted-foreground">Not approved yet. Ask your parent to open the email and tap the approval link.</p>
+              )}
               <Button variant="outline" onClick={() => { setSubmitted(false); setParentEmail(''); }} suppressHydrationWarning>
                 Use a different email
               </Button>

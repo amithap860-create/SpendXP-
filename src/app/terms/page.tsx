@@ -34,7 +34,7 @@ export default function TermsOfServicePage() {
           <section>
             <h2 className="text-xl font-black text-foreground mb-3">1. Who Can Use SpendXP</h2>
             <div className="space-y-3 text-sm">
-              <p><span className="font-bold">Age 8+:</span> SpendXP is designed for users aged 8 and above. Users under 13 require verifiable parental consent before their account is activated.</p>
+              <p><span className="font-bold">Age 9+:</span> SpendXP is designed for users aged 9 and above. Users under 13 require verifiable parental consent before their account is activated.</p>
               <p><span className="font-bold">Parental responsibility:</span> If you allow your child to use SpendXP, you are responsible for supervising their use and ensuring they follow these Terms.</p>
               <p><span className="font-bold">Accurate information:</span> You must provide accurate information when creating your account. Providing false information (including a false age) is a violation of these Terms.</p>
               <p><span className="font-bold">One account per person:</span> You may not create multiple accounts for the same person. Duplicate accounts may be merged or removed.</p>

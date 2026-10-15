@@ -9,7 +9,7 @@ const FAQS = [
     items: [
       {
         q: 'What is SpendXP?',
-        a: 'SpendXP is a gamified financial literacy app for ages 8–25. You earn XP by playing games, completing Case Files (quests), and solving daily challenges — all while learning real money skills like budgeting, investing, and managing credit.',
+        a: 'SpendXP is a gamified financial literacy app for ages 9–20. You earn XP by playing games, completing Case Files (quests), and solving daily challenges — all while learning real money skills like budgeting, investing, and managing credit.',
       },
       {
         q: 'Is SpendXP free?',
@@ -17,7 +17,7 @@ const FAQS = [
       },
       {
         q: 'What age group is SpendXP for?',
-        a: 'SpendXP is designed for ages 8–25. Content is automatically adapted based on your age group — younger users get simpler explanations, older users get more complex scenarios.',
+        a: 'SpendXP is designed for ages 9–20. Content is automatically adapted based on your age group — younger users get simpler explanations, older users get more complex scenarios.',
       },
       {
         q: 'Do I need an account to use SpendXP?',

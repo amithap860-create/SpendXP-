@@ -1,7 +1,7 @@
 {
   "name": "SpendXP — Financial Literacy",
   "short_name": "SpendXP",
-  "description": "Learn money skills through games, quests and challenges. For ages 8–25.",
+  "description": "Learn money skills through games, quests and challenges. For ages 9–20.",
   "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",

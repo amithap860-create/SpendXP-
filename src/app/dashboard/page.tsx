@@ -345,7 +345,7 @@ export default function DashboardPage() {
                 {getRankForXP(progression?.totalXP ?? 0).name}
               </span>
               <span className="px-3 py-1 bg-muted text-muted-foreground rounded-full text-[10px] font-black uppercase tracking-widest">
-                {profile?.ageGroup ?? 'Student'} • {profile?.birthYear != null ? (new Date().getFullYear() - profile.birthYear) : '8-20'}
+                {profile?.ageGroup ?? 'Student'} • {profile?.birthYear != null ? (new Date().getFullYear() - profile.birthYear) : '9-20'}
               </span>
             </div>
           </div>

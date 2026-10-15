@@ -11,7 +11,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const GenerateFlashcardsInputSchema = z.object({
-  age: z.number().int().min(8).max(20).describe('The age of the learner, expected between 8 and 20.'),
+  age: z.number().int().min(9).max(20).describe('The age of the learner, expected between 9 and 20.'),
   numFlashcards: z.number().int().min(1).max(20).optional().default(5).describe('The number of flashcards to generate, default to 5.'),
 });
 export type GenerateFlashcardsInput = z.infer<typeof GenerateFlashcardsInputSchema>;
@@ -78,7 +78,7 @@ const generatePersonalizedFlashcardsFlow = ai.defineFlow(
     } else {
       // This case should ideally not be hit due to input schema validation (min/max age).
       // As a fallback, default to 'normal'.
-      console.warn(`Age ${input.age} is outside the expected range (8-20). Defaulting to 'normal' difficulty.`);
+      console.warn(`Age ${input.age} is outside the expected range (9-20). Defaulting to 'normal' difficulty.`);
       difficultyLevel = 'normal';
     }
 

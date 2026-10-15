@@ -32,8 +32,8 @@ export function validateBirthYear(year: number): { valid: boolean; error?: strin
   const currentYear = new Date().getFullYear();
   const age = currentYear - year;
   
-  if (age < 8 || age > 20) {
-    return { valid: false, error: 'SpendXP is for ages 8 to 20' };
+  if (age < 9 || age > 20) {
+    return { valid: false, error: 'SpendXP is for ages 9 to 20' };
   }
   
   return { valid: true };
