@@ -22,11 +22,11 @@ Still to do before building 1.1.3: server-side fix for editable birth year on Pr
 What's new:
 - Lessons now play as short animated scenes with interactive charts
 - New lesson: What Makes a Stock Move? (buybacks, inflation, interest rates)
-- 9 more lessons and 100+ new quiz questions on credit, loans, scams, tax and retirement
-- Fixed quests not showing as complete; you now get a retry if saving fails
+- 9 new lessons and 100+ new quiz questions (credit, loans, scams, tax, retirement)
+- Fixed quests not showing complete; retry if saving fails
 - Case Files list keeps your place after a quest
 - Budget Blitz starts slower so you can read the cards
-- Fixed the in-game calculator getting stuck open; it now has its own close button
+- Calculator no longer gets stuck open in games
 </en-US>
 
 ## 2026-10-15 - Lesson player redesign + "What Makes a Stock Move?" (branch feature/lesson-player)
