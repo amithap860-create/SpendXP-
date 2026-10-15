@@ -2,6 +2,22 @@
 
 Running log of real fixes and changes, kept so you have something concrete to paste into the Play Console readiness questionnaire or release notes. I'll keep adding to this as we go — tell me any time you want the latest entries read out or copied somewhere.
 
+## 2026-10-15 - Play release 1.1.2 (versionCode 10)
+
+- SpendXP is now 9+ everywhere, matching the Play Console target-audience declaration (9-12, 13-15, 16-17, 18+). Signup age gate rejects under-9 birth years ("SpendXP is for ages 9 and up."), onboarding offers birth years for ages 9-20, validation, landing page, metadata, terms, privacy policy (page + public HTML), support pages, profile age check (was 8-25), manifest description and AI prompts updated.
+- Includes the under-13 consent gate (branch feature/under13-consent-gate): onboarding flags under-13 accounts without parental approval and ConsentGuard keeps them on /consent until a parent approves.
+- Known gap, not fixed here: Profile lets a user edit their birth year with no consent check, so a child could raise their age to leave the under-13 path. Needs a server-side rule (age may only change with re-consent or not at all).
+
+### Play release notes - 1.1.2
+
+<en-US>
+Safer for younger players:
+- Under-13 accounts now need a parent's approval before they can play
+- SpendXP is now for ages 9 and up; age checks updated at sign-up and setup
+- Clearer messages when a parent approval is pending
+- Parent can approve from their email; child can tap "My parent approved" to continue
+</en-US>
+
 ## 2026-10-12 (branch feature/under13-consent-gate, NOT yet on main)
 
 - Closed an under-13 consent gap. Email signup already asked a parent for approval before creating an account, but web "Continue with Google" created the account first and went to onboarding with no age check, and onboarding let anyone pick any birth year 8-20. Now onboarding decides on the FINAL birth year: under 13 with no `consentGiven` -> account flagged `consentRequired`, child sent to /consent; a new ConsentGuard (mounted in the root layout) keeps flagged children there until the server-side approval API sets `consentGiven`. Existing accounts are untouched (no flag). Guard fails open on read errors; onboarding fails closed for children. /consent gained a "My parent approved - continue" check button.

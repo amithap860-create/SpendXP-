@@ -111,7 +111,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
   const { ageGroup } = useAgeAdapt();
   const tutorial = useGameTutorial('stockMarketSim');
   const startingCash = useMemo(() => ageGroup === 'junior' ? 100 : ageGroup === 'senior' ? 5000 : 1000, [ageGroup]);
-  // Junior (8-12): first 3 core companies. Teen (13-16): the 6 core companies.
+  // Junior (9-12): first 3 core companies. Teen (13-16): the 6 core companies.
   // Senior (17-20): the 6 core companies PLUS 3 senior-only ones (2026-10-07,
   // requested by older testers who wanted more to choose from).
   const companies = useMemo(() => {

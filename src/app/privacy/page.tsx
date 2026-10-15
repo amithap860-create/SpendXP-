@@ -26,7 +26,7 @@ export default function PrivacyPolicyPage() {
               SpendXP (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) is committed to protecting the privacy of all users, especially children and teenagers. This Privacy Policy explains what data we collect, why we collect it, how it is used, and your rights regarding that data. By using SpendXP, you agree to this policy.
             </p>
             <p className="mt-4 text-base font-semibold text-foreground">
-              SpendXP is designed for users aged 8–20. If you are under 18, please review this policy with a parent or guardian before using the app.
+              SpendXP is designed for users aged 9–20. If you are under 18, please review this policy with a parent or guardian before using the app.
             </p>
           </section>
 

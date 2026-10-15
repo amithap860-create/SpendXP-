@@ -57,7 +57,7 @@ const prompt = ai.definePrompt({
   name: 'generateMarketNewsPrompt',
   input: { schema: GenerateMarketNewsInputSchema },
   output: { schema: GenerateMarketNewsOutputSchema },
-  prompt: `You are an AI assistant for a financial literacy app called SpendXP for kids aged 8-20. Your task is to generate a simplified news event for a virtual stock market simulation and an educational pop-up explaining a relevant financial concept.
+  prompt: `You are an AI assistant for a financial literacy app called SpendXP for kids aged 9-20. Your task is to generate a simplified news event for a virtual stock market simulation and an educational pop-up explaining a relevant financial concept.
 
 Consider the following:
 - Current market description: {{{marketDescription}}}

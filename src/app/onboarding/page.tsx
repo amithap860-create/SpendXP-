@@ -67,7 +67,7 @@ function OnboardingContent() {
   const [error, setError] = useState<string | null>(null);
 
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 13 }, (_, i) => currentYear - 8 - i);
+  const years = Array.from({ length: 12 }, (_, i) => currentYear - 9 - i);
 
   const nextStep = () => setStep(prev => prev + 1);
   const prevStep = () => setStep(prev => prev - 1);
@@ -97,7 +97,7 @@ function OnboardingContent() {
       // UNDER-13 GATE (2026-10-12): the email signup path asks a parent for
       // approval BEFORE creating an account, but "Continue with Google" (web)
       // creates the account first and lands here with no age check, and this
-      // screen lets anyone pick any birth year from 8 to 20. So the decision
+      // screen lets anyone pick any birth year from 9 to 20. So the decision
       // is made here, on the FINAL birth year: if under 13 and no parental
       // consent is recorded, flag the account `consentRequired` and send the
       // child to /consent. ConsentGuard (layout) keeps them there until a

@@ -19,7 +19,7 @@ import { isNative } from '@/lib/native';
 // ── Age helpers ──────────────────────────────────────────────────────────────
 const CURRENT_YEAR = new Date().getFullYear();
 const MIN_YEAR = CURRENT_YEAR - 100;
-const MAX_YEAR = CURRENT_YEAR - 4; // must be at least 4 years old
+const MAX_YEAR = CURRENT_YEAR - 9; // SpendXP is 9+ (matches the Play Console target-audience declaration)
 
 function calcAge(birthYear: number): number {
   return CURRENT_YEAR - birthYear;
@@ -148,8 +148,12 @@ function SignupContent() {
     e.preventDefault();
     setAgeError(null);
     const year = parseInt(birthYear, 10);
-    if (!birthYear || isNaN(year) || year < MIN_YEAR || year > MAX_YEAR) {
+    if (!birthYear || isNaN(year) || year < MIN_YEAR) {
       setAgeError('Please enter a valid birth year.');
+      return;
+    }
+    if (year > MAX_YEAR) {
+      setAgeError('SpendXP is for ages 9 and up.');
       return;
     }
     setStep('signup-form');

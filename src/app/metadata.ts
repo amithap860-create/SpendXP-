@@ -5,7 +5,7 @@ export const metadata: Metadata = {
     default: 'SpendXP — Financial Literacy for Future Pros',
     template: '%s | SpendXP',
   },
-  description: 'Learn money management through games, quests and tools. Built for ages 8–20.',
+  description: 'Learn money management through games, quests and tools. Built for ages 9–20.',
   applicationName: 'SpendXP',
   keywords: ['financial literacy', 'money', 'games', 'kids', 'teens', 'budgeting', 'investing'],
   authors: [{ name: 'SpendXP' }],
@@ -25,12 +25,12 @@ export const metadata: Metadata = {
     url: process.env.NEXT_PUBLIC_APP_URL ?? 'https://spendxp.vercel.app',
     siteName: 'SpendXP',
     title: 'SpendXP — Financial Literacy for Future Pros',
-    description: 'Learn money management through games, quests and tools. Built for ages 8–20.',
+    description: 'Learn money management through games, quests and tools. Built for ages 9–20.',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'SpendXP',
-    description: 'Financial literacy for ages 8–20',
+    description: 'Financial literacy for ages 9–20',
   },
   icons: {
     icon: '/favicon.ico',

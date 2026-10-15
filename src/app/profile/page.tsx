@@ -618,8 +618,8 @@ export default function ProfilePage() {
     const year = parseInt(pendingBirthYear);
     const currentYear = new Date().getFullYear();
     const age = currentYear - year;
-    if (!year || age < 8 || age > 25) {
-      toast({ title: 'Enter a valid birth year (age 8–25)', variant: 'destructive' });
+    if (!year || age < 9 || age > 20) {
+      toast({ title: 'Enter a valid birth year (age 9–20)', variant: 'destructive' });
       return;
     }
     const newAgeGroup = age <= 12 ? 'junior' : age <= 16 ? 'teen' : 'senior';
@@ -702,7 +702,7 @@ export default function ProfilePage() {
   if (loading) return <ProfileSkeleton />;
   if (!profile || !progression) return <ProfileSkeleton />;
 
-  const ageLabel = profile.ageGroup === 'junior' ? 'Junior (8–12)' : profile.ageGroup === 'teen' ? 'Teen (13–16)' : 'Senior (17–20)';
+  const ageLabel = profile.ageGroup === 'junior' ? 'Junior (9–12)' : profile.ageGroup === 'teen' ? 'Teen (13–16)' : 'Senior (17–20)';
   const avatarCfg = getAvatar(profile.avatarId ?? 'voss');
   const countryCfg = getCountryConfig(profile.countryCode ?? 'IN');
 

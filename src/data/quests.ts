@@ -51,7 +51,7 @@ export type Quest = {
 export const quests: Quest[] = [
 
   // ─────────────────────────────────────────────────────────
-  // JUNIOR QUESTS (ages 8–11)
+  // JUNIOR QUESTS (ages 9–11)
   // ─────────────────────────────────────────────────────────
   {
     id: 'birthday-loot',
