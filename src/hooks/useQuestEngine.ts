@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import { Quest, quests } from '@/data/quests';
 import { AgeGroup } from '@/lib/ageAdapt';
 import { useAuthContext } from '@/context/AuthContext';
@@ -36,6 +36,12 @@ export type QuestState = {
    *  contributes +500, not 0. */
   totalPositiveWalletDelta: number;
   optimalChoiceCount: number;
+  /** FIX (2026-10-15): tester reports "I finish a quest but it doesn't show
+   *  complete". The completion screen used to appear (and let you leave)
+   *  before the server save returned, and a failed save was only logged, so
+   *  the player saw "Mission Success" for a quest that was never recorded.
+   *  Tracked explicitly so the UI can wait for the save and offer a retry. */
+  saveStatus?: 'saving' | 'saved' | 'failed';
   /** Populated after completion — from the server response */
   serverResult?: {
     xpAwarded: number;
@@ -68,6 +74,8 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
     totalPositiveWalletDelta: 0,
     optimalChoiceCount: 0,
   });
+
+  const lastSubmitRef = useRef<(() => Promise<void>) | null>(null);
 
   const currentStep = useMemo(
     () => filteredSteps.find((s) => s.id === state.currentStepId),
@@ -130,7 +138,7 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
         status: isEnd ? 'COMPLETE' : 'IN_PROGRESS',
       };
 
-      setState(nextState);
+      setState(isEnd && user ? { ...nextState, saveStatus: 'saving' } : nextState);
 
       if (isEnd && user) {
         const uid = user.uid;
@@ -138,7 +146,18 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
 
         const xpToAward = Math.max(0, nextState.totalXPEarned + quest.xpReward);
         const optimalRate = nextState.optimalChoiceCount / Math.max(1, filteredSteps.length);
+        // Kept so a failed save can be retried with the exact same payload.
+        lastSubmitRef.current = () => makeChoiceSubmit(nextState, uid, xpToAward, optimalRate);
+        await lastSubmitRef.current();
+      }
+    },
+    [currentStep, state, quest, filteredSteps, user]
+  );
 
+  const makeChoiceSubmit = useCallback(
+    async (nextState: QuestState, uid: string, xpToAward: number, optimalRate: number) => {
+      if (!user) return;
+      {
         try {
           // Get a fresh Firebase ID token for server verification
           const token = await user.getIdToken();
@@ -178,6 +197,7 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
             setState((prev) => ({
               ...prev,
               status: 'LIMIT_REACHED',
+              saveStatus: 'saved',
               serverResult: {
                 xpAwarded: 0,
                 streak: 0,
@@ -191,7 +211,9 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
 
           if (res.ok) {
             const data = await res.json();
-            setState((prev) => ({ ...prev, serverResult: data }));
+            // Unlock "Return to Hub" as soon as the quest is actually recorded
+            // — badges/leaderboard below are non-critical and must not block it.
+            setState((prev) => ({ ...prev, serverResult: data, saveStatus: 'saved' }));
 
             // User has completed activity today — dismiss the streak reminder
             cancelStreakReminder().catch(() => {});
@@ -228,14 +250,25 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
             await updateLeaderboardEntry(uid, user.displayName || 'Strategist').catch(
               () => {}
             );
+          } else {
+            // Server error (500/503/401…): nothing was recorded.
+            console.error('[SpendXP Quest] Save failed with status', res.status);
+            setState((prev) => ({ ...prev, saveStatus: 'failed' }));
           }
         } catch (err) {
           console.error('[SpendXP Quest] Completion error:', err);
+          setState((prev) => ({ ...prev, saveStatus: 'failed' }));
         }
       }
     },
-    [currentStep, state, quest, filteredSteps, user]
+    [user, quest]
   );
+
+  const retrySave = useCallback(async () => {
+    if (!lastSubmitRef.current) return;
+    setState((prev) => ({ ...prev, saveStatus: 'saving' }));
+    await lastSubmitRef.current();
+  }, []);
 
   return {
     state,
@@ -244,5 +277,6 @@ export function useQuestEngine(quest: Quest, ageGroup: AgeGroup) {
     startQuest,
     resetQuest,
     makeChoice,
+    retrySave,
   };
 }

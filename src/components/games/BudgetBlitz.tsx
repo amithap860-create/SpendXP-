@@ -157,11 +157,16 @@ export function BudgetBlitz({ onExit }: { onExit: () => void }) {
 
   // Spawn rates and fall speeds per tier (T1 = very gentle warmup, T5 = intense)
   const TIER_CONFIG = [
-    { spawnRate: 3500, fallSpeed: 0.35 }, // T1: 0–18s
-    { spawnRate: 2800, fallSpeed: 0.55 }, // T2: 18–36s
-    { spawnRate: 2100, fallSpeed: 0.80 }, // T3: 36–54s
-    { spawnRate: 1500, fallSpeed: 1.15 }, // T4: 54–72s
-    { spawnRate: 1000, fallSpeed: 1.60 }, // T5: 72–90s
+    // FIX (2026-10-15): tester feedback (14 Oct) — start slower so players can
+    // adjust and actually read each card, then ramp up. At the old T1 speed
+    // (0.35) a card crossed the screen in ~4.6s, and a miss costs a life.
+    // Cards fall `fallSpeed`% per 16ms, so travel time ≈ 100/fallSpeed*16ms:
+    // T1 0.17 ≈ 9.4s, T2 0.28 ≈ 5.7s, T3 0.45 ≈ 3.6s, T4 0.80 ≈ 2.0s, T5 1.30 ≈ 1.2s.
+    { spawnRate: 4200, fallSpeed: 0.17 }, // T1: 0–18s
+    { spawnRate: 3200, fallSpeed: 0.28 }, // T2: 18–36s
+    { spawnRate: 2400, fallSpeed: 0.45 }, // T3: 36–54s
+    { spawnRate: 1700, fallSpeed: 0.80 }, // T4: 54–72s
+    { spawnRate: 1100, fallSpeed: 1.30 }, // T5: 72–90s
   ];
 
   useEffect(() => {

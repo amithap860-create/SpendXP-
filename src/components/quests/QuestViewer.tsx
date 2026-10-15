@@ -39,7 +39,7 @@ interface QuestViewerProps {
 export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
   const { ageGroup } = useAgeAdapt();
   const { formatINR, activeCurrency } = useCurrency();
-  const { state, currentStep, progress, startQuest, resetQuest, makeChoice } = useQuestEngine(quest, ageGroup);
+  const { state, currentStep, progress, startQuest, resetQuest, makeChoice, retrySave } = useQuestEngine(quest, ageGroup);
 
   /**
    * Replaces all ₹N / ₹N,NNN / ₹N,NN,NNN occurrences in a narrative string
@@ -339,9 +339,20 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
               <Button variant="outline" onClick={resetQuest} className="h-12 px-8 rounded-xl font-black text-muted-foreground border-2 text-sm" suppressHydrationWarning>
                 <RotateCcw className="h-4 w-4 mr-2" /> Replay Simulation
               </Button>
-              <Button onClick={onComplete} className="flex-1 h-12 text-base font-black rounded-xl shadow-lg" suppressHydrationWarning>
-                Return to Arcade Hub
-              </Button>
+              {state.saveStatus === 'failed' ? (
+                <Button onClick={retrySave} className="flex-1 h-12 text-base font-black rounded-xl shadow-lg bg-amber-600 hover:bg-amber-700" suppressHydrationWarning>
+                  Couldn&apos;t save your progress — tap to retry
+                </Button>
+              ) : (
+                <Button
+                  onClick={onComplete}
+                  disabled={state.saveStatus === 'saving'}
+                  className="flex-1 h-12 text-base font-black rounded-xl shadow-lg"
+                  suppressHydrationWarning
+                >
+                  {state.saveStatus === 'saving' ? 'Saving your progress…' : 'Return to Arcade Hub'}
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>

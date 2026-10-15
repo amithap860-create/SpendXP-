@@ -2,6 +2,15 @@
 
 Running log of real fixes and changes, kept so you have something concrete to paste into the Play Console readiness questionnaire or release notes. I'll keep adding to this as we go — tell me any time you want the latest entries read out or copied somewhere.
 
+## 2026-10-15 - Tester bug-report fixes (web only, ships via Vercel)
+
+Triage of the 17 in-app bug reports (Firestore `bugReports`, 5 Sep - 14 Oct). Already fixed before this entry: Stock Sim stuck on Day 2 (2026-09-26, timer not restarted per round), Budget Blitz rent price and scoring (2026-09-28), Money Maze drag (replaced with Up/Down buttons), Level Progress colour (card removed 2026-10), Peter Lynch lesson crash (confirmed working by AP).
+
+- Quests: finishing a case no longer lets you leave before the server save returns ("Saving your progress..." button), and a failed save now shows "Couldn't save your progress - tap to retry" instead of a false "Mission Success". Reports: "I keep finishing a quest but it doesn't show complete" (12 Sep), likely also "same cases again" (11 Sep).
+- Quests: the Case Files list keeps its scroll position when you return from a case instead of jumping to the top. Report: 12 Sep.
+- Budget Blitz: much slower start (first cards take ~9s to fall, was ~4.6s) with a gentler ramp. Report: 14 Oct.
+- Still open: "signed out every time I open the app" (5 Sep) - no code cause found, asked tester to retest on 1.1.2.
+
 ## 2026-10-15 - Play release 1.1.2 (versionCode 10)
 
 - SpendXP is now 9+ everywhere, matching the Play Console target-audience declaration (9-12, 13-15, 16-17, 18+). Signup age gate rejects under-9 birth years ("SpendXP is for ages 9 and up."), onboarding offers birth years for ages 9-20, validation, landing page, metadata, terms, privacy policy (page + public HTML), support pages, profile age check (was 8-25), manifest description and AI prompts updated.

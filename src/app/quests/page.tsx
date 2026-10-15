@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { useProgression } from '@/hooks/useProgression';
 import { quests, Quest } from '@/data/quests';
@@ -182,6 +182,35 @@ export default function QuestsHub() {
   useEffect(() => {
     document.title = 'Case Files | SpendXP';
   }, []);
+
+  // FIX (2026-10-15): tester feedback — finishing a quest dumped them back at
+  // the top of the list, so they had to scroll to find the next one. Opening
+  // a case swaps this whole page for the viewer, which destroys the scroll
+  // position. Remember where the list was scrolled (window or an inner
+  // scroll container) when a case opens, and put it back when the list returns.
+  const savedScroll = useRef<{ el: HTMLElement | null; top: number } | null>(null);
+  const rememberScroll = (from: HTMLElement | null) => {
+    let el: HTMLElement | null = from;
+    while (el && el !== document.body) {
+      const oy = getComputedStyle(el).overflowY;
+      if ((oy === 'auto' || oy === 'scroll') && el.scrollHeight > el.clientHeight) break;
+      el = el.parentElement;
+    }
+    const container = el && el !== document.body ? el : null;
+    savedScroll.current = { el: container, top: container ? container.scrollTop : window.scrollY };
+  };
+  useEffect(() => {
+    // isLoading: the list re-fetches progress when a case closes and may show
+    // a short skeleton — scrolling before it's full height would be clamped.
+    if (activeQuest || briefingQuest || isLoading || !savedScroll.current) return;
+    const { el, top } = savedScroll.current;
+    savedScroll.current = null;
+    // Wait a frame so the list has rendered at full height before scrolling.
+    requestAnimationFrame(() => {
+      if (el && el.isConnected) el.scrollTop = top;
+      else window.scrollTo(0, top);
+    });
+  }, [activeQuest, briefingQuest, isLoading]);
 
   useEffect(() => {
     if (!user) {
@@ -493,7 +522,7 @@ export default function QuestsHub() {
                         </Button>
                       ) : (
                         <Button
-                          onClick={() => setBriefingQuest({ quest, index: i })}
+                          onClick={(e) => { rememberScroll(e.currentTarget); setBriefingQuest({ quest, index: i }); }}
                           className={cn(
                             "w-full h-11 gap-2 font-black rounded-xl group/btn transition-all",
                             isCompleted
