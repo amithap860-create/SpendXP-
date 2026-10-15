@@ -123,7 +123,13 @@ export const conceptBreakdowns: ConceptBreakdown[] = [
       "Time is the ingredient that makes compounding magical — starting early matters more than starting big",
       "The same principle that builds wealth also destroys it — credit card debt compounds too"
     ],
-    realWorldStat: "$600 invested monthly from age 22 becomes $500,000 by age 60 at 12% returns. Starting at 32 gives only $150,000.",
+    // FIX (2026-10-15): content audit. The old stat ("$500,000 by 60 at 12%,
+    // only $150,000 if you start at 32") was wrong by roughly 3-10x, and 12%
+    // a year is not a safe planning assumption. Recomputed with the standard
+    // future-value-of-an-annuity formula at an ASSUMED 8% a year, compounded
+    // monthly: 600/month for 38 years (22->60) = ~1,772,586; for 28 years
+    // (32->60) = ~749,139.
+    realWorldStat: "Invest $600 every month from age 22 to 60 and, at an assumed 8% a year, it grows to about $1.8 million. Start at 32 instead and you end up with about $750,000 — roughly 60% less, just from starting 10 years later. (Returns are never guaranteed.)",
     quickQuestion: "Would you rather have $12,000 today or $1 that doubles every day for 30 days?",
     ageAdapted: {
       junior: {

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { lessons, Lesson } from '@/data/lessons';
 import { LessonViewer } from '@/components/learn/LessonViewer';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
+import { EducationalDisclaimer } from '@/components/EducationalDisclaimer';
 import { 
   BookOpen, 
   CheckCircle2, 
@@ -200,6 +201,8 @@ export default function LearnHub() {
             />,
             document.body
           )}
+
+          <EducationalDisclaimer className="mt-10" />
 
           {/* ── More to Explore ── */}
           <div className="mt-12 pt-8 border-t border-border space-y-4">

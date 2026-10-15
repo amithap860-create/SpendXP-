@@ -2,6 +2,14 @@
 
 Running log of real fixes and changes, kept so you have something concrete to paste into the Play Console readiness questionnaire or release notes. I'll keep adding to this as we go — tell me any time you want the latest entries read out or copied somewhere.
 
+## 2026-10-15 - Content expansion and audit (web only)
+
+- 8 new lessons (17 -> 25): Savings Accounts vs FDs, Loans & EMIs, Credit Cards, Spotting Scams, How Marketing Tricks Your Brain, Slabs/TDS/Filing, GST, Retirement (EPF/PPF/NPS). Inserted into the learn path where their vocabulary is already taught (existing completed lessons stay unlocked).
+- 94 new FinIQ questions (110 -> 204), including 27 hard (hard 24 -> 51), matched to the new lessons: credit cards, loans/EMI, scams, tax, GST, retirement, inflation, harder investing maths.
+- Fixed a factually wrong compound-interest statistic (was off 3-10x), removed an unsourced savings-rate statistic and an invented quote, corrected two crypto/market facts.
+- Added an educational-use disclaimer and "content last reviewed" date on Learn, Quests hub and quest completion screens (config/content.ts).
+- Full findings and remaining items: CONTENT-AUDIT.md.
+
 ## 2026-10-15 - Tester bug-report fixes (web only, ships via Vercel)
 
 Triage of the 17 in-app bug reports (Firestore `bugReports`, 5 Sep - 14 Oct). Already fixed before this entry: Stock Sim stuck on Day 2 (2026-09-26, timer not restarted per round), Budget Blitz rent price and scoring (2026-09-28), Money Maze drag (replaced with Up/Down buttons), Level Progress colour (card removed 2026-10), Peter Lynch lesson crash (confirmed working by AP).

@@ -25,6 +25,7 @@ import {
   Scale,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { EducationalDisclaimer } from '@/components/EducationalDisclaimer';
 import { db } from '@/lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import dynamic from 'next/dynamic';
@@ -556,6 +557,8 @@ export default function QuestsHub() {
             There is no end. There is only the next case file.
           </p>
         </div>
+
+        <EducationalDisclaimer />
 
       </main>
     </div>

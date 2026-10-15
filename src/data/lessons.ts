@@ -1,4 +1,5 @@
 import { AgeGroup } from '@/lib/ageAdapt';
+import { newLessons } from './newLessons';
 
 export type LessonCard = {
   id: string;
@@ -64,7 +65,7 @@ export type Lesson = {
 //  12. Stock analysis       — most advanced (PEG ratio, value vs growth) — last
 // If you add a new lesson, insert it where its required vocabulary is already
 // covered by everything before it — don't just append to the end.
-export const lessons: Lesson[] = [
+const baseLessons: Lesson[] = [
   {
     id: 'l-budgeting',
     topic: 'budgeting',
@@ -148,8 +149,8 @@ export const lessons: Lesson[] = [
       explanation: "20% of ₹1,000 is ₹200. This builds your safety net for the future!"
     },
     briefs: [
-      { emoji: '🏦', fact: 'India has one of the world\'s lowest household savings rates among young adults — under 25s save just 4% on average. The 50/30/20 rule targets 20%.' },
-      { emoji: '📅', fact: 'Warren Buffett started investing at age 11 with a strict personal budget. He says budgeting is the one habit that made everything else possible.' },
+      { emoji: '🎯', fact: 'The 50/30/20 rule asks you to save 20% of your income. Even if you can only manage 5% today, starting a habit now matters more than the exact number.' },
+      { emoji: '📅', fact: 'Warren Buffett bought his first stock at age 11 and started investing early — time in the market, more than the size of the first amount, is what made his money grow.' },
       { emoji: '🛒', fact: '"Lifestyle creep" is when your spending grows as fast as your income, leaving you no richer. A budget is the only defence against it.' },
     ]
   },
@@ -1227,7 +1228,7 @@ export const lessons: Lesson[] = [
         example: {
           junior: "Imagine borrowing your friend's bike, selling it for ₹200, planning to buy it back cheaper later and return it. If the bike suddenly becomes worth ₹500, you're in big trouble — you still have to buy it back to give it back!",
           teen: 'Short at ₹200, price drops to ₹140 → profit ₹60. But if price rises to ₹350 → loss ₹150 per share. Every ₹1 price rise = ₹1 loss per share.',
-          senior: 'GME short squeeze (2021): retail traders on Reddit forced hedge funds to cover shorts as the price rose 1,700% in a week. Several professional short-sellers lost billions.',
+          senior: 'GME short squeeze (2021): retail traders on Reddit forced hedge funds to cover shorts as the price shot from under $20 to over $300 within weeks (Jan 2021). Several professional short-sellers lost billions.',
         },
         visual: 'comparison',
         visualData: {
@@ -1376,7 +1377,7 @@ export const lessons: Lesson[] = [
     },
     briefs: [
       { emoji: '📉', fact: 'Bitcoin lost 83% of its value in 2018 and 77% again in 2022. It recovered both times — but only those who held through the crash and had no urgent need for the money benefited.' },
-      { emoji: '🕵️', fact: 'Crypto scams cost the world over $8 billion in 2022 (Chainalysis report). Ponzi schemes disguised as "DeFi" and "staking" projects are the most common trap — promising yield that never materialises.' },
+      { emoji: '🕵️', fact: 'Crypto scams cost victims billions of dollars every year (Chainalysis tracks the total annually). Ponzi schemes disguised as "DeFi" and "staking" projects are the most common trap — promising yield that never materialises.' },
       { emoji: '⚖️', fact: 'Crypto tax treatment varies by country but is generally unfavourable — gains are often taxed as income with limited or no ability to offset losses. Always check local tax rules before investing.' },
     ]
   },
@@ -1539,3 +1540,22 @@ export const lessons: Lesson[] = [
     ],
   },
 ];
+
+// ADDED (2026-10-15): 8 lessons from the content audit (see newLessons.ts).
+// Each is inserted right AFTER the lesson named here so that it only relies on
+// vocabulary already taught earlier in the path (the /learn page hard-locks
+// lessons in array order, so position = teaching order). Lessons already
+// completed stay unlocked; only unfinished ones wait behind a new lesson.
+const LESSON_INSERTIONS: Array<{ after: string; ids: string[] }> = [
+  { after: 'l-needs-wants-desires', ids: ['l-marketing'] },
+  { after: 'l-saving', ids: ['l-banking'] },
+  { after: 'l-credit', ids: ['l-loans', 'l-credit-cards'] },
+  { after: 'l-insurance', ids: ['l-scams'] },
+  { after: 'l-taxes', ids: ['l-income-tax', 'l-gst'] },
+  { after: 'l-etfs', ids: ['l-retirement'] },
+];
+
+export const lessons: Lesson[] = baseLessons.flatMap((lesson) => {
+  const ins = LESSON_INSERTIONS.find((i) => i.after === lesson.id);
+  return ins ? [lesson, ...ins.ids.map((id) => newLessons[id])] : [lesson];
+});

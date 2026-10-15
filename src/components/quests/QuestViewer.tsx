@@ -30,6 +30,7 @@ import {
 import { cn } from '@/lib/utils';
 import { fireConfettiQuestComplete } from '@/lib/confetti';
 import { getQuestFog } from '@/config/narrative';
+import { EducationalDisclaimer } from '@/components/EducationalDisclaimer';
 
 interface QuestViewerProps {
   quest: Quest;
@@ -354,6 +355,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
                 </Button>
               )}
             </div>
+            <EducationalDisclaimer />
           </CardContent>
         </Card>
       </div>
