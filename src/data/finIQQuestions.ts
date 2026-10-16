@@ -1,5 +1,5 @@
 /**
- * @fileOverview 218 scenario-based financial literacy questions for SpendXP.
+ * @fileOverview 215 scenario-based financial literacy questions for SpendXP.
  * Categorized by age group and financial topic.
  *
  * Country variants: most of these questions are universal finance concepts
@@ -199,7 +199,7 @@ export const finIQQuestions: Question[] = [
   {
     id: 'b-9',
     category: 'BUDGETING',
-    ageGroups: ['junior', 'teen', 'senior'],
+    ageGroups: ['teen', 'senior'],
     question: "Which of these is a variable expense (changes every month)?",
     options: ["Electricity bill", "Monthly Rent", "Netflix Subscription", "Car payment"],
     correctIndex: 0,
@@ -376,7 +376,7 @@ export const finIQQuestions: Question[] = [
   {
     id: 'i-10',
     category: 'INVESTING',
-    ageGroups: ['junior', 'teen'],
+    ageGroups: ['teen'],
     question: "If you lend money to the government for a fixed time, you bought a...",
     options: ["Bond", "Stock", "Toy", "Lottery ticket"],
     correctIndex: 0,
@@ -694,7 +694,7 @@ export const finIQQuestions: Question[] = [
   {
     id: 't-8',
     category: 'TAXES',
-    ageGroups: ['junior', 'teen'],
+    ageGroups: ['teen'],
     question: "If you work a 'Side Hustle' (like lawn mowing), do you technically owe taxes?",
     options: ["Yes, if you earn enough", "No, never", "Only if you use a bank", "Only on weekends"],
     correctIndex: 0,
@@ -869,17 +869,6 @@ export const finIQQuestions: Question[] = [
     }
   },
   {
-    id: 's-7',
-    category: 'SPENDING',
-    ageGroups: ['junior'],
-    question: "Buying in 'Bulk' (large packs) is often cheaper per item. This is called...",
-    options: ["Unit Pricing", "Bulk Buying", "Free shopping", "Losing money"],
-    correctIndex: 0,
-    explanation: "Buying a pack of 10 usually makes each one cheaper than buying 10 separate ones.",
-    xpReward: 20,
-    difficulty: 'medium'
-  },
-  {
     id: 's-8',
     category: 'SPENDING',
     ageGroups: ['senior'],
@@ -911,26 +900,6 @@ export const finIQQuestions: Question[] = [
     explanation: "As people get raises, they often upgrade their lifestyle, meaning they don't actually save more.",
     xpReward: 40,
     difficulty: 'hard'
-  },
-  {
-    id: 's-11',
-    category: 'SPENDING',
-    ageGroups: ['junior'],
-    question: "If you have ₹100, and you spend it all today, you have ₹0 for tomorrow. This is...",
-    options: ["Poor planning", "Saving", "Investing", "A good idea"],
-    correctIndex: 0,
-    explanation: "Spending everything now means you have no 'buffer' or money for future goals.",
-    xpReward: 15,
-    difficulty: 'easy',
-    countryVariants: {
-      US: { question: "If you have $10, and you spend it all today, you have $0 for tomorrow. This is...", options: ["Poor planning", "Saving", "Investing", "A good idea"], correctIndex: 0, explanation: "Spending everything now means you have no 'buffer' or money for future goals." },
-      GB: { question: "If you have £10, and you spend it all today, you have £0 for tomorrow. This is...", options: ["Poor planning", "Saving", "Investing", "A good idea"], correctIndex: 0, explanation: "Spending everything now means you have no 'buffer' or money for future goals." },
-      CN: { question: "If you have ¥50, and you spend it all today, you have ¥0 for tomorrow. This is...", options: ["Poor planning", "Saving", "Investing", "A good idea"], correctIndex: 0, explanation: "Spending everything now means you have no 'buffer' or money for future goals." },
-      JP: { question: "If you have ¥1,500, and you spend it all today, you have ¥0 for tomorrow. This is...", options: ["Poor planning", "Saving", "Investing", "A good idea"], correctIndex: 0, explanation: "Spending everything now means you have no 'buffer' or money for future goals." },
-      RU: { question: "If you have ₽750, and you spend it all today, you have ₽0 for tomorrow. This is...", options: ["Poor planning", "Saving", "Investing", "A good idea"], correctIndex: 0, explanation: "Spending everything now means you have no 'buffer' or money for future goals." },
-      ZA: { question: "If you have R150, and you spend it all today, you have R0 for tomorrow. This is...", options: ["Poor planning", "Saving", "Investing", "A good idea"], correctIndex: 0, explanation: "Spending everything now means you have no 'buffer' or money for future goals." },
-      SD: { question: "If you have $10, and you spend it all today, you have $0 for tomorrow. This is...", options: ["Poor planning", "Saving", "Investing", "A good idea"], correctIndex: 0, explanation: "Spending everything now means you have no 'buffer' or money for future goals." },
-    }
   },
   {
     id: 's-12',
@@ -2476,17 +2445,6 @@ export const finIQQuestions: Question[] = [
     explanation: "Lifestyle creep means spending rises as fast as income. Directing part of every raise to savings builds wealth.",
     xpReward: 35,
     difficulty: 'medium'
-  },
-  {
-    id: 'cq-90',
-    category: 'BUDGETING',
-    ageGroups: ['junior'],
-    question: "You save 5 coins a week. How many weeks until you have 40 coins?",
-    options: ["8 weeks", "5 weeks", "10 weeks", "35 weeks"],
-    correctIndex: 0,
-    explanation: "40 ÷ 5 = 8 weeks. Setting a goal and counting weeks makes saving feel doable.",
-    xpReward: 25,
-    difficulty: 'easy'
   },
   {
     id: 'cq-91',
