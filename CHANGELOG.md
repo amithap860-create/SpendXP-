@@ -48,7 +48,7 @@ What's new:
 
 - 8 new junior-only lessons (ages 9-12), placed first on the junior path: What Is a Bank?, Goals and Saving, Budgeting and Smart Shopping, Sharing as Part of the Plan, The Money Snowball (compound interest), Where Does Money Come From?, Borrowing and Credit, Your Own Small Business. Teaching order follows the FDIC "Money Smart Basics for Kids" outline; all text, examples and numbers are original and in rupees. Earning is framed around pocket money, chores and family projects (no jobs for under-14s).
 - New Parent Guide at /parent/guide ("Raising money-smart kids", linked from the parent nav): four habits (talk, daily life, saving, borrowing) by age stage, adapted in our own words from FINRA's "Financial Education for Kids" article with attribution and India-specific safety notes.
-- Known issue: the junior path also still includes short-term trading, crypto and Lynch stock analysis (existing). Consider hiding those from 9-12s.
+- Hidden from 9-12s (now teen/senior only): Short-Term Trading vs Long-Term Investing, Crypto & High-Risk Assets, Pick Stocks Like Peter Lynch - too advanced for the junior audience declared in Play. No game is gated on these lessons. Junior path is now 25 lessons, ending with ETFs & Index Funds.
 
 ## 2026-10-15 - Calculator stuck open (web only)
 

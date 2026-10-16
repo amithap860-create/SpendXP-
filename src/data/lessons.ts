@@ -1198,7 +1198,7 @@ const baseLessons: Lesson[] = [
     relatedGame: 'stockMarketSim',
     title: 'Short-Term Trading vs Long-Term Investing',
     estimatedMinutes: 3,
-    ageGroups: ['junior', 'teen', 'senior'],
+    ageGroups: ['teen', 'senior'], // 2026-10-16: hidden from 9-12s (short selling/leverage, crypto and PEG analysis are too advanced for the junior audience declared in Play)
     cards: [
       {
         id: 'st1',
@@ -1325,7 +1325,7 @@ const baseLessons: Lesson[] = [
     // only lesson missing two age tiers instead of one. Adding both closes
     // the gap consistently rather than leaving teen stranded while junior
     // gets access.
-    ageGroups: ['junior', 'teen', 'senior'],
+    ageGroups: ['teen', 'senior'], // 2026-10-16: hidden from 9-12s (short selling/leverage, crypto and PEG analysis are too advanced for the junior audience declared in Play)
     cards: [
       {
         id: 'c1',
@@ -1399,7 +1399,7 @@ const baseLessons: Lesson[] = [
     // text). Note: the quizCard below (PEG ratio, promoter buying) isn't
     // junior-adapted — that's fine since it doesn't block completion XP, but
     // it's not fully polished for junior yet either.
-    ageGroups: ['junior', 'teen', 'senior'],
+    ageGroups: ['teen', 'senior'], // 2026-10-16: hidden from 9-12s (short selling/leverage, crypto and PEG analysis are too advanced for the junior audience declared in Play)
     cards: [
       {
         id: 'sl-1',
