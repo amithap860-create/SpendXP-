@@ -1,5 +1,6 @@
 import { AgeGroup } from '@/lib/ageAdapt';
 import { newLessons } from './newLessons';
+import { kidsLessons } from './kidsLessons';
 
 export type LessonCard = {
   id: string;
@@ -1559,7 +1560,13 @@ const LESSON_INSERTIONS: Array<{ after: string; ids: string[] }> = [
   { after: 'l-etfs', ids: ['l-retirement'] },
 ];
 
-export const lessons: Lesson[] = baseLessons.flatMap((lesson) => {
-  const ins = LESSON_INSERTIONS.find((i) => i.after === lesson.id);
-  return ins ? [lesson, ...ins.ids.map((id) => newLessons[id])] : [lesson];
-});
+// ADDED (2026-10-16): the 8-lesson "Money Basics for Kids" track (junior only)
+// comes FIRST so 9-12 year olds start with it; older age groups never see it
+// (ageGroups: ['junior']) so their path is unchanged.
+export const lessons: Lesson[] = [
+  ...kidsLessons,
+  ...baseLessons.flatMap((lesson) => {
+    const ins = LESSON_INSERTIONS.find((i) => i.after === lesson.id);
+    return ins ? [lesson, ...ins.ids.map((id) => newLessons[id])] : [lesson];
+  }),
+];

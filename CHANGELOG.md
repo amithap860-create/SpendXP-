@@ -44,6 +44,12 @@ What's new:
 - Added an educational-use disclaimer and "content last reviewed" date on Learn, Quests hub and quest completion screens (config/content.ts).
 - Full findings and remaining items: CONTENT-AUDIT.md.
 
+## 2026-10-16 - Money Basics for Kids track + Parent Guide (branch feature/kids-track)
+
+- 8 new junior-only lessons (ages 9-12), placed first on the junior path: What Is a Bank?, Goals and Saving, Budgeting and Smart Shopping, Sharing as Part of the Plan, The Money Snowball (compound interest), Where Does Money Come From?, Borrowing and Credit, Your Own Small Business. Teaching order follows the FDIC "Money Smart Basics for Kids" outline; all text, examples and numbers are original and in rupees. Earning is framed around pocket money, chores and family projects (no jobs for under-14s).
+- New Parent Guide at /parent/guide ("Raising money-smart kids", linked from the parent nav): four habits (talk, daily life, saving, borrowing) by age stage, adapted in our own words from FINRA's "Financial Education for Kids" article with attribution and India-specific safety notes.
+- Known issue: the junior path also still includes short-term trading, crypto and Lynch stock analysis (existing). Consider hiding those from 9-12s.
+
 ## 2026-10-15 - Calculator stuck open (web only)
 
 - Tester report: the quick calculator could not be closed when opened during a game. The open panel covered the floating button that was meant to close it. The floating button now hides while open and the panel has its own close (X) button. File: QuickCalculator.tsx.

@@ -77,6 +77,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
   const navLinks = isParent
     ? [
         { label: 'Dashboard', href: '/parent',  icon: 'grid' },
+        { label: 'Guide',     href: '/parent/guide', icon: 'book' },
         { label: 'Profile',   href: '/profile', icon: 'user' },
       ]
     : [
