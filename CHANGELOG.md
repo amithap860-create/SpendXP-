@@ -223,3 +223,6 @@ Safer for younger players:
 - Quest choices and Credit Score Builder options now shuffle every time (optimal was first ~80–95% of the time).
 - Not done: length-balancing of quest/credit-score option text.
 - Add to 1.1.3 release notes: kids lessons, parent guide, harder quiz options.
+
+## 2026-10-16 — Lesson reward flash
+- Fixed reward screen briefly showing "+0 XP" on Finish (completion state now captured when the lesson opens).

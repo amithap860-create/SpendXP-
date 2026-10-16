@@ -131,7 +131,10 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
   // FIX (2026-10-15): finishing an already-completed lesson used to pay the
   // full XP again every time (infinite XP by re-running a lesson). Replays are
   // now practice only, matching how repeat quest completions already work.
-  const alreadyCompleted = !!tasks.find(t => t.id === `lesson-${lesson.id}`)?.completed;
+  // Captured ONCE when the lesson opens (2026-10-16). Reading it live made the
+  // reward screen flash "+0 XP" on Finish: completeTask() flips it to true
+  // before the XP write finishes, which zeroed rewardXP mid-render.
+  const [alreadyCompleted] = useState(() => !!tasks.find(t => t.id === `lesson-${lesson.id}`)?.completed);
   const rewardXP = alreadyCompleted ? 0 : totalCardXP + (answeredCorrectly ? QUIZ_BONUS_XP : 0);
   const xpSoFar = stage === 'scenes'
     ? cards.slice(0, sceneIdx).reduce((a, c) => a + c.xpReward, 0)
