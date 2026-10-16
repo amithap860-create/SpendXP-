@@ -216,3 +216,10 @@ Safer for younger players:
 
 ---
 *Not included: internal refactors, dependency bumps, or anything with no user-visible or reviewer-visible effect.*
+
+## 2026-10-16 — Answer-choice rebalancing (branch feature/kids-track)
+- Rewrote options on 67 teen/senior FinIQ questions (shorter correct answers, no "always/never" or silly distractors); removed cq-58, cq-105 (weak). Bank = 213. Junior questions untouched (kept easy).
+- Rewrote distractors on 12 lesson quiz cards (smart-goals, loans, credit-cards, scams, take-home, income-tax, stock-movers, etfs, crypto, saving).
+- Quest choices and Credit Score Builder options now shuffle every time (optimal was first ~80–95% of the time).
+- Not done: length-balancing of quest/credit-score option text.
+- Add to 1.1.3 release notes: kids lessons, parent guide, harder quiz options.

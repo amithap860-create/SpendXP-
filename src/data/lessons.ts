@@ -281,12 +281,12 @@ const baseLessons: Lesson[] = [
     quizCard: {
       question: 'Which of these is a SMART financial goal?',
       options: [
-        'I want to save money',
-        'I will try to spend less on snacks',
+        'I will save more money from now on',
         'I will save ₹500 every month for 8 months to buy a ₹4,000 bicycle by June',
-        'I want to be rich someday',
+        'I will cut my snack spending as much as I can this year',
+        'I will save a good amount for something big someday',
       ],
-      correctIndex: 2,
+      correctIndex: 1,
       explanation: 'This is the only option with a specific amount, a measurable monthly target, a realistic timeframe, and a clear deadline — all five SMART elements are present.',
     },
     briefs: [
@@ -381,10 +381,10 @@ const baseLessons: Lesson[] = [
     quizCard: {
       question: 'You just received ₹1,000. What does "pay yourself first" mean?',
       options: [
-        'Buy what you want, save what is left',
-        'Save a set amount before spending anything',
-        'Give money to family first',
-        'Pay your bills first',
+        'Spend on your wants first, then save what is left',
+        'Set aside a fixed amount for savings before spending',
+        'Give a share to family before anything else',
+        'Clear all your bills before touching savings',
       ],
       correctIndex: 1,
       explanation: '"Pay yourself first" means saving before you spend. It is the single most effective savings habit because it removes the decision entirely.',
@@ -881,9 +881,9 @@ const baseLessons: Lesson[] = [
       question: "You're offered a job with a CTC of ₹6,00,000/year. What should you use to plan your monthly budget?",
       options: [
         '₹6,00,000 ÷ 12 = ₹50,000/month',
-        'Your actual monthly take-home pay, after TDS and PF deductions',
-        'Whatever number sounds easiest to plan with',
-        "Wait until you've spent a year at the job to find out",
+        'Your monthly take-home pay after deductions',
+        'The CTC minus 10% for tax, whatever the slab',
+        'The highest monthly figure the employer quotes',
       ],
       correctIndex: 1,
       explanation: "CTC includes deductions and employer contributions you'll never see in your bank account. Always budget off actual take-home pay — check a real payslip, not the offer letter.",
@@ -1182,7 +1182,7 @@ const baseLessons: Lesson[] = [
     ],
     quizCard: {
       question: "An index ETF (e.g. Nifty 50 or S&P 500 fund) lets you invest ₹1,000 and immediately own...",
-      options: ["Only the top 1 company", "All companies in the index, proportionally", "Only tech companies", "A fixed deposit with bonus shares"],
+      options: ["Only the 10 largest companies in the index", "All companies in the index, proportionally", "A basket chosen each month by the fund manager", "A guaranteed fixed return from the fund"],
       correctIndex: 1,
       explanation: "Index ETFs give you instant diversification — your ₹1,000 is spread across every company in the index, proportional to its size. One purchase, dozens or hundreds of companies."
     },
@@ -1375,7 +1375,7 @@ const baseLessons: Lesson[] = [
     ],
     quizCard: {
       question: "A friend says a new crypto coin will give 50% monthly returns. What should you do?",
-      options: ["Invest immediately", "Ask for a referral link", "Likely a scam — don't invest", "Invest only ₹1,000"],
+      options: ["Invest a small amount to test it", "Ask for proof of last month's returns", "A promise like this is a scam warning sign", "Wait to see if friends also profit"],
       correctIndex: 2,
       explanation: "No legitimate investment guarantees 50% monthly returns. This pattern is typical of a Ponzi scheme."
     },

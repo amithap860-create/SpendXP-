@@ -176,10 +176,10 @@ export const newLessons: Record<string, Lesson> = {
     quizCard: {
       question: "A lender offers a loan at '12% flat'. What should you do before accepting?",
       options: [
-        "Accept — 12% is a low rate",
-        "Convert it to the effective (reducing-balance) rate or compare total repayment",
-        "Choose the longest tenure for the lowest EMI",
-        "Ask only about the processing fee"
+        "Accept — 12% is below most card rates",
+        "Compare the total repayment, not just the rate",
+        "Pick the tenure with the lowest EMI",
+        "Ask how much the processing fee is"
       ],
       correctIndex: 1,
       explanation: "A flat rate charges interest on the original amount for the full term, so the true cost can be nearly double the headline number. Compare the effective rate or the total repaid."
@@ -256,10 +256,10 @@ export const newLessons: Record<string, Lesson> = {
     quizCard: {
       question: "You pay only the 'minimum due' on your credit card. What usually happens?",
       options: [
-        "The debt is cleared faster",
-        "Interest is charged on the remaining balance and the debt can drag on",
-        "You earn extra rewards",
-        "Your credit limit is cut to zero"
+        "The balance is cleared in a few months",
+        "Interest keeps building on what is left",
+        "Interest is waived on the unpaid part",
+        "Your credit limit is lowered to the minimum"
       ],
       correctIndex: 1,
       explanation: "The minimum due only keeps the account in good standing. The remaining balance keeps attracting very high interest, so the debt can linger for years."
@@ -332,10 +332,10 @@ export const newLessons: Record<string, Lesson> = {
     quizCard: {
       question: "A caller says they're from your bank and asks for the OTP 'to stop a fraud'. What is the right response?",
       options: [
-        "Share it quickly so your account is safe",
-        "Share only the last 3 digits",
-        "Hang up and never share it; call the number on your card or official site",
-        "Ask them to message it to you first"
+        "Share it, but only after they verify your name",
+        "Share the OTP only if the caller knows your account number",
+        "Hang up and call the number on your card",
+        "Ask them to send a reference number, then share it"
       ],
       correctIndex: 2,
       explanation: "An OTP authorises a payment. Genuine banks never ask for it. Hang up and call the official number yourself, and if you lose money report it immediately on 1930 or cybercrime.gov.in."
@@ -489,9 +489,9 @@ export const newLessons: Record<string, Lesson> = {
       question: "Your income crosses into a higher tax slab. What happens?",
       options: [
         "All your income is now taxed at the higher rate",
-        "Only the income inside the higher slab is taxed at the higher rate",
-        "You pay no tax on the extra income",
-        "The tax is the same as before"
+        "Only the part above the threshold is taxed at the higher rate",
+        "The extra income is taxed at the old rate until next year",
+        "The extra income is exempt until the next tax year"
       ],
       correctIndex: 1,
       explanation: "Slabs are progressive: each slice of income is taxed at its own rate. Your effective rate is always lower than your top slab rate."
@@ -836,9 +836,9 @@ export const newLessons: Record<string, Lesson> = {
       question: 'A company reports its highest-ever profit, yet its stock falls. What is the most likely reason?',
       options: [
         'Investors had expected even more, so the good news was already priced in',
-        'A stock must always fall after good news',
-        'The company has too many shareholders',
-        'Profits do not matter to stock prices'
+        'Record profits are taxed at a much higher rate',
+        'Companies usually have to repay debt after record profits',
+        'Share prices only respond to dividends'
       ],
       correctIndex: 0,
       explanation: 'Prices already contain what investors expect. A result that is good but smaller than hoped, or that comes with weaker guidance, can disappoint — so the stock falls even on good news.'

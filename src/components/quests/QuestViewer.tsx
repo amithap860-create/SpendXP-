@@ -58,6 +58,18 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
   const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(null);
   const [showBreakdown, setShowBreakdown] = useState(true);
 
+  // Shuffle choice order per step (2026-10-16): authored data lists the optimal
+  // choice first most of the time, which made it guessable. Selection is by id,
+  // so order is purely cosmetic. Re-shuffles when the step changes.
+  const shuffledChoices = React.useMemo(() => {
+    const arr = [...(currentStep?.choices ?? [])];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }, [currentStep?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const activeChoice = currentStep?.choices.find(c => c.id === selectedChoiceId);
   const currentBalance = quest.startingBalance + state.totalWalletDelta;
 
@@ -448,7 +460,7 @@ export default function QuestViewer({ quest, onComplete }: QuestViewerProps) {
             </button>
           ) : (
             <div className="grid gap-3">
-              {currentStep?.choices.map((choice) => (
+              {shuffledChoices.map((choice) => (
                 <button
                   key={choice.id}
                   disabled={!!selectedChoiceId}

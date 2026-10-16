@@ -35,6 +35,15 @@ export function CreditScoreBuilder({ onExit }: { onExit: () => void }) {
   const [currentChoice, setCurrentChoice] = useState<CreditChoice | null>(null);
   const [selectedOption, setSelectedOption] = useState<CreditOption | null>(null);
   const [showBrief, setShowBrief] = useState(true);
+  // Shuffle option order per scenario (optimal option was first in 23/24 scenarios).
+  const shuffledOptions = useMemo(() => {
+    const arr = [...(currentChoice?.options ?? [])];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }, [currentChoice]);
 
   // Pre-built shuffled question sequence for the current session.
   // Using a ref avoids stale-closure issues inside the round-picker effect.
@@ -194,7 +203,7 @@ export function CreditScoreBuilder({ onExit }: { onExit: () => void }) {
           <Card className="p-6 md:p-8 flex flex-col min-h-[400px]">
             <h2 className="text-xl md:text-2xl font-bold mb-6 text-foreground leading-tight">{currentChoice.scenario}</h2>
             <div className="grid gap-3 md:gap-4">
-              {currentChoice.options.map((opt, i) => (
+              {shuffledOptions.map((opt, i) => (
                 <Button 
                   key={i} 
                   variant="outline" 
