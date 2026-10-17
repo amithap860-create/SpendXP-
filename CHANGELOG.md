@@ -226,3 +226,6 @@ Safer for younger players:
 
 ## 2026-10-16 — Lesson reward flash
 - Fixed reward screen briefly showing "+0 XP" on Finish (completion state now captured when the lesson opens).
+
+## 2026-10-17 — Stock Sim contest mode
+- /games?game=stockMarketSim&contest=stock1: fixed seed (same prices + headlines for everyone), $1,000, six core stocks, all age groups; one attempt per account (users/{uid}/gameScores/stockContest_stock1, written at start); result saved on finish. Honour-system: owner-writable doc, verify in Firebase console.

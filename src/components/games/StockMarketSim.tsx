@@ -31,6 +31,27 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useGameTutorial, GameTutorialModal, HowToPlayButton } from '@/components/games/GameTutorial';
 import { ConceptBreakdown } from '@/components/ConceptBreakdown';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { useAuthContext } from '@/context/AuthContext';
+
+// ─── Contest mode (2026-10-17) ───────────────────────────────────────────────
+// Opened with /games?game=stockMarketSim&contest=stock1. Everyone gets the SAME
+// start ($1,000, the six core stocks), the SAME price path and the SAME
+// headlines, regardless of age group, so the final value is directly
+// comparable. Randomness is a pure hash of (seed, day, tick, stock) — not a
+// stateful RNG — so a slow phone or a skipped timer tick cannot change the path.
+// One attempt per account, recorded at START (quitting early still uses it).
+const CONTEST_ID = 'stock1';
+const CONTEST_SEED = 20261018;
+const CONTEST_CASH = 1000;
+const TICK_SECONDS = 3;
+function seededRandom(a: number, b: number, c: number, d: number): number {
+  let h = (CONTEST_SEED ^ Math.imul(a + 1, 0x9e3779b1) ^ Math.imul(b + 7, 0x85ebca6b) ^ Math.imul(c + 13, 0xc2b2ae35) ^ Math.imul(d + 29, 0x27d4eb2f)) >>> 0;
+  h = Math.imul(h ^ (h >>> 16), 0x85ebca6b) >>> 0;
+  h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35) >>> 0;
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+}
 
 const SPARKLINE_LEN = 20; // points of history to show
 
@@ -108,9 +129,17 @@ function getRecommendedSymbols(r: PersonalityResult, companies: StockCompany[]):
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function StockMarketSim({ onExit }: { onExit: () => void }) {
-  const { ageGroup } = useAgeAdapt();
+  const { ageGroup: userAgeGroup } = useAgeAdapt();
+  const { user } = useAuthContext();
+  const contest = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('contest') === CONTEST_ID;
+  // Contest mode forces the teen setup for everyone so the field is level.
+  const ageGroup = contest ? 'teen' : userAgeGroup;
   const tutorial = useGameTutorial('stockMarketSim');
-  const startingCash = useMemo(() => ageGroup === 'junior' ? 100 : ageGroup === 'senior' ? 5000 : 1000, [ageGroup]);
+  const startingCash = useMemo(() => contest ? CONTEST_CASH : ageGroup === 'junior' ? 100 : ageGroup === 'senior' ? 5000 : 1000, [ageGroup, contest]);
+  // 'checking' | 'open' | 'used' (+ saved result) — contest attempt gate
+  const [attempt, setAttempt] = useState<'checking' | 'open' | 'used'>(contest ? 'checking' : 'open');
+  const [priorResult, setPriorResult] = useState<{ finalValue?: number; returnPct?: number } | null>(null);
+  const tickRef = useRef({ round: 0, tick: 0 });
   // Junior (9-12): first 3 core companies. Teen (13-16): the 6 core companies.
   // Senior (17-20): the 6 core companies PLUS 3 senior-only ones (2026-10-07,
   // requested by older testers who wanted more to choose from).
@@ -202,7 +231,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
   // headline is chosen (below); this interval only does small random
   // day-to-day drift.
   useEffect(() => {
-    if (gameState !== 'PLAYING') return;
+    if (gameState !== 'PLAYING' || contest) return;
     const interval = ageGroup === 'junior' ? 5000 : 3000;
     const timer = setInterval(() => {
       setPrices(prev => {
@@ -224,7 +253,72 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
       });
     }, interval);
     return () => clearInterval(timer);
-  }, [gameState, ageGroup, companies]);
+  }, [gameState, ageGroup, companies, contest]);
+
+  // Contest drift: one tick per TICK_SECONDS of elapsed round time, derived from
+  // the game timer (not a wall-clock interval). Catches up any skipped ticks.
+  useEffect(() => {
+    if (!contest || gameState !== 'PLAYING') return;
+    const elapsed = ROUND_TIME - timeLeft;
+    const target = Math.floor(elapsed / TICK_SECONDS);
+    const ref = tickRef.current;
+    if (ref.round !== currentRound) { ref.round = currentRound; ref.tick = 0; }
+    if (target <= ref.tick) return;
+    const from = ref.tick + 1;
+    ref.tick = target;
+    setPrices(prev => {
+      const next = { ...prev };
+      for (let k = from; k <= target; k++) {
+        companies.forEach((company, idx) => {
+          const volFactor = company.volatility === 'high' ? 0.14 : company.volatility === 'medium' ? 0.07 : 0.03;
+          const multiplier = 1 + (seededRandom(currentRound, k, idx, 1) - 0.48) * volFactor;
+          next[company.symbol] = Number(Math.max(1, next[company.symbol] * multiplier).toFixed(2));
+        });
+      }
+      return next;
+    });
+    setPriceHistory(prevHist => {
+      const nextHist = { ...prevHist };
+      companies.forEach(c => {
+        const h = prevHist[c.symbol] || [];
+        const idx = companies.indexOf(c);
+        let v = h[h.length - 1] ?? c.startPrice;
+        for (let k = from; k <= target; k++) {
+          const volFactor = c.volatility === 'high' ? 0.14 : c.volatility === 'medium' ? 0.07 : 0.03;
+          v = Number(Math.max(1, v * (1 + (seededRandom(currentRound, k, idx, 1) - 0.48) * volFactor)).toFixed(2));
+        }
+        nextHist[c.symbol] = [...h, v].slice(-SPARKLINE_LEN);
+      });
+      return nextHist;
+    });
+  }, [contest, gameState, timeLeft, currentRound, companies]);
+
+  // Contest attempt gate: one attempt per account.
+  const contestRef = user?.uid ? doc(db, 'users', user.uid, 'gameScores', `stockContest_${CONTEST_ID}`) : null;
+  useEffect(() => {
+    if (!contest) return;
+    if (!user?.uid) return;
+    let cancelled = false;
+    getDoc(doc(db, 'users', user.uid, 'gameScores', `stockContest_${CONTEST_ID}`))
+      .then(snap => {
+        if (cancelled) return;
+        if (snap.exists()) { setPriorResult(snap.data() as any); setAttempt('used'); }
+        else setAttempt('open');
+      })
+      .catch(() => { if (!cancelled) setAttempt('used'); }); // fail closed: can't verify = no attempt
+    return () => { cancelled = true; };
+  }, [contest, user?.uid]);
+
+  const startContestGame = async () => {
+    if (!contestRef) return;
+    try {
+      // Written BEFORE play: quitting early still uses the attempt.
+      await setDoc(contestRef, { contest: CONTEST_ID, startedAt: new Date(), finished: false }, { merge: true });
+    } catch { return; }
+    startGame();
+  };
+
+  const resultSaved = useRef(false);
 
   useEffect(() => {
     if (gameState === 'PLAYING' && timeLeft === 0) {
@@ -235,7 +329,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
         const inPlay = new Set(companies.map(c => c.symbol));
         const eligible = NEWS_HEADLINES.filter(h => inPlay.has(h.ticker));
         const pool = eligible.length ? eligible : NEWS_HEADLINES;
-        const headline = pool[Math.floor(Math.random() * pool.length)];
+        const headline = pool[Math.floor((contest ? seededRandom(currentRound, 0, 0, 2) : Math.random()) * pool.length)];
         setCurrentHeadline(headline);
         // Apply the news impact ONCE, right now, instead of letting the
         // ticking interval reapply it every few seconds for the whole day.
@@ -262,7 +356,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
         endGame(gameConfig.xpPerWin);
       }
     }
-  }, [timeLeft, gameState, currentRound, nextRound, endGame, gameConfig.xpPerWin, companies]);
+  }, [timeLeft, gameState, currentRound, nextRound, endGame, gameConfig.xpPerWin, companies, contest]);
 
   const handleTrade = (qty: number) => {
     if (!tradeModal) return;
@@ -307,7 +401,39 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
   const portfolioValue = Object.entries(portfolio).reduce((acc, [s, q]) => acc + q * prices[s], 0);
   const totalWealth = cash + portfolioValue;
 
+  useEffect(() => {
+    if (!contest || gameState !== 'RESULTS' || resultSaved.current || !contestRef) return;
+    resultSaved.current = true;
+    setDoc(contestRef, {
+      finished: true,
+      finishedAt: new Date(),
+      finalValue: Number(totalWealth.toFixed(2)),
+      returnPct: Number(((totalWealth - startingCash) / startingCash * 100).toFixed(2)),
+    }, { merge: true }).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contest, gameState]);
+
   // ─── Concept Brief ──────────────────────────────────────────────────────────
+
+  if (contest && attempt !== 'open') {
+    return (
+      <Card className="max-w-md mx-auto border-none shadow-xl p-8 text-center space-y-4">
+        <Trophy className="h-12 w-12 mx-auto text-primary" />
+        <h2 className="text-2xl font-black">Stock contest</h2>
+        {attempt === 'checking' ? (
+          <p className="text-sm text-muted-foreground">Checking your attempt…</p>
+        ) : (
+          <>
+            <p className="text-sm text-muted-foreground">
+              You've already used your one attempt{priorResult?.finalValue != null ? <> — final value <strong>${priorResult.finalValue.toFixed(2)}</strong> ({priorResult.returnPct}% return)</> : ' (the run was started but not finished)'}.
+              If it didn't finish because of a crash or lost connection, message the organiser.
+            </p>
+            <Button onClick={onExit} className="w-full">Back to games</Button>
+          </>
+        )}
+      </Card>
+    );
+  }
 
   if (showBreakdown) {
     return (
@@ -400,7 +526,13 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
       )}
 
       <CardContent className="p-6 md:p-10 space-y-4">
-        {!personality && (
+        {contest && (
+          <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 space-y-1">
+            <p className="font-black">Contest run — ONE attempt</p>
+            <p>Everyone gets the same $1,000, the same 6 stocks and the same prices and headlines. Your score is your % return after day 5. Once you press start the attempt is used, even if you quit.</p>
+          </div>
+        )}
+        {!personality && !contest && (
           <Button
             variant="outline"
             onClick={() => setPersonalityStep(0)}
@@ -409,7 +541,7 @@ export function StockMarketSim({ onExit }: { onExit: () => void }) {
             <Star className="h-4 w-4" /> Personalize my stock picks (3 quick questions)
           </Button>
         )}
-        <Button onClick={startGame} className="w-full h-14 md:h-16 text-xl font-black rounded-2xl shadow-xl min-h-[44px]">
+        <Button onClick={contest ? startContestGame : startGame} className="w-full h-14 md:h-16 text-xl font-black rounded-2xl shadow-xl min-h-[44px]">
           START TRADING
         </Button>
       </CardContent>
