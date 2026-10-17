@@ -10,6 +10,7 @@ import { useAgeAdapt } from '@/lib/ageAdaptProvider';
 import { ConceptBreakdown } from '@/components/ConceptBreakdown';
 import { usePremium } from '@/hooks/usePremium';
 import { useUser } from '@/lib/store';
+import { useAuthContext } from '@/context/AuthContext';
 import { lessons } from '@/data/lessons';
 
 // Per founder request (2026-09): gate each game behind the lesson that
@@ -53,7 +54,7 @@ const CreditScoreBuilder = dynamic(() => import('@/components/games/CreditScoreB
 type GameID = 'budgetBlitz' | 'finIQQuiz' | 'moneyMaze' | 'stockMarketSim' | 'creditScoreBuilder';
 
 interface GamesHubProps {
-  searchParams: Promise<{ game?: string; mode?: string }>;
+  searchParams: Promise<{ game?: string; mode?: string; contest?: string }>;
 }
 
 // ─── Game icons — SVG only, no emoji ─────────────────────────────────────────
@@ -192,6 +193,8 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
   const { ageGroup } = useAgeAdapt();
   const { canAccess } = usePremium();
   const { tasks } = useUser();
+  const { user: authUser, loading: authLoading } = useAuthContext();
+  const [contestMode, setContestMode] = useState(false);
   const isLessonComplete = (id: string) => !!tasks.find(t => t.id === `lesson-${id}`)?.completed;
 
   const [activeGame, setActiveGame] = useState<GameID | null>(null);
@@ -206,6 +209,23 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
   useEffect(() => {
     const gameParam = resolvedParams.game as GameID;
     const modeParam = resolvedParams.mode;
+
+    // Contest link (2026-10-17): needs a signed-in user. Previously a signed-out
+    // visitor was bounced to the login page and landed on the dashboard, losing
+    // the link; and the router.replace('/games') below stripped ?contest before
+    // the game could read it. Now: wait for auth, send signed-out users to login
+    // WITH a return path, and hand the flag to the game as a prop.
+    if (gameParam === 'stockMarketSim' && resolvedParams.contest) {
+      if (authLoading) return;
+      if (!authUser) {
+        router.replace(`/login?next=${encodeURIComponent(`/games?game=stockMarketSim&contest=${resolvedParams.contest}`)}`);
+        return;
+      }
+      setContestMode(resolvedParams.contest === 'stock1');
+      setActiveGame('stockMarketSim');
+      router.replace('/games');
+      return;
+    }
 
     if (gameParam) {
       const validGames: GameID[] = [
@@ -231,7 +251,7 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
       }
       router.replace('/games');
     }
-  }, [resolvedParams, router]);
+  }, [resolvedParams, router, authUser, authLoading]);
 
   const dailyTopics = ['budgeting-basics', 'investing-basics', 'credit-scores', 'taxes-global', 'spending-habits', 'emergency-fund', 'emi-and-debt'];
   const todayBreakdownId = dailyTopics[new Date().getDate() % dailyTopics.length];
@@ -252,7 +272,7 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
       case 'budgetBlitz':       return <BudgetBlitz onExit={() => setActiveGame(null)} />;
       case 'finIQQuiz':         return <FinIQQuiz onExit={() => setActiveGame(null)} isDailyChallenge={isDaily} />;
       case 'moneyMaze':         return <MoneyMaze onExit={() => setActiveGame(null)} />;
-      case 'stockMarketSim':    return <StockMarketSim onExit={() => setActiveGame(null)} />;
+      case 'stockMarketSim':    return <StockMarketSim contest={contestMode} onExit={() => { setActiveGame(null); setContestMode(false); }} />;
       case 'creditScoreBuilder':return <CreditScoreBuilder onExit={() => setActiveGame(null)} />;
       default:                  return null;
     }

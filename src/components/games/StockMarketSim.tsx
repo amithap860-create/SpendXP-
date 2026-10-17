@@ -128,10 +128,9 @@ function getRecommendedSymbols(r: PersonalityResult, companies: StockCompany[]):
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export function StockMarketSim({ onExit }: { onExit: () => void }) {
+export function StockMarketSim({ onExit, contest = false }: { onExit: () => void; contest?: boolean }) {
   const { ageGroup: userAgeGroup } = useAgeAdapt();
   const { user } = useAuthContext();
-  const contest = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('contest') === CONTEST_ID;
   // Contest mode forces the teen setup for everyone so the field is level.
   const ageGroup = contest ? 'teen' : userAgeGroup;
   const tutorial = useGameTutorial('stockMarketSim');

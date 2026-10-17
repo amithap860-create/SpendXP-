@@ -50,7 +50,7 @@ function LoginContent() {
       // was never completed and nothing visibly failed. profile/page.tsx
       // still uses ?next=, so both params are honored, 'next' taking
       // precedence only because it's checked first (no real callers pass both).
-      const nextUrl = searchParams.get('next') || searchParams.get('redirect') || defaultUrl;
+      const nextUrl = searchParams.get('next') || searchParams.get('redirect') || searchParams.get('returnTo') || defaultUrl;
       try {
         const parsed = new URL(nextUrl, window.location.origin);
         if (parsed.origin === window.location.origin) {
@@ -110,7 +110,7 @@ function LoginContent() {
       // was never completed and nothing visibly failed. profile/page.tsx
       // still uses ?next=, so both params are honored, 'next' taking
       // precedence only because it's checked first (no real callers pass both).
-      const nextUrl = searchParams.get('next') || searchParams.get('redirect') || defaultUrl;
+      const nextUrl = searchParams.get('next') || searchParams.get('redirect') || searchParams.get('returnTo') || defaultUrl;
       try {
         const parsed = new URL(nextUrl, window.location.origin);
         if (parsed.origin === window.location.origin) {
@@ -147,7 +147,7 @@ function LoginContent() {
       // was never completed and nothing visibly failed. profile/page.tsx
       // still uses ?next=, so both params are honored, 'next' taking
       // precedence only because it's checked first (no real callers pass both).
-      const nextUrl = searchParams.get('next') || searchParams.get('redirect') || defaultUrl;
+      const nextUrl = searchParams.get('next') || searchParams.get('redirect') || searchParams.get('returnTo') || defaultUrl;
       if (reason === 'reauth_required') {
         router.push('/profile');
       } else {
