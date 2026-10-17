@@ -229,3 +229,4 @@ Safer for younger players:
 
 ## 2026-10-17 — Stock Sim contest mode
 - /games?game=stockMarketSim&contest=stock1: fixed seed (same prices + headlines for everyone), $1,000, six core stocks, all age groups; one attempt per account (users/{uid}/gameScores/stockContest_stock1, written at start); result saved on finish. Honour-system: owner-writable doc, verify in Firebase console.
+- Contest updated: 3 attempts, best counts; each attempt number has its own seed (same for all players). Doc fields: attemptsStarted, attempts.{n}, bestReturnPct/bestFinalValue/bestAttempt.

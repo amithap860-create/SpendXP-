@@ -301,7 +301,7 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
               onClick={() => { setContestMode(true); setActiveGame('stockMarketSim'); }}
               className="w-full text-left rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 hover:bg-amber-100 transition-colors"
             >
-              <p className="text-[11px] font-black uppercase tracking-widest text-amber-700">Contest · one attempt</p>
+              <p className="text-[11px] font-black uppercase tracking-widest text-amber-700">Contest · 3 attempts, best counts</p>
               <p className="text-lg font-black text-amber-950">Stock Contest — tap to enter</p>
               <p className="text-sm text-amber-900">Same $1,000, same prices, same news for everyone. Highest % return wins.</p>
             </button>

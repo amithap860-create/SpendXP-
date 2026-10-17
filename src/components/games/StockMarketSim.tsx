@@ -41,13 +41,16 @@ import { useAuthContext } from '@/context/AuthContext';
 // headlines, regardless of age group, so the final value is directly
 // comparable. Randomness is a pure hash of (seed, day, tick, stock) — not a
 // stateful RNG — so a slow phone or a skipped timer tick cannot change the path.
-// One attempt per account, recorded at START (quitting early still uses it).
+// Three attempts per account, BEST of three counts. Attempt n has its own seed
+// (same for everyone), so a replay is a fresh market, not a memorised one.
+// Each attempt is recorded at START (quitting early still uses it).
 const CONTEST_ID = 'stock1';
 const CONTEST_SEED = 20261018;
 const CONTEST_CASH = 1000;
 const TICK_SECONDS = 3;
-function seededRandom(a: number, b: number, c: number, d: number): number {
-  let h = (CONTEST_SEED ^ Math.imul(a + 1, 0x9e3779b1) ^ Math.imul(b + 7, 0x85ebca6b) ^ Math.imul(c + 13, 0xc2b2ae35) ^ Math.imul(d + 29, 0x27d4eb2f)) >>> 0;
+const MAX_ATTEMPTS = 3;
+function seededRandom(att: number, a: number, b: number, c: number, d: number): number {
+  let h = (CONTEST_SEED ^ Math.imul(att + 3, 0x165667b1) ^ Math.imul(a + 1, 0x9e3779b1) ^ Math.imul(b + 7, 0x85ebca6b) ^ Math.imul(c + 13, 0xc2b2ae35) ^ Math.imul(d + 29, 0x27d4eb2f)) >>> 0;
   h = Math.imul(h ^ (h >>> 16), 0x85ebca6b) >>> 0;
   h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35) >>> 0;
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
@@ -137,7 +140,8 @@ export function StockMarketSim({ onExit, contest = false }: { onExit: () => void
   const startingCash = useMemo(() => contest ? CONTEST_CASH : ageGroup === 'junior' ? 100 : ageGroup === 'senior' ? 5000 : 1000, [ageGroup, contest]);
   // 'checking' | 'open' | 'used' (+ saved result) — contest attempt gate
   const [attempt, setAttempt] = useState<'checking' | 'open' | 'used'>(contest ? 'checking' : 'open');
-  const [priorResult, setPriorResult] = useState<{ finalValue?: number; returnPct?: number } | null>(null);
+  const [priorResult, setPriorResult] = useState<{ attemptsStarted?: number; bestFinalValue?: number; bestReturnPct?: number } | null>(null);
+  const [attemptNo, setAttemptNo] = useState(1);
   const tickRef = useRef({ round: 0, tick: 0 });
   // Junior (9-12): first 3 core companies. Teen (13-16): the 6 core companies.
   // Senior (17-20): the 6 core companies PLUS 3 senior-only ones (2026-10-07,
@@ -270,7 +274,7 @@ export function StockMarketSim({ onExit, contest = false }: { onExit: () => void
       for (let k = from; k <= target; k++) {
         companies.forEach((company, idx) => {
           const volFactor = company.volatility === 'high' ? 0.14 : company.volatility === 'medium' ? 0.07 : 0.03;
-          const multiplier = 1 + (seededRandom(currentRound, k, idx, 1) - 0.48) * volFactor;
+          const multiplier = 1 + (seededRandom(attemptNo, currentRound, k, idx, 1) - 0.48) * volFactor;
           next[company.symbol] = Number(Math.max(1, next[company.symbol] * multiplier).toFixed(2));
         });
       }
@@ -284,13 +288,13 @@ export function StockMarketSim({ onExit, contest = false }: { onExit: () => void
         let v = h[h.length - 1] ?? c.startPrice;
         for (let k = from; k <= target; k++) {
           const volFactor = c.volatility === 'high' ? 0.14 : c.volatility === 'medium' ? 0.07 : 0.03;
-          v = Number(Math.max(1, v * (1 + (seededRandom(currentRound, k, idx, 1) - 0.48) * volFactor)).toFixed(2));
+          v = Number(Math.max(1, v * (1 + (seededRandom(attemptNo, currentRound, k, idx, 1) - 0.48) * volFactor)).toFixed(2));
         }
         nextHist[c.symbol] = [...h, v].slice(-SPARKLINE_LEN);
       });
       return nextHist;
     });
-  }, [contest, gameState, timeLeft, currentRound, companies]);
+  }, [contest, gameState, timeLeft, currentRound, companies, attemptNo]);
 
   // Contest attempt gate: one attempt per account.
   const contestRef = user?.uid ? doc(db, 'users', user.uid, 'gameScores', `stockContest_${CONTEST_ID}`) : null;
@@ -301,8 +305,9 @@ export function StockMarketSim({ onExit, contest = false }: { onExit: () => void
     getDoc(doc(db, 'users', user.uid, 'gameScores', `stockContest_${CONTEST_ID}`))
       .then(snap => {
         if (cancelled) return;
-        if (snap.exists()) { setPriorResult(snap.data() as any); setAttempt('used'); }
-        else setAttempt('open');
+        const d = snap.exists() ? (snap.data() as any) : {};
+        setPriorResult(d);
+        setAttempt((d.attemptsStarted ?? 0) >= MAX_ATTEMPTS ? 'used' : 'open');
       })
       .catch(() => { if (!cancelled) setAttempt('used'); }); // fail closed: can't verify = no attempt
     return () => { cancelled = true; };
@@ -311,8 +316,14 @@ export function StockMarketSim({ onExit, contest = false }: { onExit: () => void
   const startContestGame = async () => {
     if (!contestRef) return;
     try {
+      // Re-read so a double-tap or second device can't start an extra attempt.
+      const snap = await getDoc(contestRef);
+      const used = snap.exists() ? ((snap.data() as any).attemptsStarted ?? 0) : 0;
+      if (used >= MAX_ATTEMPTS) { setAttempt('used'); return; }
+      const n = used + 1;
       // Written BEFORE play: quitting early still uses the attempt.
-      await setDoc(contestRef, { contest: CONTEST_ID, startedAt: new Date(), finished: false }, { merge: true });
+      await setDoc(contestRef, { contest: CONTEST_ID, attemptsStarted: n, attempts: { [n]: { startedAt: new Date(), finished: false } } }, { merge: true });
+      setAttemptNo(n);
     } catch { return; }
     startGame();
   };
@@ -328,7 +339,7 @@ export function StockMarketSim({ onExit, contest = false }: { onExit: () => void
         const inPlay = new Set(companies.map(c => c.symbol));
         const eligible = NEWS_HEADLINES.filter(h => inPlay.has(h.ticker));
         const pool = eligible.length ? eligible : NEWS_HEADLINES;
-        const headline = pool[Math.floor((contest ? seededRandom(currentRound, 0, 0, 2) : Math.random()) * pool.length)];
+        const headline = pool[Math.floor((contest ? seededRandom(attemptNo, currentRound, 0, 0, 2) : Math.random()) * pool.length)];
         setCurrentHeadline(headline);
         // Apply the news impact ONCE, right now, instead of letting the
         // ticking interval reapply it every few seconds for the whole day.
@@ -355,7 +366,7 @@ export function StockMarketSim({ onExit, contest = false }: { onExit: () => void
         endGame(gameConfig.xpPerWin);
       }
     }
-  }, [timeLeft, gameState, currentRound, nextRound, endGame, gameConfig.xpPerWin, companies, contest]);
+  }, [timeLeft, gameState, currentRound, nextRound, endGame, gameConfig.xpPerWin, companies, contest, attemptNo]);
 
   const handleTrade = (qty: number) => {
     if (!tradeModal) return;
@@ -403,11 +414,13 @@ export function StockMarketSim({ onExit, contest = false }: { onExit: () => void
   useEffect(() => {
     if (!contest || gameState !== 'RESULTS' || resultSaved.current || !contestRef) return;
     resultSaved.current = true;
+    const finalValue = Number(totalWealth.toFixed(2));
+    const returnPct = Number(((totalWealth - startingCash) / startingCash * 100).toFixed(2));
+    const prevBest = priorResult?.bestReturnPct;
+    const isBest = prevBest === undefined || returnPct > prevBest;
     setDoc(contestRef, {
-      finished: true,
-      finishedAt: new Date(),
-      finalValue: Number(totalWealth.toFixed(2)),
-      returnPct: Number(((totalWealth - startingCash) / startingCash * 100).toFixed(2)),
+      attempts: { [attemptNo]: { finished: true, finishedAt: new Date(), finalValue, returnPct } },
+      ...(isBest ? { bestFinalValue: finalValue, bestReturnPct: returnPct, bestAttempt: attemptNo } : {}),
     }, { merge: true }).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contest, gameState]);
@@ -424,8 +437,8 @@ export function StockMarketSim({ onExit, contest = false }: { onExit: () => void
         ) : (
           <>
             <p className="text-sm text-muted-foreground">
-              You've already used your one attempt{priorResult?.finalValue != null ? <> — final value <strong>${priorResult.finalValue.toFixed(2)}</strong> ({priorResult.returnPct}% return)</> : ' (the run was started but not finished)'}.
-              If it didn't finish because of a crash or lost connection, message the organiser.
+              You've used all {MAX_ATTEMPTS} attempts{priorResult?.bestFinalValue != null ? <> — your best: <strong>${priorResult.bestFinalValue.toFixed(2)}</strong> ({priorResult.bestReturnPct}% return)</> : ' (none finished)'}.
+              If an attempt failed because of a crash or lost connection, message the organiser.
             </p>
             <Button onClick={onExit} className="w-full">Back to games</Button>
           </>
@@ -527,8 +540,8 @@ export function StockMarketSim({ onExit, contest = false }: { onExit: () => void
       <CardContent className="p-6 md:p-10 space-y-4">
         {contest && (
           <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 space-y-1">
-            <p className="font-black">Contest run — ONE attempt</p>
-            <p>Everyone gets the same $1,000, the same 6 stocks and the same prices and headlines. Your score is your % return after day 5. Once you press start the attempt is used, even if you quit.</p>
+            <p className="font-black">Contest — attempt {Math.min((priorResult?.attemptsStarted ?? 0) + 1, MAX_ATTEMPTS)} of {MAX_ATTEMPTS} · best of three counts</p>
+            <p>Everyone gets the same $1,000, the same 6 stocks and the same prices and headlines for each attempt number (each attempt is a different market). Score = % return after day 5. Pressing start uses the attempt, even if you quit.</p>
           </div>
         )}
         {!personality && !contest && (
@@ -564,6 +577,7 @@ export function StockMarketSim({ onExit, contest = false }: { onExit: () => void
             <Trophy className="h-16 w-16 mx-auto mb-4" />
             <CardTitle className="text-4xl font-black mb-2">Market Closed!</CardTitle>
             <p className="text-[#A8D5BC] text-lg">Starting capital: ${startingCash.toFixed(2)}</p>
+            {contest && <p className="text-[#A8D5BC] text-sm font-bold mt-1">Contest attempt {attemptNo} of {MAX_ATTEMPTS} — your best attempt counts</p>}
           </div>
           <CardContent className="p-10 space-y-6">
             <div className="text-center">
