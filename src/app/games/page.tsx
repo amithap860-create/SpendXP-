@@ -22,6 +22,8 @@ import { lessons } from '@/data/lessons';
 // topic and matches the reading order already enforced on the Learn page.
 // NOTE: lessons.ts's relatedGame field uses 'finIQ', not this file's
 // GameID 'finIQQuiz' — same mismatch already worked around in learn/page.tsx.
+const CONTEST_ENDS = new Date('2026-10-31T23:59:59');
+
 const REQUIRED_LESSON_FOR_GAME: Record<string, string> = {
   budgetBlitz: 'l-budgeting',
   finIQQuiz: 'l-taxes',
@@ -288,6 +290,22 @@ export default function GamesHub({ searchParams }: GamesHubProps) {
             <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">Arcade</h1>
             <p className="text-muted-foreground font-medium">Learn by playing. Earn XP to level up.</p>
           </header>
+
+          {/* Stock contest entry (2026-10-17). Opens the contest directly, bypassing
+              the premium and "finish the investing lesson" gates on the normal
+              Stock Sim card — contest entrants are mostly free-tier testers.
+              Remove or bump CONTEST_ENDS when the contest is over. */}
+          {new Date() < CONTEST_ENDS && (
+            <button
+              type="button"
+              onClick={() => { setContestMode(true); setActiveGame('stockMarketSim'); }}
+              className="w-full text-left rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 hover:bg-amber-100 transition-colors"
+            >
+              <p className="text-[11px] font-black uppercase tracking-widest text-amber-700">Contest · one attempt</p>
+              <p className="text-lg font-black text-amber-950">Stock Contest — tap to enter</p>
+              <p className="text-sm text-amber-900">Same $1,000, same prices, same news for everyone. Highest % return wins.</p>
+            </button>
+          )}
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {GAMES.map(game => {
