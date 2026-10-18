@@ -166,7 +166,7 @@ export function StockResearchChecker() {
             onClick={() => setSubmitted(true)}
             disabled={!allAnswered}
             className="w-full h-11 rounded-xl text-sm font-black uppercase tracking-widest text-white transition-all disabled:opacity-40"
-            style={{ background: allAnswered ? '#2E7D5A' : '#94a3b8' }}
+            style={{ background: allAnswered ? 'hsl(var(--solid))' : 'hsl(var(--muted))' }}
           >
             {allAnswered ? `Check ${stockName || 'This Stock'} →` : 'Answer all 4 questions'}
           </button>

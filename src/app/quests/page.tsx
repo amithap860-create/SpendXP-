@@ -317,7 +317,7 @@ export default function QuestsHub() {
                 </div>
                 <div className="h-2.5 bg-muted rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-[#2E7D5A] to-[#4EA07A] rounded-full transition-all duration-1000"
+                    className="h-full bg-gradient-to-r from-gold to-gold/70 rounded-full transition-all duration-1000"
                     style={{ width: `${rankProgress * 100}%` }}
                   />
                 </div>

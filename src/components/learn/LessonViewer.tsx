@@ -254,7 +254,7 @@ export function LessonViewer({ lesson, onClose }: LessonViewerProps) {
             <div className="flex gap-1" role="progressbar" aria-valuemin={0} aria-valuemax={segments} aria-valuenow={Math.min(segments, currentSegment + 1)}>
               {Array.from({ length: segments }).map((_, i) => (
                 <div key={i} className="h-1.5 flex-1 rounded-full bg-muted overflow-hidden">
-                  <div className="h-full bg-primary rounded-full transition-[width] duration-500 ease-out" style={{ width: `${segmentFill(i)}%` }} />
+                  <div className="h-full bg-gold rounded-full transition-[width] duration-500 ease-out" style={{ width: `${segmentFill(i)}%` }} />
                 </div>
               ))}
             </div>

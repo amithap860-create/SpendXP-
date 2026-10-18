@@ -71,7 +71,7 @@ export async function initStatusBar(): Promise<void> {
   try {
     const { StatusBar, Style } = await import('@capacitor/status-bar');
     await StatusBar.setStyle({ style: Style.Dark });
-    await StatusBar.setBackgroundColor({ color: '#1A1F2E' });
+    await StatusBar.setBackgroundColor({ color: '#0D1424' });
     await StatusBar.show();
   } catch { /* ignore */ }
 }

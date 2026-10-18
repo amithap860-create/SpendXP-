@@ -162,7 +162,7 @@ export function CompoundVisualiser() {
               ))}
 
               <path d={getPath(stats.savingsPoints)} fill="none" stroke="#cbd5e1" strokeWidth="2" strokeDasharray="4 4" />
-              <path d={getPath(stats.points)} fill="none" stroke="#2E7D5A" strokeWidth="4" strokeLinecap="round" className="animate-draw" />
+              <path d={getPath(stats.points)} fill="none" stroke="hsl(var(--primary))" strokeWidth="4" strokeLinecap="round" className="animate-draw" />
 
               {Array.from({ length: 5 }).map((_, i) => {
                 const year = Math.round((years / 4) * i);

@@ -132,9 +132,9 @@ function ResetPasswordContent() {
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-10">
           <div className="w-9 h-9 bg-[#1A1F2E] rounded-xl flex items-center justify-center shadow-md">
-            <span className="text-[16px] leading-none select-none" style={{ color: '#4EA07A' }}>⚖</span>
+            <span className="text-[16px] leading-none select-none" style={{ color: 'hsl(var(--primary))' }}>⚖</span>
           </div>
-          <span className="font-black text-2xl tracking-tighter text-foreground">Spend<span style={{ color: '#2E7D5A' }}>XP</span></span>
+          <span className="font-black text-2xl tracking-tighter text-foreground">Spend<span style={{ color: 'hsl(var(--primary))' }}>XP</span></span>
         </div>
         <div className="bg-card rounded-2xl border border-border shadow-sm p-8">
           {children}

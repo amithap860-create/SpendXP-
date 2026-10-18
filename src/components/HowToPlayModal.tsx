@@ -153,7 +153,7 @@ export function HowToPlayModal({ forceOpen = false, onClose }: HowToPlayModalPro
                 className="h-1 rounded-full transition-all duration-300"
                 style={{
                   flex: i === step ? 2 : 1,
-                  background: i <= step ? '#2E7D5A' : 'rgba(255,255,255,0.2)',
+                  background: i <= step ? 'hsl(var(--gold))' : 'rgba(255,255,255,0.2)',
                 }}
               />
             ))}
@@ -179,7 +179,7 @@ export function HowToPlayModal({ forceOpen = false, onClose }: HowToPlayModalPro
             <button
               onClick={handleNext}
               className="flex-1 h-12 rounded-xl font-black text-sm uppercase tracking-widest transition-colors text-white flex items-center justify-center gap-2"
-              style={{ background: '#2E7D5A' }}
+              style={{ background: 'hsl(var(--solid))' }}
             >
               {isLast ? 'Start Playing' : (
                 <>Next <ChevronRight className="w-4 h-4" /></>

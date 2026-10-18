@@ -127,7 +127,7 @@ const STEPS = [
 
 export default function StoryPage() {
   return (
-    <div className="min-h-screen" style={{ background: '#F2F7F4' }}>
+    <div className="min-h-screen" style={{ background: 'hsl(var(--secondary))' }}>
 
       {/* ── Back ── */}
       <div className="max-w-3xl mx-auto px-5 pt-8">
@@ -140,17 +140,17 @@ export default function StoryPage() {
       </div>
 
       {/* ── HERO — dark, full-width ── */}
-      <div style={{ background: '#1A1F2E' }} className="mt-6">
+      <div style={{ background: 'hsl(var(--panel))' }} className="mt-6">
         <div className="max-w-3xl mx-auto px-5 py-14 md:py-20">
           <div className="flex items-center gap-2 mb-7">
-            <div style={{ color: '#2E7D5A' }}><IconScale size={18} /></div>
-            <span className="text-[10px] font-black uppercase tracking-[0.18em]" style={{ color: '#2E7D5A' }}>Order of the Golden Ledger</span>
+            <div style={{ color: 'hsl(var(--primary))' }}><IconScale size={18} /></div>
+            <span className="text-[10px] font-black uppercase tracking-[0.18em]" style={{ color: 'hsl(var(--primary))' }}>Order of the Golden Ledger</span>
           </div>
 
           <h1 className="font-black text-white leading-[1.08] tracking-tight mb-6"
             style={{ fontSize: 'clamp(2rem, 6vw, 3.5rem)' }}>
             SpendCity is in<br />
-            <span style={{ color: '#4EA07A' }}>trouble.</span>
+            <span style={{ color: 'hsl(var(--primary))' }}>trouble.</span>
           </h1>
 
           <p className="text-[#A8D5BC] leading-relaxed max-w-lg" style={{ fontSize: '15px' }}>
@@ -161,7 +161,7 @@ export default function StoryPage() {
 
           <div className="mt-8 h-px w-full" style={{ background: 'rgba(168,213,188,0.15)' }} />
 
-          <p className="mt-6 text-[13px] font-black uppercase tracking-widest" style={{ color: '#4EA07A' }}>
+          <p className="mt-6 text-[13px] font-black uppercase tracking-widest" style={{ color: 'hsl(var(--primary))' }}>
             You are the new recruit. The first case file is open.
           </p>
         </div>
@@ -171,20 +171,20 @@ export default function StoryPage() {
       <div className="max-w-3xl mx-auto px-5 py-14">
         <div className="flex items-center gap-4 mb-8">
           <span className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">How it works</span>
-          <div className="h-px flex-1" style={{ background: '#d1e8db' }} />
+          <div className="h-px flex-1" style={{ background: 'hsl(var(--border))' }} />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {STEPS.map((step, i) => (
             <div key={step.label}
               className="rounded-2xl p-5 border flex gap-4 items-start"
-              style={{ background: '#fff', borderColor: '#daeee5' }}>
+              style={{ background: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }}>
               <div className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{ background: '#E8F5EE', color: '#2E7D5A' }}>
+                style={{ background: 'hsl(var(--secondary))', color: 'hsl(var(--primary))' }}>
                 {step.icon}
               </div>
               <div>
-                <div className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: '#A8D5BC' }}>
+                <div className="text-[10px] font-black uppercase tracking-widest mb-1" style={{ color: 'hsl(var(--muted-foreground))' }}>
                   0{i + 1}
                 </div>
                 <div className="font-black text-slate-900 text-sm mb-1">{step.label}</div>
@@ -195,14 +195,14 @@ export default function StoryPage() {
 
           {/* Span the last step if odd */}
           <div className="rounded-2xl p-5 sm:col-span-2 border flex gap-4 items-center"
-            style={{ background: '#1A1F2E', borderColor: '#252B3B' }}>
+            style={{ background: 'hsl(var(--panel))', borderColor: 'hsl(var(--border))' }}>
             <div className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ background: 'rgba(46,125,90,0.2)', color: '#4EA07A' }}>
+              style={{ background: 'hsl(var(--primary) / 0.2)', color: 'hsl(var(--primary))' }}>
               <IconFog size={22} />
             </div>
             <div>
-              <div className="font-black text-sm mb-0.5" style={{ color: '#E8F5EE' }}>Fight the Gray Fog</div>
-              <div className="text-[12px] leading-relaxed" style={{ color: '#A8D5BC' }}>
+              <div className="font-black text-sm mb-0.5" style={{ color: '#F4EEDC' }}>Fight the Gray Fog</div>
+              <div className="text-[12px] leading-relaxed" style={{ color: 'hsl(var(--muted-foreground))' }}>
                 Every bad financial habit has a name in SpendCity. Defeat it with knowledge. That's the only way the Fog clears.
               </div>
             </div>
@@ -211,12 +211,12 @@ export default function StoryPage() {
       </div>
 
       {/* ── RANK PROGRESSION ── */}
-      <div style={{ background: '#1A1F2E' }}>
+      <div style={{ background: 'hsl(var(--panel))' }}>
         <div className="max-w-3xl mx-auto px-5 py-14">
           <div className="flex items-center gap-4 mb-10">
-            <span className="text-[11px] font-black uppercase tracking-[0.18em]" style={{ color: '#4EA07A' }}>Rank progression</span>
+            <span className="text-[11px] font-black uppercase tracking-[0.18em]" style={{ color: 'hsl(var(--primary))' }}>Rank progression</span>
             <div className="h-px flex-1" style={{ background: 'rgba(168,213,188,0.2)' }} />
-            <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: '#4A556B' }}>8 ranks</span>
+            <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: 'hsl(var(--muted-foreground))' }}>8 ranks</span>
           </div>
 
           <div className="space-y-2">
@@ -230,7 +230,7 @@ export default function StoryPage() {
                 {/* Rank icon */}
                 <div className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
                   style={{
-                    background: i === 0 ? '#2E7D5A' : 'rgba(255,255,255,0.07)',
+                    background: i === 0 ? 'hsl(var(--gold))' : 'rgba(255,255,255,0.07)',
                     color: i === 0 ? '#fff' : '#7A8FA8',
                   }}>
                   {RANK_ICONS[i]}
@@ -239,15 +239,15 @@ export default function StoryPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline gap-2 flex-wrap">
                     <span className="font-black text-white text-sm">{rank.name}</span>
-                    <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#4A556B' }}>{rank.xp} XP</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'hsl(var(--muted-foreground))' }}>{rank.xp} XP</span>
                   </div>
-                  <div className="text-[11px] mt-0.5 mb-1" style={{ color: '#7A8FA8' }}>{rank.district}</div>
-                  <div className="text-[11px] leading-relaxed hidden sm:block" style={{ color: '#4A556B' }}>{rank.desc}</div>
+                  <div className="text-[11px] mt-0.5 mb-1" style={{ color: 'hsl(var(--muted-foreground))' }}>{rank.district}</div>
+                  <div className="text-[11px] leading-relaxed hidden sm:block" style={{ color: 'hsl(var(--muted-foreground))' }}>{rank.desc}</div>
                 </div>
                 {/* Active fog */}
                 <div className="shrink-0 text-right hidden md:block">
-                  <div className="text-[9px] font-black uppercase tracking-widest mb-0.5" style={{ color: '#4A556B' }}>Active threat</div>
-                  <div className="text-[11px] font-black" style={{ color: '#E05252' }}>{rank.fog}</div>
+                  <div className="text-[9px] font-black uppercase tracking-widest mb-0.5" style={{ color: 'hsl(var(--muted-foreground))' }}>Active threat</div>
+                  <div className="text-[11px] font-black" style={{ color: 'hsl(0 70% 62%)' }}>{rank.fog}</div>
                 </div>
               </div>
             ))}
@@ -259,30 +259,30 @@ export default function StoryPage() {
       <div className="max-w-3xl mx-auto px-5 py-14">
         <div className="flex items-center gap-4 mb-8">
           <span className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">The Gray Fog</span>
-          <div className="h-px flex-1" style={{ background: '#d1e8db' }} />
-          <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: '#A8D5BC' }}>6 enemies</span>
+          <div className="h-px flex-1" style={{ background: 'hsl(var(--border))' }} />
+          <span className="text-[11px] font-black uppercase tracking-widest" style={{ color: 'hsl(var(--muted-foreground))' }}>6 enemies</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {FOG_ENEMIES.map((enemy, i) => (
             <div key={enemy.name}
               className="rounded-2xl p-5 border"
-              style={{ background: '#fff', borderColor: '#daeee5' }}>
+              style={{ background: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }}>
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: 'rgba(224,82,82,0.08)', color: '#E05252' }}>
+                  style={{ background: 'hsl(0 70% 62% / 0.12)', color: 'hsl(0 70% 62%)' }}>
                   {FOG_ICONS[i]}
                 </div>
                 <span className="font-black text-slate-900 text-sm">{enemy.name}</span>
               </div>
               <div className="space-y-2">
                 <div className="flex gap-2 items-start">
-                  <span className="text-[9px] font-black uppercase tracking-widest shrink-0 mt-0.5" style={{ color: '#E05252' }}>Trap</span>
+                  <span className="text-[9px] font-black uppercase tracking-widest shrink-0 mt-0.5" style={{ color: 'hsl(0 70% 62%)' }}>Trap</span>
                   <span className="text-[12px] text-slate-600 leading-relaxed">{enemy.trap}</span>
                 </div>
                 <div className="flex gap-2 items-start">
-                  <span className="text-[9px] font-black uppercase tracking-widest shrink-0 mt-0.5" style={{ color: '#2E7D5A' }}>Counter</span>
-                  <span className="text-[12px] font-bold leading-relaxed" style={{ color: '#2E7D5A' }}>{enemy.weakness}</span>
+                  <span className="text-[9px] font-black uppercase tracking-widest shrink-0 mt-0.5" style={{ color: 'hsl(var(--primary))' }}>Counter</span>
+                  <span className="text-[12px] font-bold leading-relaxed" style={{ color: 'hsl(var(--primary))' }}>{enemy.weakness}</span>
                 </div>
               </div>
             </div>
@@ -291,10 +291,10 @@ export default function StoryPage() {
       </div>
 
       {/* ── CTA ── */}
-      <div style={{ background: '#1A1F2E' }}>
+      <div style={{ background: 'hsl(var(--panel))' }}>
         <div className="max-w-3xl mx-auto px-5 py-14 md:py-20">
           <div className="max-w-md">
-            <div className="flex items-center gap-2 mb-5" style={{ color: '#2E7D5A' }}>
+            <div className="flex items-center gap-2 mb-5" style={{ color: 'hsl(var(--primary))' }}>
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                 <path d="M9 1.5v15M3 5.5l6-4 6 4v7a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-7z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"/>
               </svg>
@@ -304,15 +304,15 @@ export default function StoryPage() {
               style={{ fontSize: 'clamp(1.5rem, 4vw, 2.2rem)' }}>
               The Fog doesn't care<br />
               how smart you are.<br />
-              <span style={{ color: '#4EA07A' }}>It cares how prepared.</span>
+              <span style={{ color: 'hsl(var(--primary))' }}>It cares how prepared.</span>
             </h2>
-            <p style={{ color: '#A8D5BC', fontSize: '14px', lineHeight: '1.7' }} className="mb-8">
+            <p style={{ color: 'hsl(var(--muted-foreground))', fontSize: '14px', lineHeight: '1.7' }} className="mb-8">
               Every case file you close is a financial decision you'll make better in real life.
               That's the only metric that matters.
             </p>
             <Link href="/quests"
               className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-black text-sm uppercase tracking-widest transition-colors"
-              style={{ background: '#2E7D5A', color: '#fff' }}>
+              style={{ background: 'hsl(var(--solid))', color: '#fff' }}>
               Open first Case File
               <IconArrow size={14} />
             </Link>

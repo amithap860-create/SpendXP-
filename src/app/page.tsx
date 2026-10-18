@@ -33,7 +33,7 @@ export default function LandingPage() {
     return (
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        minHeight: '100dvh', background: '#F2F7F4'
+        minHeight: '100dvh', background: 'hsl(var(--secondary))'
       }}>
         <div style={{
           width: '32px', height: '32px',
@@ -51,7 +51,7 @@ export default function LandingPage() {
       <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
         <div className="flex items-center gap-2">
           <div className="w-9 h-9 bg-[#1A1F2E] rounded-xl flex items-center justify-center shadow-md">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ color: '#4EA07A' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ color: 'hsl(var(--primary))' }}>
               <line x1="12" y1="3" x2="12" y2="21" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
               <line x1="6" y1="21" x2="18" y2="21" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
               <line x1="6" y1="9" x2="18" y2="9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
@@ -61,7 +61,7 @@ export default function LandingPage() {
           </div>
           <div className="flex items-baseline gap-0.5">
             <span className="font-black text-xl tracking-tighter text-slate-900">Spend</span>
-            <span className="font-black text-xl tracking-tighter" style={{ color: '#2E7D5A' }}>XP</span>
+            <span className="font-black text-xl tracking-tighter" style={{ color: 'hsl(var(--primary))' }}>XP</span>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -82,7 +82,7 @@ export default function LandingPage() {
         </div>
         <h1 className="text-5xl md:text-7xl font-extrabold text-slate-900 leading-tight mb-6">
           Master your money<br />
-          <span style={{ color: '#2E7D5A' }}>with SpendXP</span>
+          <span style={{ color: 'hsl(var(--primary))' }}>with SpendXP</span>
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
           Learn budgeting, investing, saving, and credit through games, quests, and real-life scenarios.

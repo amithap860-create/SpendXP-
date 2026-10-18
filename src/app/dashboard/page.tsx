@@ -355,11 +355,11 @@ export default function DashboardPage() {
               <svg className="h-full w-full -rotate-90">
                 <circle
                   cx="50%" cy="50%" r="44%"
-                  fill="none" stroke="#f1f5f9" strokeWidth="8"
+                  fill="none" stroke="hsl(var(--muted))" strokeWidth="8"
                 />
                 <circle
                   cx="50%" cy="50%" r="44%"
-                  fill="none" stroke="#2E7D5A" strokeWidth="8"
+                  fill="none" stroke="hsl(var(--gold))" strokeWidth="8"
                   strokeDasharray="276%"
                   strokeDashoffset={2.76 * (1 - (levelProgress / 100)) * 100 + '%'}
                   strokeLinecap="round"
@@ -429,7 +429,7 @@ export default function DashboardPage() {
                     {/* XP progress */}
                     <div className="mt-1.5 space-y-1">
                       <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-700" style={{ width: `${rankPct}%` }} />
+                        <div className="h-full bg-gradient-to-r from-gold to-gold/70 rounded-full transition-all duration-700" style={{ width: `${rankPct}%` }} />
                       </div>
                       <div className="flex justify-between text-[9px] font-bold text-muted-foreground">
                         <span>{totalXP.toLocaleString()} XP</span>

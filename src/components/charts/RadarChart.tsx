@@ -79,7 +79,7 @@ export function RadarChart({ scores, size = 240 }: RadarChartProps) {
         <polygon
           points={points}
           fill="rgba(46, 125, 90, 0.15)"
-          stroke="#2E7D5A"
+          stroke="hsl(var(--primary))"
           strokeWidth="2"
           className="transition-all duration-1000 ease-out"
         />
@@ -88,7 +88,7 @@ export function RadarChart({ scores, size = 240 }: RadarChartProps) {
         {labels.map((axis, i) => {
           const score = Math.max(5, scores[axis.key as keyof ConceptStrengths] || 0);
           const { x, y } = getPoint(score, i);
-          return <circle key={i} cx={x} cy={y} r="3" fill="#2E7D5A" />;
+          return <circle key={i} cx={x} cy={y} r="3" fill="hsl(var(--primary))" />;
         })}
 
         {/* Labels */}

@@ -851,7 +851,7 @@ export default function ProfilePage() {
                       <span className="text-[11px] font-bold text-muted-foreground">{rank.district}</span>
                     </div>
                     <div className="h-1.5 bg-muted rounded-full overflow-hidden mb-1">
-                      <div className="h-full bg-gradient-to-r from-primary to-primary/60 rounded-full" style={{ width: `${rankPct}%` }} />
+                      <div className="h-full bg-gradient-to-r from-gold to-gold/60 rounded-full" style={{ width: `${rankPct}%` }} />
                     </div>
                     <p className="text-[11px] font-bold text-muted-foreground">
                       {nextRank ? `${(nextRank.minXP - totalXP).toLocaleString()} XP to ${nextRank.name}` : 'Max Rank!'}

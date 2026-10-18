@@ -464,7 +464,7 @@ function JoinContent() {
         <div className="text-center">
           <h1 className="text-3xl font-black">
             <span className="text-foreground">Spend</span>
-            <span style={{ color: '#2E7D5A' }}>XP</span>
+            <span style={{ color: 'hsl(var(--primary))' }}>XP</span>
           </h1>
           <p className="text-muted-foreground text-sm mt-1">Financial literacy for young learners</p>
         </div>

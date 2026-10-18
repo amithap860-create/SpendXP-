@@ -298,7 +298,7 @@ function SignupContent() {
             <CardHeader className="text-center pb-2">
               <h1 className="text-4xl font-black mb-2">
                 <span className="text-foreground">Spend</span>
-                <span style={{ color: '#2E7D5A' }}>XP</span>
+                <span style={{ color: 'hsl(var(--primary))' }}>XP</span>
               </h1>
               <CardDescription className="text-base">First, tell us what year you were born.</CardDescription>
             </CardHeader>
@@ -357,7 +357,7 @@ function SignupContent() {
               )}
               <h1 className="text-4xl font-black mb-1">
                 <span className="text-foreground">Spend</span>
-                <span style={{ color: '#2E7D5A' }}>XP</span>
+                <span style={{ color: 'hsl(var(--primary))' }}>XP</span>
               </h1>
               <CardDescription className="text-base">Create your account to start earning.</CardDescription>
             </CardHeader>

@@ -341,51 +341,212 @@
 }
 
 
-/* ── Dossier theme (2026-10-18) ─────────────────────────────────────────────
-   Applied ONLY by adding className="dossier" (Quests / Case Files screens).
-   Midnight-blue ground, ivory type, gold accents, Yanone Kaffeesatz throughout.
-   Everything inside uses the normal tokens (bg-card, text-foreground, …) so no
-   component needed rewriting. Yanone is a narrow font with a small x-height, so
-   the Tailwind text sizes are nudged up below to keep it readable on phones. */
-.dossier {
-  --background: 222 45% 9%;            /* #0D1424 midnight */
-  --foreground: 45 55% 92%;            /* #F4EEDC ivory */
-  --card: 222 38% 14%;                 /* #16203A */
-  --card-foreground: 45 55% 92%;
-  --popover: 222 38% 14%;
-  --popover-foreground: 45 55% 92%;
-  --primary: 45 68% 52%;               /* #D9B02B gold */
-  --primary-foreground: 222 45% 9%;
-  --secondary: 222 30% 20%;
-  --secondary-foreground: 45 55% 92%;
-  --muted: 222 30% 19%;
-  --muted-foreground: 45 18% 72%;      /* muted ivory, ≥4.5:1 on card */
-  --accent: 45 72% 62%;
-  --accent-foreground: 222 45% 9%;
-  --border: 45 28% 30%;                /* gold-tinted hairline */
-  --input: 45 28% 30%;
-  --ring: 45 68% 52%;
-  --radius: 0.5rem;
-  font-family: var(--font-yanone), 'Arial Narrow', sans-serif;
-  letter-spacing: 0.01em;
-  color: hsl(var(--foreground));
+/* ═══ THEME v2 (2026-10-18) — supersedes the token values above ═════════════
+   Dark  : midnight blue, ivory type, gold accents (the "dossier" look).
+   Light : warm ivory ground, charcoal type, forest-green primary, gold for
+           progress bars / rewards.
+   Font  : Yanone Kaffeesatz app-wide (narrow, small x-height → sizes nudged up).
+   Tailwind palettes green/rose/amber/blue (+ their aliases) are re-pointed at
+   the --p-* variables below, so every existing text-rose-600 / bg-amber-100 …
+   follows the active theme without editing individual components. */
+:root {
+  --background: 43 56% 94%;
+  --foreground: 40 4% 16%;
+  --card: 44 100% 98%;
+  --card-foreground: 40 4% 16%;
+  --popover: 44 100% 98%;
+  --popover-foreground: 40 4% 16%;
+  --primary: 147 49% 24%;
+  --primary-foreground: 42 68% 95%;
+  --secondary: 45 47% 88%;
+  --secondary-foreground: 144 33% 18%;
+  --muted: 45 42% 87%;
+  --muted-foreground: 42 9% 39%;
+  --accent: 46 59% 85%;
+  --accent-foreground: 40 4% 16%;
+  --destructive: 4 54% 43%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 44 35% 79%;
+  --input: 44 35% 79%;
+  --ring: 147 49% 24%;
+  --gold: 42 74% 45%;
+  --gold-foreground: 40 4% 16%;
+  --panel: 40 4% 16%;
+  --solid: 150 40% 24%;
+  --chart-1: 147 49% 24%;
+  --chart-2: 42 74% 45%;
+  --chart-3: 210 38% 46%;
+  --chart-4: 4 50% 50%;
+  --chart-5: 40 7% 51%;
+  --sage-700: 147 49% 24%; --sage-600: 143 42% 29%; --sage-500: 141 37% 36%;
+  --sage-200: 129 25% 78%; --sage-100: 124 25% 89%; --sage-50: 120 26% 95%;
+  --sidebar-background: 44 100% 98%;
+  --sidebar-foreground: 40 4% 16%;
+  --sidebar-primary: 147 49% 24%;
+  --sidebar-primary-foreground: 42 68% 95%;
+  --sidebar-accent: 45 47% 88%;
+  --sidebar-accent-foreground: 144 33% 18%;
+  --sidebar-border: 44 35% 79%;
+  --sidebar-ring: 147 49% 24%;
+  --p-green-50: 238 245 238;
+  --p-green-100: 220 234 221;
+  --p-green-200: 186 214 190;
+  --p-green-300: 143 188 151;
+  --p-green-400: 94 156 110;
+  --p-green-500: 58 127 82;
+  --p-green-600: 43 106 67;
+  --p-green-700: 31 91 58;
+  --p-green-800: 24 74 47;
+  --p-green-900: 18 58 37;
+  --p-green-950: 10 36 21;
+  --p-rose-50: 251 238 236;
+  --p-rose-100: 246 218 214;
+  --p-rose-200: 238 185 178;
+  --p-rose-300: 228 145 138;
+  --p-rose-400: 213 107 99;
+  --p-rose-500: 192 74 65;
+  --p-rose-600: 169 58 50;
+  --p-rose-700: 140 46 40;
+  --p-rose-800: 112 38 31;
+  --p-rose-900: 90 36 32;
+  --p-rose-950: 51 15 13;
+  --p-amber-50: 251 245 223;
+  --p-amber-100: 246 234 185;
+  --p-amber-200: 239 217 138;
+  --p-amber-300: 230 194 90;
+  --p-amber-400: 217 170 51;
+  --p-amber-500: 200 150 30;
+  --p-amber-600: 168 120 21;
+  --p-amber-700: 134 96 15;
+  --p-amber-800: 107 76 14;
+  --p-amber-900: 85 64 14;
+  --p-amber-950: 46 34 7;
+  --p-blue-50: 237 242 248;
+  --p-blue-100: 219 229 241;
+  --p-blue-200: 185 204 227;
+  --p-blue-300: 143 174 207;
+  --p-blue-400: 102 144 186;
+  --p-blue-500: 74 118 163;
+  --p-blue-600: 58 95 136;
+  --p-blue-700: 47 76 110;
+  --p-blue-800: 38 62 89;
+  --p-blue-900: 30 50 72;
+  --p-blue-950: 17 28 42;
 }
-.dossier * { font-family: inherit; }
-.dossier .text-xs   { font-size: 0.85rem; }
-.dossier .text-sm   { font-size: 1.05rem; line-height: 1.35; }
-.dossier .text-base { font-size: 1.2rem; }
-.dossier .text-lg   { font-size: 1.35rem; }
-.dossier .text-\[10px\], .dossier .text-\[11px\] { font-size: 0.85rem; }
-.dossier .font-black { font-weight: 700; }
-/* the paper-folder feel: cards get a gold top edge */
-.dossier .bg-card { border-top: 2px solid hsl(var(--primary) / 0.55); }
-.dossier h1, .dossier h2 { letter-spacing: 0.04em; }
-/* Remap the hard-coded light/sage colours used inside the Quests screens so
-   nothing renders dark-on-dark or pastel-on-midnight. Scoped to .dossier. */
-.dossier .bg-\[\#E8F5EE\], .dossier .bg-\[\#C8E8D8\], .dossier .bg-amber-50, .dossier .bg-amber-100 { background-color: hsl(var(--secondary)) !important; }
-.dossier .bg-rose-100 { background-color: hsl(0 40% 20%) !important; }
-.dossier .bg-\[\#4EA07A\] { background-color: hsl(var(--primary)) !important; color: hsl(var(--primary-foreground)); }
-.dossier .text-\[\#1A1F2E\], .dossier .text-\[\#1A4035\], .dossier .text-\[\#C8E8D8\], .dossier .text-slate-600, .dossier .text-slate-700 { color: hsl(var(--foreground)) !important; }
-.dossier .text-\[\#2E7D5A\], .dossier .text-\[\#4EA07A\], .dossier .text-amber-600, .dossier .text-amber-700 { color: hsl(var(--primary)) !important; }
-.dossier .text-rose-600, .dossier .text-rose-700 { color: hsl(0 80% 72%) !important; }
-.dossier .border-\[\#A8D5BC\], .dossier .border-\[\#2E7D5A\], .dossier .border-\[\#4A556B\] { border-color: hsl(var(--border)) !important; }
+.dark {
+  --background: 222 47% 10%;
+  --foreground: 45 52% 91%;
+  --card: 223 45% 16%;
+  --card-foreground: 45 52% 91%;
+  --popover: 223 45% 16%;
+  --popover-foreground: 45 52% 91%;
+  --primary: 46 70% 51%;
+  --primary-foreground: 222 47% 10%;
+  --secondary: 224 33% 20%;
+  --secondary-foreground: 45 52% 91%;
+  --muted: 225 32% 20%;
+  --muted-foreground: 48 18% 72%;
+  --accent: 46 73% 64%;
+  --accent-foreground: 222 47% 10%;
+  --destructive: 0 58% 40%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 46 25% 27%;
+  --input: 46 25% 27%;
+  --ring: 46 70% 51%;
+  --gold: 46 70% 51%;
+  --gold-foreground: 222 47% 10%;
+  --panel: 223 45% 16%;
+  --chart-1: 46 70% 51%;
+  --chart-2: 135 25% 49%;
+  --chart-3: 210 38% 56%;
+  --chart-4: 4 58% 61%;
+  --chart-5: 50 15% 67%;
+  --sage-700: 131 25% 65%; --sage-600: 135 25% 49%; --sage-500: 141 37% 36%;
+  --sage-200: 148 51% 19%; --sage-100: 148 53% 15%; --sage-50: 149 47% 11%;
+  --sidebar-background: 222 47% 10%;
+  --sidebar-foreground: 45 52% 91%;
+  --sidebar-primary: 46 70% 51%;
+  --sidebar-primary-foreground: 222 47% 10%;
+  --sidebar-accent: 224 33% 20%;
+  --sidebar-accent-foreground: 45 52% 91%;
+  --sidebar-border: 46 25% 27%;
+  --sidebar-ring: 46 70% 51%;
+  --p-green-50: 10 36 21;
+  --p-green-100: 18 58 37;
+  --p-green-200: 24 74 47;
+  --p-green-300: 31 91 58;
+  --p-green-400: 94 156 110;
+  --p-green-500: 58 127 82;
+  --p-green-600: 43 106 67;
+  --p-green-700: 143 188 151;
+  --p-green-800: 186 214 190;
+  --p-green-900: 220 234 221;
+  --p-green-950: 238 245 238;
+  --p-rose-50: 51 15 13;
+  --p-rose-100: 90 36 32;
+  --p-rose-200: 112 38 31;
+  --p-rose-300: 140 46 40;
+  --p-rose-400: 213 107 99;
+  --p-rose-500: 192 74 65;
+  --p-rose-600: 169 58 50;
+  --p-rose-700: 228 145 138;
+  --p-rose-800: 238 185 178;
+  --p-rose-900: 246 218 214;
+  --p-rose-950: 251 238 236;
+  --p-amber-50: 46 34 7;
+  --p-amber-100: 85 64 14;
+  --p-amber-200: 107 76 14;
+  --p-amber-300: 134 96 15;
+  --p-amber-400: 217 170 51;
+  --p-amber-500: 200 150 30;
+  --p-amber-600: 168 120 21;
+  --p-amber-700: 230 194 90;
+  --p-amber-800: 239 217 138;
+  --p-amber-900: 246 234 185;
+  --p-amber-950: 251 245 223;
+  --p-blue-50: 17 28 42;
+  --p-blue-100: 30 50 72;
+  --p-blue-200: 38 62 89;
+  --p-blue-300: 47 76 110;
+  --p-blue-400: 102 144 186;
+  --p-blue-500: 74 118 163;
+  --p-blue-600: 58 95 136;
+  --p-blue-700: 143 174 207;
+  --p-blue-800: 185 204 227;
+  --p-blue-900: 219 229 241;
+  --p-blue-950: 237 242 248;
+}
+
+html { font-size: 106.25%; }   /* 17px base: Yanone runs small */
+body {
+  font-family: var(--font-yanone), 'Arial Narrow', system-ui, sans-serif !important;
+  letter-spacing: 0.01em;
+}
+button, input, select, textarea { font-family: inherit; }
+/* minimum sizes — nothing smaller than ~14px rendered */
+.text-xs, .text-\[10px\], .text-\[11px\], .text-\[12px\] { font-size: 0.9rem !important; line-height: 1.3; }
+.text-sm { font-size: 1.05rem; line-height: 1.4; }
+.text-base { font-size: 1.2rem; }
+.text-lg { font-size: 1.35rem; }
+.text-xl { font-size: 1.55rem; }
+.font-black { font-weight: 700; }
+
+/* hard-coded sage/slate hex values → theme tokens */
+.bg-\[\#E8F5EE\], .bg-\[\#C8E8D8\], .bg-\[\#F2F7F4\], .bg-\[\#F6FBF8\], .bg-\[\#F0FAF4\] { background-color: hsl(var(--secondary)) !important; }
+.text-\[\#2E7D5A\], .text-\[\#4EA07A\], .text-\[\#3A9068\] { color: hsl(var(--primary)) !important; }
+.border-\[\#A8D5BC\], .border-\[\#C8E8D8\], .border-\[\#2E7D5A\], .border-\[\#4EA07A\] { border-color: hsl(var(--border)) !important; }
+.bg-\[\#2E7D5A\], .bg-\[\#4EA07A\], .bg-\[\#3A9068\], .bg-\[\#3A9B6F\] { background-color: hsl(var(--solid)) !important; color: #F4EEDC; }
+.bg-\[\#1A1F2E\], .bg-\[\#252B3B\], .bg-\[\#4A556B\] { background-color: hsl(var(--panel)) !important; }
+.text-\[\#1A1F2E\], .text-\[\#1A4035\] { color: hsl(var(--foreground)) !important; }
+.text-\[\#A8D5BC\], .text-\[\#C8E8D8\], .text-\[\#E8F5EE\] { color: #EFE6CC !important; }
+.from-\[\#2E7D5A\] { --tw-gradient-from: hsl(var(--solid)) var(--tw-gradient-from-position) !important; }
+.to-\[\#4EA07A\] { --tw-gradient-to: hsl(var(--sage-500)) var(--tw-gradient-to-position) !important; }
+
+/* slate: neutral text/chips follow the theme; slate-700..950 stay dark (panels) */
+.dark .bg-slate-50, .dark .bg-slate-100, .dark .bg-slate-200, .dark .bg-white { background-color: hsl(var(--card)) !important; }
+.dark .bg-slate-300 { background-color: hsl(var(--secondary)) !important; }
+.dark .text-slate-600, .dark .text-slate-700, .dark .text-slate-800, .dark .text-slate-900 { color: hsl(var(--foreground)) !important; }
+.dark .border-slate-100, .dark .border-slate-200, .dark .border-slate-300 { border-color: hsl(var(--border)) !important; }
+/* solid gold (primary) surfaces in dark need dark text, not text-white */
+.dark .bg-primary.text-white, .dark .bg-primary .text-white { color: hsl(var(--primary-foreground)) !important; }
+.dark .bg-primary .text-white\/70, .dark .bg-primary .text-white\/80 { color: hsl(var(--primary-foreground) / 0.75) !important; }

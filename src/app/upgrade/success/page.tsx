@@ -42,7 +42,7 @@ function SuccessContent() {
           <div className="text-amber-400 text-xs font-black uppercase tracking-widest">Agent Tier Activated</div>
           <h1 className="text-4xl font-black text-white">
             Welcome to<br />
-            <span style={{ color: '#4EA07A' }}>SpendXP Premium!</span>
+            <span style={{ color: 'hsl(var(--primary))' }}>SpendXP Premium!</span>
           </h1>
           <p className="text-slate-300 text-base">
             Your account has been upgraded. Here's what you've unlocked:

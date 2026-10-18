@@ -210,7 +210,7 @@ function LoginContent() {
             <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-lg">
               <Sparkles className="h-5 w-5" />
             </div>
-            <h1 className="text-3xl font-black tracking-tighter"><span className="text-foreground">Spend</span><span style={{ color: "#2E7D5A" }}>XP</span></h1>
+            <h1 className="text-3xl font-black tracking-tighter"><span className="text-foreground">Spend</span><span style={{ color: 'hsl(var(--primary))' }}>XP</span></h1>
           </div>
           <CardDescription className="text-muted-foreground font-medium">
             Learn money. Earn XP. Level up your future.

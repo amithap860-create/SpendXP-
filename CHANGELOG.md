@@ -233,3 +233,8 @@ Safer for younger players:
 
 ## 2026-10-18 — Dossier theme (branch feature/dossier-theme)
 - Quests / Case Files screens: Yanone Kaffeesatz, midnight/ivory/gold via scoped .dossier class (layout.tsx loads font; globals.css holds theme). Rest of app unchanged.
+
+## 2026-10-18 — Theme v2, app-wide
+- Dark: midnight/ivory/gold. Light: warm ivory, charcoal text, forest-green primary, gold progress/rewards. Yanone Kaffeesatz everywhere; base 17px and minimum ~14px text.
+- Tailwind palettes green/rose/amber/blue (+aliases) re-pointed at --p-* theme variables; hard-coded sage/slate hex and inline styles remapped; ~15 inline-style files and SVG strokes updated.
+- Needs next AAB for: splash/background colour (#1A1F2E in capacitor.config.ts) and Play screenshots.

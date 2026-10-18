@@ -175,7 +175,7 @@ function OnboardingContent() {
         {/* Logo wordmark */}
         <div className="text-center mb-6">
           <span className="text-2xl font-black tracking-tighter">
-            <span className="text-foreground">Spend</span><span style={{ color: '#2E7D5A' }}>XP</span>
+            <span className="text-foreground">Spend</span><span style={{ color: 'hsl(var(--primary))' }}>XP</span>
           </span>
         </div>
 

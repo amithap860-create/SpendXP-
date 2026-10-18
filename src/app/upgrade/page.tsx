@@ -74,8 +74,8 @@ function FeatureCell({ value }: { value: string | boolean }) {
     return (
       <span className="flex items-center justify-center">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="7" fill="#2E7D5A" opacity="0.15"/>
-          <path d="M5 8l2.2 2.2L11 5.5" stroke="#2E7D5A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          <circle cx="8" cy="8" r="7" fill="hsl(var(--primary))" opacity="0.15"/>
+          <path d="M5 8l2.2 2.2L11 5.5" stroke="hsl(var(--primary))" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </span>
     );
@@ -274,7 +274,7 @@ export default function UpgradePage() {
           name:  user.displayName || '',
           email: user.email || '',
         },
-        theme: { color: '#2E7D5A' },
+        theme: { color: 'hsl(var(--primary))' },
         modal: {
           ondismiss: () => {
             setLoading(false);
@@ -325,7 +325,7 @@ export default function UpgradePage() {
 
           <h1 className="text-4xl md:text-5xl font-black leading-tight mb-4">
             Level Up Your<br />
-            <span style={{ color: '#4EA07A' }}>Financial Power</span>
+            <span style={{ color: 'hsl(var(--primary))' }}>Financial Power</span>
           </h1>
 
           <p className="text-slate-400 text-base md:text-lg leading-relaxed max-w-md mx-auto mb-8">
@@ -396,7 +396,7 @@ export default function UpgradePage() {
             <div className="grid grid-cols-[1fr_80px_80px] text-center bg-muted border-b border-border">
               <div className="px-4 py-3 text-left text-xs font-black uppercase tracking-widest text-muted-foreground">Feature</div>
               <div className="py-3 text-xs font-black uppercase tracking-widest text-muted-foreground">Explorer</div>
-              <div className="py-3 text-xs font-black uppercase tracking-widest" style={{ color: '#2E7D5A' }}>Agent</div>
+              <div className="py-3 text-xs font-black uppercase tracking-widest" style={{ color: 'hsl(var(--primary))' }}>Agent</div>
             </div>
             {FEATURE_ROWS.map((row, i) => (
               <div
@@ -444,7 +444,7 @@ export default function UpgradePage() {
                 onClick={handlePayment}
                 disabled={loading}
                 className="w-full mt-2 h-12 rounded-xl text-sm font-black uppercase tracking-widest text-white transition-all disabled:opacity-50"
-                style={{ background: loading ? '#1a3d2b' : '#2E7D5A' }}
+                style={{ background: loading ? 'hsl(var(--muted))' : 'hsl(var(--solid))' }}
               >
                 {loading ? 'Opening payment…' : `Pay ₹${selectedPlan === 'annual' ? '399' : '100'} with Razorpay`}
               </button>
@@ -495,11 +495,11 @@ export default function UpgradePage() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <circle cx="9" cy="7" r="3" stroke="#92400E" strokeWidth="1.6"/>
-                <circle cx="15" cy="7" r="3" stroke="#92400E" strokeWidth="1.6"/>
-                <path d="M3 19c0-3 2.7-5 6-5" stroke="#92400E" strokeWidth="1.6" strokeLinecap="round"/>
-                <path d="M21 19c0-3-2.7-5-6-5" stroke="#92400E" strokeWidth="1.6" strokeLinecap="round"/>
-                <path d="M9 19c0-2.8 2-5 5-5" stroke="#92400E" strokeWidth="1.6" strokeLinecap="round"/>
+                <circle cx="9" cy="7" r="3" stroke="hsl(var(--gold))" strokeWidth="1.6"/>
+                <circle cx="15" cy="7" r="3" stroke="hsl(var(--gold))" strokeWidth="1.6"/>
+                <path d="M3 19c0-3 2.7-5 6-5" stroke="hsl(var(--gold))" strokeWidth="1.6" strokeLinecap="round"/>
+                <path d="M21 19c0-3-2.7-5-6-5" stroke="hsl(var(--gold))" strokeWidth="1.6" strokeLinecap="round"/>
+                <path d="M9 19c0-2.8 2-5 5-5" stroke="hsl(var(--gold))" strokeWidth="1.6" strokeLinecap="round"/>
               </svg>
             </div>
             <div>
@@ -512,8 +512,8 @@ export default function UpgradePage() {
           {waitlistDone ? (
             <div className="flex items-center gap-2 bg-primary/10 rounded-xl p-4">
               <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                <circle cx="10" cy="10" r="9" fill="#2E7D5A" opacity="0.15"/>
-                <path d="M6 10l2.5 2.5L14 7" stroke="#2E7D5A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="10" cy="10" r="9" fill="hsl(var(--primary))" opacity="0.15"/>
+                <path d="M6 10l2.5 2.5L14 7" stroke="hsl(var(--primary))" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
               <p className="text-xs font-black text-primary">You&apos;re on the list! We&apos;ll email you when Group Play launches.</p>
             </div>

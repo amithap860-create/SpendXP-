@@ -261,7 +261,7 @@ export function FinEducatorChat() {
                   onClick={() => sendMessage(input)}
                   disabled={!input.trim() || loading}
                   className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={{ background: input.trim() && !loading ? '#2E7D5A' : '#CBD5E1' }}
+                  style={{ background: input.trim() && !loading ? 'hsl(var(--solid))' : 'hsl(var(--muted))' }}
                   aria-label="Send message"
                 >
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">

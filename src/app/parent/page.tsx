@@ -211,15 +211,15 @@ export default function ParentDashboard() {
                       ) : (
                         <div className="relative">
                           <svg viewBox="0 0 100 100" className="w-64 h-64">
-                            <polygon points="50,10 84.6,30 84.6,70 50,90 15.4,70 15.4,30" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="0.5" />
-                            <circle cx="50" cy="50" r="20" fill="none" stroke="#e2e8f0" strokeWidth="0.5" strokeDasharray="2 2" />
-                            <circle cx="50" cy="50" r="40" fill="none" stroke="#e2e8f0" strokeWidth="0.5" />
-                            <polygon points={getRadarPoints(radarItems, 100)} fill="rgba(45, 114, 219, 0.2)" stroke="#2e72db" strokeWidth="2" />
+                            <polygon points="50,10 84.6,30 84.6,70 50,90 15.4,70 15.4,30" fill="hsl(var(--card))" stroke="hsl(var(--border))" strokeWidth="0.5" />
+                            <circle cx="50" cy="50" r="20" fill="none" stroke="hsl(var(--border))" strokeWidth="0.5" strokeDasharray="2 2" />
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--border))" strokeWidth="0.5" />
+                            <polygon points={getRadarPoints(radarItems, 100)} fill="hsl(var(--chart-3) / 0.2)" stroke="hsl(var(--chart-3))" strokeWidth="2" />
                             {radarItems.map((d, i) => {
                               const angle = (Math.PI * 2 * i) / radarItems.length - Math.PI / 2;
                               const x = 50 + 40 * (d.score / 100) * Math.cos(angle);
                               const y = 50 + 40 * (d.score / 100) * Math.sin(angle);
-                              return <circle key={i} cx={x} cy={y} r="2" fill="#2e72db" />;
+                              return <circle key={i} cx={x} cy={y} r="2" fill="hsl(var(--chart-3))" />;
                             })}
                           </svg>
                         </div>

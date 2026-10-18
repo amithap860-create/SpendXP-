@@ -109,7 +109,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
               {/* Logo mark: navy foundation + amber scale accent */}
               <div className="w-8 h-8 bg-[#1A1F2E] rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform relative overflow-hidden">
                 {/* Scales of financial balance — SVG, no emoji */}
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ color: '#4EA07A' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ color: 'hsl(var(--primary))' }}>
                   <line x1="12" y1="3" x2="12" y2="21" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
                   <line x1="6" y1="21" x2="18" y2="21" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
                   <line x1="6" y1="9" x2="18" y2="9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
@@ -119,7 +119,7 @@ function RootLayoutContent({ children }: { children: React.ReactNode }) {
               </div>
               <div className="flex items-baseline gap-0.5">
                 <span className="font-black text-xl tracking-tighter text-foreground">Spend</span>
-                <span className="font-black text-xl tracking-tighter" style={{ color: '#2E7D5A' }}>XP</span>
+                <span className="font-black text-xl tracking-tighter" style={{ color: 'hsl(var(--primary))' }}>XP</span>
               </div>
             </Link>
             <nav className="flex gap-1">
@@ -258,7 +258,7 @@ function NavLink({ href, label, active, isSmallScreen }: { href: string; label: 
       {active && (
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full"
-          style={{ background: '#2E7D5A' }}
+          style={{ background: 'hsl(var(--solid))' }}
         />
       )}
       <div className={cn("transition-transform duration-200", active && "scale-110")}>
