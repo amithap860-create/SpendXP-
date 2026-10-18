@@ -9,6 +9,16 @@ export default {
   ],
   theme: {
     extend: {
+      // Scaled up for Yanone Kaffeesatz (narrow, small x-height).
+      fontSize: {
+        xs: ['1rem', { lineHeight: '1.35rem' }],
+        sm: ['1.2rem', { lineHeight: '1.65rem' }],
+        base: ['1.35rem', { lineHeight: '1.85rem' }],
+        lg: ['1.5rem', { lineHeight: '2rem' }],
+        xl: ['1.7rem', { lineHeight: '2.1rem' }],
+        '2xl': ['2rem', { lineHeight: '2.4rem' }],
+        '3xl': ['2.4rem', { lineHeight: '2.7rem' }],
+      },
       fontFamily: {
         sans: ['var(--font-yanone)', 'Arial Narrow', 'system-ui', 'sans-serif'],
         body: ['var(--font-yanone)', 'Arial Narrow', 'sans-serif'],

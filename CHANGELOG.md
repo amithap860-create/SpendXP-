@@ -238,3 +238,4 @@ Safer for younger players:
 - Dark: midnight/ivory/gold. Light: warm ivory, charcoal text, forest-green primary, gold progress/rewards. Yanone Kaffeesatz everywhere; base 17px and minimum ~14px text.
 - Tailwind palettes green/rose/amber/blue (+aliases) re-pointed at --p-* theme variables; hard-coded sage/slate hex and inline styles remapped; ~15 inline-style files and SVG strokes updated.
 - Needs next AAB for: splash/background colour (#1A1F2E in capacitor.config.ts) and Play screenshots.
+- Type scale raised again: text-xs 17px, sm 20px, base 23px (via tailwind fontSize so responsive variants work); arbitrary text-[9..16px] sizes mapped to 17-22px.
