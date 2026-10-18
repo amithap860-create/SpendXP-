@@ -339,3 +339,53 @@
 @media (prefers-reduced-motion: reduce) {
   .lesson-rise, .lesson-pop, .lesson-shake, .lesson-glow { animation: none; }
 }
+
+
+/* ── Dossier theme (2026-10-18) ─────────────────────────────────────────────
+   Applied ONLY by adding className="dossier" (Quests / Case Files screens).
+   Midnight-blue ground, ivory type, gold accents, Yanone Kaffeesatz throughout.
+   Everything inside uses the normal tokens (bg-card, text-foreground, …) so no
+   component needed rewriting. Yanone is a narrow font with a small x-height, so
+   the Tailwind text sizes are nudged up below to keep it readable on phones. */
+.dossier {
+  --background: 222 45% 9%;            /* #0D1424 midnight */
+  --foreground: 45 55% 92%;            /* #F4EEDC ivory */
+  --card: 222 38% 14%;                 /* #16203A */
+  --card-foreground: 45 55% 92%;
+  --popover: 222 38% 14%;
+  --popover-foreground: 45 55% 92%;
+  --primary: 45 68% 52%;               /* #D9B02B gold */
+  --primary-foreground: 222 45% 9%;
+  --secondary: 222 30% 20%;
+  --secondary-foreground: 45 55% 92%;
+  --muted: 222 30% 19%;
+  --muted-foreground: 45 18% 72%;      /* muted ivory, ≥4.5:1 on card */
+  --accent: 45 72% 62%;
+  --accent-foreground: 222 45% 9%;
+  --border: 45 28% 30%;                /* gold-tinted hairline */
+  --input: 45 28% 30%;
+  --ring: 45 68% 52%;
+  --radius: 0.5rem;
+  font-family: var(--font-yanone), 'Arial Narrow', sans-serif;
+  letter-spacing: 0.01em;
+  color: hsl(var(--foreground));
+}
+.dossier * { font-family: inherit; }
+.dossier .text-xs   { font-size: 0.85rem; }
+.dossier .text-sm   { font-size: 1.05rem; line-height: 1.35; }
+.dossier .text-base { font-size: 1.2rem; }
+.dossier .text-lg   { font-size: 1.35rem; }
+.dossier .text-\[10px\], .dossier .text-\[11px\] { font-size: 0.85rem; }
+.dossier .font-black { font-weight: 700; }
+/* the paper-folder feel: cards get a gold top edge */
+.dossier .bg-card { border-top: 2px solid hsl(var(--primary) / 0.55); }
+.dossier h1, .dossier h2 { letter-spacing: 0.04em; }
+/* Remap the hard-coded light/sage colours used inside the Quests screens so
+   nothing renders dark-on-dark or pastel-on-midnight. Scoped to .dossier. */
+.dossier .bg-\[\#E8F5EE\], .dossier .bg-\[\#C8E8D8\], .dossier .bg-amber-50, .dossier .bg-amber-100 { background-color: hsl(var(--secondary)) !important; }
+.dossier .bg-rose-100 { background-color: hsl(0 40% 20%) !important; }
+.dossier .bg-\[\#4EA07A\] { background-color: hsl(var(--primary)) !important; color: hsl(var(--primary-foreground)); }
+.dossier .text-\[\#1A1F2E\], .dossier .text-\[\#1A4035\], .dossier .text-\[\#C8E8D8\], .dossier .text-slate-600, .dossier .text-slate-700 { color: hsl(var(--foreground)) !important; }
+.dossier .text-\[\#2E7D5A\], .dossier .text-\[\#4EA07A\], .dossier .text-amber-600, .dossier .text-amber-700 { color: hsl(var(--primary)) !important; }
+.dossier .text-rose-600, .dossier .text-rose-700 { color: hsl(0 80% 72%) !important; }
+.dossier .border-\[\#A8D5BC\], .dossier .border-\[\#2E7D5A\], .dossier .border-\[\#4A556B\] { border-color: hsl(var(--border)) !important; }

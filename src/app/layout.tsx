@@ -1,6 +1,6 @@
 'use client';
 
-import { Inter } from 'next/font/google';
+import { Inter, Yanone_Kaffeesatz } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 import { FirestoreErrorBoundary } from '@/components/FirestoreErrorBoundary';
@@ -33,6 +33,14 @@ const FinEducatorChat = dynamic(
   () => import('@/components/chat/FinEducatorChat').then((m) => m.FinEducatorChat),
   { ssr: false }
 );
+
+// Used only inside the .dossier theme (Quests / Case Files) — see globals.css.
+const yanone = Yanone_Kaffeesatz({
+  subsets: ['latin'],
+  variable: '--font-yanone',
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+});
 
 const inter = Inter({ 
   subsets: ['latin'], 
@@ -297,7 +305,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body
-        className={cn(inter.variable, "font-sans antialiased bg-background text-foreground")}
+        className={cn(inter.variable, yanone.variable, "font-sans antialiased bg-background text-foreground")}
         suppressHydrationWarning
       >
         <ThemeProvider>

@@ -56,7 +56,7 @@ function CaseFileBriefing({ quest, index, onAccept, onDecline }: {
   const { district, fogEnemy } = getQuestFog(quest.id);
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-background flex flex-col overflow-y-auto">
+    <div className="dossier fixed inset-0 z-[9999] bg-background flex flex-col overflow-y-auto">
       {/* Header */}
       <div className="border-b border-border bg-card px-6 py-4 flex items-center justify-between">
         <button onClick={onDecline} className="text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors">
@@ -236,7 +236,7 @@ export default function QuestsHub() {
   // Quest viewer — full screen
   if (activeQuest) {
     return (
-      <div className="min-h-screen-safe bg-slate-950 flex flex-col">
+      <div className="dossier min-h-screen-safe bg-slate-950 flex flex-col">
         <header className="px-6 py-4 border-b border-slate-800 flex items-center gap-4">
           <button
             onClick={() => setActiveQuest(null)}
@@ -279,7 +279,7 @@ export default function QuestsHub() {
   }
 
   return (
-    <div className="min-h-screen-safe bg-background pb-24 md:pb-8">
+    <div className="dossier min-h-screen-safe bg-background pb-24 md:pb-8">
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
 
         {/* ── ORDER HQ HERO ─────────────────────────────────────── */}
