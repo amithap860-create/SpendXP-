@@ -492,10 +492,10 @@ export default function DashboardPage() {
                     Open Case Files →
                   </Link>
                   <Link
-                    href="/story"
+                    href="/story#chapters"
                     className="h-10 px-4 border border-border text-muted-foreground text-xs font-black uppercase tracking-widest rounded-xl flex items-center justify-center hover:bg-muted transition-colors"
                   >
-                    The Lore
+                    Read Your Chapter
                   </Link>
                 </div>
               </div>

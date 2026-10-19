@@ -242,3 +242,6 @@ Safer for younger players:
 
 ## 2026-10-18 — Contest leaderboard
 - /contest-admin page + /api/admin/contest (admin SDK, requires users/{uid}.isAdmin). Lives outside /admin because middleware 404s /admin.
+
+## 2026-10-19 — Story chapters (branch feature/story-chapters)
+- 8 chapters, one per rank, unlock with rank (XP-derived). New: src/config/chapters.ts, ChapterReader, StoryChapters (on /story#chapters). Dashboard link now "Read Your Chapter"; quest briefing shows the chapter of its district. Arc: every Fog enemy is a hand of the Hollow Broker.

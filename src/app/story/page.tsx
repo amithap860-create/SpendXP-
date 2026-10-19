@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { StoryChapters } from '@/components/story/StoryChapters';
 
 /* ── SVG icon components — all in Slate + Sage palette ── */
 
@@ -166,6 +167,9 @@ export default function StoryPage() {
           </p>
         </div>
       </div>
+
+      {/* ── CHAPTERS (2026-10-19) ── */}
+      <StoryChapters />
 
       {/* ── HOW IT WORKS ── */}
       <div className="max-w-3xl mx-auto px-5 py-14">

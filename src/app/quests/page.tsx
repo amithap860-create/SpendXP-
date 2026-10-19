@@ -29,6 +29,7 @@ import { EducationalDisclaimer } from '@/components/EducationalDisclaimer';
 import { db } from '@/lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import dynamic from 'next/dynamic';
+import { getChapterForDistrict } from '@/config/chapters';
 import { getRankForXP, getRankProgress, getNextRank, getFogEnemy, getCaseFileId, getCurrentSaga, getQuestFog } from '@/config/narrative';
 import { useDailyQuestStatus } from '@/hooks/useDailyQuestStatus';
 import { trackQuestStarted } from '@/lib/analytics';
@@ -110,6 +111,12 @@ function CaseFileBriefing({ quest, index, onAccept, onDecline }: {
             <AlertTriangle className="h-4 w-4 text-cat-wrong" />
             <div className="text-[10px] font-black uppercase tracking-widest text-cat-wrong">Active Threat · {district.name}</div>
           </div>
+          {(() => {
+            const ch = getChapterForDistrict(district.id);
+            return ch ? (
+              <p className="text-sm text-muted-foreground">Story · Chapter {ch.number}: {ch.title}</p>
+            ) : null;
+          })()}
           <div className="flex items-start gap-3">
             <div className="w-8 h-8 rounded-lg bg-cat-wrong/15 flex items-center justify-center shrink-0 mt-0.5">
               <AlertTriangle className="h-4 w-4 text-cat-wrong" />
