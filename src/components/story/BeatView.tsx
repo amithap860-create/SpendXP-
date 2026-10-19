@@ -1,6 +1,6 @@
 import React from 'react';
 import { CharacterPortrait } from '@/components/story/CharacterPortrait';
-import { DEFAULT_MOOD, type SceneBeat } from '@/config/characters';
+import { DEFAULT_MOOD, SHOW_PORTRAITS, type SceneBeat } from '@/config/characters';
 
 /** One story beat: portrait + speaker + line (or italic narration with no portrait). */
 export function BeatView({ beat }: { beat: SceneBeat }) {
@@ -10,6 +10,14 @@ export function BeatView({ beat }: { beat: SceneBeat }) {
     );
   }
   const mood = beat.mood ?? DEFAULT_MOOD[beat.who];
+  if (!SHOW_PORTRAITS) {
+    return (
+      <div className="lesson-rise space-y-3">
+        <span className="inline-block rounded-full bg-primary/10 text-primary px-3 py-1 text-sm font-black uppercase tracking-widest">{beat.who}</span>
+        <p className="text-2xl leading-relaxed text-foreground font-medium">“{beat.text}”</p>
+      </div>
+    );
+  }
   return (
     <div className="lesson-rise flex flex-col items-center gap-4 text-center sm:flex-row sm:items-start sm:text-left">
       <div key={`${beat.who}-${mood}`} className="lesson-pop shrink-0 rounded-3xl bg-secondary p-3 border border-border">

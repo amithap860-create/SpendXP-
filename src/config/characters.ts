@@ -34,3 +34,10 @@ export const CHARACTER_ART: Record<Speaker, { slug: string; initial: string; gra
   'Archivist Ines': { slug: 'ines',   initial: 'I', gradient: 'from-rose-700 to-red-950' },
   'The Broker':     { slug: 'broker', initial: 'B', gradient: 'from-zinc-700 to-black' },
 };
+
+/**
+ * Portraits are switched off for now (2026-10-19): the story reads as text with
+ * a speaker label until real art is in public/story/ (docs/STORY-CHARACTER-ART.md).
+ * Set to true to bring portraits back — nothing else needs to change.
+ */
+export const SHOW_PORTRAITS = false;
