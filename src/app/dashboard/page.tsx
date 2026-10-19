@@ -44,6 +44,7 @@ import { getRankForXP, getRankProgress, getNextRank, getFogEnemy, getCurrentSaga
 import { getAvatar } from '@/config/avatars';
 import Image from 'next/image';
 import { HowToPlayModal } from '@/components/HowToPlayModal';
+import { CityMapCard } from '@/components/city/CityMapCard';
 import { trackRankUp } from '@/lib/analytics';
 
 const RadarChart = dynamic(() => import('@/components/charts/RadarChart').then(mod => mod.RadarChart), {
@@ -311,7 +312,7 @@ export default function DashboardPage() {
       )}
 
       {/* In-app tooltip tour */}
-      {showTooltipTour && (
+      {showTooltipTour && !showIntroSlides && (
         <TooltipTour
           onComplete={() => {
             localStorage.setItem('spendxp_tour_done', '1');
@@ -320,7 +321,7 @@ export default function DashboardPage() {
         />
       )}
 
-      <HowToPlayModal forceOpen={showHowToPlay} onClose={() => setShowHowToPlay(false)} />
+      <HowToPlayModal autoOpen={false} forceOpen={showHowToPlay} onClose={() => setShowHowToPlay(false)} />
       {/* Help button */}
       <button
         onClick={() => setShowHowToPlay(true)}
@@ -380,6 +381,9 @@ export default function DashboardPage() {
             </div>
           </div>
         </section>
+
+        {/* CITY MAP — front and centre (2026-10-19) */}
+        <CityMapCard xp={progression?.totalXP ?? 0} />
 
         {/* STORYLINE CARD — Order of the Golden Ledger */}
         {(() => {
@@ -490,12 +494,6 @@ export default function DashboardPage() {
                     className="flex-1 h-10 bg-primary text-white text-xs font-black uppercase tracking-widest rounded-xl flex items-center justify-center gap-1 hover:bg-primary/90 transition-colors"
                   >
                     Open Case Files →
-                  </Link>
-                  <Link
-                    href="/city"
-                    className="h-10 px-4 bg-gold text-gold-foreground text-xs font-black uppercase tracking-widest rounded-xl flex items-center justify-center hover:opacity-90 transition-opacity"
-                  >
-                    City Map
                   </Link>
                   <Link
                     href="/story#chapters"

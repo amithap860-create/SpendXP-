@@ -249,3 +249,7 @@ Safer for younger players:
 ## 2026-10-19 — SpendCity map (branch feature/story-chapters)
 - /city: areas = topics (Pocket Park [junior], Neighbourhood, Bank Row, World Gate, Central Hall, Market District, Academy), each held by a Fog villain. Level = 1 lesson + 1 case file; all levels done = area crime-free; next area opens. XP rank powers: Fog Sight, Pathfinder (Scout), Rank Clearance (Agent: open areas by rank). Config: src/config/cityMap.ts. Completion read from existing lesson tasks + questProgress; nothing new stored server-side. Entry: dashboard "City Map", quests page button.
 - Level lessons follow the Learn tab order (contiguous runs of lessons.ts); do not reorder without checking.
+
+## 2026-10-19 — Dashboard reorg + onboarding fix
+- Dashboard: SpendCity map card (CityMapCard, shared useCityProgress hook with /city) now sits directly under the greeting, above the rank card.
+- Fixed first-run overlap: HowToPlayModal auto-opened on top of the intro slides and the tooltip tour. Dashboard now runs intro slides -> tour only (HowToPlay opens from the ? button). Tour gets a City Map step first.

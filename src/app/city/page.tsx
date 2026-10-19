@@ -1,17 +1,13 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { collection, getDocs } from 'firebase/firestore';
 import { ArrowLeft, Check, Lock, Sparkles, Compass, ShieldCheck, Eye } from 'lucide-react';
-import { db } from '@/lib/firebase';
-import { useAuthContext } from '@/context/AuthContext';
-import { useUser } from '@/lib/store';
-import { getProgression } from '@/lib/progressionService';
+import { useCityProgress } from '@/hooks/useCityProgress';
 import { lessons } from '@/data/lessons';
 import { quests } from '@/data/quests';
-import { RANKS, getRankForXP, getFogEnemy } from '@/config/narrative';
-import { POWERS, resolveCity, type ResolvedArea, type ResolvedLevel } from '@/config/cityMap';
+import { RANKS, getFogEnemy } from '@/config/narrative';
+import { POWERS, type ResolvedArea } from '@/config/cityMap';
 import { Button } from '@/components/ui/button';
 import { EducationalDisclaimer } from '@/components/EducationalDisclaimer';
 
@@ -22,55 +18,15 @@ import { EducationalDisclaimer } from '@/components/EducationalDisclaimer';
  * server-side; the "already celebrated" list is a per-device convenience.
  */
 export default function CityMapPage() {
-  const { user, loading: authLoading } = useAuthContext();
-  const { tasks, ageGroup } = useUser();
-  const age = ((ageGroup as string) || 'junior') as 'junior' | 'teen' | 'senior';
-  const [xp, setXp] = useState(0);
-  const [doneQuests, setDoneQuests] = useState<string[]>([]);
-  const [ready, setReady] = useState(false);
+  const {
+    user, authLoading, ready, xp, rank, rankIndex, hasPathfinder, hasClearance,
+    areas, availableLessons, cleared, clearedCount, nextAreaIdx, nextLevel,
+    lessonDone, questDone, levelDone, areaOpen,
+  } = useCityProgress();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [celebrate, setCelebrate] = useState<ResolvedArea | null>(null);
 
   useEffect(() => { document.title = 'City Map | SpendXP'; }, []);
-
-  useEffect(() => {
-    if (!user?.uid) { if (!authLoading) setReady(true); return; }
-    let cancelled = false;
-    (async () => {
-      try {
-        const [prog, snap] = await Promise.all([
-          getProgression(user.uid),
-          getDocs(collection(db, 'users', user.uid, 'questProgress')),
-        ]);
-        if (cancelled) return;
-        setXp(prog?.totalXP ?? 0);
-        setDoneQuests(snap.docs.map(d => d.id));
-      } catch (e) {
-        console.warn('[SpendXP] City map: could not load progress', e);
-      } finally {
-        if (!cancelled) setReady(true);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [user?.uid, authLoading]);
-
-  const lessonDone = (id: string) => !!tasks.find(t => t.id === `lesson-${id}`)?.completed;
-  const questDone = (id: string) => doneQuests.includes(id);
-
-  const areas = useMemo(() => resolveCity(age, lessons as any, quests as any), [age]);
-  const availableLessons = useMemo(() => lessons.filter(l => l.ageGroups.includes(age)), [age]);
-
-  const rank = getRankForXP(xp);
-  const rankIndex = RANKS.findIndex(r => r.id === rank.id);
-  const hasPathfinder = rankIndex >= 1;
-  const hasClearance = rankIndex >= 2;
-
-  const levelDone = (lv: ResolvedLevel) => (!lv.lessonId || lessonDone(lv.lessonId)) && (!lv.questId || questDone(lv.questId));
-  const cleared = areas.map(a => a.levels.every(levelDone));
-  const areaOpen = (i: number) => i === 0 || cleared[i - 1] || (hasClearance && rankIndex >= areas[i].tier);
-  const clearedCount = cleared.filter(Boolean).length;
-  const nextAreaIdx = areas.findIndex((_, i) => !cleared[i] && areaOpen(i));
-  const nextLevel = nextAreaIdx >= 0 ? areas[nextAreaIdx].levels.find(l => !levelDone(l)) : undefined;
 
   // Default selection: the area you should work on next
   useEffect(() => {

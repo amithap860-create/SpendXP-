@@ -81,10 +81,12 @@ const STORAGE_KEY = 'spendxp_how_to_play_seen';
 
 interface HowToPlayModalProps {
   forceOpen?: boolean;
+  /** Open by itself on first visit (default true). The dashboard turns this off: it already runs intro slides then a tour, and this modal opened on top of both. */
+  autoOpen?: boolean;
   onClose?: () => void;
 }
 
-export function HowToPlayModal({ forceOpen = false, onClose }: HowToPlayModalProps) {
+export function HowToPlayModal({ forceOpen = false, autoOpen = true, onClose }: HowToPlayModalProps) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
 
@@ -96,7 +98,7 @@ export function HowToPlayModal({ forceOpen = false, onClose }: HowToPlayModalPro
     }
     // Show on first visit only
     try {
-      if (!localStorage.getItem(STORAGE_KEY)) {
+      if (autoOpen && !localStorage.getItem(STORAGE_KEY)) {
         const timer = setTimeout(() => setOpen(true), 1200);
         return () => clearTimeout(timer);
       }

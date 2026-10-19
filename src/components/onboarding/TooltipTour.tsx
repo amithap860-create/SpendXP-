@@ -14,6 +14,14 @@ export interface TourStep {
 
 const TOUR_STEPS: TourStep[] = [
   {
+    id: 'citymap',
+    targetId: 'tour-citymap',
+    title: 'Your City Map',
+    body: 'SpendCity is under attack by the Gray Fog. Each area is a money topic. Finish its lessons and case files to make it crime-free, then move on. Your next mission is always right here.',
+    emoji: '🗺️',
+    position: 'bottom',
+  },
+  {
     id: 'storyline',
     targetId: 'tour-storyline',
     title: 'Your Mission Brief',
