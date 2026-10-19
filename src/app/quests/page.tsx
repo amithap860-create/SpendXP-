@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { useProgression } from '@/hooks/useProgression';
+import Link from 'next/link';
 import { quests, Quest } from '@/data/quests';
 import { calculateHealthLabel } from '@/lib/financialHealth';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
