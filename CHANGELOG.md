@@ -245,3 +245,7 @@ Safer for younger players:
 
 ## 2026-10-19 — Story chapters (branch feature/story-chapters)
 - 8 chapters, one per rank, unlock with rank (XP-derived). New: src/config/chapters.ts, ChapterReader, StoryChapters (on /story#chapters). Dashboard link now "Read Your Chapter"; quest briefing shows the chapter of its district. Arc: every Fog enemy is a hand of the Hollow Broker.
+
+## 2026-10-19 — SpendCity map (branch feature/story-chapters)
+- /city: areas = topics (Pocket Park [junior], Neighbourhood, Bank Row, World Gate, Central Hall, Market District, Academy), each held by a Fog villain. Level = 1 lesson + 1 case file; all levels done = area crime-free; next area opens. XP rank powers: Fog Sight, Pathfinder (Scout), Rank Clearance (Agent: open areas by rank). Config: src/config/cityMap.ts. Completion read from existing lesson tasks + questProgress; nothing new stored server-side. Entry: dashboard "City Map", quests page button.
+- Level lessons follow the Learn tab order (contiguous runs of lessons.ts); do not reorder without checking.

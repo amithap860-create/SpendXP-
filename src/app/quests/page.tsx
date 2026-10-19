@@ -296,6 +296,10 @@ export default function QuestsHub() {
             {/* Left — Rank & Status */}
             <div className="md:col-span-7 p-6 md:p-10 space-y-6">
 
+              <Link href="/city" className="inline-flex items-center gap-2 rounded-full bg-gold text-gold-foreground px-4 py-1.5 text-xs font-black uppercase tracking-widest hover:opacity-90 transition-opacity">
+                🗺️ Open the City Map
+              </Link>
+
               {/* Order badge */}
               <div className="inline-flex items-center gap-2 bg-[#E8F5EE] border border-[#A8D5BC] rounded-full px-4 py-1.5">
                 <Scale className="h-3.5 w-3.5 text-[#2E7D5A]" />

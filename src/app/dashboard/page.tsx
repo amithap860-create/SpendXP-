@@ -492,6 +492,12 @@ export default function DashboardPage() {
                     Open Case Files →
                   </Link>
                   <Link
+                    href="/city"
+                    className="h-10 px-4 bg-gold text-gold-foreground text-xs font-black uppercase tracking-widest rounded-xl flex items-center justify-center hover:opacity-90 transition-opacity"
+                  >
+                    City Map
+                  </Link>
+                  <Link
                     href="/story#chapters"
                     className="h-10 px-4 border border-border text-muted-foreground text-xs font-black uppercase tracking-widest rounded-xl flex items-center justify-center hover:bg-muted transition-colors"
                   >

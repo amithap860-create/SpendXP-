@@ -1,0 +1,275 @@
+'use client';
+
+import React, { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { collection, getDocs } from 'firebase/firestore';
+import { ArrowLeft, Check, Lock, Sparkles, Compass, ShieldCheck, Eye } from 'lucide-react';
+import { db } from '@/lib/firebase';
+import { useAuthContext } from '@/context/AuthContext';
+import { useUser } from '@/lib/store';
+import { getProgression } from '@/lib/progressionService';
+import { lessons } from '@/data/lessons';
+import { quests } from '@/data/quests';
+import { RANKS, getRankForXP, getFogEnemy } from '@/config/narrative';
+import { POWERS, resolveCity, type ResolvedArea, type ResolvedLevel } from '@/config/cityMap';
+import { Button } from '@/components/ui/button';
+import { EducationalDisclaimer } from '@/components/EducationalDisclaimer';
+
+/**
+ * SpendCity map (2026-10-19). See src/config/cityMap.ts for the rules.
+ * Completion comes from existing data only: lessons from the user's tasks
+ * (`lesson-<id>`), quests from users/{uid}/questProgress. Nothing new is stored
+ * server-side; the "already celebrated" list is a per-device convenience.
+ */
+export default function CityMapPage() {
+  const { user, loading: authLoading } = useAuthContext();
+  const { tasks, ageGroup } = useUser();
+  const age = ((ageGroup as string) || 'junior') as 'junior' | 'teen' | 'senior';
+  const [xp, setXp] = useState(0);
+  const [doneQuests, setDoneQuests] = useState<string[]>([]);
+  const [ready, setReady] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [celebrate, setCelebrate] = useState<ResolvedArea | null>(null);
+
+  useEffect(() => { document.title = 'City Map | SpendXP'; }, []);
+
+  useEffect(() => {
+    if (!user?.uid) { if (!authLoading) setReady(true); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        const [prog, snap] = await Promise.all([
+          getProgression(user.uid),
+          getDocs(collection(db, 'users', user.uid, 'questProgress')),
+        ]);
+        if (cancelled) return;
+        setXp(prog?.totalXP ?? 0);
+        setDoneQuests(snap.docs.map(d => d.id));
+      } catch (e) {
+        console.warn('[SpendXP] City map: could not load progress', e);
+      } finally {
+        if (!cancelled) setReady(true);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?.uid, authLoading]);
+
+  const lessonDone = (id: string) => !!tasks.find(t => t.id === `lesson-${id}`)?.completed;
+  const questDone = (id: string) => doneQuests.includes(id);
+
+  const areas = useMemo(() => resolveCity(age, lessons as any, quests as any), [age]);
+  const availableLessons = useMemo(() => lessons.filter(l => l.ageGroups.includes(age)), [age]);
+
+  const rank = getRankForXP(xp);
+  const rankIndex = RANKS.findIndex(r => r.id === rank.id);
+  const hasPathfinder = rankIndex >= 1;
+  const hasClearance = rankIndex >= 2;
+
+  const levelDone = (lv: ResolvedLevel) => (!lv.lessonId || lessonDone(lv.lessonId)) && (!lv.questId || questDone(lv.questId));
+  const cleared = areas.map(a => a.levels.every(levelDone));
+  const areaOpen = (i: number) => i === 0 || cleared[i - 1] || (hasClearance && rankIndex >= areas[i].tier);
+  const clearedCount = cleared.filter(Boolean).length;
+  const nextAreaIdx = areas.findIndex((_, i) => !cleared[i] && areaOpen(i));
+  const nextLevel = nextAreaIdx >= 0 ? areas[nextAreaIdx].levels.find(l => !levelDone(l)) : undefined;
+
+  // Default selection: the area you should work on next
+  useEffect(() => {
+    if (ready && !selectedId && areas.length) setSelectedId(areas[Math.max(0, nextAreaIdx)].id);
+  }, [ready, selectedId, areas, nextAreaIdx]);
+
+  // Celebrate newly cleared areas (never on the very first visit)
+  useEffect(() => {
+    if (!ready || !user?.uid || !areas.length) return;
+    const key = `spendxp_city_cleared_${user.uid}`;
+    try {
+      const raw = localStorage.getItem(key);
+      const prev: string[] | null = raw ? JSON.parse(raw) : null;
+      const now = areas.filter((_, i) => cleared[i]).map(a => a.id);
+      if (prev) {
+        const fresh = areas.find((a, i) => cleared[i] && !prev.includes(a.id));
+        if (fresh) setCelebrate(fresh);
+      }
+      localStorage.setItem(key, JSON.stringify(now));
+    } catch { /* storage unavailable */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, user?.uid, clearedCount]);
+
+  const selectedIdx = areas.findIndex(a => a.id === selectedId);
+  const selected = selectedIdx >= 0 ? areas[selectedIdx] : null;
+
+  // ── map geometry ──
+  const STEP = 128, TOP = 72, W = 360, R = 42;
+  const pts = areas.map((_, i) => ({ x: i % 2 === 0 ? 96 : 264, y: TOP + i * STEP }));
+  const H = TOP * 2 + Math.max(0, areas.length - 1) * STEP;
+  const road = pts.map((p, i) => i === 0 ? `M ${p.x} ${p.y}` : `C ${pts[i - 1].x} ${pts[i - 1].y + 64}, ${p.x} ${p.y - 64}, ${p.x} ${p.y}`).join(' ');
+
+  if (authLoading || !ready) return <div className="p-8 text-muted-foreground">Loading the city…</div>;
+  if (!user) return <div className="p-8"><Link href="/login?next=/city" className="underline">Sign in</Link> to see your city.</div>;
+
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-6 pb-28 md:pb-10 space-y-6">
+      <Link href="/dashboard" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-primary">
+        <ArrowLeft className="h-4 w-4" /> Back to HQ
+      </Link>
+
+      <header className="space-y-3">
+        <h1 className="text-3xl md:text-4xl font-black text-foreground tracking-tight">SpendCity</h1>
+        <p className="text-base text-muted-foreground">Clear each area of its villain. Finish every level — one lesson and one case file — and the area is crime-free.</p>
+        <div className="rounded-2xl border bg-card p-4 space-y-2">
+          <div className="flex items-center justify-between text-sm font-black uppercase tracking-widest">
+            <span className="text-primary">{rank.emoji} {rank.name} · {xp.toLocaleString()} XP</span>
+            <span className="text-muted-foreground">{clearedCount}/{areas.length} areas crime-free</span>
+          </div>
+          <div className="h-3 rounded-full bg-muted overflow-hidden">
+            <div className="h-full bg-gold transition-all duration-700" style={{ width: `${areas.length ? (clearedCount / areas.length) * 100 : 0}%` }} />
+          </div>
+          <div className="flex flex-wrap gap-2 pt-1">
+            {POWERS.map(p => {
+              const on = rankIndex >= p.rankIndex;
+              const Icon = p.id === 'fog_sight' ? Eye : p.id === 'pathfinder' ? Compass : ShieldCheck;
+              return (
+                <span key={p.id} title={p.desc} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-bold ${on ? 'border-primary/40 bg-primary/10 text-primary' : 'border-border text-muted-foreground opacity-70'}`}>
+                  {on ? <Icon className="h-4 w-4" /> : <Lock className="h-3.5 w-3.5" />} {p.name}{!on && ` · ${p.rankName}`}
+                </span>
+              );
+            })}
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {hasClearance
+              ? 'Rank Clearance: areas open by rank, even if the one before them isn\'t cleared yet. Lessons still unlock in order on the Learn tab.'
+              : 'More XP means more power. At Agent rank you can open areas out of order (Rank Clearance).'}
+          </p>
+        </div>
+      </header>
+
+      {/* ── MAP ── */}
+      <div className="rounded-3xl border bg-card p-2">
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" role="group" aria-label="SpendCity map">
+          <path d={road} fill="none" stroke="hsl(var(--border))" strokeWidth="6" strokeLinecap="round" strokeDasharray="2 12" />
+          {areas.map((a, i) => {
+            const p = pts[i];
+            const isCleared = cleared[i];
+            const open = areaOpen(i);
+            const isSel = a.id === selectedId;
+            const isNext = hasPathfinder && i === nextAreaIdx;
+            const stroke = isCleared ? 'hsl(var(--gold))' : open ? 'hsl(var(--primary))' : 'hsl(var(--border))';
+            const fog = getFogEnemy(a.fogId);
+            return (
+              <g key={a.id} role="button" tabIndex={0} aria-label={`${a.name}: ${isCleared ? 'crime-free' : open ? 'open' : 'locked'}`}
+                onClick={() => setSelectedId(a.id)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setSelectedId(a.id); }}
+                style={{ cursor: 'pointer', outline: 'none' }}>
+                {isSel && <circle cx={p.x} cy={p.y} r={R + 9} fill="none" stroke={stroke} strokeWidth="2" opacity="0.5" />}
+                <circle cx={p.x} cy={p.y} r={R} fill="hsl(var(--background))" stroke={stroke} strokeWidth={isCleared ? 5 : 4} strokeDasharray={open ? undefined : '6 6'} />
+                <text x={p.x} y={p.y + 12} textAnchor="middle" fontSize="36" opacity={open ? 1 : 0.4}>{a.emoji}</text>
+                {!isCleared && (
+                  <g opacity={open ? 0.28 : 0.4} aria-hidden>
+                    <circle cx={p.x - 26} cy={p.y - 20} r="20" fill="hsl(var(--muted-foreground))" />
+                    <circle cx={p.x + 22} cy={p.y - 24} r="16" fill="hsl(var(--muted-foreground))" />
+                    <circle cx={p.x + 6} cy={p.y + 22} r="22" fill="hsl(var(--muted-foreground))" />
+                  </g>
+                )}
+                {isCleared && <text x={p.x + 30} y={p.y - 30} fontSize="24" fill="hsl(var(--gold))">✦</text>}
+                {!open && <text x={p.x} y={p.y + 10} textAnchor="middle" fontSize="26">🔒</text>}
+                {open && !isCleared && <text x={p.x - 34} y={p.y - 30} fontSize="22">{fog.emoji}</text>}
+                <text x={p.x} y={p.y + R + 24} textAnchor="middle" fontSize="17" fontWeight="700" fill="hsl(var(--foreground))">{a.name}</text>
+                <text x={p.x} y={p.y + R + 42} textAnchor="middle" fontSize="13" fill="hsl(var(--muted-foreground))">
+                  {isCleared ? 'Crime-free' : `${a.levels.filter(levelDone).length}/${a.levels.length} levels`}
+                </text>
+                {isNext && <text x={p.x + 36} y={p.y + 4} fontSize="14" fontWeight="700" fill="hsl(var(--gold))">NEXT</text>}
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+
+      {/* ── SELECTED AREA ── */}
+      {selected && (() => {
+        const i = selectedIdx;
+        const open = areaOpen(i);
+        const fog = getFogEnemy(selected.fogId);
+        const prev = areas[i - 1];
+        return (
+          <section className="rounded-3xl border bg-card p-5 space-y-4">
+            <div>
+              <p className="text-xs font-black uppercase tracking-widest text-primary">{selected.topic}</p>
+              <h2 className="text-2xl font-black text-foreground">{selected.emoji} {selected.name}</h2>
+            </div>
+
+            <div className="rounded-2xl bg-secondary p-4 space-y-1">
+              <p className="text-sm font-black uppercase tracking-widest text-muted-foreground">Villain · {fog.emoji} {fog.name}</p>
+              <p className="text-base text-foreground">{fog.description}</p>
+              <p className="text-sm text-muted-foreground"><span className="font-black text-foreground">Weakness:</span> {fog.weakness}</p>
+            </div>
+
+            {!open ? (
+              <p className="text-base text-muted-foreground">
+                Locked. Clear <strong className="text-foreground">{prev?.name}</strong>
+                {rankIndex < 2 ? ' first — or reach Agent rank to unlock areas by rank (Rank Clearance).' : `, or reach rank ${RANKS[selected.tier]?.name ?? 'higher'}.`}
+              </p>
+            ) : (
+              <ul className="space-y-3">
+                {selected.levels.map((lv, k) => {
+                  const done = levelDone(lv);
+                  const isNextLv = hasPathfinder && nextLevel?.id === lv.id && i === nextAreaIdx;
+                  const lesson = lv.lessonId ? lessons.find(l => l.id === lv.lessonId) : undefined;
+                  const quest = lv.questId ? quests.find(q => q.id === lv.questId) : undefined;
+                  const lDone = lesson ? lessonDone(lesson.id) : false;
+                  const seq = lesson ? availableLessons.findIndex(l => l.id === lesson.id) : -1;
+                  const prevLesson = seq > 0 ? availableLessons[seq - 1] : null;
+                  const lessonLocked = !!lesson && !lDone && !!prevLesson && !lessonDone(prevLesson.id);
+                  const qDone = quest ? questDone(quest.id) : false;
+                  const needQ = quest?.unlockRequirement?.completedQuestId;
+                  const questLocked = !!quest && !qDone && !!needQ && !questDone(needQ);
+                  return (
+                    <li key={lv.id} className={`rounded-2xl border p-4 space-y-3 ${done ? 'border-gold/60 bg-gold/5' : isNextLv ? 'border-primary' : ''}`}>
+                      <div className="flex items-center gap-3">
+                        <span className={`h-9 w-9 shrink-0 rounded-full flex items-center justify-center text-base font-black ${done ? 'bg-gold text-gold-foreground' : 'bg-muted text-muted-foreground'}`}>
+                          {done ? <Check className="h-5 w-5" /> : k + 1}
+                        </span>
+                        <p className="text-lg font-black text-foreground leading-snug flex-1">{lv.title}</p>
+                        {isNextLv && <span className="rounded-full bg-primary/10 text-primary px-2.5 py-0.5 text-sm font-black uppercase tracking-widest">Next</span>}
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {lesson && (
+                          <Link href="/learn" className={`flex-1 min-w-[150px] rounded-xl border px-3 py-2 text-sm font-bold ${lDone ? 'text-muted-foreground' : lessonLocked ? 'text-muted-foreground opacity-80' : 'text-primary border-primary/40 bg-primary/5'}`}>
+                            <span className="block text-xs font-black uppercase tracking-widest opacity-70">Lesson {lDone ? '· done' : lessonLocked ? '· locked' : ''}</span>
+                            {lesson.title}
+                            {lessonLocked && prevLesson && <span className="block text-xs font-medium">Finish “{prevLesson.title}” first</span>}
+                          </Link>
+                        )}
+                        {quest && (
+                          <Link href="/quests" className={`flex-1 min-w-[150px] rounded-xl border px-3 py-2 text-sm font-bold ${qDone ? 'text-muted-foreground' : questLocked ? 'text-muted-foreground opacity-80' : 'text-primary border-primary/40 bg-primary/5'}`}>
+                            <span className="block text-xs font-black uppercase tracking-widest opacity-70">Case file {qDone ? '· closed' : questLocked ? '· locked' : ''}</span>
+                            {quest.title}
+                            {questLocked && needQ && <span className="block text-xs font-medium">Close “{quests.find(q => q.id === needQ)?.title}” first</span>}
+                          </Link>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </section>
+        );
+      })()}
+
+      <EducationalDisclaimer />
+
+      {/* ── CRIME-FREE MOMENT ── */}
+      {celebrate && (
+        <div className="fixed inset-0 z-[9999] bg-black/70 flex items-center justify-center p-6" role="dialog" aria-modal="true">
+          <div className="lesson-pop max-w-sm w-full rounded-3xl bg-card border-2 border-gold p-7 text-center space-y-4">
+            <Sparkles className="h-12 w-12 mx-auto text-gold" />
+            <p className="text-xs font-black uppercase tracking-widest text-gold">Crime-free</p>
+            <h2 className="text-3xl font-black text-foreground">{celebrate.emoji} {celebrate.name}</h2>
+            <p className="text-lg text-muted-foreground leading-relaxed">{celebrate.clearedLine}</p>
+            <Button onClick={() => { const i = areas.findIndex(a => a.id === celebrate.id); const n = areas[i + 1]; if (n) setSelectedId(n.id); setCelebrate(null); }} className="w-full h-12 text-lg font-black rounded-2xl">
+              {areas.findIndex(a => a.id === celebrate.id) < areas.length - 1 ? 'On to the next area' : 'Back to the map'}
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
