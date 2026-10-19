@@ -257,3 +257,7 @@ Safer for younger players:
 ## 2026-10-19 — Story cast + scenes
 - Faces: src/components/story/CharacterFace.tsx — original SVG portraits for Pip, Warden Vale, Archivist Ines, The Broker, 9 expressions (neutral, content, happy, worried, surprised, determined, proud, sly, sad). Chapters now show portraits (moods added to all 28 spoken beats).
 - City scenes (src/config/cityStory.ts): area intro (first time an open area is shown), level story (first time a level lesson/case file is opened, replay via Story button), cleared scene before the reward card. Seen-list is per device (localStorage).
+
+## 2026-10-19 — Story art + avatar cleanup
+- Removed the SVG-drawn story faces (did not match the avatars). CharacterPortrait shows public/story/<slug>/<mood>.png, falling back to neutral then a nameplate medallion. Spec: docs/STORY-CHARACTER-ART.md.
+- Avatars cleaned: stray specks and Gemini sparkle removed from voss.png, thin stray lines removed from Finn/Storm, voss.png shrunk 967KB -> 189KB (1024 -> 512px).
