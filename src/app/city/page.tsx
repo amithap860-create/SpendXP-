@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, Check, Lock, Sparkles, Compass, ShieldCheck, Eye } from 'lucide-react';
 import { useCityProgress } from '@/hooks/useCityProgress';
 import { lessons } from '@/data/lessons';
@@ -10,6 +11,10 @@ import { RANKS, getFogEnemy } from '@/config/narrative';
 import { POWERS, type ResolvedArea } from '@/config/cityMap';
 import { Button } from '@/components/ui/button';
 import { EducationalDisclaimer } from '@/components/EducationalDisclaimer';
+import { SceneReader } from '@/components/story/SceneReader';
+import { AREA_SCENES, LEVEL_SCENES, CLEARED_SCENES } from '@/config/cityStory';
+import type { SceneBeat } from '@/config/characters';
+import { Play } from 'lucide-react';
 
 /**
  * SpendCity map (2026-10-19). See src/config/cityMap.ts for the rules.
@@ -25,6 +30,43 @@ export default function CityMapPage() {
   } = useCityProgress();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [celebrate, setCelebrate] = useState<ResolvedArea | null>(null);
+  const router = useRouter();
+
+  // ── story scenes (2026-10-19) ──
+  // Seen-list is per device (localStorage); a new device replays the scenes once.
+  const seenKey = user?.uid ? `spendxp_story_seen_${user.uid}` : null;
+  const [seen, setSeen] = useState<string[]>([]);
+  const [seenLoaded, setSeenLoaded] = useState(false);
+  const [scene, setScene] = useState<{ title: string; kicker: string; beats: SceneBeat[]; doneLabel?: string; after?: () => void } | null>(null);
+
+  useEffect(() => {
+    if (!seenKey) return;
+    try { setSeen(JSON.parse(localStorage.getItem(seenKey) || '[]')); } catch { setSeen([]); }
+    setSeenLoaded(true);
+  }, [seenKey]);
+
+  const markSeen = (k: string) => {
+    setSeen(prev => {
+      if (prev.includes(k)) return prev;
+      const next = [...prev, k];
+      if (seenKey) { try { localStorage.setItem(seenKey, JSON.stringify(next)); } catch { /* storage unavailable */ } }
+      return next;
+    });
+  };
+  const playScene = (key: string, title: string, kicker: string, beats: SceneBeat[] | undefined, after?: () => void, doneLabel?: string) => {
+    markSeen(key);
+    if (!beats?.length) { after?.(); return; }
+    setScene({ title, kicker, beats, after, doneLabel });
+  };
+  const endScene = () => { const a = scene?.after; setScene(null); a?.(); };
+  // Opening a level (tapping its lesson or case file) plays the level's story
+  // first, once; then goes where the player was headed.
+  const openLevel = (e: React.MouseEvent, levelId: string, title: string, areaName: string, k: number, done: boolean, href: string) => {
+    const key = `level:${levelId}`;
+    if (done || seen.includes(key) || !LEVEL_SCENES[levelId]) return;
+    e.preventDefault();
+    playScene(key, title, `${areaName} · Level ${k + 1}`, LEVEL_SCENES[levelId], () => router.push(href), 'Begin the level');
+  };
 
   useEffect(() => { document.title = 'City Map | SpendXP'; }, []);
 
@@ -43,7 +85,7 @@ export default function CityMapPage() {
       const now = areas.filter((_, i) => cleared[i]).map(a => a.id);
       if (prev) {
         const fresh = areas.find((a, i) => cleared[i] && !prev.includes(a.id));
-        if (fresh) setCelebrate(fresh);
+        if (fresh) playScene(`cleared:${fresh.id}`, fresh.name, 'Crime-free', CLEARED_SCENES[fresh.id], () => setCelebrate(fresh), 'Claim your reward');
       }
       localStorage.setItem(key, JSON.stringify(now));
     } catch { /* storage unavailable */ }
@@ -52,6 +94,19 @@ export default function CityMapPage() {
 
   const selectedIdx = areas.findIndex(a => a.id === selectedId);
   const selected = selectedIdx >= 0 ? areas[selectedIdx] : null;
+
+  // First time an OPEN, not-yet-cleared area is shown -> its intro scene.
+  // Areas the player has already cleared are marked seen silently (no replay spam
+  // for existing players).
+  useEffect(() => {
+    if (!ready || !seenLoaded || !selected || scene || celebrate) return;
+    const key = `area:${selected.id}`;
+    if (seen.includes(key)) return;
+    if (cleared[selectedIdx]) { markSeen(key); return; }
+    if (!areaOpen(selectedIdx)) return;
+    playScene(key, selected.name, selected.topic, AREA_SCENES[selected.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, seenLoaded, selectedId, seen.length]);
 
   // ── map geometry ──
   const STEP = 128, TOP = 72, W = 360, R = 42;
@@ -184,17 +239,24 @@ export default function CityMapPage() {
                         </span>
                         <p className="text-lg font-black text-foreground leading-snug flex-1">{lv.title}</p>
                         {isNextLv && <span className="rounded-full bg-primary/10 text-primary px-2.5 py-0.5 text-sm font-black uppercase tracking-widest">Next</span>}
+                        {LEVEL_SCENES[lv.id] && (
+                          <button type="button" onClick={() => playScene(`level:${lv.id}`, lv.title, `${selected.name} · Level ${k + 1}`, LEVEL_SCENES[lv.id])}
+                            className={`shrink-0 inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-black uppercase tracking-widest ${!seen.includes(`level:${lv.id}`) && !done ? 'border-gold text-gold animate-pulse' : 'border-border text-muted-foreground'}`}
+                            aria-label={`Play the story for ${lv.title}`}>
+                            <Play className="h-3.5 w-3.5" /> Story
+                          </button>
+                        )}
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {lesson && (
-                          <Link href="/learn" className={`flex-1 min-w-[150px] rounded-xl border px-3 py-2 text-sm font-bold ${lDone ? 'text-muted-foreground' : lessonLocked ? 'text-muted-foreground opacity-80' : 'text-primary border-primary/40 bg-primary/5'}`}>
+                          <Link href="/learn" onClick={(e) => openLevel(e, lv.id, lv.title, selected.name, k, done, '/learn')} className={`flex-1 min-w-[150px] rounded-xl border px-3 py-2 text-sm font-bold ${lDone ? 'text-muted-foreground' : lessonLocked ? 'text-muted-foreground opacity-80' : 'text-primary border-primary/40 bg-primary/5'}`}>
                             <span className="block text-xs font-black uppercase tracking-widest opacity-70">Lesson {lDone ? '· done' : lessonLocked ? '· locked' : ''}</span>
                             {lesson.title}
                             {lessonLocked && prevLesson && <span className="block text-xs font-medium">Finish “{prevLesson.title}” first</span>}
                           </Link>
                         )}
                         {quest && (
-                          <Link href="/quests" className={`flex-1 min-w-[150px] rounded-xl border px-3 py-2 text-sm font-bold ${qDone ? 'text-muted-foreground' : questLocked ? 'text-muted-foreground opacity-80' : 'text-primary border-primary/40 bg-primary/5'}`}>
+                          <Link href="/quests" onClick={(e) => openLevel(e, lv.id, lv.title, selected.name, k, done, '/quests')} className={`flex-1 min-w-[150px] rounded-xl border px-3 py-2 text-sm font-bold ${qDone ? 'text-muted-foreground' : questLocked ? 'text-muted-foreground opacity-80' : 'text-primary border-primary/40 bg-primary/5'}`}>
                             <span className="block text-xs font-black uppercase tracking-widest opacity-70">Case file {qDone ? '· closed' : questLocked ? '· locked' : ''}</span>
                             {quest.title}
                             {questLocked && needQ && <span className="block text-xs font-medium">Close “{quests.find(q => q.id === needQ)?.title}” first</span>}
@@ -211,6 +273,10 @@ export default function CityMapPage() {
       })()}
 
       <EducationalDisclaimer />
+
+      {scene && (
+        <SceneReader title={scene.title} kicker={scene.kicker} beats={scene.beats} doneLabel={scene.doneLabel} onDone={endScene} />
+      )}
 
       {/* ── CRIME-FREE MOMENT ── */}
       {celebrate && (

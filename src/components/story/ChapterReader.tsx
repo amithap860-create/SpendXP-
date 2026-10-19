@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { X, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { Chapter } from '@/config/chapters';
+import { BeatView } from '@/components/story/BeatView';
 import { DISTRICTS, getFogEnemy } from '@/config/narrative';
 
 /**
@@ -49,14 +50,7 @@ export function ChapterReader({ chapter, onClose }: { chapter: Chapter; onClose:
 
       <main className="flex-1 flex flex-col justify-center max-w-2xl w-full mx-auto px-5 py-8">
         {!atEnd ? (
-          <div key={idx} className="lesson-rise space-y-4">
-            {beat.who && (
-              <span className="inline-block rounded-full bg-primary/10 text-primary px-3 py-1 text-sm font-black uppercase tracking-widest">{beat.who}</span>
-            )}
-            <p className={`text-2xl leading-relaxed ${beat.who ? 'text-foreground font-medium' : 'text-muted-foreground italic'}`}>
-              {beat.who ? `“${beat.text}”` : beat.text}
-            </p>
-          </div>
+          <div key={idx}><BeatView beat={beat} /></div>
         ) : (
           <div className="lesson-rise space-y-5">
             <div className="rounded-3xl border bg-card p-6 space-y-2">

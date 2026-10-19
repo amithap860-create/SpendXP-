@@ -253,3 +253,7 @@ Safer for younger players:
 ## 2026-10-19 — Dashboard reorg + onboarding fix
 - Dashboard: SpendCity map card (CityMapCard, shared useCityProgress hook with /city) now sits directly under the greeting, above the rank card.
 - Fixed first-run overlap: HowToPlayModal auto-opened on top of the intro slides and the tooltip tour. Dashboard now runs intro slides -> tour only (HowToPlay opens from the ? button). Tour gets a City Map step first.
+
+## 2026-10-19 — Story cast + scenes
+- Faces: src/components/story/CharacterFace.tsx — original SVG portraits for Pip, Warden Vale, Archivist Ines, The Broker, 9 expressions (neutral, content, happy, worried, surprised, determined, proud, sly, sad). Chapters now show portraits (moods added to all 28 spoken beats).
+- City scenes (src/config/cityStory.ts): area intro (first time an open area is shown), level story (first time a level lesson/case file is opened, replay via Story button), cleared scene before the reward card. Seen-list is per device (localStorage).
