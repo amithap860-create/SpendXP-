@@ -261,3 +261,7 @@ Safer for younger players:
 ## 2026-10-19 — Story art + avatar cleanup
 - Removed the SVG-drawn story faces (did not match the avatars). CharacterPortrait shows public/story/<slug>/<mood>.png, falling back to neutral then a nameplate medallion. Spec: docs/STORY-CHARACTER-ART.md.
 - Avatars cleaned: stray specks and Gemini sparkle removed from voss.png, thin stray lines removed from Finn/Storm, voss.png shrunk 967KB -> 189KB (1024 -> 512px).
+
+## 2026-10-20 — SpendCity terrain map
+- New `CityTerrainMap`: top-down island map (sea, coast, one biome per area, roads, lettered grid, Gray Fog over uncleared areas, gold roads/✦ for cleared). Original artwork, drawn in SVG.
+- Dashboard map card now shows this map (tap opens /city); /city uses it with selectable areas, replacing the winding-path map.

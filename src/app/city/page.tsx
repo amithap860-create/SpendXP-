@@ -15,6 +15,7 @@ import { SceneReader } from '@/components/story/SceneReader';
 import { AREA_SCENES, LEVEL_SCENES, CLEARED_SCENES } from '@/config/cityStory';
 import type { SceneBeat } from '@/config/characters';
 import { Play } from 'lucide-react';
+import { CityTerrainMap } from '@/components/city/CityTerrainMap';
 
 /**
  * SpendCity map (2026-10-19). See src/config/cityMap.ts for the rules.
@@ -108,12 +109,6 @@ export default function CityMapPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, seenLoaded, selectedId, seen.length]);
 
-  // ── map geometry ──
-  const STEP = 128, TOP = 72, W = 360, R = 42;
-  const pts = areas.map((_, i) => ({ x: i % 2 === 0 ? 96 : 264, y: TOP + i * STEP }));
-  const H = TOP * 2 + Math.max(0, areas.length - 1) * STEP;
-  const road = pts.map((p, i) => i === 0 ? `M ${p.x} ${p.y}` : `C ${pts[i - 1].x} ${pts[i - 1].y + 64}, ${p.x} ${p.y - 64}, ${p.x} ${p.y}`).join(' ');
-
   if (authLoading || !ready) return <div className="p-8 text-muted-foreground">Loading the city…</div>;
   if (!user) return <div className="p-8"><Link href="/login?next=/city" className="underline">Sign in</Link> to see your city.</div>;
 
@@ -155,42 +150,11 @@ export default function CityMapPage() {
 
       {/* ── MAP ── */}
       <div className="rounded-3xl border bg-card p-2">
-        <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" role="group" aria-label="SpendCity map">
-          <path d={road} fill="none" stroke="hsl(var(--border))" strokeWidth="6" strokeLinecap="round" strokeDasharray="2 12" />
-          {areas.map((a, i) => {
-            const p = pts[i];
-            const isCleared = cleared[i];
-            const open = areaOpen(i);
-            const isSel = a.id === selectedId;
-            const isNext = hasPathfinder && i === nextAreaIdx;
-            const stroke = isCleared ? 'hsl(var(--gold))' : open ? 'hsl(var(--primary))' : 'hsl(var(--border))';
-            const fog = getFogEnemy(a.fogId);
-            return (
-              <g key={a.id} role="button" tabIndex={0} aria-label={`${a.name}: ${isCleared ? 'crime-free' : open ? 'open' : 'locked'}`}
-                onClick={() => setSelectedId(a.id)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setSelectedId(a.id); }}
-                style={{ cursor: 'pointer', outline: 'none' }}>
-                {isSel && <circle cx={p.x} cy={p.y} r={R + 9} fill="none" stroke={stroke} strokeWidth="2" opacity="0.5" />}
-                <circle cx={p.x} cy={p.y} r={R} fill="hsl(var(--background))" stroke={stroke} strokeWidth={isCleared ? 5 : 4} strokeDasharray={open ? undefined : '6 6'} />
-                <text x={p.x} y={p.y + 12} textAnchor="middle" fontSize="36" opacity={open ? 1 : 0.4}>{a.emoji}</text>
-                {!isCleared && (
-                  <g opacity={open ? 0.28 : 0.4} aria-hidden>
-                    <circle cx={p.x - 26} cy={p.y - 20} r="20" fill="hsl(var(--muted-foreground))" />
-                    <circle cx={p.x + 22} cy={p.y - 24} r="16" fill="hsl(var(--muted-foreground))" />
-                    <circle cx={p.x + 6} cy={p.y + 22} r="22" fill="hsl(var(--muted-foreground))" />
-                  </g>
-                )}
-                {isCleared && <text x={p.x + 30} y={p.y - 30} fontSize="24" fill="hsl(var(--gold))">✦</text>}
-                {!open && <text x={p.x} y={p.y + 10} textAnchor="middle" fontSize="26">🔒</text>}
-                {open && !isCleared && <text x={p.x - 34} y={p.y - 30} fontSize="22">{fog.emoji}</text>}
-                <text x={p.x} y={p.y + R + 24} textAnchor="middle" fontSize="17" fontWeight="700" fill="hsl(var(--foreground))">{a.name}</text>
-                <text x={p.x} y={p.y + R + 42} textAnchor="middle" fontSize="13" fill="hsl(var(--muted-foreground))">
-                  {isCleared ? 'Crime-free' : `${a.levels.filter(levelDone).length}/${a.levels.length} levels`}
-                </text>
-                {isNext && <text x={p.x + 36} y={p.y + 4} fontSize="14" fontWeight="700" fill="hsl(var(--gold))">NEXT</text>}
-              </g>
-            );
-          })}
-        </svg>
+        <CityTerrainMap
+          areas={areas} cleared={cleared} areaOpen={areaOpen} nextAreaIdx={nextAreaIdx} showNext={hasPathfinder}
+          selectedId={selectedId ?? undefined} onSelect={setSelectedId}
+          progress={i => cleared[i] ? 'Crime-free' : `${areas[i].levels.filter(levelDone).length}/${areas[i].levels.length} levels`}
+        />
       </div>
 
       {/* ── SELECTED AREA ── */}

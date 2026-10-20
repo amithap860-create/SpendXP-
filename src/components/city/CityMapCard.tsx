@@ -2,11 +2,12 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Lock, Check, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useCityProgress } from '@/hooks/useCityProgress';
 import { lessons } from '@/data/lessons';
 import { quests } from '@/data/quests';
 import { getFogEnemy } from '@/config/narrative';
+import { CityTerrainMap } from '@/components/city/CityTerrainMap';
 
 /**
  * Dashboard map card (2026-10-19): the first thing under the greeting. A row of
@@ -14,7 +15,7 @@ import { getFogEnemy } from '@/config/narrative';
  * the full map. Shares all logic with /city via useCityProgress.
  */
 export function CityMapCard({ xp }: { xp: number }) {
-  const { ready, areas, cleared, clearedCount, areaOpen, nextAreaIdx, nextLevel } = useCityProgress({ xp });
+  const { ready, areas, cleared, clearedCount, areaOpen, nextAreaIdx, nextLevel, levelDone, hasPathfinder } = useCityProgress({ xp });
   if (!ready || areas.length === 0) return null;
 
   const nextArea = nextAreaIdx >= 0 ? areas[nextAreaIdx] : null;
@@ -33,25 +34,12 @@ export function CityMapCard({ xp }: { xp: number }) {
         <span className="shrink-0 rounded-full bg-gold/15 text-foreground px-3 py-1 text-sm font-black">{clearedCount}/{areas.length}</span>
       </div>
 
-      <div className="px-5 pb-2 overflow-x-auto">
-        <div className="flex items-start gap-3 min-w-max py-2">
-          {areas.map((a, i) => {
-            const isCleared = cleared[i];
-            const open = areaOpen(i);
-            const isNext = i === nextAreaIdx;
-            return (
-              <Link key={a.id} href="/city" aria-label={`${a.name}: ${isCleared ? 'crime-free' : open ? 'open' : 'locked'}`} className="flex flex-col items-center gap-1 w-[76px]">
-                <span className={`relative h-14 w-14 rounded-full flex items-center justify-center text-2xl bg-background border-4 ${isCleared ? 'border-gold' : open ? (isNext ? 'border-primary' : 'border-primary/40') : 'border-dashed border-border opacity-60'}`}>
-                  <span className={open ? '' : 'opacity-40'}>{a.emoji}</span>
-                  {!open && <Lock className="absolute h-4 w-4 text-muted-foreground bottom-0 right-0" />}
-                  {isCleared && <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-gold text-gold-foreground flex items-center justify-center"><Check className="h-3.5 w-3.5" /></span>}
-                </span>
-                <span className="text-xs font-bold text-foreground text-center leading-tight">{a.name.replace('The ', '')}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
+      <Link href="/city" aria-label="Open the SpendCity map" className="block px-3 pb-2">
+        <CityTerrainMap
+          areas={areas} cleared={cleared} areaOpen={areaOpen} nextAreaIdx={nextAreaIdx} showNext={hasPathfinder}
+          progress={i => cleared[i] ? 'Crime-free' : `${areas[i].levels.filter(levelDone).length}/${areas[i].levels.length}`}
+        />
+      </Link>
 
       <div className="px-5 pb-5 pt-1 space-y-3">
         {nextArea && nextLevel ? (
