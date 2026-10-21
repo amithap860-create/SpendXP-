@@ -59,6 +59,7 @@ export function CityTerrainMap({
           <feDisplacementMap in="SourceGraphic" in2="n" scale="26" result="d" />
           <feGaussianBlur in="d" stdDeviation="5" />
         </filter>
+        <filter id="sc-tshadow" x="-20%" y="-30%" width="140%" height="180%"><feDropShadow dx="0" dy="1" stdDeviation="1.6" floodColor="#041822" floodOpacity="0.85" /></filter>
         <filter id="sc-fog" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="7" /></filter>
       </defs>
 
@@ -132,9 +133,9 @@ export function CityTerrainMap({
                 <path d="m3.5 7.2 2.4 2.4 4.6-4.9" fill="none" stroke="#10202c" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
               </g>
             )}
-            <text x={s.cx} y={s.cy + 40} textAnchor="middle" fontSize="13.5" fontWeight="800" fill="#fff" stroke="#10202c" strokeWidth="3.5" paintOrder="stroke" strokeLinejoin="round">{a.name.replace('The ', '')}</text>
-            <text x={s.cx} y={s.cy + 54} textAnchor="middle" fontSize="11" fontWeight="700" fill={isCleared ? '#f5c542' : '#e6edf3'} stroke="#10202c" strokeWidth="3" paintOrder="stroke" strokeLinejoin="round">{progress(i)}</text>
-            {showNext && i === nextAreaIdx && <text x={s.cx + 24} y={s.cy + 4} fontSize="12" fontWeight="900" fill="#f5c542" stroke="#10202c" strokeWidth="3" paintOrder="stroke">NEXT</text>}
+            <text x={s.cx} y={s.cy + 40} textAnchor="middle" fontSize="13.5" fontWeight="800" fill="#fff" filter="url(#sc-tshadow)">{a.name.replace('The ', '')}</text>
+            <text x={s.cx} y={s.cy + 54} textAnchor="middle" fontSize="11" fontWeight="700" fill={isCleared ? '#f5c542' : '#e6edf3'} filter="url(#sc-tshadow)">{progress(i)}</text>
+            {showNext && i === nextAreaIdx && <text x={s.cx + 24} y={s.cy + 4} fontSize="12" fontWeight="900" fill="#f5c542" filter="url(#sc-tshadow)">NEXT</text>}
           </g>
         );
       })}
