@@ -31,6 +31,17 @@ export function isNative(): boolean {
   return native;
 }
 
+/**
+ * True when the installed app binary includes the native Google sign-in plugin.
+ * Older builds (<= 1.1.2) load this same web code from Vercel but don't have the
+ * plugin, so the Google button must stay hidden for them.
+ */
+export function canNativeGoogle(): boolean {
+  if (typeof window === 'undefined') return false;
+  const cap = (window as any).Capacitor;
+  return !!cap?.isNativePlatform?.() && !!cap?.isPluginAvailable?.('FirebaseAuthentication');
+}
+
 export function getPlatform(): 'ios' | 'android' | 'web' {
   if (typeof window === 'undefined') return 'web';
   const cap = (window as any).Capacitor;

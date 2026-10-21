@@ -12,7 +12,7 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { auth } from '@/lib/firebase';
-import { isNative } from '@/lib/native';
+import { isNative, canNativeGoogle } from '@/lib/native';
 
 // ── Age helpers ──────────────────────────────────────────────────────────────
 const CURRENT_YEAR = new Date().getFullYear();
@@ -324,7 +324,7 @@ function SignupContent() {
                   "missing initial state" errors. Hiding this on native until a
                   proper native Google Sign-In plugin is added — email/password
                   below is unaffected and works fine in the app. */}
-              {!isUnder13 && !isNative() && (
+              {!isUnder13 && (!isNative() || canNativeGoogle()) && (
                 <>
                   <Button
                     onClick={handleGoogleSignUp}

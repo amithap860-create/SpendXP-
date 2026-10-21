@@ -678,10 +678,14 @@ export default function ProfilePage() {
         const cred = EmailAuthProvider.credential(auth.currentUser.email!, deletePassword);
         await reauthenticateWithCredential(auth.currentUser, cred);
       }
-      // Delete Firestore user doc
-      await deleteDoc(doc(db, 'users', user.uid));
-      await deleteUser(auth.currentUser);
-      toast({ title: 'Account deleted. Goodbye!' });
+      // Server-side delete (2026-10-21): removes users/{uid} AND all subcollections,
+      // leaderboard/chat/reports/links and the Auth account. The old client-side
+      // version left everything except the top user doc behind.
+      const token = await auth.currentUser.getIdToken(true);
+      const res = await fetch('/api/account/delete', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error('delete-failed');
+      try { await logout(); } catch {}
+      toast({ title: 'Account and data deleted. Goodbye!' });
       router.replace('/');
     } catch (err: any) {
       const msg = err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential'

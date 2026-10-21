@@ -6,6 +6,8 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signInWithPopup,
+  signInWithCredential,
+  GoogleAuthProvider,
   signOut as firebaseSignOut,
   sendPasswordResetEmail,
   sendEmailVerification,
@@ -13,6 +15,7 @@ import {
   User as FirebaseUser,
 } from 'firebase/auth';
 import { auth, googleProvider, db } from '@/lib/firebase';
+import { canNativeGoogle } from '@/lib/native';
 import { doc, onSnapshot } from 'firebase/firestore';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -305,16 +308,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   /**
-   * Sign in with Google using a popup.
+   * Sign in with Google. On the native app a WebView popup is blocked by Google,
+   * so we use the native account picker (Credential Manager) and exchange the
+   * returned ID token for a Firebase session. On the web we use the popup.
    */
   const signInWithGoogle = async (): Promise<{ success: boolean }> => {
     try {
       setError(null);
-      await signInWithPopup(auth, googleProvider);
+      if (canNativeGoogle()) {
+        const { FirebaseAuthentication } = await import('@capacitor-firebase/authentication');
+        const result = await FirebaseAuthentication.signInWithGoogle({ skipNativeAuth: true });
+        const idToken = result.credential?.idToken;
+        if (!idToken) throw Object.assign(new Error('No ID token from Google'), { code: 'auth/no-id-token' });
+        await signInWithCredential(auth, GoogleAuthProvider.credential(idToken));
+      } else {
+        await signInWithPopup(auth, googleProvider);
+      }
       return { success: true };
     } catch (err: any) {
+      const msg = String(err?.message ?? '').toLowerCase();
+      // Picker dismissed by the user — not an error worth showing.
+      if (msg.includes('cancel') || err?.code === 'auth/popup-closed-by-user' || err?.code === 'auth/cancelled-popup-request') {
+        return { success: false };
+      }
       console.error('[SpendXP] Google sign-in error:', err);
-      setError(friendlyAuthError(err.code));
+      setError(friendlyAuthError(err?.code ?? ''));
       return { success: false };
     }
   };

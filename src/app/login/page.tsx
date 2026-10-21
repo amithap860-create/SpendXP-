@@ -10,7 +10,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { checkLockout } from '@/firebase';
 import { db } from '@/firebase';
 import { cn } from '@/lib/utils';
-import { isNative } from '@/lib/native';
+import { isNative, canNativeGoogle } from '@/lib/native';
 
 type Tab = 'signin' | 'signup';
 
@@ -315,7 +315,7 @@ function LoginContent() {
                     "missing initial state" errors. Hiding this on native until
                     a proper native Google Sign-In plugin is added — email/password
                     below is unaffected and works fine in the app. */}
-                {!isNative() && (
+                {(!isNative() || canNativeGoogle()) && (
                   <Button
                     onClick={handleGoogleSignIn}
                     variant="outline"
