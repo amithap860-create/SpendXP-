@@ -5,55 +5,24 @@ import type { ResolvedArea } from '@/config/cityMap';
 import { AreaGlyphPaths } from '@/components/city/AreaGlyph';
 
 /**
- * SpendCity map v3 (2026-10-21): a top-down city of districts. Each area is a
- * city block with rooftops and a landmark badge; streets and a river run
- * between them. REVEAL RULE: only cleared and open areas are drawn — everything
- * further on is a fogged, unnamed block, so each player's map reflects how far
- * they've got. Fixed geometry per area id; no emoji, no external assets.
+ * SpendCity map v4 (2026-10-21): the illustrated island (public/city/spendcity-map.webp)
+ * with live overlays. REVEAL RULE: only cleared and open areas are shown; every
+ * other region is covered by Gray Fog with a "?" and no name, so each player's
+ * map reflects how far they've got. Coordinates are in the image's 1024x1024 space.
+ * If the image is ever regenerated, only POS below needs retuning.
  */
 
-const BW = 110, BH = 110;
-const SLOT: Record<string, [number, number]> = {
-  pocket_park: [15, 275], neighbourhood: [145, 275], bank_row: [275, 275],
-  world_gate: [275, 145], central_hall: [145, 145], market_district: [15, 145],
-  academy: [15, 15],
+type Pos = { fog: [number, number, number, number]; pill: [number, number] };
+const POS: Record<string, Pos> = {
+  pocket_park:     { fog: [235, 780, 130, 105], pill: [235, 862] },
+  neighbourhood:   { fog: [510, 770, 120, 105], pill: [520, 612] },
+  bank_row:        { fog: [770, 715, 130, 120], pill: [770, 808] },
+  world_gate:      { fog: [815, 400, 110, 140], pill: [790, 525] },
+  central_hall:    { fog: [520, 375, 140, 150], pill: [520, 455] },
+  market_district: { fog: [250, 470, 125, 115], pill: [250, 405] },
+  academy:         { fog: [270, 195, 140, 115], pill: [265, 312] },
 };
-type Theme = { base: string; roofs: [string, string]; trees?: boolean };
-const THEME: Record<string, Theme> = {
-  pocket_park:     { base: '#3f7a3a', roofs: ['#6fba5e', '#4f9a47'], trees: true },
-  neighbourhood:   { base: '#46805a', roofs: ['#d6dccb', '#b9c6b0'] },
-  bank_row:        { base: '#a8893f', roofs: ['#ecd9a0', '#d3b86e'] },
-  world_gate:      { base: '#9a4f35', roofs: ['#e3ab90', '#cc886a'] },
-  central_hall:    { base: '#6f7f95', roofs: ['#d9e0ea', '#b5c1d0'] },
-  market_district: { base: '#b5732a', roofs: ['#f3c57f', '#e2a54e'] },
-  academy:         { base: '#2f6b52', roofs: ['#a4d4b9', '#82bd9f'] },
-};
-const FOGGED = '#223242';
 const GOLD = '#f5c542';
-
-/** Deterministic integer hash → 0..n-1 (no floats, so SSR and client agree). */
-function hv(a: number, b: number, n: number) {
-  let x = (a * 374761393 + b * 668265263) | 0;
-  x = (x ^ (x >>> 13)) * 1274126177;
-  x = x ^ (x >>> 16);
-  return Math.abs(x | 0) % n;
-}
-
-function Rooftops({ id, x, y, theme, idx }: { id: string; x: number; y: number; theme: Theme; idx: number }) {
-  const out: React.ReactNode[] = [];
-  const cols = 4, rows = 4, pad = 8, cw = (BW - pad * 2) / cols, ch = (BH - pad * 2) / rows;
-  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
-    if ((c === 1 || c === 2) && (r === 1 || r === 2)) continue; // landmark space
-    const k = hv(idx * 31 + r, c + 7, 100);
-    const cx = x + pad + c * cw + cw / 2, cy = y + pad + r * ch + ch / 2;
-    if (theme.trees) out.push(<circle key={`${r}${c}`} cx={cx} cy={cy} r={6 + (k % 3)} fill={theme.roofs[k % 2]} />);
-    else {
-      const w = cw - 5 - (k % 4), h = ch - 5 - ((k >> 2) % 4);
-      out.push(<rect key={`${r}${c}`} x={cx - w / 2} y={cy - h / 2} width={w} height={h} rx="2" fill={theme.roofs[k % 2]} opacity="0.92" />);
-    }
-  }
-  return <g aria-hidden data-area={id}>{out}</g>;
-}
 
 export function CityTerrainMap({
   areas, cleared, areaOpen, progress, nextAreaIdx = -1, showNext = false, selectedId, onSelect,
@@ -68,92 +37,72 @@ export function CityTerrainMap({
   onSelect?: (id: string) => void;
 }) {
   const revealed = (i: number) => cleared[i] || areaOpen(i);
-  const centre = (id: string) => ({ x: SLOT[id][0] + BW / 2, y: SLOT[id][1] + 42 });
 
   return (
-    <svg viewBox="0 0 400 400" className="w-full h-auto rounded-2xl block" role="group" aria-label="SpendCity map" style={{ background: '#1b2a38' }}>
+    <svg viewBox="0 0 1024 1024" className="w-full h-auto rounded-2xl block" role="group" aria-label="SpendCity map" style={{ background: '#0e4a5c' }}>
       <defs>
-        <filter id="sc-fog" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6" /></filter>
+        <filter id="sc-fog" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="22" /></filter>
+        <filter id="sc-soft" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="10" /></filter>
+        <filter id="sc-pill" x="-10%" y="-20%" width="120%" height="150%"><feDropShadow dx="0" dy="4" stdDeviation="5" floodColor="#000" floodOpacity="0.5" /></filter>
       </defs>
-
-      {/* streets (the background) + centre lines */}
-      <rect width="400" height="400" fill="#2b3b4b" />
-      <g stroke="#4a5d70" strokeWidth="1.5" strokeDasharray="6 8" aria-hidden>
-        {[135, 265].map(p => <React.Fragment key={p}><line x1={p} y1="0" x2={p} y2="400" /><line x1="0" y1={p} x2="400" y2={p} /></React.Fragment>)}
-      </g>
-      {/* river */}
-      <path d="M 268 0 C 258 60, 278 100, 262 140 S 250 210, 266 262 S 258 340, 270 400" fill="none" stroke="#2f7fa0" strokeWidth="9" strokeLinecap="round" opacity="0.85" aria-hidden />
-
-      {/* empty plots (areas this player never sees) become small parks */}
-      {Object.entries(SLOT).filter(([id]) => !areas.some(a => a.id === id)).map(([id, [x, y]]) => (
-        <g key={id} aria-hidden>
-          <rect x={x} y={y} width={BW} height={BH} rx="14" fill="#2f5a45" />
-          {[0, 1, 2, 3, 4].map(k => <circle key={k} cx={x + 20 + hv(k, x, 70)} cy={y + 20 + hv(k + 9, y, 70)} r="8" fill="#47805f" />)}
-        </g>
-      ))}
-      {/* the two leftover plots */}
-      {[[145, 15], [275, 15]].map(([x, y]) => (
-        <g key={`${x}${y}`} aria-hidden>
-          <rect x={x} y={y} width={BW} height={BH} rx="14" fill="#233443" />
-        </g>
-      ))}
-
-      {/* route between revealed neighbouring areas */}
-      <g fill="none" strokeLinecap="round" aria-hidden>
-        {areas.slice(1).map((a, i) => {
-          const prev = areas[i];
-          if (!revealed(i) || !revealed(i + 1)) return null;
-          const p = centre(prev.id), q = centre(a.id);
-          return <path key={a.id} d={`M ${p.x} ${p.y} L ${q.x} ${q.y}`} stroke={cleared[i] ? GOLD : '#e9eef3'} strokeOpacity={cleared[i] ? 0.95 : 0.55} strokeWidth="3" strokeDasharray={cleared[i] ? undefined : '3 7'} />;
-        })}
-      </g>
+      <image href="/city/spendcity-map.webp" x="0" y="0" width="1024" height="1024" />
 
       {areas.map((a, i) => {
-        const [x, y] = SLOT[a.id];
-        const th = THEME[a.id];
-        const isCleared = cleared[i];
+        const pos = POS[a.id];
+        if (!pos) return null;
         const show = revealed(i);
+        const [fx, fy, rx, ry] = pos.fog;
+        if (show) {
+          // villain still holds an open area: a thin haze at its edge
+          return cleared[i] ? null : (
+            <g key={a.id} filter="url(#sc-soft)" fill="#5b6672" opacity="0.28" aria-hidden>
+              <ellipse cx={fx - rx * 0.55} cy={fy - ry * 0.6} rx={rx * 0.35} ry={ry * 0.3} />
+              <ellipse cx={fx + rx * 0.6} cy={fy + ry * 0.55} rx={rx * 0.35} ry={ry * 0.3} />
+            </g>
+          );
+        }
+        return (
+          <g key={a.id} aria-label="Undiscovered area">
+            <g filter="url(#sc-fog)" aria-hidden>
+              <ellipse cx={fx} cy={fy} rx={rx} ry={ry} fill="#1f2b38" opacity="0.93" />
+              <ellipse cx={fx - rx * 0.45} cy={fy - ry * 0.35} rx={rx * 0.55} ry={ry * 0.5} fill="#7b8794" opacity="0.8" />
+              <ellipse cx={fx + rx * 0.4} cy={fy + ry * 0.3} rx={rx * 0.6} ry={ry * 0.5} fill="#8e99a6" opacity="0.7" />
+            </g>
+            <text x={fx} y={fy + 34} textAnchor="middle" fontSize="100" fontWeight="900" fill="#e4eaf0" opacity="0.85">?</text>
+          </g>
+        );
+      })}
+
+      {areas.map((a, i) => {
+        const pos = POS[a.id];
+        if (!pos || !revealed(i)) return null;
+        const [px, py] = pos.pill;
+        const isCleared = cleared[i];
         const isSel = a.id === selectedId;
-        const interactive = !!onSelect && show;
-        const c = centre(a.id);
+        const interactive = !!onSelect;
+        const name = a.name.replace('The ', '');
+        const w = 112 + name.length * 17;
+        const h = 82;
         return (
           <g key={a.id}
             {...(interactive ? { role: 'button', tabIndex: 0, onClick: () => onSelect!(a.id), onKeyDown: (e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') onSelect!(a.id); } } : {})}
-            aria-label={show ? `${a.name}: ${isCleared ? 'crime-free' : 'open'}` : 'Undiscovered area'}
+            aria-label={`${a.name}: ${isCleared ? 'crime-free' : 'open'}`}
             style={{ cursor: interactive ? 'pointer' : undefined, outline: 'none' }}>
-            <rect x={x} y={y} width={BW} height={BH} rx="14" fill={show ? th.base : FOGGED} stroke={isCleared ? GOLD : show ? '#ffffff' : '#34495c'} strokeOpacity={show && !isCleared ? 0.35 : 1} strokeWidth={isCleared ? 3 : 1.5} />
-            {show ? <Rooftops id={a.id} x={x} y={y} theme={th} idx={i + 1} /> : null}
-
-            {show ? (
-              <>
-                <circle cx={c.x} cy={c.y} r="21" fill="#0f1b26" stroke={isCleared ? GOLD : '#ffffff'} strokeWidth="2.5" />
-                <g transform={`translate(${c.x - 13} ${c.y - 13}) scale(1.08)`} fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><AreaGlyphPaths id={a.id} /></g>
-                {isCleared && (
-                  <g transform={`translate(${c.x + 9} ${c.y - 27})`}>
-                    <circle cx="7" cy="7" r="8" fill={GOLD} />
-                    <path d="m3.5 7.2 2.4 2.4 4.6-4.9" fill="none" stroke="#10202c" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-                  </g>
-                )}
-                <rect x={x + 5} y={y + BH - 40} width={BW - 10} height="35" rx="8" fill="#0d1822" fillOpacity="0.88" />
-                <text x={x + BW / 2} y={y + BH - 24} textAnchor="middle" fontSize="11.5" fontWeight="800" fill="#ffffff">{a.name.replace('The ', '')}</text>
-                <text x={x + BW / 2} y={y + BH - 10} textAnchor="middle" fontSize="11" fontWeight="700" fill={isCleared ? GOLD : '#cfd9e3'}>{progress(i)}</text>
-                {showNext && i === nextAreaIdx && (
-                  <g><rect x={x + BW - 42} y={y + 5} width="37" height="17" rx="8" fill={GOLD} /><text x={x + BW - 23.5} y={y + 17.5} textAnchor="middle" fontSize="10" fontWeight="900" fill="#10202c">NEXT</text></g>
-                )}
-                {!isCleared && (
-                  <g filter="url(#sc-fog)" fill="#44505e" opacity="0.28" aria-hidden>
-                    <circle cx={x + 18} cy={y + 20} r="16" /><circle cx={x + BW - 16} cy={y + 30} r="13" />
-                  </g>
-                )}
-                {isSel && <rect x={x - 4} y={y - 4} width={BW + 8} height={BH + 8} rx="17" fill="none" stroke={GOLD} strokeWidth="2.5" strokeDasharray="6 5" />}
-              </>
-            ) : (
-              <>
-                <g filter="url(#sc-fog)" fill="#6b7886" opacity="0.7" aria-hidden>
-                  <circle cx={x + 30} cy={y + 34} r="24" /><circle cx={x + 80} cy={y + 40} r="22" /><circle cx={x + 55} cy={y + 80} r="26" />
-                </g>
-                <text x={x + BW / 2} y={y + BH / 2 + 12} textAnchor="middle" fontSize="34" fontWeight="900" fill="#c9d3de" opacity="0.7">?</text>
-              </>
+            {isSel && <rect x={px - w / 2 - 10} y={py - h / 2 - 10} width={w + 20} height={h + 20} rx="30" fill="none" stroke={GOLD} strokeWidth="6" strokeDasharray="16 12" />}
+            <rect x={px - w / 2} y={py - h / 2} width={w} height={h} rx="22" fill="#0d1822" fillOpacity="0.92" stroke={isCleared ? GOLD : '#ffffff'} strokeOpacity={isCleared ? 1 : 0.5} strokeWidth={isCleared ? 5 : 3} filter="url(#sc-pill)" />
+            <g transform={`translate(${px - w / 2 + 10} ${py - 31}) scale(2.6)`} fill="none" stroke={isCleared ? GOLD : '#ffffff'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <AreaGlyphPaths id={a.id} />
+            </g>
+            <text x={px - w / 2 + 84} y={py - 4} fontSize="30" fontWeight="800" fill="#ffffff">{name}</text>
+            <text x={px - w / 2 + 84} y={py + 27} fontSize="26" fontWeight="700" fill={isCleared ? GOLD : '#cfd9e3'}>{progress(i)}</text>
+            {isCleared && (
+              <g transform={`translate(${px + w / 2 - 24} ${py - h / 2 - 22})`}>
+                <circle cx="22" cy="22" r="22" fill={GOLD} stroke="#0d1822" strokeWidth="4" />
+                <path d="m11 22.5 8 8 15-16" fill="none" stroke="#0d1822" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round" />
+              </g>
+            )}
+            {showNext && i === nextAreaIdx && (
+              <g><rect x={px - 52} y={py - h / 2 - 40} width="104" height="34" rx="17" fill={GOLD} /><text x={px} y={py - h / 2 - 15} textAnchor="middle" fontSize="24" fontWeight="900" fill="#10202c">NEXT</text></g>
             )}
           </g>
         );
