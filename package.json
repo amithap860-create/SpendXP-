@@ -97,7 +97,10 @@
     "typescript": "^5"
   },
   "overrides": {
-    "@opentelemetry/sdk-node": "^0.207.0"
+    "@opentelemetry/sdk-node": "^0.207.0",
+    "@capacitor-firebase/authentication": {
+      "firebase": "$firebase"
+    }
   },
   "resolutions": {
     "@opentelemetry/sdk-node": "^0.207.0"
