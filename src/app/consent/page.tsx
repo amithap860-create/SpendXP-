@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
 import { db } from '@/firebase';
-import { collection, addDoc, doc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -64,22 +65,20 @@ export default function ConsentPage() {
     setError(null);
 
     try {
-      // Store the consent request in Firestore (legacy path)
-      // The actual email is sent via the consent-request API
-      await addDoc(collection(db, 'consentRequests'), {
-        childUid: user.uid,
-        childEmail: user.email,
-        parentEmail: parentEmail.toLowerCase(),
-        requestedAt: serverTimestamp(),
-        status: 'pending'
-      });
-
-      // Send parental consent email via server-side API
+      // NOTE (2026-10-20): removed the client-side addDoc to consentRequests —
+      // Firestore rules key that collection by uid, so a random-id addDoc was
+      // always denied and threw before the email was ever sent.
+      // The server route now identifies the user from the ID token, not the body.
+      const idToken = await auth.currentUser?.getIdToken();
+      if (!idToken) {
+        setError('Please sign in again and retry.');
+        setLoading(false);
+        return;
+      }
       const res = await fetch('/api/consent-email', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
         body: JSON.stringify({
-          uid: user.uid,
           parentEmail: parentEmail.toLowerCase(),
         }),
       });

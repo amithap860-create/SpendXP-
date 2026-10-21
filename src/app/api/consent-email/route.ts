@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getFirebaseAdmin } from '@/lib/firebaseAdmin';
 import { emailService } from '@/lib/email';
 import crypto from 'crypto';
+import { requireUid, rateLimit } from '@/lib/serverSecurity';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,12 +20,21 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(req: NextRequest) {
   try {
-    const { uid, parentEmail } = await req.json();
+    // SECURITY (2026-10-20): previously took `uid` from the request body with
+    // no auth — anyone could pull a uid off the public leaderboard, enter their
+    // own address as "parent", receive the child's name + email, and overwrite
+    // the child's parentEmail/consent. The uid now comes ONLY from the verified
+    // ID token, so you can only request consent for your own account.
+    const authed = await requireUid(req);
+    if (authed instanceof NextResponse) return authed;
+    const uid = authed.uid;
 
-    if (!uid || typeof uid !== 'string') {
-      return NextResponse.json({ error: 'Invalid uid.' }, { status: 400 });
-    }
-    if (!parentEmail || !parentEmail.includes('@')) {
+    const limited = await rateLimit(`consent-email:${uid}`, 3, 86400);
+    if (limited) return limited;
+
+    const { parentEmail } = await req.json().catch(() => ({} as any));
+
+    if (!parentEmail || typeof parentEmail !== 'string' || !parentEmail.includes('@')) {
       return NextResponse.json({ error: 'Invalid parent email.' }, { status: 400 });
     }
 
@@ -37,6 +47,11 @@ export async function POST(req: NextRequest) {
 
     if (!userRecord || !userDoc.exists) {
       return NextResponse.json({ error: 'User not found.' }, { status: 404 });
+    }
+
+    // Consent already recorded — don't let it be re-pointed at a different "parent".
+    if (userData?.coppaConsented === true || userData?.consentGiven === true) {
+      return NextResponse.json({ error: 'Parental consent is already on file for this account.' }, { status: 409 });
     }
 
     const childEmail = userRecord.email || '';

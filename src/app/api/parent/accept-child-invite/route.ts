@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFirebaseAdmin } from '@/lib/firebaseAdmin';
+import { rateLimit, clientIp } from '@/lib/serverSecurity';
+
+// SECURITY (2026-10-20): invite codes are now 12 chars. Old 6-char codes are
+// rejected outright — they were brute-forceable, and any still pending expire
+// within 7 days anyway (users just generate a new one).
+const CODE_RE = /^[A-Z2-9]{12}$/;
 
 export const dynamic = 'force-dynamic';
 
@@ -10,15 +16,18 @@ export const dynamic = 'force-dynamic';
  * Returns only non-sensitive info: parent name, parent email, expiry.
  */
 export async function GET(req: NextRequest) {
-  const code = req.nextUrl.searchParams.get('code');
-  if (!code || code.trim().length < 4) {
+  const limited = await rateLimit(`child-invite-lookup:ip:${clientIp(req)}`, 30, 3600);
+  if (limited) return limited;
+
+  const code = (req.nextUrl.searchParams.get('code') || '').trim().toUpperCase();
+  if (!CODE_RE.test(code)) {
     return NextResponse.json({ error: 'Invalid code.' }, { status: 400 });
   }
 
   const { db } = await getFirebaseAdmin();
   const inviteSnap = await db
     .collection('pendingChildInvites')
-    .doc(code.toUpperCase())
+    .doc(code)
     .get();
 
   if (!inviteSnap.exists) {
@@ -73,11 +82,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
   }
 
-  const body = await req.json().catch(() => ({}));
-  const { inviteCode } = body;
+  const limitedUid = await rateLimit(`child-invite-accept:uid:${childUid}`, 10, 3600);
+  if (limitedUid) return limitedUid;
+  const limitedIp = await rateLimit(`child-invite-accept:ip:${clientIp(req)}`, 30, 3600);
+  if (limitedIp) return limitedIp;
 
-  if (!inviteCode || typeof inviteCode !== 'string') {
-    return NextResponse.json({ error: 'Invite code is required.' }, { status: 400 });
+  const body = await req.json().catch(() => ({}));
+  const inviteCode = typeof body.inviteCode === 'string' ? body.inviteCode.trim().toUpperCase() : '';
+  if (!CODE_RE.test(inviteCode)) {
+    return NextResponse.json({ error: 'Invalid invite code.' }, { status: 400 });
   }
 
   const { db } = await getFirebaseAdmin();
@@ -85,7 +98,7 @@ export async function POST(req: NextRequest) {
   // ── Fetch invite ───────────────────────────────────────────────────────────
   const inviteSnap = await db
     .collection('pendingChildInvites')
-    .doc(inviteCode.toUpperCase())
+    .doc(inviteCode)
     .get();
 
   if (!inviteSnap.exists) {
@@ -107,6 +120,16 @@ export async function POST(req: NextRequest) {
   }
 
   const parentUid: string = invite.parentUid;
+
+  // SECURITY (2026-10-20): an emailed invite is addressed to ONE child. Only
+  // that child's account may accept it — a forwarded/leaked link can't be used
+  // by anyone else.
+  if (invite.targetChildEmail && (childEmail || '').toLowerCase() !== String(invite.targetChildEmail).toLowerCase()) {
+    return NextResponse.json(
+      { error: 'This invite was sent to a different email address. Sign in with that account to accept it.' },
+      { status: 403 }
+    );
+  }
 
   // ── Prevent self-linking ───────────────────────────────────────────────────
   if (childUid === parentUid) {
@@ -177,11 +200,12 @@ export async function POST(req: NextRequest) {
   });
 
   // Mark invite as used
+  // Precondition: fails the whole batch if the invite changed since we read it.
   batch.update(inviteSnap.ref, {
     status: 'accepted',
     acceptedAt: now,
     acceptedByUid: childUid,
-  });
+  }, { lastUpdateTime: inviteSnap.updateTime! });
 
   await batch.commit();
 

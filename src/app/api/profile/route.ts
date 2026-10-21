@@ -1,36 +1,13 @@
-import { NextRequest } from 'next/server';
-import AuthController from '@/controllers/authController';
+import { NextResponse } from 'next/server';
 
+// DISABLED (2026-10-20 security pass): this was a leftover prototype auth
+// system (in-memory users, forgeable base64 "tokens"). Real auth is Firebase
+// Auth; nothing in the app calls this. Safe to delete this folder.
 export const dynamic = 'force-dynamic';
 
-// Simple middleware to extract user from token
-function extractUser(request: NextRequest): any {
-  const authHeader = request.headers.get('authorization');
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    const token = authHeader.substring(7);
-    try {
-      const decoded = Buffer.from(token, 'base64').toString('utf-8');
-      const [id, email] = decoded.split(':');
-      return { id: parseInt(id), email };
-    } catch {
-      return null;
-    }
-  }
-  return null;
+export async function GET() {
+  return NextResponse.json({ error: 'This endpoint has been removed.' }, { status: 410 });
 }
-
-export async function GET(request: NextRequest) {
-  const user = extractUser(request);
-  if (!user) {
-    return Response.json(
-      { error: 'No token provided' },
-      { status: 401 }
-    );
-  }
-
-  // Attach user to request
-  (request as any).user = user;
-
-  // User is authenticated, proceed to get profile
-  return await AuthController.getProfile(request as any);
+export async function POST() {
+  return NextResponse.json({ error: 'This endpoint has been removed.' }, { status: 410 });
 }

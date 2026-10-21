@@ -84,11 +84,13 @@ export function useNativeInit({
     setupPushNotifications(onPushMessage ?? (() => {})).then(async ({ token }) => {
       if (!token) return;
       try {
+        const { auth } = await import('@/lib/firebase');
+        const idToken = await auth.currentUser?.getIdToken();
+        if (!idToken) return;
         await fetch('/api/push-token', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
           body: JSON.stringify({
-            uid,
             token,
             platform: getPlatform(),
           }),

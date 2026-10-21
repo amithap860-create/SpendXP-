@@ -10,6 +10,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireUid, rateLimit } from '@/lib/serverSecurity';
+import { getFirebaseAdmin } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30; // Vercel timeout — assistant runs can take a few seconds
@@ -17,6 +19,21 @@ export const maxDuration = 30; // Vercel timeout — assistant runs can take a f
 export async function POST(req: NextRequest) {
   const openaiKey = process.env.OPENAI_API_KEY;
   const assistantId = process.env.ASSISTANT_ID || 'asst_7eC7qPZz0xusBLL9wuCxEweC';
+
+  // SECURITY (2026-10-20): the UI is behind NEXT_PUBLIC_FIN_EDUCATOR_ENABLED,
+  // but this endpoint was live for anyone regardless — no auth, no limit — so
+  // a script could run up the OpenAI bill. Enforce the same flag server-side,
+  // require sign-in, and rate limit per user.
+  if (process.env.NEXT_PUBLIC_FIN_EDUCATOR_ENABLED !== 'true') {
+    return NextResponse.json({ error: 'AI Educator is not configured yet. Check back soon!' }, { status: 503 });
+  }
+  const authed = await requireUid(req);
+  if (authed instanceof NextResponse) return authed;
+  const uid = authed.uid;
+  const limitedMin = await rateLimit(`chat:min:${uid}`, 6, 60);
+  if (limitedMin) return limitedMin;
+  const limitedDay = await rateLimit(`chat:day:${uid}`, 60, 86400);
+  if (limitedDay) return limitedDay;
 
   if (!openaiKey) {
     return NextResponse.json(
@@ -51,7 +68,13 @@ export async function POST(req: NextRequest) {
 
   try {
     // ── Step 1: Create or reuse a thread ─────────────────────────────────────
-    let activeThreadId = threadId;
+    // A thread may only be continued by the user who started it.
+    const { db } = getFirebaseAdmin();
+    let activeThreadId = typeof threadId === 'string' && /^thread_[A-Za-z0-9]+$/.test(threadId) ? threadId : undefined;
+    if (activeThreadId) {
+      const owner = await db.collection('chatThreads').doc(activeThreadId).get();
+      if (!owner.exists || owner.data()?.uid !== uid) activeThreadId = undefined;
+    }
     if (!activeThreadId) {
       const threadRes = await fetch('https://api.openai.com/v1/threads', {
         method: 'POST',
@@ -65,6 +88,7 @@ export async function POST(req: NextRequest) {
       }
       const thread = await threadRes.json();
       activeThreadId = thread.id;
+      await db.collection('chatThreads').doc(thread.id).set({ uid, createdAt: new Date() });
     }
 
     // ── Step 2: Add user message to thread ────────────────────────────────────

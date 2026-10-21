@@ -1,15 +1,13 @@
-import { NextRequest } from 'next/server';
-import AuthController from '@/controllers/authController';
+import { NextResponse } from 'next/server';
 
+// DISABLED (2026-10-20 security pass): this was a leftover prototype auth
+// system (in-memory users, forgeable base64 "tokens"). Real auth is Firebase
+// Auth; nothing in the app calls this. Safe to delete this folder.
 export const dynamic = 'force-dynamic';
 
-export async function POST(request: NextRequest) {
-  return await AuthController.login(request);
-}
-
 export async function GET() {
-  return Response.json({
-    message: 'Login endpoint - POST required',
-    fields: ['email', 'password']
-  }, { status: 200 });
+  return NextResponse.json({ error: 'This endpoint has been removed.' }, { status: 410 });
+}
+export async function POST() {
+  return NextResponse.json({ error: 'This endpoint has been removed.' }, { status: 410 });
 }

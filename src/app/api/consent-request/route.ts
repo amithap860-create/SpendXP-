@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getFirebaseAdmin } from '@/lib/firebaseAdmin';
 import { emailService } from '@/lib/email';
 import crypto from 'crypto';
+import { rateLimit, clientIp } from '@/lib/serverSecurity';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,9 +21,21 @@ export const dynamic = 'force-dynamic';
  * Body: { displayName, email, password, birthYear, parentEmail }
  */
 export async function POST(req: NextRequest) {
+  // Every call emails a real address — limit per IP and per parent address so
+  // this can't be used to spam strangers from our sender domain.
+  const limitedIp = await rateLimit(`consent-request:ip:${clientIp(req)}`, 5, 3600);
+  if (limitedIp) return limitedIp;
+
   try {
     const body = await req.json();
     const { displayName, email, password, birthYear, parentEmail } = body;
+    if (typeof parentEmail === 'string') {
+      const limitedParent = await rateLimit(`consent-request:parent:${parentEmail.toLowerCase().trim()}`, 3, 86400);
+      if (limitedParent) return limitedParent;
+    }
+    if (typeof displayName === 'string' && displayName.length > 60) {
+      return NextResponse.json({ error: 'Display name is too long.' }, { status: 400 });
+    }
 
     // ── Validate inputs ────────────────────────────────────────────────────
     if (!displayName || typeof displayName !== 'string' || displayName.trim().length < 1) {

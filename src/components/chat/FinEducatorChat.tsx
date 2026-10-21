@@ -59,9 +59,16 @@ export function FinEducatorChat() {
     setError(null);
 
     try {
+      const { auth } = await import('@/lib/firebase');
+      const idToken = await auth.currentUser?.getIdToken();
+      if (!idToken) {
+        setError('Please sign in to chat with the Fin Educator.');
+        setLoading(false);
+        return;
+      }
       const res = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
         body: JSON.stringify({ message: userText, threadId }),
       });
 

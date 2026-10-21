@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFirebaseAdmin } from '@/lib/firebaseAdmin';
+import { requireUid, rateLimit } from '@/lib/serverSecurity';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,13 +13,18 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { uid, token, platform } = body;
+    // SECURITY (2026-10-20): uid used to come from the body with no auth, so
+    // anyone could overwrite/disable any user's push token. Token-derived now.
+    const authed = await requireUid(req);
+    if (authed instanceof NextResponse) return authed;
+    const uid = authed.uid;
+    const limited = await rateLimit(`push-token:${uid}`, 30, 3600);
+    if (limited) return limited;
 
-    if (!uid || typeof uid !== 'string' || uid.trim().length < 5) {
-      return NextResponse.json({ error: 'Invalid uid' }, { status: 400 });
-    }
-    if (!token || typeof token !== 'string') {
+    const body = await req.json();
+    const { token, platform } = body;
+
+    if (!token || typeof token !== 'string' || token.length > 4096) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 400 });
     }
     if (!['ios', 'android'].includes(platform)) {
@@ -47,10 +53,9 @@ export async function POST(req: NextRequest) {
  */
 export async function DELETE(req: NextRequest) {
   try {
-    const { uid } = await req.json();
-    if (!uid || typeof uid !== 'string') {
-      return NextResponse.json({ error: 'Invalid uid' }, { status: 400 });
-    }
+    const authed = await requireUid(req);
+    if (authed instanceof NextResponse) return authed;
+    const uid = authed.uid;
 
     const { db } = await getFirebaseAdmin();
     await db.collection('users').doc(uid).update({

@@ -15,17 +15,14 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getFirebaseAdmin } from '@/lib/firebaseAdmin';
+import { PLANS, type PlanKey } from '@/lib/razorpayServer';
+import { rateLimit } from '@/lib/serverSecurity';
 
 export const dynamic = 'force-dynamic';
 
-// Pricing in paise (1 INR = 100 paise)
-// Monthly: ₹149 | Annual: ₹599 (saves ₹1,189 vs monthly × 12)
-const PLANS = {
-  monthly: { amount: 10000, label: 'SpendXP Premium — 1 Month' },
-  annual:  { amount: 39900, label: 'SpendXP Premium — 12 Months' },
-} as const;
+// Pricing lives in lib/razorpayServer.ts so create-order and verify/webhook
+// can never disagree about what a plan costs. Monthly ₹100 | Annual ₹399.
 
-type PlanKey = keyof typeof PLANS;
 
 export async function POST(request: NextRequest) {
   // NEXT_PUBLIC_ prefix makes it available client-side too; server can also read it
@@ -53,6 +50,9 @@ export async function POST(request: NextRequest) {
   } catch {
     return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
   }
+
+  const limited = await rateLimit(`create-order:${uid}`, 20, 3600);
+  if (limited) return limited;
 
   // ── Parse plan ───────────────────────────────────────────────────────────────
   let plan: PlanKey = 'monthly';

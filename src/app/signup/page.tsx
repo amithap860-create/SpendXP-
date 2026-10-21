@@ -11,8 +11,6 @@ import { User, Mail, Lock, ShieldCheck, AlertCircle, Calendar, ChevronDown, Chec
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { collection, query, where, getDocs, doc, serverTimestamp, writeBatch, arrayUnion } from 'firebase/firestore';
-import { db } from '@/firebase';
 import { auth } from '@/lib/firebase';
 import { isNative } from '@/lib/native';
 
@@ -29,65 +27,24 @@ function calcAge(birthYear: number): number {
 type Step = 'age-gate' | 'signup-form' | 'parent-consent' | 'consent-sent';
 
 // ── Process a pendingParentInvites code after account creation ────────────────
+// SECURITY (2026-10-20): this used to write linkRequests/users docs straight from
+// the browser. Firestore rules (correctly) block that — parentUid is a
+// server-only field — so it silently failed. Linking now goes through the
+// server route, which validates the code, expiry, and rate limits.
 async function processInviteCode(
   inviteCode: string,
-  newUserUid: string,
-  newUserEmail: string
+  _newUserUid: string,
+  _newUserEmail: string
 ): Promise<boolean> {
   try {
-    const q = query(
-      collection(db, 'pendingParentInvites'),
-      where('inviteCode', '==', inviteCode)
-    );
-    const snap = await getDocs(q);
-    const inviteDoc = snap.docs[0];
-
-    if (!inviteDoc) return false;
-
-    const inviteData = inviteDoc.data();
-
-    // Support both ISO string and Firestore Timestamp expiresAt
-    const expiresAt =
-      typeof inviteData.expiresAt === 'string'
-        ? new Date(inviteData.expiresAt)
-        : inviteData.expiresAt?.toDate?.() ?? new Date(0);
-
-    if (expiresAt < new Date()) return false;
-
-    const batch = writeBatch(db);
-
-    const linkRef = doc(db, 'linkRequests', `${inviteData.childUid}_${newUserUid}`);
-    batch.set(linkRef, {
-      parentUid: newUserUid,
-      childUid: inviteData.childUid,
-      parentEmail: newUserEmail.toLowerCase(),
-      childEmail: inviteData.childEmail || '',
-      status: 'accepted',
-      createdAt: serverTimestamp(),
+    const idToken = await auth.currentUser?.getIdToken();
+    if (!idToken) return false;
+    const res = await fetch('/api/parent/accept-invite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+      body: JSON.stringify({ inviteCode }),
     });
-
-    batch.update(doc(db, 'users', inviteData.childUid), {
-      parentLinked: true,
-      parentUid: newUserUid,
-      parentEmail: newUserEmail.toLowerCase(),
-      pendingParentEmail: null,
-      parentLinkedAt: new Date().toISOString(),
-    });
-
-    batch.update(doc(db, 'users', newUserUid), {
-      linkedChildren: arrayUnion(inviteData.childUid),
-      isParent: true,
-      setupComplete: true,
-    });
-
-    batch.update(inviteDoc.ref, {
-      status: 'accepted',
-      acceptedAt: serverTimestamp(),
-      acceptedByUid: newUserUid,
-    });
-
-    await batch.commit();
-    return true;
+    return res.ok;
   } catch (err) {
     console.error('[processInviteCode] Error:', err);
     return false;

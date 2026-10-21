@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFirebaseAdmin } from '@/lib/firebaseAdmin';
+import { rateLimit, clientIp } from '@/lib/serverSecurity';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
+  // Public form (works signed-out), so limit by IP to stop ticket spam.
+  const limited = await rateLimit(`support:ip:${clientIp(request)}`, 5, 3600);
+  if (limited) return limited;
+
   try {
     const body = await request.json();
     const { name, email, category, message } = body;
+    if ([name, email, message, category ?? ''].some((v) => typeof v !== 'string') || name.length > 100 || email.length > 254) {
+      return NextResponse.json({ error: 'Invalid input.' }, { status: 400 });
+    }
 
     if (!name?.trim() || !email?.trim() || !message?.trim()) {
       return NextResponse.json({ error: 'Name, email, and message are required.' }, { status: 400 });
@@ -43,8 +51,9 @@ export async function POST(request: NextRequest) {
       console.error('[SpendXP] Failed to write support ticket to Firestore:', dbErr);
     }
 
-    // Always log to server output so Vercel logs capture it
-    console.log('[SpendXP] SUPPORT TICKET:', JSON.stringify(ticket, null, 2));
+    // Log without personal data (name/email/message stay in Firestore only —
+    // Vercel logs are retained and visible to anyone with project access).
+    console.log('[SpendXP] SUPPORT TICKET received, category:', ticket.category);
 
     return NextResponse.json({
       success: true,

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFirebaseAdmin } from '@/lib/firebaseAdmin';
-import crypto from 'crypto';
+import { newInviteCode, rateLimit } from '@/lib/serverSecurity';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,6 +34,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
   }
 
+  const limited = await rateLimit(`gen-parent-invite:${uid}`, 10, 3600);
+  if (limited) return limited;
+
   const { db } = await getFirebaseAdmin();
 
   // ── Check if already linked ────────────────────────────────────────────────
@@ -56,7 +59,8 @@ export async function POST(req: NextRequest) {
 
   // ── Generate new invite code ───────────────────────────────────────────────
   // 6 alphanumeric uppercase chars — easy to read/type if needed
-  const inviteCode = crypto.randomBytes(4).toString('hex').toUpperCase().slice(0, 6);
+  // SECURITY (2026-10-20): was 6 hex chars (~16.7M combos, brute-forceable).
+  const inviteCode = newInviteCode(12);
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
   const inviteRef = db.collection('pendingParentInvites').doc(inviteCode);

@@ -153,7 +153,10 @@ service cloud.firestore {
 
     // Leaderboard
     match /leaderboard/{uid} {
-      allow read: if true;
+      // SECURITY (2026-10-20): was `if true` — the whole leaderboard (uid +
+      // displayName of every child) was readable by anyone on the internet,
+      // no account needed. Signed-in users only now.
+      allow read: if request.auth != null;
       allow write: if isOwner(uid) || isStudioPreview();
     }
 
@@ -172,16 +175,19 @@ service cloud.firestore {
     match /linkRequests/{id} {
       allow read: if isOwner(resource.data.parentUid) || isOwner(resource.data.childUid) || isStudioPreview();
       // For CREATE: document doesn't exist yet — check request.resource.data (incoming)
-      allow create: if isOwner(request.resource.data.parentUid) || isOwner(request.resource.data.childUid) || isStudioPreview();
-      // For UPDATE/DELETE: document exists — check resource.data (existing)
-      allow update, delete: if isOwner(resource.data.parentUid) || isOwner(resource.data.childUid) || isStudioPreview();
+      // SECURITY (2026-10-20): links are created ONLY by the Admin-SDK accept
+      // routes, which validate the invite. Client writes are no longer allowed —
+      // a client-created link record could otherwise impersonate a real link.
+      allow create, update: if false;
+      allow delete: if isOwner(resource.data.parentUid) || isOwner(resource.data.childUid);
     }
 
     // Pending parent invites — same create vs update pattern
     match /pendingParentInvites/{id} {
       allow read: if isOwner(resource.data.childUid) || isStudioPreview();
-      allow create: if isOwner(request.resource.data.childUid) || isStudioPreview();
-      allow update, delete: if isOwner(resource.data.childUid) || isStudioPreview();
+      // Created/accepted only by /api/parent/generate-invite + accept-invite (Admin SDK).
+      allow create, update: if false;
+      allow delete: if isOwner(resource.data.childUid);
     }
 
     // Consent requests

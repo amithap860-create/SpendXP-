@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFirebaseAdmin } from '@/lib/firebaseAdmin';
+import { newInviteCode, rateLimit } from '@/lib/serverSecurity';
 import { emailService } from '@/lib/email';
-import crypto from 'crypto';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,6 +35,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
   }
 
+  // Each call sends a real email — cap it so this can't be used as a spam relay.
+  const limited = await rateLimit(`email-child-invite:${parentUid}`, 5, 86400);
+  if (limited) return limited;
+
   const body = await req.json().catch(() => ({}));
   const childEmail = (body.childEmail || '').toLowerCase().trim();
 
@@ -61,7 +65,8 @@ export async function POST(req: NextRequest) {
   existing.docs.forEach((d) => batch.delete(d.ref));
 
   // ── Generate new invite code ───────────────────────────────────────────────
-  const inviteCode = crypto.randomBytes(4).toString('hex').toUpperCase().slice(0, 6);
+  // SECURITY (2026-10-20): was 6 hex chars (~16.7M combos, brute-forceable).
+  const inviteCode = newInviteCode(12);
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
   const inviteRef = db.collection('pendingChildInvites').doc(inviteCode);
