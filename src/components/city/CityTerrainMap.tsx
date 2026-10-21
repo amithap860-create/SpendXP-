@@ -2,6 +2,7 @@
 
 import React from 'react';
 import type { ResolvedArea } from '@/config/cityMap';
+import { AreaGlyphPaths } from '@/components/city/AreaGlyph';
 
 /**
  * SpendCity terrain map (2026-10-20): an original top-down overview — sea,
@@ -122,8 +123,15 @@ export function CityTerrainMap({
             style={{ cursor: interactive ? 'pointer' : undefined, outline: 'none' }}>
             {isSel && <circle cx={s.cx} cy={s.cy} r="30" fill="none" stroke="#f5c542" strokeWidth="2.5" strokeDasharray="5 4" />}
             <circle cx={s.cx} cy={s.cy} r="21" fill="#10202c" stroke={ring} strokeWidth={isCleared ? 4 : 3} strokeDasharray={open ? undefined : '4 4'} />
-            <text x={s.cx} y={s.cy + 8} textAnchor="middle" fontSize="23" opacity={open ? 1 : 0.4}>{open ? a.emoji : '🔒'}</text>
-            {isCleared && <text x={s.cx + 16} y={s.cy - 14} fontSize="16" fill="#f5c542" stroke="#10202c" strokeWidth="2" paintOrder="stroke">✦</text>}
+            <g transform={`translate(${s.cx - 13} ${s.cy - 13}) scale(1.08)`} fill="none" stroke={open ? '#ffffff' : '#9aa5b3'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity={open ? 1 : 0.8}>
+              {open ? <AreaGlyphPaths id={a.id} /> : <><rect x="5" y="11" width="14" height="9.5" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></>}
+            </g>
+            {isCleared && (
+              <g transform={`translate(${s.cx + 10} ${s.cy - 24})`}>
+                <circle cx="7" cy="7" r="8" fill="#f5c542" stroke="#10202c" strokeWidth="2" />
+                <path d="m3.5 7.2 2.4 2.4 4.6-4.9" fill="none" stroke="#10202c" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+              </g>
+            )}
             <text x={s.cx} y={s.cy + 40} textAnchor="middle" fontSize="13.5" fontWeight="800" fill="#fff" stroke="#10202c" strokeWidth="3.5" paintOrder="stroke" strokeLinejoin="round">{a.name.replace('The ', '')}</text>
             <text x={s.cx} y={s.cy + 54} textAnchor="middle" fontSize="11" fontWeight="700" fill={isCleared ? '#f5c542' : '#e6edf3'} stroke="#10202c" strokeWidth="3" paintOrder="stroke" strokeLinejoin="round">{progress(i)}</text>
             {showNext && i === nextAreaIdx && <text x={s.cx + 24} y={s.cy + 4} fontSize="12" fontWeight="900" fill="#f5c542" stroke="#10202c" strokeWidth="3" paintOrder="stroke">NEXT</text>}

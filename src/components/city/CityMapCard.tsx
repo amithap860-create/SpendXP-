@@ -44,7 +44,7 @@ export function CityMapCard({ xp }: { xp: number }) {
       <div className="px-5 pb-5 pt-1 space-y-3">
         {nextArea && nextLevel ? (
           <div className="rounded-2xl bg-secondary p-4 space-y-1">
-            <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">Next mission · {nextArea.emoji} {nextArea.name} · {fog?.emoji} {fog?.name}</p>
+            <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">Next mission · {nextArea.name} · {fog?.name}</p>
             <p className="text-lg font-black text-foreground leading-snug">{nextLevel.title}</p>
             <p className="text-sm text-muted-foreground">
               {lesson ? `Lesson: ${lesson.title}` : ''}{lesson && quest ? ' · ' : ''}{quest ? `Case file: ${quest.title}` : ''}

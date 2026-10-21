@@ -265,3 +265,4 @@ Safer for younger players:
 ## 2026-10-20 — SpendCity terrain map
 - New `CityTerrainMap`: top-down island map (sea, coast, one biome per area, roads, lettered grid, Gray Fog over uncleared areas, gold roads/✦ for cleared). Original artwork, drawn in SVG.
 - Dashboard map card now shows this map (tap opens /city); /city uses it with selectable areas, replacing the winding-path map.
+- Map graphics: emoji and ✦ replaced by drawn line-art area icons (tree, house, bank, globe, domed hall, chart, cap), a padlock for locked areas and a gold check badge for crime-free. Same icons used in the /city area heading; emoji removed from the map card and city headings.

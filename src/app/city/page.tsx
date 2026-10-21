@@ -15,6 +15,7 @@ import { SceneReader } from '@/components/story/SceneReader';
 import { AREA_SCENES, LEVEL_SCENES, CLEARED_SCENES } from '@/config/cityStory';
 import type { SceneBeat } from '@/config/characters';
 import { Play } from 'lucide-react';
+import { AreaIcon } from '@/components/city/AreaGlyph';
 import { CityTerrainMap } from '@/components/city/CityTerrainMap';
 
 /**
@@ -123,7 +124,7 @@ export default function CityMapPage() {
         <p className="text-base text-muted-foreground">Clear each area of its villain. Finish every level — one lesson and one case file — and the area is crime-free.</p>
         <div className="rounded-2xl border bg-card p-4 space-y-2">
           <div className="flex items-center justify-between text-sm font-black uppercase tracking-widest">
-            <span className="text-primary">{rank.emoji} {rank.name} · {xp.toLocaleString()} XP</span>
+            <span className="text-primary">{rank.name} · {xp.toLocaleString()} XP</span>
             <span className="text-muted-foreground">{clearedCount}/{areas.length} areas crime-free</span>
           </div>
           <div className="h-3 rounded-full bg-muted overflow-hidden">
@@ -167,11 +168,11 @@ export default function CityMapPage() {
           <section className="rounded-3xl border bg-card p-5 space-y-4">
             <div>
               <p className="text-xs font-black uppercase tracking-widest text-primary">{selected.topic}</p>
-              <h2 className="text-2xl font-black text-foreground">{selected.emoji} {selected.name}</h2>
+              <h2 className="text-2xl font-black text-foreground flex items-center gap-2"><AreaIcon id={selected.id} className="h-7 w-7 text-primary" /> {selected.name}</h2>
             </div>
 
             <div className="rounded-2xl bg-secondary p-4 space-y-1">
-              <p className="text-sm font-black uppercase tracking-widest text-muted-foreground">Villain · {fog.emoji} {fog.name}</p>
+              <p className="text-sm font-black uppercase tracking-widest text-muted-foreground">Villain · {fog.name}</p>
               <p className="text-base text-foreground">{fog.description}</p>
               <p className="text-sm text-muted-foreground"><span className="font-black text-foreground">Weakness:</span> {fog.weakness}</p>
             </div>
@@ -248,7 +249,7 @@ export default function CityMapPage() {
           <div className="lesson-pop max-w-sm w-full rounded-3xl bg-card border-2 border-gold p-7 text-center space-y-4">
             <Sparkles className="h-12 w-12 mx-auto text-gold" />
             <p className="text-xs font-black uppercase tracking-widest text-gold">Crime-free</p>
-            <h2 className="text-3xl font-black text-foreground">{celebrate.emoji} {celebrate.name}</h2>
+            <h2 className="text-3xl font-black text-foreground">{celebrate.name}</h2>
             <p className="text-lg text-muted-foreground leading-relaxed">{celebrate.clearedLine}</p>
             <Button onClick={() => { const i = areas.findIndex(a => a.id === celebrate.id); const n = areas[i + 1]; if (n) setSelectedId(n.id); setCelebrate(null); }} className="w-full h-12 text-lg font-black rounded-2xl">
               {areas.findIndex(a => a.id === celebrate.id) < areas.length - 1 ? 'On to the next area' : 'Back to the map'}
