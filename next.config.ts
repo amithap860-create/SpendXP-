@@ -1,5 +1,4 @@
 import type { NextConfig } from 'next';
-import withPWAInit from '@ducanh2912/next-pwa';
 
 // PWA/service worker fully disabled as of 2026-08-24. Across one debugging
 // session it was traced as the root cause of: the native app failing to
@@ -11,71 +10,8 @@ import withPWAInit from '@ducanh2912/next-pwa';
 // already had the service worker torn out separately in src/lib/native.ts
 // (disableServiceWorkerIfNative) as a safety net for existing installs;
 // this stops a new one from ever being generated again, for web or native.
-const withPWA = withPWAInit({
-  dest: 'public',
-  disable: true,
-  workboxOptions: {
-    disableDevLogs: true,
-    skipWaiting: true,
-    clientsClaim: true,
-    cleanupOutdatedCaches: true,
-    // Cache strategies for different route types
-    runtimeCaching: [
-      // Google Fonts
-      {
-        urlPattern: /^https:\/\/fonts\.(?:gstatic|googleapis)\.com\/.*/i,
-        handler: 'CacheFirst',
-        options: {
-          cacheName: 'google-fonts',
-          expiration: { maxEntries: 4, maxAgeSeconds: 365 * 24 * 60 * 60 },
-        },
-      },
-      // Firebase Auth & Firestore API calls — NetworkFirst so data stays fresh
-      {
-        urlPattern: /^https:\/\/.*\.googleapis\.com\/.*/i,
-        handler: 'NetworkFirst',
-        options: {
-          cacheName: 'firebase-api',
-          networkTimeoutSeconds: 10,
-          expiration: { maxEntries: 32, maxAgeSeconds: 24 * 60 * 60 },
-        },
-      },
-      // App pages — NetworkFirst with a short cache lifetime. This is
-      // intentionally short (1 hour, not 24) so a phone that was offline or
-      // slow when it reopened the app falls back to a recent shell, not a
-      // build that's a day (or several deploys) old.
-      {
-        urlPattern: ({ url }: { url: URL }) => url.pathname.startsWith('/') && !url.pathname.startsWith('/api/'),
-        handler: 'NetworkFirst',
-        options: {
-          cacheName: 'pages',
-          networkTimeoutSeconds: 10,
-          expiration: { maxEntries: 32, maxAgeSeconds: 60 * 60 },
-        },
-      },
-      // Static assets (JS/CSS chunks) — StaleWhileRevalidate. Safe to keep
-      // long-lived since Next.js content-hashes these filenames; a new
-      // deploy produces new filenames rather than overwriting old ones.
-      {
-        urlPattern: /\/_next\/static\/.*/i,
-        handler: 'CacheFirst',
-        options: {
-          cacheName: 'next-static',
-          expiration: { maxEntries: 128, maxAgeSeconds: 365 * 24 * 60 * 60 },
-        },
-      },
-      // Images
-      {
-        urlPattern: /\.(?:jpg|jpeg|gif|png|svg|ico|webp)$/i,
-        handler: 'StaleWhileRevalidate',
-        options: {
-          cacheName: 'static-images',
-          expiration: { maxEntries: 64, maxAgeSeconds: 30 * 24 * 60 * 60 },
-        },
-      },
-    ],
-  },
-});
+// @ducanh2912/next-pwa removed 2026-10-22 (security pass 2): it was already
+// `disable: true` (see above) and only pulled in vulnerable build-time deps.
 
 const securityHeaders = [
   { key: 'X-Frame-Options', value: 'DENY' },
@@ -156,4 +92,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withPWA(nextConfig);
+export default nextConfig;

@@ -30,8 +30,13 @@ const config: CapacitorConfig = {
     // confirming this was the cause rather than a network/DNS block).
     allowNavigation: [
       'spendxp.vercel.app',
-      '*.firebaseapp.com',
-      '*.googleapis.com',
+      // Exact auth domain only — '*.firebaseapp.com' let ANY Firebase project's
+      // hosted page load inside the app with native-bridge access.
+      'studio-7609169345-afafa.firebaseapp.com',
+      // '*.googleapis.com' removed 2026-10-22: anyone can host a page on
+      // storage.googleapis.com, and any page allowed here runs inside the app
+      // with the native bridge. API calls (fetch/XHR) to googleapis aren't
+      // governed by allowNavigation, so nothing needs it.
       '*.razorpay.com',
     ],
   },

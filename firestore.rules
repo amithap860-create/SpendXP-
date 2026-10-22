@@ -18,9 +18,9 @@ service cloud.firestore {
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
 
-    function isStudioPreview() {
-      return request.auth != null && request.auth.token.firebase.sign_in_provider == 'custom';
-    }
+    // isStudioPreview() removed 2026-10-22: it granted FULL read/write on every
+    // collection to any custom-token sign-in (Firebase Studio preview). Not
+    // something production should ship with.
 
     // Fields that must only be written by server-side Admin SDK (e.g. Stripe webhook).
     // Clients are never allowed to set these directly — even on their own document.
@@ -32,8 +32,18 @@ service cloud.firestore {
     // them bypass the whole invite/consent flow and grant read access to
     // their own activity data (gameScores, lessonProgress, healthHistory,
     // etc. — see the /users/{uid} read rule below) to any account they chose.
+    function isContestDoc(gameId) {
+      return gameId.matches('stockContest_.*');
+    }
+
+    // Start is $1,000; anything above 6x is not a real result.
+    function contestValuesSane() {
+      return request.resource.data.get('bestFinalValue', 0) <= 6000
+          && request.resource.data.get('bestReturnPct', 0) <= 500;
+    }
+
     function hasProtectedFields(data) {
-      return data.keys().hasAny(['isPremium', 'isAdmin', 'stripeCustomerId', 'stripeSubscriptionId', 'parentUid', 'consentGiven', 'coppaConsented']);
+      return data.keys().hasAny(['isPremium', 'isAdmin', 'stripeCustomerId', 'stripeSubscriptionId', 'parentUid', 'consentGiven', 'coppaConsented', 'subscriptionEndAt', 'premiumPlan', 'premiumActivatedAt', 'razorpayPaymentId', 'razorpayOrderId']);
     }
 
     // User documents
@@ -57,95 +67,108 @@ service cloud.firestore {
       // itself.
       allow read: if isOwner(uid)
                   || (request.auth != null && resource.data.parentUid == request.auth.uid)
-                  || isAdmin()
-                  || isStudioPreview();
+                  || isAdmin();
 
       // Create: owner can create their own doc, but cannot set protected fields
-      allow create: if (isOwner(uid) && !hasProtectedFields(request.resource.data))
-                    || isStudioPreview();
+      allow create: if (isOwner(uid) && !hasProtectedFields(request.resource.data));
 
       // Update: owner can update their doc, but cannot add/change protected fields
-      allow update: if (isOwner(uid) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isPremium', 'isAdmin', 'stripeCustomerId', 'stripeSubscriptionId', 'parentUid', 'consentGiven', 'coppaConsented']))
-                    || isStudioPreview();
+      allow update: if (isOwner(uid) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isPremium', 'isAdmin', 'stripeCustomerId', 'stripeSubscriptionId', 'parentUid', 'consentGiven', 'coppaConsented', 'subscriptionEndAt', 'premiumPlan', 'premiumActivatedAt', 'razorpayPaymentId', 'razorpayOrderId']));
 
       // Delete: disallow client-side account deletion (use Admin SDK / Cloud Function)
       allow delete: if false;
 
       // Subcollections
       match /gameScores/{gameId} {
-        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
         // Client can write non-critical game state (budgetSplit, UI state) but not highScore
         // High scores are submitted via /api/scores/submit (server-validated).
         // Keeping write open here for budgetSplit merge writes from BudgetBlitz component.
-        allow write: if isOwner(uid) || isStudioPreview();
+        allow write: if isOwner(uid) && !isContestDoc(gameId);
+
+        // Stock contest docs (2026-10-22): attempts may only go up by one,
+        // never past 3, the doc can't be deleted/reset, and reported results
+        // must be within a sane bound. This does NOT make self-reported scores
+        // trustworthy — only a server-side replay can — but it stops the
+        // trivial cheats (unlimited retries, resetting attempts, 1e9 scores).
+        allow create: if isOwner(uid) && isContestDoc(gameId)
+                      && request.resource.data.get('attemptsStarted', 0) == 1
+                      && contestValuesSane();
+        allow update: if isOwner(uid) && isContestDoc(gameId)
+                      && request.resource.data.get('attemptsStarted', 0) >= resource.data.get('attemptsStarted', 0)
+                      && request.resource.data.get('attemptsStarted', 0) <= resource.data.get('attemptsStarted', 0) + 1
+                      && request.resource.data.get('attemptsStarted', 0) <= 3
+                      && contestValuesSane();
       }
 
       match /progression/{doc} {
-        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
-        allow write: if isOwner(uid) || isStudioPreview();
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
+        allow write: if isOwner(uid);
       }
 
       match /lessonProgress/{lessonId} {
-        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
-        allow write: if isOwner(uid) || isStudioPreview();
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
+        allow write: if isOwner(uid);
       }
 
       match /activityLog/{logId} {
-        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
-        allow create: if isOwner(uid) || isStudioPreview();
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
+        allow create: if isOwner(uid);
         allow update: if false;
-        allow delete: if isOwner(uid) || isStudioPreview();
+        allow delete: if isOwner(uid);
       }
 
       match /questProgress/{questId} {
-        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
-        allow write: if isOwner(uid) || isStudioPreview();
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
+        allow write: if isOwner(uid);
       }
 
       match /savingsGoals/{goalId} {
-        allow read: if isOwner(uid) || isStudioPreview();
-        allow write: if isOwner(uid) || isStudioPreview();
+        allow read: if isOwner(uid);
+        allow write: if isOwner(uid);
       }
 
       match /virtualInvestments/{investmentId} {
-        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
-        allow write: if isOwner(uid) || isStudioPreview();
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
+        allow write: if isOwner(uid);
       }
 
       match /toolsUsed/{doc} {
-        allow read: if isOwner(uid) || isStudioPreview();
-        allow write: if isOwner(uid) || isStudioPreview();
+        allow read: if isOwner(uid);
+        allow write: if isOwner(uid);
       }
 
       match /healthHistory/{doc} {
-        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
-        allow write: if isOwner(uid) || isStudioPreview();
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
+        allow write: if isOwner(uid);
       }
 
       match /notifications/{notifId} {
-        allow read: if isOwner(uid) || isStudioPreview();
-        allow write: if isOwner(uid) || isStudioPreview();
+        allow read: if isOwner(uid);
+        allow write: if isOwner(uid);
       }
 
       match /parentControls/{doc} {
-        allow read: if isOwner(uid) || isParentOf(uid) || isStudioPreview();
-        allow write: if isOwner(uid) || isParentOf(uid) || isStudioPreview();
+        allow read: if isOwner(uid) || isParentOf(uid);
+        // Only the linked parent sets controls — a child could previously
+        // switch off their own parental controls.
+        allow write: if isParentOf(uid);
       }
 
       match /profile/{doc} {
-        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
-        allow write: if isOwner(uid) || isStudioPreview();
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
+        allow write: if isOwner(uid);
       }
 
       match /resourceProgress/{doc} {
-        allow read: if isOwner(uid) || isStudioPreview();
-        allow write: if isOwner(uid) || isStudioPreview();
+        allow read: if isOwner(uid);
+        allow write: if isOwner(uid);
       }
 
       // Daily quest/activity counters — written server-side via Admin SDK (bypasses rules)
       // Client only reads (to show "X of 3 quests today")
       match /dailyActivity/{dateKey} {
-        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin() || isStudioPreview();
+        allow read: if isOwner(uid) || isParentOf(uid) || isAdmin();
         // Writes are done via Admin SDK in /api/quests/complete — no client write needed
         allow write: if false;
       }
@@ -157,23 +180,23 @@ service cloud.firestore {
       // displayName of every child) was readable by anyone on the internet,
       // no account needed. Signed-in users only now.
       allow read: if request.auth != null;
-      allow write: if isOwner(uid) || isStudioPreview();
+      allow write: if isOwner(uid);
     }
 
     // Daily challenges
     match /dailyChallenges/{date} {
       allow read: if true;
-      allow write: if isAdmin() || isStudioPreview();
+      allow write: if isAdmin();
 
       match /scores/{uid} {
         allow read: if true;
-        allow write: if isOwner(uid) || isStudioPreview();
+        allow write: if isOwner(uid);
       }
     }
 
     // Link requests — split create vs update/delete to use correct resource reference
     match /linkRequests/{id} {
-      allow read: if isOwner(resource.data.parentUid) || isOwner(resource.data.childUid) || isStudioPreview();
+      allow read: if isOwner(resource.data.parentUid) || isOwner(resource.data.childUid);
       // For CREATE: document doesn't exist yet — check request.resource.data (incoming)
       // SECURITY (2026-10-20): links are created ONLY by the Admin-SDK accept
       // routes, which validate the invite. Client writes are no longer allowed —
@@ -184,7 +207,7 @@ service cloud.firestore {
 
     // Pending parent invites — same create vs update pattern
     match /pendingParentInvites/{id} {
-      allow read: if isOwner(resource.data.childUid) || isStudioPreview();
+      allow read: if isOwner(resource.data.childUid);
       // Created/accepted only by /api/parent/generate-invite + accept-invite (Admin SDK).
       allow create, update: if false;
       allow delete: if isOwner(resource.data.childUid);
@@ -192,44 +215,47 @@ service cloud.firestore {
 
     // Consent requests
     match /consentRequests/{uid} {
-      allow read: if isOwner(uid) || isParentOf(uid) || isStudioPreview();
-      allow write: if isOwner(uid) || isParentOf(uid) || isStudioPreview();
+      allow read: if isOwner(uid) || isParentOf(uid);
+      // Consent records are written only by the consent API routes (Admin SDK).
+      allow write: if false;
     }
 
     // Security log
     match /securityLog/{uid}/events/{id} {
-      allow read: if isOwner(uid) || isAdmin() || isStudioPreview();
-      allow write: if isOwner(uid) || isAdmin() || isStudioPreview();
+      allow read: if isOwner(uid) || isAdmin();
+      // Users could previously edit/delete their own security events.
+      allow create: if isOwner(uid) || isAdmin();
+      allow update, delete: if isAdmin();
     }
 
     // Auth attempts
     match /authAttempts/{email} {
-      allow read: if isAdmin() || isStudioPreview();
-      allow write: if isAdmin() || isStudioPreview();
+      allow read: if isAdmin();
+      allow write: if isAdmin();
     }
 
     // Bug reports — any signed-in user can create; only admins can read/update
     match /bugReports/{id} {
-      allow create: if request.auth != null || isStudioPreview();
-      allow read, update: if isAdmin() || isStudioPreview();
+      allow create: if request.auth != null;
+      allow read, update: if isAdmin();
     }
 
     // Waitlist — any signed-in user can add their own entry; only admins can read
     match /waitlist/{id} {
-      allow create: if request.auth != null || isStudioPreview();
-      allow read, update, delete: if isAdmin() || isStudioPreview();
+      allow create: if request.auth != null;
+      allow read, update, delete: if isAdmin();
     }
 
     // Payment records — written exclusively by Admin SDK (verify-payment route).
     // Users can read their own payments; only admins can see all.
     match /payments/{id} {
-      allow read: if isAdmin() || isStudioPreview();
+      allow read: if isAdmin();
       allow write: if false; // Admin SDK bypasses rules — no client writes needed
     }
 
     // Support tickets — no client write (route uses Admin SDK); admins read
     match /supportTickets/{id} {
-      allow read, update: if isAdmin() || isStudioPreview();
+      allow read, update: if isAdmin();
       allow write: if false; // Admin SDK only
     }
   }

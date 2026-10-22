@@ -23,7 +23,7 @@
  * left with no levels are hidden.
  */
 
-import type { AgeGroup } from '@/data/quests';
+import type { AgeGroup } from '@/lib/ageAdapt';
 
 export type MapLevel = {
   id: string;
