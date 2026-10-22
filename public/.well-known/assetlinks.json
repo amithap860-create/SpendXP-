@@ -1,11 +1,14 @@
 [
   {
-    "relation": ["delegate_permission/common.handle_all_urls"],
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
     "target": {
       "namespace": "android_app",
       "package_name": "com.spendxp.app",
       "sha256_cert_fingerprints": [
-        "3D:74:0A:03:84:72:2E:EC:EF:0F:17:A3:F2:F9:7C:49:5A:C8:72:B5:0B:AA:76:6B:D2:2A:7E:60:96:E2:BC:FA"
+        "3D:74:0A:03:84:72:2E:EC:EF:0F:17:A3:F2:F9:7C:49:5A:C8:72:B5:0B:AA:76:6B:D2:2A:7E:60:96:E2:BC:FA",
+        "A6:C0:90:56:15:28:D0:3E:45:79:49:A9:5E:23:DC:75:7C:51:87:04:DA:02:0E:41:C3:87:F9:72:E8:5C:8C:6F"
       ]
     }
   }
